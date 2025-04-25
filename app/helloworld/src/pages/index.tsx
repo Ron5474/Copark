@@ -24,6 +24,8 @@ export default function Home() {
         <h1>Hello World!</h1>
         <h2>Contibutors</h2>
         <p>Atharva Tawde</p>
+        <p>Jiancheng Xiong</p>
+		<p>Bryant Oliver</p>
       </div>
     </>
   );

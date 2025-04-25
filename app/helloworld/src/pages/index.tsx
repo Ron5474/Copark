@@ -26,7 +26,8 @@ export default function Home() {
         <p>Atharva Tawde</p>
         <p>Swayam Shah</p>
         <p>Jiancheng Xiong</p>
-		    <p>Bryant Oliver</p>
+	    <p>Bryant Oliver</p>
+        <p>Ronak Patel</p>
       </div>
     </>
   );

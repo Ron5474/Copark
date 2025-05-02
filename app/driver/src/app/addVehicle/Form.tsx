@@ -53,7 +53,7 @@ export default function View() {
         'flexDirection': 'column',
         'margin': 'auto',
         'width': '80%',
-        'height': '100vh',
+        // 'height': '100vh',
         'maxWidth': 'calc(100vh * 0.5)',
       }}
     >
@@ -147,7 +147,7 @@ export default function View() {
           width: '100%',
           marginTop: '5vh',
           alignSelf: 'end',
-          fontSize: '1.0rem',
+          fontSize: '1.15rem',
           color: 'white',
           backgroundColor: (theme) => theme.palette.primary.main,
           textTransform: 'none',

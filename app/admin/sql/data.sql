@@ -9,7 +9,7 @@ VALUES (
     'email', 'jxiong0822@outlook.com',
     'phone' , '123-456-7890',
     'pwhash', crypt('password1', gen_salt('bf')),
-    'role', '["admin"]',
+    'role', 'admin',
     'accountStatus', 'active'
   )
 );

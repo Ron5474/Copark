@@ -11,15 +11,17 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import TextField from '@mui/material/TextField'
-import FormGroup from '@mui/material/FormGroup'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
-import Button from '@mui/material/Button'
+import {
+  Box,
+  Typography,
+  TextField,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Button
+ } from '@mui/material'
 
 /**
  * All MUI components/materials taken from mui.com
@@ -35,15 +37,22 @@ import Button from '@mui/material/Button'
 
 
 export default function View() {
-  const [authenticated, setAuthenticated] = useState<boolean|null>(null)
-  const [credentials, setCredentials] = useState({email: '', password: ''})
-  const [rememberMe, setRememberMe] = useState(false)
-  const router = useRouter()
+  const [plateNumber, setPlateNumber] = useState<string>('')
+  const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
+
+  const submitVehicle = () => {
+    setIsValidEntry(plateNumber.length > 0)
+  }
 
   const textFieldStyle = {
+    margin: 0,
+    mt: '5px',
     '& .MuiInputLabel-root': {fontSize: '0.8rem'},
-    '& .MuiFormLabel-asterisk': {display: 'none'},
-    '& input::placeholder': {opacity: '0'}, // hides placeholder text
+    '& .MuiFormHelperText-root': {
+      textAlign: 'left',
+      margin: 0,
+      mt: '5px',
+    },
   }
 
   return (
@@ -51,7 +60,6 @@ export default function View() {
       sx={{
         'display': 'flex',
         'flexDirection': 'column',
-        'alignItems': 'center',
         'margin': 'auto',
         'width': '80%',
         'height': '100vh',
@@ -59,76 +67,59 @@ export default function View() {
       }}
     >
       <Typography
-        variant="h6"
+        variant="h5"
         gutterBottom
         sx={{
-          textAlign: 'center',
-          marginTop: '15vh',
+          marginTop: '5vh',
         }}
       >
-        CSE187 Assignment 3
+        Add Vehicle
       </Typography>
-      <TextField
-        required
-        fullWidth
-        error={authenticated === false}
-        variant="standard"
-        margin="normal"
-        label="Email"
-        placeholder="Email"
-        value={credentials.email}
-        sx={textFieldStyle}
-        // onChange={(event) => setCredentials({...credentials, email: event.target.value})}
-      />
-      <TextField
-        required
-        fullWidth
-        error={authenticated === false}
-        helperText={authenticated === false ? 'Invalid credentials' : ''}
-        variant="standard"
-        margin="normal"
-        label="Password"
-        placeholder="Password"
-        type="password"
-        sx={textFieldStyle}
-        // onChange={(event) => setCredentials({...credentials, password: event.target.value})}
-      />
-      <Box
+      <Box sx={{marginTop: '2vh'}}>
+        <Typography
+          variant="body1"
+          sx={{margin: 0}}
+        >
+          License Plate Number
+        </Typography>
+        <TextField
+          required
+          fullWidth
+          error={!isValidEntry}
+          helperText={
+            isValidEntry ?
+            "Must be 1-10 characters" :
+            "License plate number is required"
+          }
+          // label="Email"
+          placeholder="e.g. 1ABC123"
+          value={plateNumber}
+          sx={textFieldStyle}
+          size="small"
+          slotProps={{
+            input: {
+              inputProps: {
+                maxLength: 10,
+              },
+            },
+          }}
+          onChange={(event) => setPlateNumber(event.target.value)}
+        />
+      </Box>
+      <Button
+        onClick={submitVehicle}
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          width: '100%', // Ensures the children take up full width
+          width: '100%',
+          marginTop: '5vh',
+          alignSelf: 'end',
+          fontSize: '1.0rem',
+          color: 'white',
+          backgroundColor: '#41A9AB', //(theme) => theme.palette.primary.light
+          textTransform: 'none',
         }}
       >
-        <FormGroup sx={{'marginTop': '5vh'}}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                aria-label={
-                rememberMe ?
-                'Disable remember me' :
-                'Enable remember me'
-                }
-                onChange={() => setRememberMe(!rememberMe)}
-                sx={{'& .MuiSvgIcon-root': {fontSize: 28}}}
-              />
-            }
-            label="Remember me"
-          />
-        </FormGroup>
-        <Button
-          // onClick={authenticate}
-          sx={{
-            'width': '40%',
-            'marginTop': '5vh',
-            'alignSelf': 'end',
-            'fontSize': '1.0rem',
-          }}
-        >
-          Sign in
-        </Button>
-      </Box>
+        Continue
+      </Button>
     </Box>
   )
 }

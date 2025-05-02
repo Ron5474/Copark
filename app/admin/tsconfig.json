@@ -19,6 +19,7 @@
       }
     ],
     "paths": {
+      "@services/*": ["../microservices/*"],
       "@/*": ["./src/*"]
     }
   },

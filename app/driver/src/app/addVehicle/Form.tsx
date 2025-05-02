@@ -85,6 +85,7 @@ export default function View() {
           // label="Email"
           placeholder="e.g. 1ABC123"
           value={plateNumber}
+          aria-label="Enter license plate number"
           sx={textFieldStyle}
           size="small"
           slotProps={{
@@ -108,6 +109,7 @@ export default function View() {
           select
           fullWidth
           value={country}
+          aria-label="Select a country"
           size="small"
         >
           {Object.keys(locations).map((country) => (
@@ -127,7 +129,8 @@ export default function View() {
         <TextField
           select
           fullWidth
-          value={state}
+          value={locations[country].includes(state) ? state : ''}
+          aria-label="Select a state"
           size="small"
         >
           {locations[country].map((state) => (
@@ -139,6 +142,7 @@ export default function View() {
       </Box>
       <Button
         onClick={submitVehicle}
+        aria-label='Submit vehicle'
         sx={{
           width: '100%',
           marginTop: '5vh',

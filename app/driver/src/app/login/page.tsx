@@ -9,13 +9,19 @@
 #######################################################################
 */
 
-import type { NextPage } from 'next'
+'use client'
 
+import type { NextPage } from 'next'
+import { ThemeProvider } from '@mui/material/styles'
+
+import theme from '../theme'
 import LoginView from './View'
 
 const Page: NextPage = () => {
   return (
-    <LoginView />
+    <ThemeProvider theme={theme}>
+      <LoginView />
+    </ThemeProvider>
   )
 }
 

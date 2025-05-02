@@ -40,6 +40,7 @@ export default function LoginView() {
           variant="outlined"
           startIcon={<GitHubIcon />}
           fullWidth
+          sx={{color: 'black', borderColor: 'black'}}
         >
           Sign In With GitHub
         </Button>
@@ -47,6 +48,7 @@ export default function LoginView() {
           variant="outlined"
           startIcon={<GoogleIcon />}
           fullWidth
+          sx={{color: 'black', borderColor: 'black'}}
         >
           Sign In With Google
         </Button>
@@ -54,6 +56,7 @@ export default function LoginView() {
           variant="outlined"
           startIcon={<FacebookIcon />}
           fullWidth
+          sx={{color: 'black', borderColor: 'black'}}
         >
           Sign In With Facebook
         </Button>

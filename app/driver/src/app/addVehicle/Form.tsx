@@ -1,14 +1,3 @@
-/*
-#######################################################################
-#
-# Copyright (C) 2025 David C. Harrison. All right reserved.
-#
-# You may not use, distribute, publish, or modify this code without
-# the express written permission of the copyright holder.
-#
-#######################################################################
-*/
-
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -26,7 +15,6 @@ import {
  * https://mui.com/material-ui/react-box/
  * https://mui.com/material-ui/react-typography/
  * https://mui.com/material-ui/react-text-field/
- * https://mui.com/material-ui/react-checkbox/
  * https://mui.com/material-ui/react-button/
  */
 
@@ -157,7 +145,7 @@ export default function View() {
           alignSelf: 'end',
           fontSize: '1.0rem',
           color: 'white',
-          backgroundColor: '#41A9AB', //(theme) => theme.palette.primary.light
+          backgroundColor: (theme) => theme.palette.primary.main,
           textTransform: 'none',
         }}
       >

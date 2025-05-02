@@ -59,7 +59,7 @@ export default function EnforcementLoginPage() {
             id="email"
             type="email"
             value={email}
-            autoFocus
+            // autoFocus
             onChange={(e) => setEmail(e.target.value)}
             startAdornment={
               <InputAdornment position="start">

@@ -1,0 +1,26 @@
+{
+  "entryFile": "./server/app.ts",
+  "noImplicitAdditionalProperties": "throw-on-extras",
+  "controllerPathGlobs": ["**/*api.ts"],
+  "spec": {
+    "outputDirectory": "build",
+    "specVersion": 3,
+    "schemes": [ "http" ],
+    "basePath": "/api/v0",
+    "securityDefinitions": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "scopes": {
+          "driver": "driver",
+          "admin": "admin",
+          "enforcer": "enforcer"
+        }
+      }
+    }
+  },
+  "routes": {
+    "routesDir": "build",
+    "authenticationModule": "./auth/expressAuth.ts"
+  }
+}

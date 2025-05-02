@@ -5,10 +5,14 @@ import TopBar from "./components/topBar";
 export default function Home() {
   return (
     <>
+<<<<<<< Updated upstream
       <CssBaseline />
       <Box>
         <TopBar />
       </Box>
+=======
+    Logged In
+>>>>>>> Stashed changes
     </>
   );
 }

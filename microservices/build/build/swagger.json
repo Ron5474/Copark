@@ -1,0 +1,114 @@
+{
+    "openapi": "3.0.0",
+    "components": {
+        "examples": {},
+        "headers": {},
+        "parameters": {},
+        "requestBodies": {},
+        "responses": {},
+        "schemas": {
+            "Authenticated": {
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name"
+                ],
+                "type": "object",
+                "additionalProperties": false
+            },
+            "Credentials": {
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "type": "object",
+                "additionalProperties": false
+            }
+        },
+        "securitySchemes": {
+            "jwt": {
+                "type": "http",
+                "scheme": "bearer",
+                "scopes": {
+                    "driver": "driver",
+                    "admin": "admin",
+                    "enforcer": "enforcer"
+                }
+            }
+        }
+    },
+    "info": {
+        "title": "microservices",
+        "version": "1.0.0",
+        "license": {
+            "name": "ISC"
+        },
+        "contact": {}
+    },
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "operationId": "Login",
+                "responses": {
+                    "200": {
+                        "description": "Ok",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Authenticated"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [],
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Credentials"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/status": {
+            "get": {
+                "operationId": "Status",
+                "responses": {
+                    "200": {
+                        "description": "Ok",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [],
+                "parameters": []
+            }
+        }
+    },
+    "servers": [
+        {
+            "url": "/api/v0"
+        }
+    ]
+}

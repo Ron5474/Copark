@@ -3,18 +3,18 @@ import express, {
   Router,
   Response as ExResponse, 
   Request as ExRequest, 
-  ErrorRequestHandler ,
+  ErrorRequestHandler,
   NextFunction
 } from 'express'
 import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
 
-import {RegisterRoutes} from "../build/routes"
+import { RegisterRoutes } from "../build/routes"
 
 const app: Express = express()
 app.use(cors())
 app.use(express.json())
-app.use(express.urlencoded({extended: false}))
+app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/v0/docs', swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
   res.send(
@@ -26,13 +26,16 @@ const router = Router()
 RegisterRoutes(router)
 app.use('/api/v0', router)
 
+// Enhanced error handler
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next: NextFunction) => {
-  res.status(err.status).json( {
-    message: err.message,
-    errors: err.errors,
-    status: err.status,
+  console.log(process.env.POSTGRES_PASSWORD)
+  console.error('Error occurred:', err) // Log the error to the console for debugging
+
+  res.status(err.status || 500).json({
+    message: err.message || 'Internal Server Error',
+    errors: err.errors || null,
+    status: err.status || 500,
   })
-  _next()
 }
 app.use(errorHandler)
 

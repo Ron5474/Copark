@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "prestart": "npm run build",
-    "start": "node build/src/server.js",
+    "start": "node build/server/server.js",
     "prebuild": "npm run swagger",
     "build": "tsc",
     "predev": "npm run swagger",
@@ -48,6 +48,7 @@
     "express": "*",
     "jsonwebtoken": "*",
     "pg": "*",
+    "jose": "*",
     "swagger-ui-express": "*",
     "tsoa": "*"
   },

@@ -1,13 +1,51 @@
 
 import { SessionUser } from "../server";
-import { AuthUser } from "./index";
+import { AuthUser, Credentials, User } from "./index";
 import { pool } from "./db";
+import { SignJWT } from 'jose'
 import jwt from "jsonwebtoken";
 
+const encodedKey = new TextEncoder().encode(process.env.MASTER_SECRET)
+
 export class AuthService {
+
+   public async authenticate(credentials: Credentials): Promise<User|undefined> {
+    const query = {
+      text: `
+        SELECT jsonb_build_object(
+          'id', id,
+          'name', data->>'name',
+          'email', data->>'email'
+        ) AS user
+        FROM account
+        WHERE data->>'email' = $1
+        AND data->>'pwhash' = crypt($2::text, data->>'pwhash')
+        AND (data->>'deleted' IS NULL OR data->>'deleted' != 'true');
+      `,
+      values: [credentials.email, credentials.password]
+    }
+  
+    const { rows } = await pool.query(query)
+  
+    if (rows.length > 0) {
+      const user = rows[0].user
+      return { id: await user.id, name: user.name }
+    } else {
+      return undefined
+    }
+  }
+
+  public async encrypt(userId: string): Promise<string> {
+    return new SignJWT({ id: userId })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(encodedKey)
+  }
+
   private async getUserById(id: string): Promise<AuthUser | undefined> {
     const query = {
-      text: "SELECT id, data as data FROM member WHERE id = $1 AND data->>'deleted' IS NULL",
+      text: "SELECT id, data as data FROM account WHERE id = $1 AND data->>'deleted' IS NULL",
       values: [id],
     };
 

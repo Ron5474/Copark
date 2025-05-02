@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 import { Credentials, Authenticated } from '../../auth/index'
 import { authenticate, encrypt } from '../../auth/service'
@@ -25,6 +26,7 @@ export async function login(credentials: Credentials) : Promise<Authenticated|un
 }
 
 export async function logout() {
-   const cookieStore = await cookies()
-   cookieStore.delete('session')
+  const cookieStore = await cookies()
+  cookieStore.delete('session')
+  redirect('/login')
 }

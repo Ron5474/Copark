@@ -64,12 +64,13 @@ export default function Page() {
             width: "100%",
           }}
         >
-          <Box sx={{ mb: 3 }}>
+          <Box sx={{ mb: 3, width: '100%', display: 'flex', justifyContent: 'center' }}>
             <Image
               src="/admin_logo.png"
               alt="Admin Logo"
               width={200}
-              height={100}
+              height={0}
+              style={{ width: '200px', height: 'auto' }}
               priority
             />
           </Box>

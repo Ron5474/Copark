@@ -14,6 +14,7 @@ function TopBar() {
       justifyContent: "space-between",
       flexDirection: "row",
       alignItems: "center",
+      borderBottom: "3px solid #41A9AB",
     }}>
      <Image src="/logo-noBg.png" alt="Logo" width={52} height={52} />
      <Box sx={{display: "flex", gap: "10px", alignItems: "center"}}>

@@ -15,11 +15,15 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
 
+import { useRouter } from 'next/navigation'
+import { login } from './actions'
+
 export default function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +31,14 @@ export default function Page() {
     try {
       // TODO: Implement login logic
       console.log("Login attempt with:", { email, password });
+      const authenticated = await login({ email, password })
+      if (authenticated) {
+        window.sessionStorage.setItem('name', authenticated.name)
+        console.log("Login successful:", authenticated);
+
+        // Redirect to the home page
+        router.push('/')
+      }
     } finally {
       setIsLoading(false);
     }

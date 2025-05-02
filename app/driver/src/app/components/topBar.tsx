@@ -16,7 +16,7 @@ function TopBar() {
       alignItems: "center",
       borderBottom: "3px solid #41A9AB",
     }}>
-     <Image src="/logo-noBg.png" alt="Logo" width={52} height={52} />
+     <Image src="/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-logo"/>
      <Box sx={{display: "flex", gap: "10px", alignItems: "center"}}>
       <Avatar sx={{width: "40px", height: "40px"}}/>
       <IconButton>

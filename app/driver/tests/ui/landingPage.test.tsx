@@ -1,12 +1,12 @@
 /**
- * @file Topbar.test.tsx
- * @description This file contains the test cases for the Topbar component.
+ * @file LandingPage.test.tsx
+ * @description This file contains the test cases for the Landing Page.
  * @author Swayam Shah
  */
 
 import { render, screen, cleanup } from '@testing-library/react';
 import { it, expect, afterEach, vi } from 'vitest';
-import Topbar from '../../src/app/components/topBar';
+import Home from '../../src/app/page';
 
 afterEach(() => {
   cleanup()
@@ -14,6 +14,6 @@ afterEach(() => {
 })
 
 it('Renders', async () => {
-  render(<Topbar />);
+  render(<Home />);
   expect(await screen.queryByLabelText('copark-logo')).not.toBeNull();
 });

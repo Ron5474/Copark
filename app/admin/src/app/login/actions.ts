@@ -10,7 +10,7 @@ export async function login(credentials: { email: string; password: string }): P
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(credentials),
-  }).then(res => {console.log('weopeoperokperwwerkopwerkope'); console.log(res); return res;})
+  })
 
   if (response.status === 200) {
     const user = await response.json()

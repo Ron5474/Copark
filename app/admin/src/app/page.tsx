@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Home from './components/Home';
+import ManageEnforcement from './components/ManageEnforcement';
 
 export default function Page() {
   const [currentComponent, setCurrentComponent] = useState<string>('home');
@@ -15,7 +16,7 @@ export default function Page() {
       case 'home':
         return <Home onNavigate={handleNavigate} />;
       case 'enforcement':
-        return <div>Manage Enforcement Component</div>;
+        return <ManageEnforcement onNavigate={handleNavigate} />;
       case 'drivers':
         return <div>Manage Drivers Component</div>;
       case 'tickets':
@@ -31,3 +32,4 @@ export default function Page() {
 
   return renderComponent();
 }
+

@@ -4,9 +4,9 @@
 import { Fragment } from 'react'
 import type { NextPage } from 'next'
 
-import TopBar from '../components/topBar'
+import TopBar from '../shared/topBar'
 import Form from './AddForm'
-import Footer from '../components/footer'
+import Footer from '../shared/footer'
 
 const View: NextPage = () => {
   return (

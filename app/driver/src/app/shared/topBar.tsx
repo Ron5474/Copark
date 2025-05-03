@@ -2,7 +2,6 @@
 
 import { AppBar, Avatar, Box, IconButton } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import Image from "next/image";
 
 function TopBar() {
   return (
@@ -18,7 +17,10 @@ function TopBar() {
       alignItems: "center",
       borderBottom: (theme) => `3px solid ${theme.palette.primary.main}`,
     }}>
-     <Image src="/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-logo"/>
+      <picture>
+        <source srcSet="/logo-noBg.png" type="image/png" />
+        <img src="/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-logo" />
+      </picture>
      <Box sx={{display: "flex", gap: "10px", alignItems: "center"}}>
       <Avatar sx={{width: "40px", height: "40px"}}/>
       <IconButton>

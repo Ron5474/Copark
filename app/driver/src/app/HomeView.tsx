@@ -6,13 +6,15 @@
 
 // import { Box } from "@mui/material";
 import { CssBaseline } from "@mui/material";
-import TopBar from "./components/topBar";
+import TopBar from "./shared/topBar";
+import Footer from "./shared/footer";
 
 function HomeView() {
   return (
     <>
     <CssBaseline />
     <TopBar />
+    <Footer />
     </>
   );
 }

@@ -34,7 +34,7 @@
 // }
 
 export const metadata = {
-  title: 'CSE187 Assignment 3',
+  title: 'copark',
   icons: {
     icon: [
       { url: '/favicon.ico' },

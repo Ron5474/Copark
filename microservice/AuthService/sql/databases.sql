@@ -2,9 +2,9 @@
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-CREATE DATABASE test;
+CREATE DATABASE auth;
 
-\connect test
+\connect auth;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 ----- DO NOT CHANGE ANYTHING IN THIS FILE ------

@@ -9,11 +9,11 @@ import { Box, Button } from "@mui/material";
 function Footer() {
   return (
        <Box sx={{
-        position: "fixed", // or "relative" if not sticking to bottom
+        position: "relative", // or "relative" if not sticking to bottom
         bottom: 0,
         width: "100%",
         backgroundColor: (theme) => theme.palette.primary.light,
-        padding: '15px 12px',
+        padding: '15px 12px 5px 12px',
         display: "flex",
         justifyContent: "space-between",
         flexDirection: "column",

@@ -5,7 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 function TopBar() {
   return (
-  <AppBar position="static"
+  <AppBar position="fixed"
     sx={{
       backgroundColor: (theme) => theme.palette.primary.light,
       width: "100%",

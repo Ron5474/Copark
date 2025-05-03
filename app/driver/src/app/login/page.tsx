@@ -16,7 +16,7 @@ import { ThemeProvider } from '@mui/material/styles'
 
 import theme from '../theme'
 import LoginView from './View'
-import TopBar from '../shared/TopBar'
+import TopBar from '../shared/Topbar'
 import Footer from '../shared/Footer'
 
 const Page: NextPage = () => {

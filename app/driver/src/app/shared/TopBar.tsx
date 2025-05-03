@@ -3,7 +3,7 @@
 import { AppBar, Avatar, Box, IconButton } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 
-function TopBar() {
+function Topbar() {
   return (
   <AppBar position="fixed"
     sx={{
@@ -30,4 +30,4 @@ function TopBar() {
   </AppBar>)
 }
 
-export default TopBar;
+export default Topbar;

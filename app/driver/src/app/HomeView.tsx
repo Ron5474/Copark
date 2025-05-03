@@ -6,7 +6,7 @@
 
 import { Box, Toolbar, Typography } from "@mui/material";
 import { CssBaseline } from "@mui/material";
-import TopBar from "./shared/TopBar";
+import Topbar from "./shared/Topbar";
 import Footer from "./shared/Footer";
 import ZoneField from "./homeComponents/ZoneField";
 import GetStartedButton from "./homeComponents/GetStartedButton";
@@ -16,7 +16,7 @@ function HomeView() {
   return (
     <>
     <CssBaseline />
-    <TopBar />
+    <Topbar />
     <Toolbar />
     <Box sx={{
       height: "100vh",

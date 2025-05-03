@@ -3,8 +3,8 @@
 import { Fragment } from 'react'
 import type { NextPage } from 'next'
 
-import EnforcementAppBar from '../components/DashboardTopBar'
-import EnforcementNavBar from '../components/NavBar'
+import EnforcementAppBar from './TopBar'
+import EnforcementNavBar from '../shared/NavBar'
 import DashboardContent from './Content'
 
 const View: NextPage = () => {

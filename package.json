@@ -1,0 +1,24 @@
+{
+    "name": "copark-containerised",
+    "version": "1.0.0",
+    "description": "Copark WebApp",
+    "author": "Copark Inc.",
+    "license": "UNLICENSED",
+    "repository": "none",
+    "scripts": {
+      "package": "docker build . -t cte-linux-amd64 --platform linux/amd64 && docker save -o cte-linux-amd64.tar cte-linux-amd64",
+      "containerised": "npm run build && npm run compose",
+      "compose": "docker compose up --build",
+      "installs": "npm install && npm run install-auth",
+      "install-auth": "cd microservice/AuthService && npm install",
+      "cis": "npm ci && npm run ci-auth",
+      "ci-auth": "cd microservice/AuthService && npm ci",
+      "build": "npm run build-auth",
+      "build-auth": "cd microservice/AuthService && npm run build",
+      "start": "concurrently --kill-others \"npm run start-auth\"",
+      "start-auth": "cd microservice/AuthService && npm start"
+    },
+    "devDependencies": {
+      "concurrently": "*"
+    }
+  }

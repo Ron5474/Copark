@@ -6,8 +6,8 @@
 
 import { Box, Toolbar } from "@mui/material";
 import { CssBaseline } from "@mui/material";
-import TopBar from "./shared/topBar";
-import Footer from "./shared/footer";
+import TopBar from "./shared/TopBar";
+import Footer from "./shared/Footer";
 
 function HomeView() {
   return (

@@ -29,12 +29,12 @@ export default function LoginView() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '100vh',
+        height: '65vh',
       }}
     >
       <Stack alignItems="center" spacing={2} sx={{ width: '100%', maxWidth: 300, margin: 'auto', paddingTop: 4 }}>
-        <Typography component="h1" variant="h5" sx={{mb: 3}}>
-            Login
+        <Typography component="h1" variant="h3" sx={{mb: 3}}>
+            Log In
         </Typography>
         <Button
           variant="outlined"

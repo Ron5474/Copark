@@ -16,11 +16,15 @@ import { ThemeProvider } from '@mui/material/styles'
 
 import theme from '../theme'
 import LoginView from './View'
+import TopBar from '../shared/TopBar'
+import Footer from '../shared/Footer'
 
 const Page: NextPage = () => {
   return (
     <ThemeProvider theme={theme}>
+      <TopBar />
       <LoginView />
+      <Footer />
     </ThemeProvider>
   )
 }

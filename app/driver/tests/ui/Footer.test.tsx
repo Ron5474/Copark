@@ -6,7 +6,7 @@
 
 import { render, screen, cleanup } from '@testing-library/react';
 import { it, expect, afterEach, vi } from 'vitest';
-import Footer from '../../src/app/shared/footer';
+import Footer from '../../src/app/shared/Footer';
 
 afterEach(() => {
   cleanup()

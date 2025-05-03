@@ -10,7 +10,7 @@
 */
 
 'use client'
-import React from 'react'
+// import {useState} from 'react'
 
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
@@ -19,9 +19,15 @@ import Button from '@mui/material/Button';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
+import { signIn } from "next-auth/react"
 
 
 export default function LoginView() {
+  // const { data: session } = useSession()
+  const handleClick = async () => {
+    await signIn('google', { callbackUrl: '/' })
+  }
+
   return (
     <Container
       maxWidth="sm"
@@ -49,6 +55,7 @@ export default function LoginView() {
           startIcon={<GoogleIcon />}
           fullWidth
           sx={{color: 'black', borderColor: 'black'}}
+          onClick={handleClick}
         >
           Sign In With Google
         </Button>

@@ -5,14 +5,19 @@ import {
   Body,
   Get
 } from "tsoa";
-import { EnforcementUser } from "./";
+import { EnforcementUser, NewEnforcementUser } from ".";
 import { AdminService } from "./service";
 
 @Route("admin")
 export class AdminController extends Controller {
 
-  @Post("getEnforcers")
+  @Get("getEnforcers")
   public async getEnforcers(): Promise<EnforcementUser[]> {
     return new AdminService().getEnforcers();
+  }
+
+  @Post("addEnforcer")
+  public async addEnforcer(@Body() enforcer: NewEnforcementUser): Promise<EnforcementUser[]> {
+    return new AdminService().addEnforcer(enforcer);
   }
 }

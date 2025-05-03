@@ -4,3 +4,8 @@ export interface EnforcementUser {
   email: string
   accountStatus: string
 }
+
+export interface NewEnforcementUser {
+  name: string
+  email: string
+}

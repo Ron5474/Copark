@@ -5,7 +5,7 @@ import {
   Body,
   Get
 } from "tsoa";
-import { EnforcementUser, NewEnforcementUser } from ".";
+import { EnforcementUser, NewEnforcementUser } from "./schema";
 import { AdminService } from "./service";
 
 @Route("admin")

@@ -3,13 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "prestart": "npm run build",
-    "start": "node build/src/server.js",
-    "prebuild": "npm run swagger",
+    "start": "node build/server.js",
     "build": "tsc",
-    "predev": "npm run swagger",
-    "dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
-    "swagger": "tsoa spec-and-routes",
-    "pretest": "npm run swagger && npm run lint",
+    "dev": "nodemon",
     "test": "vitest run --no-file-parallelism --testTimeout=3000 --coverage",
     "lint": "eslint src/**/*.[jt]s --fix"
   },
@@ -43,13 +39,17 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "class-validator": "*",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "graphql-http": "*",
+    "graphql": "*",
+    "graphql-playground-html": "^1.6.29",
     "jose": "^6.0.10",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.15.6",
-    "swagger-ui-express": "^5.0.1",
-    "tsoa": "*"
+    "tsoa": "*",
+    "type-graphql": "*"
   },
   "nodemonConfig": {
     "watch": [

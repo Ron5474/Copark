@@ -1,42 +1,45 @@
 import express, { 
   Express, 
-  Router,
-  Response as ExResponse, 
-  Request as ExRequest, 
-  ErrorRequestHandler,
-  NextFunction
 } from 'express'
-import cors from 'cors'
-import swaggerUi from 'swagger-ui-express'
 
-import { RegisterRoutes } from "../build/routes"
+import path from 'path'
+import { createHandler } from 'graphql-http/lib/use/express'
+import { renderPlaygroundPage } from "graphql-playground-html"
+import 'reflect-metadata' // must come before buildSchema
+import { buildSchema } from "type-graphql"
+
+import { resolvers } from './resolvers'
 
 const app: Express = express()
-app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-app.use('/api/v0/docs', swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
-  res.send(
-    swaggerUi.generateHTML(await import('../build/swagger.json'))
+async function bootstrap() {
+  const schema = await buildSchema({
+    resolvers: resolvers,
+    validate: true, 
+    emitSchemaFile: {
+      path: path.resolve(__dirname, "../build/schema.gql"),
+      sortedSchema: true, 
+    }
+  })
+  app.use(
+    "/graphql",
+    createHandler({
+        schema: schema,
+        context: (req) => ({
+          headers: req.headers
+        }),
+    })
   )
-})
-
-const router = Router()
-RegisterRoutes(router)
-app.use('/api/v0', router)
-
-// Enhanced error handler
-const errorHandler: ErrorRequestHandler = (err, _req, res, _next: NextFunction) => {
-  console.log(process.env.POSTGRES_PASSWORD)
-  console.error('Error occurred:', err) // Log the error to the console for debugging
-
-  res.status(err.status || 500).json({
-    message: err.message || 'Internal Server Error',
-    errors: err.errors || null,
-    status: err.status || 500,
+  // Updated /playground route
+  app.get("/playground", (req, res) => {
+    res.send(
+      renderPlaygroundPage({
+        endpoint: "/graphql",
+      })
+    )
   })
 }
-app.use(errorHandler)
 
-export default app
+export { app, bootstrap }

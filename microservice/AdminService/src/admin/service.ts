@@ -1,4 +1,4 @@
-import { EnforcementUser, NewEnforcementUser } from "./index";
+import { EnforcementUser, NewEnforcementUser } from "./schema";
 import { pool } from "./db";
 import { SignJWT } from 'jose'
 

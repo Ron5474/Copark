@@ -13,15 +13,3 @@ VALUES (
     'accountStatus', 'active'
   )
 );
-
-INSERT INTO account(data)
-VALUES (
-  jsonb_build_object(
-    'name', 'Enforcer 1',
-    'email', 'enforcer1@outlook.com',
-    'phone' , '123-456-7890',
-    'pwhash', crypt('password1', gen_salt('bf')),
-    'role', 'enforcement',
-    'accountStatus', 'active'
-  )
-);

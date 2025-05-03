@@ -1,0 +1,45 @@
+# Official framework image.
+# https://hub.docker.com/r/library/node/tags/
+# lts = Long Term Support
+image: node:lts
+
+services:
+  - postgres
+
+variables:
+  PIPELINE: true
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: 5432
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  MASTER_SECRET: not-a-very-secret-secret
+
+stages:
+  - quality
+  - build
+  - test
+  - deploy
+
+lint:
+  stage: quality 
+  script:
+    - npm run installs
+    - npm run lint
+
+build:
+  stage: build
+  script:
+    - npm run installs
+    - npm run build
+
+test:
+  stage: test
+  script:
+    - npm run installs
+    - npm test
+
+deploy:
+  stage: deploy
+  script: echo "Define your deployment script!"
+  environment: production

@@ -29,7 +29,6 @@ export default function Page() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      // TODO: Implement login logic
       console.log("Login attempt with:", { email, password });
       const authenticated = await login({ email, password })
       if (authenticated) {

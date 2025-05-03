@@ -6,7 +6,7 @@
 
 import { render, screen, cleanup } from '@testing-library/react';
 import { it, expect, afterEach, vi } from 'vitest';
-import Topbar from '../../src/app/shared/TopBar';
+import Topbar from '../../src/app/shared/Topbar';
 
 afterEach(() => {
   cleanup()

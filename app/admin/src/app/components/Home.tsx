@@ -9,7 +9,8 @@ interface HomeProps {
 
 export default function Home({ onNavigate }: HomeProps) {
   const buttons = [
-    { label: 'Manage Users', component: 'users' },
+    { label: 'Manage Enforcement', component: 'enforcement' },
+    { label: 'Manage Drivers', component: 'drivers' },
     { label: 'Override Tickets', component: 'tickets' },
     { label: 'View Statistics', component: 'statistics' },
     { label: 'Generate Reports', component: 'reports' },

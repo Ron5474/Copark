@@ -14,8 +14,10 @@ export default function Page() {
     switch (currentComponent) {
       case 'home':
         return <Home onNavigate={handleNavigate} />;
-      case 'users':
-        return <div>Users Component</div>;
+      case 'enforcement':
+        return <div>Manage Enforcement Component</div>;
+      case 'drivers':
+        return <div>Manage Drivers Component</div>;
       case 'tickets':
         return <div>Tickets Component</div>;
       case 'statistics':

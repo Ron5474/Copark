@@ -4,8 +4,8 @@
 import type { TsoaRoute } from '@tsoa/runtime';
 import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { AuthController } from './../auth/api';
-import { expressAuthentication } from './../auth/expressAuth';
+import { AuthController } from './../src/auth/api';
+import { expressAuthentication } from './../src/auth/expressAuth';
 // @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
 

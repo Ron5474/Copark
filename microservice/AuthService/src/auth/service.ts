@@ -1,9 +1,9 @@
 
-import { SessionUser } from "../server";
+import { SessionUser } from "../index";
 import { AuthUser, Credentials, User } from "./index";
 import { pool } from "./db";
 import { SignJWT } from 'jose'
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 
 const encodedKey = new TextEncoder().encode(process.env.MASTER_SECRET)
 

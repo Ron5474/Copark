@@ -1,5 +1,5 @@
 {
-  "entryFile": "./server/app.ts",
+  "entryFile": "./src/app.ts",
   "noImplicitAdditionalProperties": "throw-on-extras",
   "controllerPathGlobs": ["**/*api.ts"],
   "spec": {
@@ -21,6 +21,6 @@
   },
   "routes": {
     "routesDir": "build",
-    "authenticationModule": "./auth/expressAuth.ts"
+    "authenticationModule": "./src/auth/expressAuth.ts"
   }
 }

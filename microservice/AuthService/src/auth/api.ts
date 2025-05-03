@@ -3,23 +3,17 @@ import {
   Controller,
   Post,
   Body,
-  Get,
+  Get
 } from "tsoa";
-import { Credentials, Authenticated } from "./index";
+import { Credentials, Authenticated } from "./";
 import { AuthService } from "./service";
 
 @Route("auth")
 export class AuthController extends Controller {
-  private authService: AuthService;
-
-  constructor() {
-    super();
-    this.authService = new AuthService();
-  }
 
   @Post("login")
   public async login(@Body() credentials: Credentials): Promise<Authenticated | undefined> {
-    return this.authService.authenticate(credentials);
+    return new AuthService().authenticate(credentials);
   }
 
   @Get("status")

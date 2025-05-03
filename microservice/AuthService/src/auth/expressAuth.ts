@@ -5,7 +5,7 @@
 
 import {Request} from "express"
 import {AuthService} from './service'
-import {SessionUser} from '../server'
+import {SessionUser} from '../index'
 
 export function expressAuthentication(
   request: Request,

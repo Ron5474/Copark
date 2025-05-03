@@ -16,13 +16,8 @@ exports.AuthController = void 0;
 const tsoa_1 = require("tsoa");
 const service_1 = require("./service");
 let AuthController = class AuthController extends tsoa_1.Controller {
-    authService;
-    constructor() {
-        super();
-        this.authService = new service_1.AuthService();
-    }
     async login(credentials) {
-        return this.authService.authenticate(credentials);
+        return new service_1.AuthService().authenticate(credentials);
     }
     async status() {
         return "Auth service is running!";
@@ -43,6 +38,5 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "status", null);
 exports.AuthController = AuthController = __decorate([
-    (0, tsoa_1.Route)("auth"),
-    __metadata("design:paramtypes", [])
+    (0, tsoa_1.Route)("auth")
 ], AuthController);

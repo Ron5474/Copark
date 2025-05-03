@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterRoutes = RegisterRoutes;
 const runtime_1 = require("@tsoa/runtime");
-const api_1 = require("./../auth/api");
-const expressAuth_1 = require("./../auth/expressAuth");
+const api_1 = require("./../src/auth/api");
+const expressAuth_1 = require("./../src/auth/expressAuth");
 const expressAuthenticationRecasted = expressAuth_1.expressAuthentication;
 const models = {
     "Authenticated": {

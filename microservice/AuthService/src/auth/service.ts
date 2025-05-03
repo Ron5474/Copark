@@ -15,7 +15,8 @@ export class AuthService {
         SELECT jsonb_build_object(
           'id', id,
           'name', data->>'name',
-          'email', data->>'email'
+          'email', data->>'email',
+          'role', data->>'role'
         ) AS user
         FROM account
         WHERE data->>'email' = $1
@@ -29,7 +30,7 @@ export class AuthService {
   
     if (rows.length > 0) {
       const user = rows[0].user
-      return { id: await user.id, name: user.name }
+      return { id: await user.id, name: user.name, role: user.role };
     } else {
       return undefined
     }

@@ -16,10 +16,10 @@ function HowToUseCard({number, image, description, variant}: {number: number, im
       backgroundTransform: "scaleX(-1)",
       display: "flex",
       alignItems: "center",
-      gap: "20px",
+      gap: "5%",
       width: "100%",
-      height: "150px",
-      padding: "10px 15px 10px 30px",
+      height: "fit-content",
+      padding: "30px 15px 30px 30px",
       borderRadius: "25px",
     }}>
       {variant === "secondary" &&(

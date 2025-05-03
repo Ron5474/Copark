@@ -18,13 +18,21 @@ import theme from '../theme'
 import LoginView from './View'
 import TopBar from '../shared/Topbar'
 import Footer from '../shared/Footer'
+import { Box, CssBaseline } from '@mui/material'
 
 const Page: NextPage = () => {
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <TopBar />
       <LoginView />
+      <Box sx={{
+        position: 'relative',
+        bottom: 0,
+        marginBottom: '0px',
+      }}>
       <Footer />
+      </Box>
     </ThemeProvider>
   )
 }

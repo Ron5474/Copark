@@ -6,11 +6,20 @@
 
 import { Button } from "@mui/material";
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+import { useRouter } from "next/navigation";
 
 function GetStartedButton() {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push("/login");
+  };
+
   return (
     <Button
+      onClick={() => handleClick()}
       variant="contained"
+      aria-label="go-to-login"
       sx={{
         backgroundColor: (theme) => theme.palette.secondary.main,
         color: "white",

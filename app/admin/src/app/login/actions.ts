@@ -14,14 +14,15 @@ export async function login(credentials: { email: string; password: string }): P
 
   if (response.status === 200) {
     const user = await response.json()
+
     // console.log(user)
-    if (user.role !== 'admin') {
+    if (user.role !== '["admin"]') {
       // throw new Error('Unauthorized: Admin role required')
       return undefined;
     }
 
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000)
-    const session = user.session // Assuming the API returns a session token
+    const session = user.session 
     const cookieStore = await cookies()
 
     cookieStore.set('session', session, {

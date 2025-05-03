@@ -1,24 +1,51 @@
-import React from 'react';
-import { Box, Button, Paper, Typography, IconButton, Grid } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Paper, Typography, IconButton, Grid, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GavelIcon from '@mui/icons-material/Gavel';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import HomeIcon from '@mui/icons-material/Home';
 import { useRouter } from 'next/navigation';
-
-const enforcers = [
-  { name: 'Name of Enforcer 1' },
-  { name: 'Name of Enforcer 2' },
-  { name: 'Name of Enforcer 3' },
-];
+import { getEnforcers, addEnforcer } from '../../enforcement/actions';
 
 export default function ManageEnforcement({ onNavigate }) {
   const router = useRouter();
+  const [enforcers, setEnforcers] = useState([]);
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [newEnforcer, setNewEnforcer] = useState({
+    name: '',
+    email: ''
+  });
+
+  useEffect(() => {
+    fetchEnforcers();
+  }, []);
+
+  const fetchEnforcers = async () => {
+    try {
+      const data = await getEnforcers();
+      setEnforcers(data);
+    } catch (error) {
+      console.error('Error fetching enforcers:', error);
+    }
+  };
+
+  const handleAddEnforcer = async () => {
+    try {
+      await addEnforcer(newEnforcer);
+      setOpenAddDialog(false);
+      setNewEnforcer({
+        name: '',
+        email: ''
+      });
+      fetchEnforcers();
+    } catch (error) {
+      console.error('Error adding enforcer:', error);
+    }
+  };
 
   return (
     <Box sx={{ p: 4 }}>
-      {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
         <img src="/admin_logo.png" alt="CoPark Admin" style={{ height: 60, marginRight: 16 }} />
         <Button
@@ -33,16 +60,16 @@ export default function ManageEnforcement({ onNavigate }) {
           variant="contained"
           startIcon={<PersonAddIcon />}
           sx={{ bgcolor: '#bdbdbd', color: 'black' }}
+          onClick={() => setOpenAddDialog(true)}
         >
           Add Enforcer
         </Button>
       </Box>
 
-      {/* Enforcer List */}
       <Paper sx={{ p: 2, background: '#e0e0e0', maxWidth: 900, mx: 'auto' }}>
-        {enforcers.map((enforcer, idx) => (
+        {enforcers.map((enforcer) => (
           <Box
-            key={enforcer.name}
+            key={enforcer.id}
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -64,9 +91,34 @@ export default function ManageEnforcement({ onNavigate }) {
             </Box>
           </Box>
         ))}
-        {/* Empty space at the bottom */}
         <Box sx={{ height: 120, background: '#d3d3d3', borderRadius: 1 }} />
       </Paper>
+
+      {/* Add Enforcer Dialog */}
+      <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)}>
+        <DialogTitle>Add New Enforcer</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Name"
+            fullWidth
+            value={newEnforcer.name}
+            onChange={(e) => setNewEnforcer({ ...newEnforcer, name: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Email"
+            fullWidth
+            value={newEnforcer.email}
+            onChange={(e) => setNewEnforcer({ ...newEnforcer, email: e.target.value })}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAddDialog(false)}>Cancel</Button>
+          <Button onClick={handleAddEnforcer}>Add</Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Home Icon */}
       <Box sx={{ position: 'fixed', bottom: 24, right: 24 }}>

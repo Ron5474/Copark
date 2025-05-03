@@ -5,7 +5,7 @@ import { Fragment } from 'react'
 import type { NextPage } from 'next'
 
 import TopBar from '../components/topBar'
-import Form from './Form'
+import Form from './AddForm'
 import Footer from '../components/footer'
 
 const View: NextPage = () => {

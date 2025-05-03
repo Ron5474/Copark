@@ -26,6 +26,7 @@ export default function View() {
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
   const [country, setCountry] = useState<string>(Object.keys(locations)[0])
   const [state, setState] = useState<string>(Object.values(locations)[0][0])
+  const [nickname, setNickname] = useState<string>('')
 
   const submitVehicle = () => {
     setIsValidEntry(plateNumber.length > 0)
@@ -82,16 +83,16 @@ export default function View() {
             "Must be 1-10 characters" :
             "License plate number is required"
           }
-          // label="Email"
           placeholder="e.g. 1ABC123"
           value={plateNumber}
-          aria-label="Enter license plate number"
+          // aria-label="Enter license plate number"
           sx={textFieldStyle}
           size="small"
           slotProps={{
             input: {
               inputProps: {
                 maxLength: 10,
+                'aria-label': 'Enter license plate number',
               },
             },
           }}
@@ -139,6 +140,31 @@ export default function View() {
             </MenuItem>
           ))}
         </TextField>
+      </Box>
+      <Box sx={{marginTop: '2vh'}}>
+        <Box sx={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+          <Typography variant="body1" sx={{ margin: 0 }}>
+            Nickname
+          </Typography>
+          <Typography variant="body2" sx={{ margin: 0, fontStyle: 'italic' }}>
+            (optional)
+          </Typography>
+        </Box>
+        <TextField
+          required
+          fullWidth
+          value={nickname}
+          slotProps={{
+            input: {
+              inputProps: {
+                'aria-label': 'Enter nickname',
+              }
+            },
+          }}
+          sx={textFieldStyle}
+          size="small"
+          onChange={(event) => setNickname(event.target.value)}
+        />
       </Box>
       <Button
         onClick={submitVehicle}

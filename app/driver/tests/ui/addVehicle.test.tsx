@@ -2,8 +2,8 @@ import { vi, it, afterEach, expect } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import View from '../../src/app/addVehicle/View'
-import AddVehicle from '../../src/app/addVehicle/Form'
+import View from '../../src/app/selectVehicle/GuestView'
+import AddVehicle from '../../src/app/selectVehicle/AddForm'
 
 afterEach(() => {
   cleanup()
@@ -31,7 +31,7 @@ it('Error if license # is empty', async () => {
 it('Can not enter more than 10 characters', async () => {
   render(<AddVehicle />)
   const user = userEvent.setup()
-  const input = screen.getByPlaceholderText('e.g. 1ABC123')
+  const input = screen.getByLabelText('Enter license plate number')
   await user.type(input, '012345678912345')
 
   expect((input as HTMLInputElement).value).toBe('0123456789')
@@ -67,25 +67,16 @@ it('Changes state', async () => {
   expect(screen.queryByText('Alabama')).toBeNull()
 })
 
+it('Renders nickname entry', () => {
+  render(<AddVehicle />)
+  expect(screen.getByLabelText('Enter nickname')).toBeDefined()
+})
 
-// it('shows loading text when login is clicked', async () => {
-//   render(<EnforcementLoginPage />)
-//   const user = userEvent.setup()
+it('Enter nickname', async () => {
+  render(<AddVehicle />)
+  const user = userEvent.setup()
+  const input = await screen.findByLabelText('Enter nickname')
+  await user.type(input, 'Henry')
 
-//   await user.type(screen.getByLabelText('Your Email'), 'test@copark.com')
-//   await user.type(screen.getByLabelText('Password'), 'secret')
-//   await user.click(screen.getByRole('button', { name: /login/i }))
-
-//   expect(await screen.findByText('Logging in...')).toBeDefined()
-// })
-
-// it('displays invalid credentials message after delay', async () => {
-//   render(<Page />)
-//   const user = userEvent.setup()
-
-//   await user.type(screen.getByLabelText('Your Email'), 'wrong@copark.com')
-//   await user.type(screen.getByLabelText('Password'), 'wrongpass')
-//   await user.click(screen.getByRole('button', { name: /login/i }))
-
-//   expect(await screen.findByText('Invalid credentials')).toBeDefined()
-// })
+  expect((input as HTMLInputElement).value).toBe('Henry')
+})

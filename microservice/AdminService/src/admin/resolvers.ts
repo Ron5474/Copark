@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
+import { Resolver, Query, Mutation, Arg } from "type-graphql";
 import { AdminService } from "./service";
 import { EnforcementUser, NewEnforcementUser } from "./schema";
 

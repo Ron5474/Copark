@@ -1,0 +1,17 @@
+services:
+  postgres:
+    container_name: database
+    image: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./microservice/AuthService/sql/databases.sql:/docker-entrypoint-initdb.d/1.databases.sql
+      - ./microservice/AuthService/sql/schema.sql:/docker-entrypoint-initdb.d/2.schema.sql
+      - ./microservice/AuthService/sql/data.sql:/docker-entrypoint-initdb.d/3.data.sql
+      - ./microservice/AdminService/sql/databases.sql:/docker-entrypoint-initdb.d/4.databases.sql
+      - ./microservice/AdminService/sql/schema.sql:/docker-entrypoint-initdb.d/5.schema.sql
+      - ./microservice/AdminService/sql/data.sql:/docker-entrypoint-initdb.d/6.data.sql

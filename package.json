@@ -16,7 +16,12 @@
       "build": "npm run build-auth",
       "build-auth": "cd microservice/AuthService && npm run build",
       "start": "concurrently --kill-others \"npm run start-auth\"",
-      "start-auth": "cd microservice/AuthService && npm start"
+      "start-auth": "cd microservice/AuthService && npm start",
+      "lint": "npm run lint-auth && npm run lint-admin && npm run lint-enforcement && npm run lint-driver",
+      "lint-auth": "cd microservice/AuthService && npm run lint",
+      "lint-admin": "cd app/admin && npm run lint",
+      "lint-enforcement": "cd app/enforcement && npm run lint",
+      "lint-driver": "cd app/driver && npm run lint"
     },
     "devDependencies": {
       "concurrently": "*"

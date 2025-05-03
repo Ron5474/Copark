@@ -82,6 +82,7 @@ export default function Page() {
               margin="normal"
               required
               fullWidth
+              aria-label="Email Address"
               id="email"
               label="Email Address"
               name="email"
@@ -90,11 +91,12 @@ export default function Page() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
-            />
+              />
             <TextField
               margin="normal"
               required
               fullWidth
+              aria-label="Password"
               name="password"
               label="Password"
               type={showPassword ? "text" : "password"}

@@ -21,7 +21,7 @@ afterEach(() => {
 
 it('Renders', async () => {
   render(<Page />)
-  expect(await screen.findByText('Login')).toBeDefined()
+  expect(await screen.findByText('Log In')).toBeDefined()
 })
 
 

@@ -17,7 +17,7 @@ async function bootstrap() {
     validate: true,
     authChecker: async ({ context }, roles) => {
       console.log('AuthChecker called with roles:', roles);
-      console.log('Context headers:', context.headers);
+      // console.log('Context headers:', context.headers);
       const authHeader = context.headers.authorization;
 
       if (!authHeader) {
@@ -32,7 +32,7 @@ async function bootstrap() {
             'Content-Type': 'application/json',
             Authorization: authHeader,
           },
-          body: JSON.stringify({ scopes: roles }),
+          body: JSON.stringify(roles),
         });
 
         if (response.status !== 200) {

@@ -7,13 +7,13 @@ const adminService = new AdminService();
 @Resolver()
 export class AdminResolver {
   @Query(() => [EnforcementUser])
-  @Authorized("admin")
+  // @Authorized(["admin"])
   async getEnforcers(): Promise<EnforcementUser[]> {
     return adminService.getEnforcers();
   }
 
   @Mutation(() => [EnforcementUser])
-  @Authorized("admin")
+  // @Authorized(["admin"])
   async addEnforcer(
     @Arg("enforcer") enforcer: NewEnforcementUser
   ): Promise<EnforcementUser[]> {

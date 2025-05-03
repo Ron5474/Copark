@@ -30,7 +30,7 @@ export class AuthService {
   
     if (rows.length > 0) {
       const user = rows[0].user
-      return { id: await user.id, name: user.name, role: user.role };
+      return { id: await this.encrypt(user.id), name: user.name, role: user.role };
     } else {
       return undefined
     }
@@ -70,6 +70,8 @@ export class AuthService {
     scopes?: string[]
   ): Promise<SessionUser> {
     return new Promise((resolve, reject) => {
+      console.log('hey there!!!!!!');
+      console.log(authHeader);
       if (!authHeader) {
         reject(new Error("Unauthorized"));
       } else {
@@ -80,6 +82,7 @@ export class AuthService {
           async (err: jwt.VerifyErrors | null, decoded?: object | string) => {
             const uid = decoded as SessionUser;
             if (err) {
+              console.log("ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!")
               reject(err);
             } else {
               const user = await this.getUserById(uid.id);

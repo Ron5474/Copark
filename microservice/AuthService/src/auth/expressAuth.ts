@@ -12,5 +12,7 @@ export function expressAuthentication(
   securityName: string,
   scopes?: string[]
 ): Promise<SessionUser> {
+  // console.log(request.headers.authorization); 
+  // console.log(scopes);
   return new AuthService().check(request.headers.authorization, scopes)
 }

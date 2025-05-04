@@ -34,10 +34,12 @@ export const getEnforcers = async (): Promise<EnforcementUser[]> => {
     });
 
     const { data } = await response.json();
+<<<<<<< HEAD
     // console.log(data);
+=======
+>>>>>>> dfcf863a38b0370d7943ee136c26805ad5314460
     return data.getEnforcers;
   } catch (error) {
-    console.error('Error fetching enforcers:', error);
     throw error;
   }
 };

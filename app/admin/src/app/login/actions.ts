@@ -11,8 +11,8 @@ export async function login({ email, password }: { email: string; password: stri
     body: JSON.stringify({ email, password }),
   });
 
-  if (!response.ok) {
-    throw new Error('Login failed');
+  if (!response || !response.ok) {
+    return undefined;
   }
 
   // Ensure the response body is valid before parsing

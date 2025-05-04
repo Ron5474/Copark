@@ -29,10 +29,8 @@ export default function Page() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      console.log("Login attempt with:", { email, password });
       const authenticated = await login({ email, password })
       if (authenticated) {
-        console.log("Login successful:", authenticated);
 
         // Redirect to the home page
         router.push('/')

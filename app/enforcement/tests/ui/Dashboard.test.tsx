@@ -1,4 +1,4 @@
-import { vi, it, afterEach, expect } from 'vitest'
+import { vi, it, afterEach, expect, beforeAll } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -9,6 +9,19 @@ import View from '@/app/page'
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
+})
+
+beforeAll(() => {
+  Object.defineProperty(navigator, 'mediaDevices', {
+    writable: true,
+    value: {
+      getUserMedia: vi.fn().mockResolvedValue({
+        getTracks: () => [
+          { stop: vi.fn() }
+        ]
+      })
+    }
+  })
 })
 
 it('Renders Enforcement Dashboard', async () => {

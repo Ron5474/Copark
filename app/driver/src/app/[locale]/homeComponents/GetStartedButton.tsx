@@ -3,6 +3,7 @@
  * @description This file contains the Get Started button component.
  * @author Swayam Shah
  */
+'use client';
 
 import { Button } from "@mui/material";
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
@@ -11,8 +12,10 @@ import { useRouter } from "next/navigation";
 function GetStartedButton() {
   const router = useRouter();
 
+
   const handleClick = () => {
-    router.push("/login");
+    const locale = window.location.pathname.split("/")[1];
+    router.push(`/${locale}/login`);
   };
 
   return (

@@ -11,8 +11,10 @@ import Footer from "./shared/Footer";
 import ZoneField from "./homeComponents/ZoneField";
 import GetStartedButton from "./homeComponents/GetStartedButton";
 import HowToUseCard from "./homeComponents/UseCard";
+import { useTranslations } from "next-intl";
 
 function HomeView() {
+  const t = useTranslations('landingPage');
   return (
     <>
     <CssBaseline />
@@ -40,8 +42,8 @@ function HomeView() {
         paddingBottom: "35px",
         paddingLeft: "15px",
       }}>
-        <Typography sx={{color: "white", fontSize: "40px", fontWeight: 700}}>Park. Pay. Relax.</Typography>
-        <ZoneField />
+        <Typography sx={{color: "white", fontSize: "40px", fontWeight: 700}}>{t('card title')}</Typography>
+        <ZoneField text = {t('zone-prompt')}/>
       </Box>
       <Box sx={{
         marginTop: "30px",

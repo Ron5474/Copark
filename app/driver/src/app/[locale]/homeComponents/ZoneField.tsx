@@ -5,9 +5,9 @@
  */
 
 import { Button } from "@mui/material";
+import proptypes from "prop-types";
 
-
-function ZoneField() {
+function ZoneField({text}: {text: string}) {
   return (
     <Button sx={{
       width: "fit-content",
@@ -19,9 +19,13 @@ function ZoneField() {
       borderStyle: "solid",
       borderRadius: "30px"
        }}>
-      Enter Zone Number
+      {text}
     </Button>
   )
+}
+
+ZoneField.prototype = {
+  text: proptypes.string.isRequired,
 }
 
 export default ZoneField;

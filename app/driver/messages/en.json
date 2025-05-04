@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "title": "Copark Driver"
+  },
+  "common": {
+    "english": "🌐English",
+    "spanish": "Español"
+  },
+  "landingPage": {
+    "card title": "Park. Pay. Relax.",
+    "zone-prompt": "Enter Zone Number"
+  }
+}

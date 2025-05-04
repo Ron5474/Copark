@@ -13,7 +13,7 @@ const View: NextPage = () => {
     <Fragment>
       <TopBar/>
       <Form/>
-      <Footer/>
+      <Footer />
     </Fragment>
   )
 }

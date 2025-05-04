@@ -8,12 +8,14 @@ services:
 
 variables:
   PIPELINE: true
-  POSTGRES_HOST: postgres
-  POSTGRES_PORT: 5432
-  POSTGRES_DB: postgres
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: postgres
-  MASTER_SECRET: not-a-very-secret-secret
+  POSTGRES_HOST: ${POSTGRES_HOST}
+  POSTGRES_PORT: ${POSTGRES_PORT}
+  POSTGRES_DB: ${POSTGRES_DB}
+  POSTGRES_USER: ${POSTGRES_USER}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  # MASTER_SECRET: not-a-very-secret-secret
+  GOOGLE_ID: ${GOOGLE_ID}
+  GOOGLE_SECRET: ${GOOGLE_SECRET}
 
 stages:
   - quality

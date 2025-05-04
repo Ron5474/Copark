@@ -19,15 +19,16 @@ import Button from '@mui/material/Button';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import { signIn } from "next-auth/react"
+// import { signIn } from "next-auth/react"
+import {login} from './actions'
 
 
 export default function LoginView() {
   // const { data: session } = useSession()
-  const handleClick = async () => {
-    const locale = window.location.pathname.split("/")[1]
-    await signIn('google', { callbackUrl: `/${locale}` })
-  }
+  // const handleClick = async () => {
+  //   const locale = window.location.pathname.split("/")[1]
+  //   await signIn('google', { callbackUrl: `/${locale}` })
+  // }
 
   return (
     <Container
@@ -56,7 +57,10 @@ export default function LoginView() {
           startIcon={<GoogleIcon />}
           fullWidth
           sx={{color: 'black', borderColor: 'black'}}
-          onClick={handleClick}
+          onClick={() => {
+            console.log('Logging In')
+            login()
+          }}
         >
           Sign In With Google
         </Button>

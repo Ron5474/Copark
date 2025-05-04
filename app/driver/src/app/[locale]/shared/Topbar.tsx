@@ -1,7 +1,10 @@
 import { AppBar, Avatar, Box, IconButton } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
+// import { auth } from "@/auth";
 
-function Topbar() {
+
+const Topbar = () => {
+  // const session = await auth()
   return (
   <AppBar position="fixed"
     sx={{
@@ -20,6 +23,7 @@ function Topbar() {
         <img src="/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-logo" />
       </picture>
      <Box sx={{display: "flex", gap: "10px", alignItems: "center"}}>
+      {/* {session?.user? <Avatar sx={{width: "40px", height: "40px"}} src={session.user.image || undefined}/> : <Avatar sx={{width: "40px", height: "40px"}}/>} */}
       <Avatar sx={{width: "40px", height: "40px"}}/>
       <IconButton>
         <MenuIcon sx={{color: "black"}}/>

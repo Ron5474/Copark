@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "title": "Copark Conductor"
+  },
+  "common": {
+    "english": "🌐Inglés",
+    "spanish": "Español"
+  },
+  "landingPage": {
+    "card title": "Estaciona. Paga. Relájate.",
+    "zone-prompt": "Ingrese el número de zona"
+  }
+}

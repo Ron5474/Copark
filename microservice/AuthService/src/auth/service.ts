@@ -2,8 +2,7 @@
 import { SessionUser } from "../index";
 import { AuthUser, Credentials, User } from "./index";
 import { pool } from "./db";
-import { SignJWT } from 'jose'
-import * as jwt from "jsonwebtoken";
+import { SignJWT, jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.MASTER_SECRET)
 
@@ -30,7 +29,11 @@ export class AuthService {
   
     if (rows.length > 0) {
       const user = rows[0].user
-      return { id: await this.encrypt(user.id), name: user.name, role: user.role };
+      const retid = await this.encrypt(user.id)
+      console.log("retid", retid)
+      const { payload } = await jwtVerify(retid, encodedKey);
+      console.log("payload", payload)
+      return { id: retid, name: user.name, role: user.role };
     } else {
       return undefined
     }
@@ -60,49 +63,44 @@ export class AuthService {
         id: user.id,
         name: data.name,
         email: data.email,
-        roles: data.roles,
+        role: data.role,
       };
     }
   }
 
   public async check(
-    authHeader?: string,
-    scopes?: string[]
-  ): Promise<SessionUser> {
-    return new Promise((resolve, reject) => {
-      console.log('hey there!!!!!!');
-      console.log(authHeader);
-      if (!authHeader) {
-        reject(new Error("Unauthorized"));
-      } else {
-        const token = authHeader.split(" ")[1];
-        jwt.verify(
-          token,
-          `${process.env.MASTER_SECRET}`,
-          async (err: jwt.VerifyErrors | null, decoded?: object | string) => {
-            const uid = decoded as SessionUser;
-            if (err) {
-              console.log("ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!")
-              reject(err);
-            } else {
-              const user = await this.getUserById(uid.id);
-              if (user) {
-                if (scopes) {
-                  if (
-                    !user.roles ||
-                    !scopes.some((role) => user.roles.includes(role))
-                  ) {
-                    // CREDITS: TO ALLOW FOR MULTIPLE SCOPES https://chatgpt.com/c/67f1d214-c684-8007-b007-ab0547bad07c
-                    reject(new Error("Unauthorized"));
-                  }
-                }
-                resolve({ id: user.id });
-              }
-              reject(new Error("Unauthorized"));
-            }
-          }
-        );
-      }
-    });
+  authHeader?: string,
+  scopes?: string[]
+): Promise<SessionUser> {
+  if (!authHeader) {
+    throw new Error("Unauthorized");
   }
+
+  try {
+    const token = authHeader.split(" ")[1];
+
+    // console.log(token, encodedKey)
+
+    const { payload } = await jwtVerify(token, encodedKey);
+    if (typeof payload.id !== 'string') {
+      throw new Error("Invalid token payload");
+    }
+    const uid = payload as unknown as SessionUser;
+
+    const user = await this.getUserById(uid.id);
+    if (!user) throw new Error("Unauthorized1");
+
+    // console.log(scopes, user)
+    if (scopes) {
+      if (!user.role || !scopes.some(role => user.role.includes(role))) {
+        throw new Error("Unauthorized2");
+      }
+    }
+
+    return { id: user.id };
+  } catch (err) {
+    console.log("JWT ERROR:", err);
+    throw new Error("Unauthorized3");
+  }
+}
 }

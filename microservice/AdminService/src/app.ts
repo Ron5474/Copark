@@ -16,7 +16,7 @@ async function bootstrap() {
     resolvers: resolvers,
     validate: true,
     authChecker: async ({ context }, roles) => {
-      console.log('AuthChecker called with roles:', roles);
+      // console.log('AuthChecker called with roles:', roles);
       // console.log('Context headers:', context.headers);
       const authHeader = context.headers.authorization;
 

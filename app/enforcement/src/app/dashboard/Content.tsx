@@ -9,10 +9,9 @@ export default function EnforcementDashboardView() {
   const [plate, setPlate] = useState('')
   const [cameraOn, setCameraOn] = useState(false)
 
-  const handleCapture = () => {
-    setTimeout(() => {
-      setPlate('')
-    }, 500)
+  const handleCapture = (image: string) => {
+    console.log('Captured image base64:', image)
+    // TODO: send `image` to server for license plate detection
   }
 
   const handleSearch = () => {

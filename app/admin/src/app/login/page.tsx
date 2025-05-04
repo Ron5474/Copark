@@ -32,7 +32,6 @@ export default function Page() {
       console.log("Login attempt with:", { email, password });
       const authenticated = await login({ email, password })
       if (authenticated) {
-        window.sessionStorage.setItem('name', authenticated.name)
         console.log("Login successful:", authenticated);
 
         // Redirect to the home page

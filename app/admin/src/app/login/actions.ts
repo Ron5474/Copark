@@ -3,43 +3,32 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-export async function login(credentials: { email: string; password: string }): Promise<{ name: string } | undefined> {
+export async function login({ email, password }: { email: string; password: string }) {
+  // Simulate an API call for authentication
   const response = await fetch('http://localhost:3010/api/v0/auth/login', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-  })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
 
-  if (response.status === 200) {
-    const user = await response.json()
-
-    // console.log(user)
-    if (user.role !== '["admin"]') {
-      // throw new Error('Unauthorized: Admin role required')
-      return undefined;
-    }
-
-    const expiresAt = new Date(Date.now() + 30 * 60 * 1000)
-    const session = user.session 
-    const cookieStore = await cookies()
-
-    cookieStore.set('session', session, {
-      httpOnly: true,
-      secure: true,
-      expires: expiresAt,
-      sameSite: 'lax',
-      path: '/',
-    })
-    return { name: user.name }
+  if (!response.ok) {
+    throw new Error('Login failed');
   }
 
-  return undefined
+  // Ensure the response body is valid before parsing
+  const text = await response.text();
+  const authenticated = text ? JSON.parse(text) : null;
+
+  // Set session storage here
+  if (authenticated && authenticated.name) {
+    window.sessionStorage.setItem('name', authenticated.name);
+  }
+
+  return authenticated;
 }
 
 export async function logout() {
-    const cookieStore = await cookies()
-    cookieStore.delete('session')
-    redirect('/login')
+  const cookieStore = await cookies();
+  cookieStore.delete('session');
+  redirect('/login');
 }

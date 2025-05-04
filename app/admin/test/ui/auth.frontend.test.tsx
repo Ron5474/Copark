@@ -1,13 +1,13 @@
 import { it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
-import Page from '../src/app/login/page';
+import Page from '../../src/app/login/page';
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
 }));
 
-vi.mock('../src/app/login/actions', () => ({
+vi.mock('../../src/app/login/actions', () => ({
   login: vi.fn(),
 }));
 
@@ -42,7 +42,7 @@ it('renders login form with all required elements', () => {
 });
 
 it('handles successful login', async () => {
-  const { login } = await import('../src/app/login/actions');
+  const { login } = await import('../../src/app/login/actions');
   (login as any).mockResolvedValueOnce({ name: jason.name });
   
   render(<Page />);
@@ -69,13 +69,12 @@ it('handles successful login', async () => {
       email: jason.email,
       password: jason.password
     });
-    expect(window.sessionStorage.getItem('name')).toBe(jason.name);
     expect(mockRouter.push).toHaveBeenCalledWith('/');
   });
 });
 
 it('handles failed login', async () => {
-  const { login } = await import('../src/app/login/actions');
+  const { login } = await import('../../src/app/login/actions');
   (login as any).mockResolvedValueOnce(undefined);
   
   render(<Page />);

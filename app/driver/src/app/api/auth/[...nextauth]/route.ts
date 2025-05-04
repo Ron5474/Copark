@@ -15,8 +15,8 @@ export const authOptions = {
 //     //   clientSecret: process.env.GOOGLE_SECRET,
 //     // }),
     Google({
-      clientId: '',
-      clientSecret: '',
+      clientId: '512602013845-tir6qaf1v2cf1q51a7prq26cbf6ge37p.apps.googleusercontent.com',
+      clientSecret: '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',
     }),
   ],
 }

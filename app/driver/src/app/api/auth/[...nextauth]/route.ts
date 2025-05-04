@@ -11,7 +11,7 @@ if (!process.env.NEXT_PUBLIC_GOOGLE_ID || !process.env.NEXT_PUBLIC_GOOGLE_SECRET
   throw new Error("Missing Google OAuth credentials in environment variables")
 }
 
-export const authOptions = {
+const authOptions = {
   providers: [
    Google({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_ID,

@@ -5,13 +5,34 @@
  */
 
 import { render, screen, cleanup } from '@testing-library/react';
-import { it, expect, afterEach, vi } from 'vitest';
-import Home from '../../src/app/page';
+import { it, expect, afterEach, beforeEach, vi } from 'vitest';
+import Home from '../../src/app/[locale]/page';
 
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
 })
+
+beforeEach(() => {
+  vi.mock('next/navigation', () => ({
+    useRouter: () => ({
+      push: vi.fn(),
+    }),
+  }))
+
+  vi.mock('next-intl', () => ({
+    useTranslations: () => (
+      vi.fn((x: string) => {
+        if (x === 'card title') {
+          return 'Card Title';
+        }
+        if (x === 'zone-prompt') {
+          return 'Zone Prompt';
+        }
+      })),
+    }));
+  })
+
 
 it('Renders', async () => {
   render(<Home />);

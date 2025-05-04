@@ -12,7 +12,7 @@ import { vi, it, afterEach, expect } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 // import userEvent from '@testing-library/user-event'
 
-import Page from '../../src/app/login/page'
+import Page from '../../src/app/[locale]/login/page'
 
 afterEach(() => {
   cleanup()

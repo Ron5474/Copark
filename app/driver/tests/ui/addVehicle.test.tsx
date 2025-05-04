@@ -2,8 +2,8 @@ import { vi, it, afterEach, expect } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import View from '../../src/app/selectVehicle/GuestView'
-import AddVehicle from '../../src/app/selectVehicle/AddForm'
+import View from '../../src/app/[locale]/selectVehicle/GuestView'
+import AddVehicle from '../../src/app/[locale]/selectVehicle/AddForm'
 
 afterEach(() => {
   cleanup()

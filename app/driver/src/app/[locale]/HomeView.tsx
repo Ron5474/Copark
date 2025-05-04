@@ -54,32 +54,32 @@ function HomeView() {
           color: (theme) => theme.palette.secondary.main,
           lineHeight: "40px"
         }}>
-        Save the hassle
+        {t('login prompt line 1')}
         </Typography>
         <Typography sx={{
           fontSize: "20px",
           color: "black",
           lineHeight: "20px",
         }}>
-          of entering License plate each time
+          {t('login prompt line 2')}
           </Typography>
       </Box>
       <GetStartedButton />
 
       <Typography sx={{color: "black", fontSize: "32px", fontWeight: 700, marginTop: "30px"}}>
-        How to use:
+        {t('How to use')}:
       </Typography>
       <Box sx={{
         display: "flex",
         flexDirection: "column",
         gap: "20px",
         marginTop: "10px",}}>
-      <HowToUseCard number={1} image="/howV1.jpeg" description="Enter your zone number" variant="secondary"/>
-      <HowToUseCard number={2} image="/howV1.jpeg" description="Select your vehicle type" variant="primary"/>
-      <HowToUseCard number={3} image="/howV1.jpeg" description="Enter your license plate" variant="secondary"/>
-      <HowToUseCard number={4} image="/howV1.jpeg" description="Select your parking duration" variant="primary"/>
-      <HowToUseCard number={5} image="/howV1.jpeg" description="Pay and park" variant="secondary"/>
-      <HowToUseCard number={6} image="/howV1.jpeg" description="Relax and enjoy" variant="primary"/>
+      <HowToUseCard number={1} image="/howV1.jpeg" description={t('How to use step 1')} variant="secondary"/>
+      <HowToUseCard number={2} image="/howV1.jpeg" description={t('How to use step 2')} variant="primary"/>
+      <HowToUseCard number={3} image="/howV1.jpeg" description={t('How to use step 3')} variant="secondary"/>
+      <HowToUseCard number={4} image="/howV1.jpeg" description={t('How to use step 4')} variant="primary"/>
+      <HowToUseCard number={5} image="/howV1.jpeg" description={t('How to use step 5')} variant="secondary"/>
+      <HowToUseCard number={6} image="/howV1.jpeg" description={t('How to use step 6')} variant="primary"/>
       </Box>
       </Box>
       <Footer />

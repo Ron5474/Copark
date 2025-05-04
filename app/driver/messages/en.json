@@ -8,6 +8,16 @@
   },
   "landingPage": {
     "card title": "Park. Pay. Relax.",
-    "zone-prompt": "Enter Zone Number"
+    "zone-prompt": "Enter Zone Number",
+    "login prompt line 1": "Save the hassle",
+    "login prompt line 2": "of entering License plate each time",
+    "Get Started": "Get Started",
+    "How to use": "How to use",
+    "How to use step 1": "Enter your zone number",
+    "How to use step 2": "Select your vehicle type",
+    "How to use step 3": "Enter your license plate",
+    "How to use step 4": "Select your parking duration",
+    "How to use step 5": "Pay and park",
+    "How to use step 6": "Relax and enjoy"
   }
 }

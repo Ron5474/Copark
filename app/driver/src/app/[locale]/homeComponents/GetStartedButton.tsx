@@ -8,9 +8,11 @@
 import { Button } from "@mui/material";
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 function GetStartedButton() {
   const router = useRouter();
+  const t = useTranslations('landingPage');
 
 
   const handleClick = () => {
@@ -32,7 +34,7 @@ function GetStartedButton() {
         padding: "10px 20px",
       }}
     >
-      Get Started
+      {t('Get Started')}
       <ArrowRightAltIcon sx={{ marginLeft: "10px" }} />
     </Button>
   );

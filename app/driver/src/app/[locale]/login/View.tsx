@@ -25,7 +25,8 @@ import { signIn } from "next-auth/react"
 export default function LoginView() {
   // const { data: session } = useSession()
   const handleClick = async () => {
-    await signIn('google', { callbackUrl: '/' })
+    const locale = window.location.pathname.split("/")[1]
+    await signIn('google', { callbackUrl: `/${locale}` })
   }
 
   return (

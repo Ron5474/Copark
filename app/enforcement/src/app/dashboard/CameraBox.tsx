@@ -22,24 +22,46 @@ export default function CameraCaptureCard({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
+  const stopAllTracks = () => {
+    if (streamRef.current) {
+      const tracks = streamRef.current.getTracks();
+      tracks.forEach(track => {
+        track.stop();
+        // debugging
+        // console.log(`Track ${track.id} stopped:`, track.readyState);
+      });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+      streamRef.current = null;
+    }
+  };
+
   useEffect(() => {
-    if (cameraOn && videoRef.current) {
+    if (cameraOn) {
+      stopAllTracks();
+      
       navigator.mediaDevices
-        .getUserMedia({ video: true })
+        .getUserMedia({ video: { facingMode: 'environment' } })
         .then((stream) => {
-          streamRef.current = stream
-          videoRef.current!.srcObject = stream
+          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.play();
+          }
         })
         .catch((err) => {
-          console.error('Error accessing camera:', err)
-          setCameraOn(false)
-        })
+          console.error('Camera access denied:', err);
+          setCameraOn(false);
+        });
     } else {
-      streamRef.current?.getTracks().forEach((track) => track.stop())
-      streamRef.current = null
-      if (videoRef.current) videoRef.current.srcObject = null
+      stopAllTracks();
     }
-  }, [cameraOn, setCameraOn])
+    return () => {
+      stopAllTracks();
+    };
+  }, [cameraOn, setCameraOn]);
 
   const handleCapture = () => {
     const video = videoRef.current
@@ -53,6 +75,9 @@ export default function CameraCaptureCard({
 
     context.drawImage(video, 0, 0, canvas.width, canvas.height)
     const imageDataURL = canvas.toDataURL('image/png')
+
+    stopAllTracks(); // check me later
+
     onCapture(imageDataURL)
   }
 

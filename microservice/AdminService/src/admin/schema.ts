@@ -13,6 +13,9 @@ export class EnforcementUser {
 
   @Field()
   accountStatus!: string;
+
+  @Field()
+  password?: string;
 }
 
 @InputType()
@@ -22,4 +25,10 @@ export class NewEnforcementUser {
 
   @Field()
   email!: string;
+}
+
+@InputType()
+export class EnforcementUserInput {
+  @Field(() => ID)
+  id!: string;
 }

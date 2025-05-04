@@ -34,7 +34,7 @@ export const getEnforcers = async (): Promise<EnforcementUser[]> => {
     });
 
     const { data } = await response.json();
-    console.log(data);
+    // console.log(data);
     return data.getEnforcers;
   } catch (error) {
     console.error('Error fetching enforcers:', error);

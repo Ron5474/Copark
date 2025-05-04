@@ -29,7 +29,7 @@ app.use('/api/v0', router)
 // Enhanced error handler
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next: NextFunction) => {
-  console.log(process.env.POSTGRES_PASSWORD)
+  // console.log(process.env.POSTGRES_PASSWORD)
   console.error('Error occurred:', err) // Log the error
 
   res.status(err.status || 500).json({

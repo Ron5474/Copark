@@ -1,6 +1,10 @@
 import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
 import { AdminService } from "./service";
-import { EnforcementUser, NewEnforcementUser } from "./schema";
+import { 
+  EnforcementUser,
+  NewEnforcementUser,
+  EnforcementUserInput
+} from "./schema";
 
 const adminService = new AdminService();
 
@@ -18,5 +22,13 @@ export class AdminResolver {
     @Arg("enforcer") enforcer: NewEnforcementUser
   ): Promise<EnforcementUser[]> {
     return adminService.addEnforcer(enforcer);
+  }
+
+  @Mutation(() => [EnforcementUser])
+  @Authorized(["admin"])
+  async suspendEnforcer(
+    @Arg("enforcer") enforcer: EnforcementUserInput
+  ): Promise<EnforcementUser[]> {
+    return adminService.suspendEnforcer(enforcer);
   }
 }

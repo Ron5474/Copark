@@ -30,9 +30,6 @@ export class AuthService {
     if (rows.length > 0) {
       const user = rows[0].user
       const retid = await this.encrypt(user.id)
-      console.log("retid", retid)
-      const { payload } = await jwtVerify(retid, encodedKey);
-      console.log("payload", payload)
       return { id: retid, name: user.name, role: user.role };
     } else {
       return undefined

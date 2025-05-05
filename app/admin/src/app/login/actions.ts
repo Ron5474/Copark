@@ -4,7 +4,6 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 export async function login({ email, password }: { email: string; password: string }) {
-  // Simulate an API call for authentication
   const response = await fetch('http://localhost:3010/api/v0/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -19,12 +18,19 @@ export async function login({ email, password }: { email: string; password: stri
   const text = await response.text();
   const authenticated = text ? JSON.parse(text) : null;
 
-  // Set session storage here
-  if (authenticated && authenticated.name) {
-    window.sessionStorage.setItem('name', authenticated.name);
+  if (authenticated && authenticated.id) {
+    const cookieStore = await cookies();
+    cookieStore.set('session', authenticated.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/'
+    });
+
+    return authenticated;
   }
 
-  return authenticated;
+  return undefined;
 }
 
 export async function logout() {

@@ -25,9 +25,9 @@ import { signIn } from "next-auth/react"
 
 export default function LoginView() {
   // const { data: session } = useSession()
-  const handleClick = async () => {
+  const handleClick = async (provider: string) => {
     const locale = window.location.pathname.split("/")[1]
-    await signIn('google', { callbackUrl: `/${locale}` })
+    await signIn(provider, { callbackUrl: `/${locale}` })
   }
 
   return (
@@ -49,6 +49,11 @@ export default function LoginView() {
           startIcon={<GitHubIcon />}
           fullWidth
           sx={{color: 'black', borderColor: 'black'}}
+          onClick={() => {
+            console.log('Logging In')
+            // login()
+            handleClick('github')
+          }}
         >
           Sign In With GitHub
         </Button>
@@ -60,7 +65,7 @@ export default function LoginView() {
           onClick={() => {
             console.log('Logging In')
             // login()
-            handleClick()
+            handleClick('google')
           }}
         >
           Sign In With Google
@@ -70,6 +75,11 @@ export default function LoginView() {
           startIcon={<FacebookIcon />}
           fullWidth
           sx={{color: 'black', borderColor: 'black'}}
+          onClick={() => {
+            console.log('Logging In')
+            // login()
+            handleClick('facebook')
+          }}
         >
           Sign In With Facebook
         </Button>

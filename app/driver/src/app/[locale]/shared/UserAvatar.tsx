@@ -22,7 +22,7 @@ function UserAvatar() {
   return (
     <Avatar
       alt="User Avatar"
-      src={session?.user?.image || '/default-avatar.png'}
+      src={session?.user?.image || undefined}
       sx={{
         width: 40,
         height: 40,        

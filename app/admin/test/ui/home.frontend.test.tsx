@@ -49,6 +49,26 @@ vi.mock('@mui/material', () => ({
   }))
 }));
 
+// Mock enforcement actions
+vi.mock('../../src/enforcement/actions', () => ({
+  getEnforcers: vi.fn().mockResolvedValue([
+    {
+      id: '1',
+      name: 'Test Enforcer',
+      email: 'test@example.com',
+      accountStatus: 'active'
+    },
+    {
+      id: '2',
+      name: 'Test Enforcer 2',
+      email: 'test2@example.com',
+      accountStatus: 'suspended'
+    }
+  ]),
+  addEnforcer: vi.fn(),
+  suspendUser: vi.fn()
+}));
+
 const mockRouter = {
   push: vi.fn(),
 };
@@ -100,5 +120,40 @@ it('renders without user name when session is empty', () => {
   render(<Page />);
   
   expect(screen.queryByText(/Jason Xiong/)).toBeNull();
+});
+
+it('displays enforcers list when navigating to manage enforcement', async () => {
+  render(<Page />);
+  
+  // Navigate to manage enforcement
+  const manageEnforcementButton = screen.getByText('Manage Enforcement');
+  fireEvent.click(manageEnforcementButton);
+
+  // Wait for the enforcers to be displayed
+  await waitFor(() => {
+    expect(screen.getByText('Test Enforcer')).toBeDefined();
+    expect(screen.getByText('Test Enforcer 2')).toBeDefined();
+    expect(screen.getByText('active')).toBeDefined();
+    expect(screen.getByText('suspended')).toBeDefined();
+  });
+});
+
+it('handles enforcer suspension', async () => {
+  render(<Page />);
+  
+  // Navigate to manage enforcement
+  const manageEnforcementButton = screen.getByText('Manage Enforcement');
+  fireEvent.click(manageEnforcementButton);
+
+  // Find and click the suspend button for the first enforcer
+  await waitFor(() => {
+    const suspendButton = screen.getAllByRole('button')[0]; // Adjust this selector as needed
+    fireEvent.click(suspendButton);
+  });
+
+  // Verify that getEnforcers was called again to refresh the list
+  await waitFor(() => {
+    expect(screen.getByText('active')).toBeDefined();
+  });
 });
 

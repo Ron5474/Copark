@@ -19,6 +19,7 @@ export class AdminService {
 
       return payload.id as string; // Extract the `id` from the payload
     } catch (error) {
+      void error;
       // console.error('Failed to decrypt token:', error);
       return undefined; // Return undefined if the token is invalid or expired
     }

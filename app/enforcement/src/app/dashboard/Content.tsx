@@ -3,11 +3,11 @@
 import { Container, Box, Typography, Button } from '@mui/material'
 import { useEffect } from 'react'
 
-import CameraCaptureCard from './CameraBox'
-import ManualEntryCard from './ManualEntry'
-import PlateResult from './PlateResult'
-import EditPlateCard from './EditPlateCard'
-import { useEnforcement } from './Context'
+import CameraCaptureCard from './camera/CameraBox'
+import ManualEntryCard from './plate/ManualEntry'
+import PlateResult from './plate/PlateResult'
+import EditPlateCard from './plate/EditPlateCard'
+import { useEnforcement } from './context/Context'
 
 export default function EnforcementDashboardView() {
   const {

@@ -1,58 +1,72 @@
-import { vi, it, afterEach, expect, beforeAll } from 'vitest'
+import { vi, it, beforeEach, expect, afterAll } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import EnforcementDashboardView from '@/app/dashboard/Content'
 
 import View from '@/app/page'
+import { EnforcementProvider } from '@/app/dashboard/context/Context'
 
-afterEach(() => {
+beforeEach(() => {
   cleanup()
-  vi.clearAllMocks()
-})
+  vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(() => Promise.resolve())
 
-beforeAll(() => {
-  Object.defineProperty(navigator, 'mediaDevices', {
-    writable: true,
+  Object.defineProperty(global.navigator, 'mediaDevices', {
     value: {
       getUserMedia: vi.fn().mockResolvedValue({
-        getTracks: () => [
-          { stop: vi.fn() }
-        ]
+        getTracks: () => [{ stop: vi.fn() }]
       })
-    }
+    },
+    configurable: true
   })
 })
 
+afterAll(() => {
+  vi.resetAllMocks()
+})
+
 it('Renders Enforcement Dashboard', async () => {
-  render(<View />)
+  render(
+    <EnforcementProvider>
+      <View />
+    </EnforcementProvider>
+  )
   expect(await screen.findByText('Enforcement Dashboard')).toBeDefined()
 })
 
 it('renders the camera feed title', async () => {
-    render(<EnforcementDashboardView />)
+    render(
+      <EnforcementProvider>
+        <EnforcementDashboardView />
+      </EnforcementProvider>
+  )
     expect(await screen.getByText('Camera Feed')).toBeDefined()
 })
 
-it('renders scan button', () => {
-    render(<EnforcementDashboardView />)
+it('renders Capture license plate button', () => {
+    render(
+      <EnforcementProvider>
+        <EnforcementDashboardView />
+      </EnforcementProvider>
+    )
     expect(screen.getByRole('button', { name: /Capture License Plate/i })).toBeDefined()
 })
 
 it('renders license plate input', () => {
-  render(<EnforcementDashboardView />)
+  render(
+    <EnforcementProvider>
+      <EnforcementDashboardView />
+    </EnforcementProvider>
+  )
   expect(screen.getByLabelText('License Plate')).toBeDefined()
 })
 
-// it('shows retry button after scan fails', async () => {
-//   render(<EnforcementDashboardView />)
-//   const user = userEvent.setup()
-//   await user.click(screen.getByRole('button', { name: /scan license plate/i }))
-//   expect(await screen.findByRole('button', { name: /retry/i })).toBeDefined()
-// })
-
 it('can type in the plate input', async () => {
-  render(<EnforcementDashboardView />)
+  render(
+      <EnforcementProvider>
+        <EnforcementDashboardView />
+      </EnforcementProvider>
+    )
   const user = userEvent.setup()
   const input = screen.getByLabelText('License Plate')
   await user.type(input, 'helloworld')
@@ -60,7 +74,11 @@ it('can type in the plate input', async () => {
 })
 
 it('Turn on camera', async () => {
-  render(<EnforcementDashboardView />)
+  render(
+      <EnforcementProvider>
+        <EnforcementDashboardView />
+      </EnforcementProvider>
+    )
   const user = userEvent.setup()
   const cameraOn = screen.getByLabelText('Camera Off')
   await user.click(cameraOn)
@@ -70,7 +88,11 @@ it('Turn on camera', async () => {
 })
 
 it('sets plate from manual input when searching', async () => {
-  render(<EnforcementDashboardView />)
+  render(
+      <EnforcementProvider>
+        <EnforcementDashboardView />
+      </EnforcementProvider>
+    )
   const user = userEvent.setup()
   const input = screen.getByLabelText('License Plate')
   const searchButton = screen.getByRole('button', { name: /Search/i })
@@ -82,7 +104,11 @@ it('sets plate from manual input when searching', async () => {
 })
 
 it('starts a new scan and turns on camera', async () => {
-  render(<EnforcementDashboardView />)
+  render(
+      <EnforcementProvider>
+        <EnforcementDashboardView />
+      </EnforcementProvider>
+    )
   const user = userEvent.setup()
 
   const input = screen.getByLabelText('License Plate')
@@ -97,7 +123,11 @@ it('starts a new scan and turns on camera', async () => {
 })
 
 it('edits a detected plate number', async () => {
-  render(<EnforcementDashboardView />)
+  render(
+      <EnforcementProvider>
+        <EnforcementDashboardView />
+      </EnforcementProvider>
+    )
   const user = userEvent.setup()
 
   const input = screen.getByLabelText('License Plate')
@@ -118,19 +148,17 @@ it('edits a detected plate number', async () => {
   expect(await screen.findByText('NEW123')).toBeDefined()
 })
 
-// it('displays edit screen with captured image after simulated capture', async () => {
-//   render(<EnforcementDashboardView />)
-//   const user = userEvent.setup()
+it('shows camera detection note if detectionMethod is "camera"', async () => {
+  render(
+    <EnforcementProvider
+      initialPlate="ABC123"
+      initialCapturedImage="data:image/png;base64,fakeimg"
+      initialDetectionMethod="camera"
+    >
+      <EnforcementDashboardView />
+    </EnforcementProvider>
+  )
 
-//   const cameraToggle = screen.getByLabelText('Camera Off')
-//   await user.click(cameraToggle)
-
-//   const captureButton = await screen.findByLabelText('Capture License Plate')
-//   await user.click(captureButton)
-
-//   const editButton = await screen.findByLabelText('Edit Plate Number')
-//   await user.click(editButton)
-
-//   const image = await screen.findByAltText('Captured license plate')
-//   expect(image).toBeDefined()
-// })
+  const hint = await screen.findByText(/detected via camera/i)
+  expect(hint).toBeDefined()
+})

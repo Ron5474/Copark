@@ -7,7 +7,7 @@
 
 import { useEffect, useRef } from 'react'
 import { Box, Button, Typography } from '@mui/material'
-import { useEnforcement } from './Context'
+import { useEnforcement } from '../context/Context'
 
 export default function CameraCaptureCard() {
   const { cameraOn, setCameraOn, setCapturedImage, setPlate, setManualInput, setDetectionMethod } = useEnforcement()
@@ -109,7 +109,7 @@ export default function CameraCaptureCard() {
         disabled={!cameraOn}
         onClick={handleCapture}
         sx={{ bgcolor: cameraOn ? '#d3ffff' : '#ccc', mb: 2 }}
-        aria-label="Capture License Plate"
+        aria-label={`Capture License Plate ${cameraOn ? 'Enabled' : 'Disabled'}`}
       >
         Capture License Plate
       </Button>

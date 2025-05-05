@@ -2,8 +2,10 @@
 
 import { Box, Typography, Button } from '@mui/material'
 import Image from 'next/image'
+import { useState } from 'react'
+
 import ManualEntryCard from './ManualEntry'
-import { useEnforcement } from './Context'
+import { useEnforcement } from '../context/Context'
 
 export default function EditPlateCard() {
   const {
@@ -14,8 +16,15 @@ export default function EditPlateCard() {
     setIsEditing
   } = useEnforcement()
 
+  const [inputError, setInputError] = useState(false)
+
+
   const handleSaveEdit = () => {
-    if (!manualInput.trim()) return
+    if (!manualInput.trim()) {
+      setInputError(true)
+      return
+    }
+    setInputError(false)
     setPlate(manualInput.toUpperCase())
     setIsEditing(false)
   }
@@ -53,7 +62,10 @@ export default function EditPlateCard() {
         </Box>
       )}
 
-      <ManualEntryCard />
+      <ManualEntryCard showSearchButton={false}
+        inputError={inputError}
+        setInputError={setInputError}
+      />
 
       <Box display="flex" gap={2} mt={2}>
         <Button 

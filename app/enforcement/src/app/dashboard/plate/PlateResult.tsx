@@ -2,7 +2,7 @@
 
 import { Box, Typography, Paper, Button } from '@mui/material'
 import Image from 'next/image'
-import { useEnforcement } from './Context'
+import { useEnforcement } from '../context/Context'
 
 export default function PlateResult({
   showActions = true,

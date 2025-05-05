@@ -1,43 +1,92 @@
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { vi, it, expect, afterEach } from 'vitest'
+import { it, expect, afterEach, vi } from 'vitest'
 
-import PlateResult from '@/app/dashboard/PlateResult'
-  
+import PlateResult from '@/app/dashboard/plate/PlateResult'
+import { EnforcementProvider } from '@/app/dashboard/context/Context'
+
 afterEach(() => {
   cleanup()
 })
 
-it('renders detected plate info', () => {
-  render(
-    <PlateResult showActions={true}
-    />
+it('renders nothing if plate is null', () => {
+  const { container } = render(
+    <EnforcementProvider>
+      <PlateResult />
+    </EnforcementProvider>
   )
+
+  expect(container.firstChild).toBeNull()
+})
+
+it('shows the "License Plate Detected" message', async () => {
+  render(
+    <EnforcementProvider initialPlate="TEST123">
+      <PlateResult showActions />
+    </EnforcementProvider>
+  )
+
+  expect(await screen.findByText(/License Plate Detected/i)).toBeDefined()
+})
+
+it('shows the detected plate number', async () => {
+  render(
+    <EnforcementProvider initialPlate="TEST123">
+      <PlateResult showActions />
+    </EnforcementProvider>
+  )
+
   expect(screen.getByText(/TEST123/i)).toBeDefined()
 })
 
-it('calls callback functions on button click', async () => {
-  const onNewScan = vi.fn()
-  const onValidate = vi.fn()
+// fix me later
+it('calls validate callback when Validate button is clicked', async () => {
   const user = userEvent.setup()
+  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
 
   render(
-    <PlateResult showActions={true}
-    />
+    <EnforcementProvider initialPlate="TEST123">
+      <PlateResult showActions />
+    </EnforcementProvider>
   )
 
-  await user.click(screen.getByRole('button', { name: /New Scan/i }))
-  expect(onNewScan).toHaveBeenCalled()
+  const validateBtn = await screen.findByRole('button', { name: /Validate/i })
+  await user.click(validateBtn)
 
-  await user.click(screen.getByRole('button', { name: /Validate/i }))
-  expect(onValidate).toHaveBeenCalled()
+  expect(logSpy).toHaveBeenCalledWith('Validating permit for: TEST123')
+  logSpy.mockRestore()
 })
 
-it('does not show action buttons if showActions is false', () => {
+it('hides New Scan button when showActions is false', () => {
   render(
-    <PlateResult showActions={false}
-    />
+    <EnforcementProvider initialPlate="TEST123">
+      <PlateResult showActions={false} />
+    </EnforcementProvider>
   )
 
   expect(screen.queryByRole('button', { name: /New Scan/i })).toBeNull()
+})
+
+it('hides Validate button when showActions is false', () => {
+  render(
+    <EnforcementProvider initialPlate="TEST123">
+      <PlateResult showActions={false} />
+    </EnforcementProvider>
+  )
+
+  expect(screen.queryByRole('button', { name: /Validate/i })).toBeNull()
+})
+
+it('displays captured image preview if capturedImage is present', async () => {
+  render(
+    <EnforcementProvider
+      initialPlate="ABC123"
+      initialCapturedImage="data:image/png;base64,abc123"
+    >
+      <PlateResult />
+    </EnforcementProvider>
+  )
+
+  const img = await screen.findByAltText('Captured license plate')
+  expect(img).toBeDefined()
 })

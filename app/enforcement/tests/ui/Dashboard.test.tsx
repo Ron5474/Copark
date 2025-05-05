@@ -162,3 +162,25 @@ it('shows camera detection note if detectionMethod is "camera"', async () => {
   const hint = await screen.findByText(/detected via camera/i)
   expect(hint).toBeDefined()
 })
+
+it('renders PermitCard only when plate and isValidated are set', async () => {
+  const user = userEvent.setup()
+
+  render(
+    <EnforcementProvider>
+      <EnforcementDashboardView />
+    </EnforcementProvider>
+  )
+
+  const input = screen.getByLabelText('License Plate')
+  await user.type(input, 'ABC123')
+
+  const searchButton = screen.getByRole('button', { name: /search/i })
+  await user.click(searchButton)
+
+  const validLabel = screen.getByLabelText('Validate Permit')
+  await user.click(validLabel)
+
+  const newScan = screen.getByLabelText('New Scan')
+  expect(newScan).toBeDefined()
+})

@@ -17,6 +17,8 @@ type EnforcementContextType = {
   setDetectionMethod: (method: DetectionMethod) => void
   isEditing: boolean
   setIsEditing: (val: boolean) => void
+  isValidated: boolean
+  setIsValidated: (val: boolean) => void
 }
 
 const EnforcementContext = createContext<EnforcementContextType | undefined>(undefined)
@@ -44,6 +46,7 @@ export function EnforcementProvider({
   const [capturedImage, setCapturedImage] = useState<string | null>(initialCapturedImage)
   const [detectionMethod, setDetectionMethod] = useState<DetectionMethod>(initialDetectionMethod)
   const [isEditing, setIsEditing] = useState(initialIsEditing)
+  const [isValidated, setIsValidated] = useState(false)
 
   return (
     <EnforcementContext.Provider
@@ -60,6 +63,8 @@ export function EnforcementProvider({
         setDetectionMethod,
         isEditing,
         setIsEditing,
+        isValidated,
+        setIsValidated,
       }}
     >
       {children}

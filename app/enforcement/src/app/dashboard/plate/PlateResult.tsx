@@ -18,6 +18,7 @@ export default function PlateResult({
     setCameraOn,
     setDetectionMethod,
     setIsEditing,
+    setIsValidated,
   } = useEnforcement()
 
   if (!plate) return null
@@ -34,6 +35,7 @@ export default function PlateResult({
   const handleValidate = () => {
     console.log(`Validating permit for: ${plate}`)
     // TODO: replace with backend API call
+    setIsValidated(true)
   }
 
   return (

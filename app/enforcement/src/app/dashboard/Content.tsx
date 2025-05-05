@@ -7,6 +7,7 @@ import CameraCaptureCard from './camera/CameraBox'
 import ManualEntryCard from './plate/ManualEntry'
 import PlateResult from './plate/PlateResult'
 import EditPlateCard from './plate/EditPlateCard'
+import PermitCard from './permit/Card'
 import { useEnforcement } from './context/Context'
 
 export default function EnforcementDashboardView() {
@@ -16,7 +17,8 @@ export default function EnforcementDashboardView() {
     setCameraOn,
     detectionMethod,
     isEditing,
-    setIsEditing
+    setIsEditing,
+    isValidated,
   } = useEnforcement()
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function EnforcementDashboardView() {
 
       {isEditing && <EditPlateCard />}
 
-      {plate && !isEditing && (
+      {plate && !isEditing && !isValidated && (
         <>
           <PlateResult showActions={true} />
 
@@ -71,6 +73,7 @@ export default function EnforcementDashboardView() {
           )}
         </>
       )}
+      {plate && isValidated && <PermitCard />}
     </Container>
   )
 }

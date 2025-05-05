@@ -20,6 +20,12 @@ beforeEach(() => {
     }),
   }))
 
+  vi.mock('@/app/api/auth/[...nextauth]/route', () => ({
+    handler: vi.fn(),
+    GET: vi.fn(),
+    POST: vi.fn(),
+  }))
+
   vi.mock('next-intl', () => ({
     useTranslations: () => (
       vi.fn((x: string) => {
@@ -29,9 +35,10 @@ beforeEach(() => {
         if (x === 'zone-prompt') {
           return 'Zone Prompt';
         }
-      })),
-    }));
-  })
+      })
+    ),
+  }))
+})
 
 
 it('Renders', async () => {

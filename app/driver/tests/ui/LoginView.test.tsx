@@ -26,6 +26,12 @@ beforeEach(() => {
     }),
   }))
 
+  vi.mock('@/app/api/auth/[...nextauth]/route', () => ({
+    handler: vi.fn(),
+    GET: vi.fn(),
+    POST: vi.fn(),
+  }))
+
   vi.mock('next-intl', () => ({
     useTranslations: () => (
       vi.fn((x: string) => {
@@ -45,9 +51,10 @@ beforeEach(() => {
           default:
             return x;
         }
-      })),
-    }));
-  })
+      })
+    ),
+  }))
+})
 
 it('Renders', async () => {
   await render(<Page />)

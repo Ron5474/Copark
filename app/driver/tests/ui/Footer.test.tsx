@@ -39,9 +39,10 @@ beforeEach(() => {
           default:
             return x;
         }
-      })),
-    }));
-  })
+      })
+    ),
+  }))
+})
 it('Renders', async () => {
   await render(<Footer />);
   expect(await screen.queryByText('Copark™')).not.toBeNull();

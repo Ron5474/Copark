@@ -53,7 +53,7 @@ export default function View() {
         'display': 'flex',
         'flexDirection': 'column',
         'margin': 'auto',
-        'width': '80%',
+        'width': '95%',
         // 'height': '100vh',
         'maxWidth': 'calc(100vh * 0.5)',
       }}
@@ -62,12 +62,12 @@ export default function View() {
         variant="h5"
         gutterBottom
         sx={{
-          marginTop: '5vh',
+          marginTop: '1vh',
         }}
       >
         Add Vehicle
       </Typography>
-      <Box sx={{marginTop: '2vh'}}>
+      <Box sx={{marginTop: '1vh'}}>
         <Typography
           variant="body1"
           sx={{margin: 0}}
@@ -110,7 +110,14 @@ export default function View() {
           select
           fullWidth
           value={country}
-          aria-label="Select a country"
+          // aria-label="Select a country"
+          slotProps={{
+            input: {
+              inputProps: {
+                'aria-label': 'Select a country',
+              }
+            },
+          }}
           size="small"
         >
           {Object.keys(locations).map((country) => (
@@ -131,7 +138,14 @@ export default function View() {
           select
           fullWidth
           value={locations[country].includes(state) ? state : ''}
-          aria-label="Select a state"
+          // aria-label="Select a state"
+          slotProps={{
+            input: {
+              inputProps: {
+                'aria-label': 'Select a state',
+              }
+            },
+          }}
           size="small"
         >
           {locations[country].map((state) => (

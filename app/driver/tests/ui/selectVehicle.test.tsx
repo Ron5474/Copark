@@ -1,8 +1,14 @@
+/**
+ * @file selectVehicle.test.tsx
+ * @description This file contains the test cases for the Vehicle page in zone checkout.
+ * @author Bryant Oliver
+ */
+
 import { vi, it, afterEach, expect, beforeEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import View from '../../src/app/[locale]/selectVehicle/GuestView'
+import View from '../../src/app/[locale]/selectVehicle/guest/View'
 import AddVehicle from '../../src/app/[locale]/selectVehicle/AddForm'
 
 afterEach(() => {

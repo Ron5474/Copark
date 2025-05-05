@@ -3,7 +3,7 @@ import { test, beforeAll, afterAll, expect } from 'vitest'
 import supertest from 'supertest'
 import * as http from 'http'
 
-import * as db from '../db'
+import * as db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
 
@@ -23,7 +23,6 @@ beforeAll(async () => {
   authServer = http.createServer(authApp)
   await new Promise<void>((resolve) => {
     authServer.listen(AUTH_PORT, () => {
-    //   console.log(`Auth service running on ${AUTH_SERVICE_URL}`)
       resolve()
     })
   })

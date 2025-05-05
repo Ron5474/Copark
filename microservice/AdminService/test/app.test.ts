@@ -3,7 +3,7 @@ import { test, beforeAll, afterAll, expect } from 'vitest'
 import supertest from 'supertest'
 import * as http from 'http'
 
-import * as db from '../db'
+import * as db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
 
@@ -85,9 +85,7 @@ test('Admin can get a list of enforcers', async () => {
   expect(response.body.data.getEnforcers.length).toBeGreaterThan(0)
 })
 
-test('Errors out with no auth header', async () => {
-    const token = await loginAsAdmin()
-  
+test('Errors out with no auth header', async () => {  
     const query = `
       query {
         getEnforcers {

@@ -3,10 +3,9 @@
  */
 
 import { beforeAll, afterAll, test, expect } from 'vitest';
-import { reset, shutdown } from '../db';
+import { reset, shutdown } from './db';
 import { AdminService } from '../src/admin/service';
 import { NewUser, UserInput } from '../src/admin/schema';
-import e = require('express');
 
 const adminService = new AdminService();
 
@@ -27,7 +26,7 @@ test('getEnforcers should return a list of enforcers', async () => {
 
     expect(enforcers[1].name).toBe('Enforcer 2');
     expect(enforcers[1].accountStatus).toBe('active');
-  });
+});
 
 test('AddEnforcer should add an enforcer', async () => {
     const enforcer: NewUser = { name: 'Enforcer 3', email: 'enforcer3@outlook.com' };

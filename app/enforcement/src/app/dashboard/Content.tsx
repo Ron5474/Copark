@@ -31,7 +31,7 @@ export default function EnforcementDashboardView() {
   }
 
   return (
-    <Container maxWidth="xs" sx={{ py: 3 }}>
+    <Container maxWidth="xs" sx={{ py: 3, mt: 8 }}>
       {!plate && !isEditing && (
         <>
           <CameraCaptureCard />

@@ -5,7 +5,17 @@ import Image from 'next/image'
 
 export default function EnforcementAppBar() {
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#ffffff', color: 'black' }} elevation={2}>
+    <AppBar position="fixed" 
+      sx={{ 
+        top: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#0B1120',
+        color: 'white',
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        elevation={2}
+    >
       <Toolbar>
         <Image
           src="/copark-enforce-logo.png"

@@ -11,6 +11,7 @@ export default function PermitCard() {
     setManualInput,
     setCameraOn,
     setIsValidated,
+    setIsIssuingViolation 
   } = useEnforcement()
 
    // Replace this with real validation logic
@@ -27,6 +28,7 @@ export default function PermitCard() {
 
   const handleIssueCitation = () => {
     console.log(`Issuing citation for ${plate}`)
+    setIsIssuingViolation(true)
   }
 
   return (

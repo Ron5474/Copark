@@ -8,6 +8,7 @@ import ManualEntryCard from './plate/ManualEntry'
 import PlateResult from './plate/PlateResult'
 import EditPlateCard from './plate/EditPlateCard'
 import PermitCard from './permit/Card'
+import IssueViolationForm from './permit/IssueViolationForm'
 import { useEnforcement } from './context/Context'
 
 export default function EnforcementDashboardView() {
@@ -19,6 +20,8 @@ export default function EnforcementDashboardView() {
     isEditing,
     setIsEditing,
     isValidated,
+    isIssuingViolation,
+    setIsIssuingViolation,
   } = useEnforcement()
 
   useEffect(() => {
@@ -73,7 +76,11 @@ export default function EnforcementDashboardView() {
           )}
         </>
       )}
-      {plate && isValidated && <PermitCard />}
+      {plate && isValidated && !isIssuingViolation && <PermitCard />}
+
+      {plate && isIssuingViolation && (
+        <IssueViolationForm onCancel={() => setIsIssuingViolation(false)} />
+      )}
     </Container>
   )
 }

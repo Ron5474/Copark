@@ -5,25 +5,25 @@ export class EnforcementUser {
   @Field(() => ID)
   id!: string;
 
-  @Field()
+  @Field(() => String)  
   name!: string;
 
-  @Field()
+  @Field(() => String)  
   email!: string;
 
-  @Field()
+  @Field(() => String)  
   accountStatus!: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   password?: string;
 }
 
 @InputType()
 export class NewEnforcementUser {
-  @Field()
+  @Field(() => String)  
   name!: string;
 
-  @Field()
+  @Field(() => String)  
   email!: string;
 }
 

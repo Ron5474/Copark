@@ -19,7 +19,7 @@ export class AdminResolver {
   @Mutation(() => [EnforcementUser])
   @Authorized(["admin"])
   async addEnforcer(
-    @Arg("enforcer") enforcer: NewEnforcementUser
+    @Arg("enforcer", () => NewEnforcementUser) enforcer: NewEnforcementUser
   ): Promise<EnforcementUser[]> {
     return adminService.addEnforcer(enforcer);
   }
@@ -27,7 +27,7 @@ export class AdminResolver {
   @Mutation(() => [EnforcementUser])
   @Authorized(["admin"])
   async suspendEnforcer(
-    @Arg("enforcer") enforcer: EnforcementUserInput
+    @Arg("enforcer", () => EnforcementUserInput) enforcer: EnforcementUserInput
   ): Promise<EnforcementUser[]> {
     return adminService.suspendEnforcer(enforcer);
   }

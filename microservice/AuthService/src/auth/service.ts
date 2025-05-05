@@ -96,7 +96,7 @@ export class AuthService {
 
     return { id: user.id };
   } catch (err) {
-    console.log("JWT ERROR:", err);
+    // console.log("JWT ERROR:", err);
     throw new Error("Unauthorized3");
   }
 }

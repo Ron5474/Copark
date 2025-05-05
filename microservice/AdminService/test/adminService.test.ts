@@ -5,7 +5,7 @@
 import { beforeAll, afterAll, test, expect } from 'vitest';
 import { reset, shutdown } from '../db';
 import { AdminService } from '../src/admin/service';
-import { NewEnforcementUser, EnforcementUserInput } from '../src/admin/schema';
+import { NewUser, UserInput } from '../src/admin/schema';
 import e = require('express');
 
 const adminService = new AdminService();
@@ -30,7 +30,7 @@ test('getEnforcers should return a list of enforcers', async () => {
   });
 
 test('AddEnforcer should add an enforcer', async () => {
-    const enforcer: NewEnforcementUser = { name: 'Enforcer 3', email: 'enforcer3@outlook.com' };
+    const enforcer: NewUser = { name: 'Enforcer 3', email: 'enforcer3@outlook.com' };
     await adminService.addEnforcer(enforcer);
 
     const enforcers = await adminService.getEnforcers();
@@ -41,24 +41,24 @@ test('AddEnforcer should add an enforcer', async () => {
     expect(enforcers[2].accountStatus).toBe('active');
 });
 
-test('suspendEnforcer should suspend an enforcer', async () => {
-    const enforcer: NewEnforcementUser = { name: 'Michelle Obama', email: 'michelle.obama@example.com' };
+test('suspendUser should suspend an enforcer', async () => {
+    const enforcer: NewUser = { name: 'Michelle Obama', email: 'michelle.obama@example.com' };
     const addedEnforcers = await adminService.addEnforcer(enforcer);
   
-    const enforcerInput: EnforcementUserInput = { id: addedEnforcers[0].id };
-    const updatedEnforcers = await adminService.suspendEnforcer(enforcerInput);
+    const enforcerInput: UserInput = { id: addedEnforcers[0].id };
+    const updatedEnforcers = await adminService.suspendUser(enforcerInput);
   
     expect(updatedEnforcers).toHaveLength(1);
     expect(updatedEnforcers[0].name).toBe('Michelle Obama');
     expect(updatedEnforcers[0].accountStatus).toBe('suspended');
 });
   
-test('suspendEnforcer should suspend an enforcer', async () => {
-    const enforcer: NewEnforcementUser = { name: 'Michelle Obama', email: 'michelle.obama@example.com' };
+test('suspendUser should suspend an enforcer', async () => {
+    const enforcer: NewUser = { name: 'Michelle Obama', email: 'michelle.obama@example.com' };
     const addedEnforcers = await adminService.addEnforcer(enforcer);
   
-    const enforcerInput: EnforcementUserInput = { id: addedEnforcers[0].id + 'extra text' };
-    const updatedEnforcers = await adminService.suspendEnforcer(enforcerInput);
+    const enforcerInput: UserInput = { id: addedEnforcers[0].id + 'extra text' };
+    const updatedEnforcers = await adminService.suspendUser(enforcerInput);
   
     expect(updatedEnforcers).toHaveLength(0);
 });

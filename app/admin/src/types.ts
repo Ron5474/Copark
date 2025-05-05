@@ -1,4 +1,4 @@
-export interface EnforcementUser {
+export interface User {
   id: string
   name: string
   /**
@@ -11,7 +11,7 @@ export interface EnforcementUser {
   accountStatus: string
 }
 
-export interface NewEnforcementUser {
+export interface NewUser {
   name: string;
   /**
    * the email address of the user

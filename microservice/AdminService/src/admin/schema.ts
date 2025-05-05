@@ -1,7 +1,7 @@
 import { Field, ObjectType, InputType, ID } from "type-graphql";
 
 @ObjectType()
-export class EnforcementUser {
+export class User {
   @Field(() => ID)
   id!: string;
 
@@ -19,7 +19,7 @@ export class EnforcementUser {
 }
 
 @InputType()
-export class NewEnforcementUser {
+export class NewUser {
   @Field(() => String)  
   name!: string;
 
@@ -28,7 +28,7 @@ export class NewEnforcementUser {
 }
 
 @InputType()
-export class EnforcementUserInput {
+export class UserInput {
   @Field(() => ID)
   id!: string;
 }

@@ -1,4 +1,4 @@
-import { EnforcementUser, EnforcementUserInput, NewEnforcementUser } from "./schema";
+import { User, UserInput, NewUser } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -24,19 +24,20 @@ export class AdminService {
     }
   }
 
-  public async getEnforcers(): Promise<EnforcementUser[]> {
+  public async getEnforcers(): Promise<User[]> {
     const enforcementQuery = `
         SELECT id,
         data->>'name' AS name,
         data->>'email' AS email,
         data->>'accountStatus' AS accountStatus
         FROM account
-        WHERE data->>'role' = '["enforcement"]';
+        WHERE data->>'role' = '["enforcement"]'
+        AND data->>'accountStatus' != 'deleted';
     `
 
     const enforcementResult = await pool.query(enforcementQuery);
 
-    const enforcers: EnforcementUser[] = [];
+    const enforcers: User[] = [];
 
     for (const row of enforcementResult.rows) {
       enforcers.push({
@@ -50,7 +51,7 @@ export class AdminService {
     return enforcers;
   }
 
-  public async addEnforcer(enforcer: NewEnforcementUser): Promise<EnforcementUser[]> {
+  public async addEnforcer(enforcer: NewUser): Promise<User[]> {
     const insertQuery = `
     INSERT INTO account (data)
     VALUES (
@@ -74,7 +75,7 @@ export class AdminService {
 
     const result = await pool.query(insertQuery, [enforcer.name, enforcer.email, randomPassword]);
 
-    const enforcers: EnforcementUser[] = [];
+    const enforcers: User[] = [];
 
     for (const row of result.rows) {
       enforcers.push({
@@ -89,7 +90,7 @@ export class AdminService {
     return enforcers;
   }
 
-  public async suspendEnforcer(enforcer: EnforcementUserInput): Promise<EnforcementUser[]> {
+  public async suspendUser(enforcer: UserInput): Promise<User[]> {
     const updateQuery = `
       UPDATE account
       SET data = jsonb_set(data, '{accountStatus}', '"suspended"')
@@ -99,7 +100,7 @@ export class AdminService {
   
     const result = await pool.query(updateQuery, [await this.decrypt(enforcer.id)]);
   
-    const enforcers: EnforcementUser[] = [];
+    const enforcers: User[] = [];
   
     for (const row of result.rows) {
       enforcers.push({
@@ -111,5 +112,32 @@ export class AdminService {
     }
   
     return enforcers;
+  }
+
+  public async getDrivers(): Promise<User[]> {
+    const driverQuery = `
+        SELECT id,
+        data->>'name' AS name,
+        data->>'email' AS email,
+        data->>'accountStatus' AS accountStatus
+        FROM account
+        WHERE data->>'role' = '["driver"]'
+        AND data->>'accountStatus' != 'deleted';
+    `
+
+    const driverResult = await pool.query(driverQuery);
+
+    const drivers: User[] = [];
+
+    for (const row of driverResult.rows) {
+      drivers.push({
+        id: await this.encrypt(row.id),
+        name: row.name,
+        accountStatus: row.accountstatus,
+        email: row.email
+      });
+    }
+
+    return drivers;
   }
 }

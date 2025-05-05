@@ -144,7 +144,7 @@ test('Admin can suspend an enforcer', async () => {
   
     const suspendMutation = `
       mutation {
-        suspendEnforcer(enforcer: { id: "${targetId}" }) {
+        suspendUser(enforcer: { id: "${targetId}" }) {
           id
           name
           accountStatus
@@ -160,7 +160,7 @@ test('Admin can suspend an enforcer', async () => {
   
   
     expect(suspendResponse.body.errors).toBeUndefined()
-    const suspended = suspendResponse.body.data.suspendEnforcer
+    const suspended = suspendResponse.body.data.suspendUser
     expect(suspended[0].accountStatus).toBe('suspended')
   })
   

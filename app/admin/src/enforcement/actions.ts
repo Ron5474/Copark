@@ -1,6 +1,6 @@
 'use server'
 import { cookies } from 'next/headers';
-import { EnforcementUser, NewEnforcementUser } from './types';
+import { User, NewUser } from './types';
 
 const API_URL = 'http://localhost:4000/graphql';
 
@@ -10,7 +10,7 @@ const getAuthToken = async () => {
   return token;
 };
 
-export const getEnforcers = async (): Promise<EnforcementUser[]> => {
+export const getEnforcers = async (): Promise<User[]> => {
   try {
     const token = await getAuthToken();
     const response = await fetch(API_URL, {
@@ -40,7 +40,7 @@ export const getEnforcers = async (): Promise<EnforcementUser[]> => {
   }
 };
 
-export const addEnforcer = async (enforcer: NewEnforcementUser): Promise<EnforcementUser[]> => {
+export const addEnforcer = async (enforcer: NewUser): Promise<User[]> => {
   try {
     const token = await getAuthToken();
     const response = await fetch(API_URL, {
@@ -51,7 +51,7 @@ export const addEnforcer = async (enforcer: NewEnforcementUser): Promise<Enforce
       },
       body: JSON.stringify({
         query: `
-          mutation AddEnforcer($enforcer: NewEnforcementUser!) {
+          mutation AddEnforcer($enforcer: NewUser!) {
             addEnforcer(enforcer: $enforcer) {
               id
               name

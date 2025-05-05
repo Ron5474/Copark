@@ -2,7 +2,7 @@ import { test, beforeAll, afterAll, expect } from 'vitest';
 import * as http from 'http';
 import * as db from '../db';
 import { app, bootstrap } from '../src/app';
-import { EnforcementUser, NewEnforcementUser, EnforcementUserInput } from '../src/admin/schema'; // Adjust to your schema import
+import { User, NewUser, UserInput } from '../src/admin/schema'; // Adjust to your schema import
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>;
 
@@ -19,7 +19,7 @@ afterAll(() => {
 });
 
 // Test Data
-export const enforcementUserData = {
+export const UserData = {
   id: '1234',
   name: 'Enforcer 1',
   email: 'enforcer1@outlook.com',
@@ -27,40 +27,40 @@ export const enforcementUserData = {
   password: 'securepassword',
 };
 
-test('EnforcementUser schema loads correctly', () => {
-  // Create instance of EnforcementUser
-  const enforcementUser = new EnforcementUser();
-  enforcementUser.id = enforcementUserData.id;
-  enforcementUser.name = enforcementUserData.name;
-  enforcementUser.email = enforcementUserData.email;
-  enforcementUser.accountStatus = enforcementUserData.accountStatus;
-  enforcementUser.password = enforcementUserData.password;
+test('User schema loads correctly', () => {
+  // Create instance of User
+  const testUser = new User();
+  testUser.id = UserData.id;
+  testUser.name = UserData.name;
+  testUser.email = UserData.email;
+  testUser.accountStatus = UserData.accountStatus;
+  testUser.password = UserData.password;
 
-  expect(enforcementUser).toBeDefined();
-  expect(enforcementUser.id).toBe(enforcementUserData.id);
-  expect(enforcementUser.name).toBe(enforcementUserData.name);
-  expect(enforcementUser.email).toBe(enforcementUserData.email);
-  expect(enforcementUser.accountStatus).toBe(enforcementUserData.accountStatus);
-  expect(enforcementUser.password).toBe(enforcementUserData.password);
+  expect(testUser).toBeDefined();
+  expect(testUser.id).toBe(UserData.id);
+  expect(testUser.name).toBe(UserData.name);
+  expect(testUser.email).toBe(UserData.email);
+  expect(testUser.accountStatus).toBe(UserData.accountStatus);
+  expect(testUser.password).toBe(UserData.password);
 });
 
-test('NewEnforcementUser input type validation', () => {
-  const newEnforcementUser: NewEnforcementUser = {
+test('NewUser input type validation', () => {
+  const newUser: NewUser = {
     name: 'Enforcer 2',
     email: 'enforcer2@outlook.com',
   };
 
-  expect(newEnforcementUser.name).toBeDefined();
-  expect(newEnforcementUser.name).toBe('Enforcer 2');
-  expect(newEnforcementUser.email).toBeDefined();
-  expect(newEnforcementUser.email).toBe('enforcer2@outlook.com');
+  expect(newUser.name).toBeDefined();
+  expect(newUser.name).toBe('Enforcer 2');
+  expect(newUser.email).toBeDefined();
+  expect(newUser.email).toBe('enforcer2@outlook.com');
 });
 
-test('EnforcementUserInput input type validation', () => {
-  const enforcementUserInput: EnforcementUserInput = {
+test('UserInput input type validation', () => {
+  const UserInput: UserInput = {
     id: '1234',
   };
 
-  expect(enforcementUserInput.id).toBeDefined();
-  expect(enforcementUserInput.id).toBe('1234');
+  expect(UserInput.id).toBeDefined();
+  expect(UserInput.id).toBe('1234');
 });

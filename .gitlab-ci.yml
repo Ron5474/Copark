@@ -16,7 +16,7 @@ variables:
   # MASTER_SECRET: not-a-very-secret-secret
   GOOGLE_ID: ${GOOGLE_ID}
   GOOGLE_SECRET: ${GOOGLE_SECRET}
-
+  NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
 stages:
   - quality
   - build

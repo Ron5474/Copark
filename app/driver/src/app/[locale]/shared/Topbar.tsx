@@ -1,11 +1,10 @@
-import { AppBar, Avatar, Box, IconButton } from "@mui/material";
+import { AppBar, Box, IconButton } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import theme from "../theme";
-// import { auth } from "@/auth";
+import UserAvatar from "./UserAvatar";
 
 
 function Topbar() {
-  // const session = await auth()
   const primaryColorMain = theme.palette.primary.main;
   const primaryColorLight = theme.palette.primary.light;
   return (
@@ -28,7 +27,8 @@ function Topbar() {
       </picture>
      <Box sx={{display: "flex", gap: "10px", alignItems: "center"}}>
       {/* {session?.user? <Avatar sx={{width: "40px", height: "40px"}} src={session.user.image || undefined}/> : <Avatar sx={{width: "40px", height: "40px"}}/>} */}
-      <Avatar sx={{width: "40px", height: "40px"}}/>
+      {/* <Avatar sx={{width: "40px", height: "40px"}}/> */}
+      <UserAvatar />
       <IconButton>
         <MenuIcon sx={{color: "black"}}/>
       </IconButton>

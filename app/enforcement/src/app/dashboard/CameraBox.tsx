@@ -3,65 +3,48 @@
  * https://medium.com/@gk150899/building-a-webcam-app-with-reactjs-3111c1e90efb
  * https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API/Taking_still_photos
  */
-
 'use client'
 
 import { useEffect, useRef } from 'react'
 import { Box, Button, Typography } from '@mui/material'
+import { useEnforcement } from './Context'
 
-export default function CameraCaptureCard({
-  cameraOn,
-  setCameraOn,
-  onCapture,
-}: {
-  cameraOn: boolean
-  setCameraOn: (on: boolean) => void
-  onCapture: (image: string) => void
-}) {
+export default function CameraCaptureCard() {
+  const { cameraOn, setCameraOn, setCapturedImage, setPlate, setManualInput, setDetectionMethod } = useEnforcement()
+
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
   const stopAllTracks = () => {
     if (streamRef.current) {
-      const tracks = streamRef.current.getTracks();
-      tracks.forEach(track => {
-        track.stop();
-        // debugging
-        // console.log(`Track ${track.id} stopped:`, track.readyState);
-      });
-
+      streamRef.current.getTracks().forEach(track => track.stop())
       if (videoRef.current) {
-        videoRef.current.srcObject = null;
+        videoRef.current.srcObject = null
       }
-      streamRef.current = null;
+      streamRef.current = null
     }
-  };
+  }
 
   useEffect(() => {
     if (cameraOn) {
-      stopAllTracks();
-      
-      navigator.mediaDevices
-        .getUserMedia({ video: { facingMode: 'environment' } })
-        .then((stream) => {
-          streamRef.current = stream;
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-            videoRef.current.play();
-          }
-        })
-        .catch((err) => {
-          console.error('Camera access denied:', err);
-          setCameraOn(false);
-        });
+      stopAllTracks()
+      navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+        streamRef.current = stream
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+          videoRef.current.play()
+        }
+      }).catch(err => {
+        console.error('Camera access denied:', err)
+        setCameraOn(false)
+      })
     } else {
-      stopAllTracks();
+      stopAllTracks()
     }
-    return () => {
-      stopAllTracks();
-    };
-  }, [cameraOn, setCameraOn]);
+
+    return () => stopAllTracks()
+  }, [cameraOn, setCameraOn])
 
   const handleCapture = () => {
     const video = videoRef.current
@@ -75,10 +58,14 @@ export default function CameraCaptureCard({
 
     context.drawImage(video, 0, 0, canvas.width, canvas.height)
     const imageDataURL = canvas.toDataURL('image/png')
+    stopAllTracks()
 
-    stopAllTracks(); // check me later
-
-    onCapture(imageDataURL)
+    setCapturedImage(imageDataURL)
+    const simulatedPlate = 'ABC123'
+    setPlate(simulatedPlate)
+    setManualInput(simulatedPlate)
+    setDetectionMethod('camera')
+    setCameraOn(false)
   }
 
   return (
@@ -101,13 +88,7 @@ export default function CameraCaptureCard({
         </Button>
       </Box>
 
-      <Box
-        sx={{
-          width: '100%', height: 150,
-          borderRadius: 2, mt: 1, mb: 2,
-          overflow: 'hidden', position: 'relative'
-        }}
-      >
+      <Box sx={{ width: '100%', height: 150, borderRadius: 2, mt: 1, mb: 2, overflow: 'hidden', position: 'relative' }}>
         {cameraOn ? (
           <video
             ref={videoRef}
@@ -117,13 +98,7 @@ export default function CameraCaptureCard({
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
-          <Box
-            sx={{
-              width: '100%', height: '100%',
-              bgcolor: '#999',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}
-          >
+          <Box sx={{ width: '100%', height: '100%', bgcolor: '#999', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Typography color="white">Camera Off</Typography>
           </Box>
         )}

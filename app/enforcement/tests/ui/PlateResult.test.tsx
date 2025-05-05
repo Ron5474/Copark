@@ -3,11 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { vi, it, expect, afterEach } from 'vitest'
 
 import PlateResult from '@/app/dashboard/PlateResult'
-
-const mockPlate = 'TEST123'
-const mockImage = 'data:image/png;base64,123abc'
-
-
   
 afterEach(() => {
   cleanup()
@@ -15,12 +10,7 @@ afterEach(() => {
 
 it('renders detected plate info', () => {
   render(
-    <PlateResult
-      plate={mockPlate}
-      capturedImage={mockImage}
-      onNewScan={vi.fn()}
-      onValidate={vi.fn()}
-      showActions={true}
+    <PlateResult showActions={true}
     />
   )
   expect(screen.getByText(/TEST123/i)).toBeDefined()
@@ -32,12 +22,7 @@ it('calls callback functions on button click', async () => {
   const user = userEvent.setup()
 
   render(
-    <PlateResult
-      plate={mockPlate}
-      capturedImage={mockImage}
-      onNewScan={onNewScan}
-      onValidate={onValidate}
-      showActions={true}
+    <PlateResult showActions={true}
     />
   )
 
@@ -50,12 +35,7 @@ it('calls callback functions on button click', async () => {
 
 it('does not show action buttons if showActions is false', () => {
   render(
-    <PlateResult
-      plate={mockPlate}
-      capturedImage={mockImage}
-      onNewScan={vi.fn()}
-      onValidate={vi.fn()}
-      showActions={false}
+    <PlateResult showActions={false}
     />
   )
 

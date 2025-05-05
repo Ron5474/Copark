@@ -8,26 +8,37 @@ import {
   IconButton,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
+import { useEnforcement } from './Context'
 
-export default function ManualEntryCard({
-  plate,
-  setPlate,
-  onSearch,
-}: {
-  plate: string
-  setPlate: (val: string) => void
-  onSearch: () => void
-}) {
+export default function ManualEntryCard() {
+  const {
+    manualInput,
+    setManualInput,
+    setPlate,
+    setDetectionMethod,
+    setCapturedImage,
+    setCameraOn,
+  } = useEnforcement()
+
+  const handleSearch = () => {
+    const trimmed = manualInput.trim()
+    if (!trimmed) return
+    setPlate(trimmed.toUpperCase())
+    setDetectionMethod('manual')
+    setCapturedImage(null)
+    setCameraOn(false)
+  }
+
   return (
     <FormControl fullWidth variant="standard">
       <InputLabel htmlFor="plate">License Plate</InputLabel>
       <Input
         id="plate"
-        value={plate}
-        onChange={(e) => setPlate(e.target.value)}
+        value={manualInput}
+        onChange={(e) => setManualInput(e.target.value)}
         endAdornment={
           <InputAdornment position="end">
-            <IconButton onClick={onSearch} aria-label="Search">
+            <IconButton onClick={handleSearch} aria-label="Search">
               <SearchIcon />
             </IconButton>
           </InputAdornment>

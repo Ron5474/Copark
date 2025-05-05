@@ -2,20 +2,40 @@
 
 import { Box, Typography, Paper, Button } from '@mui/material'
 import Image from 'next/image'
+import { useEnforcement } from './Context'
 
 export default function PlateResult({
-  plate,
-  capturedImage,
-  onNewScan,
-  onValidate,
   showActions = true,
 }: {
-  plate: string
-  capturedImage?: string | null
-  onNewScan: () => void
-  onValidate: () => void
   showActions?: boolean
 }) {
+  const {
+    plate,
+    capturedImage,
+    setPlate,
+    setCapturedImage,
+    setManualInput,
+    setCameraOn,
+    setDetectionMethod,
+    setIsEditing,
+  } = useEnforcement()
+
+  if (!plate) return null
+
+  const handleNewScan = () => {
+    setPlate(null)
+    setCapturedImage(null)
+    setManualInput('')
+    setDetectionMethod(null)
+    setIsEditing(false)
+    setTimeout(() => setCameraOn(true), 100)
+  }
+
+  const handleValidate = () => {
+    console.log(`Validating permit for: ${plate}`)
+    // TODO: replace with backend API call
+  }
+
   return (
     <Paper
       elevation={3}
@@ -26,7 +46,6 @@ export default function PlateResult({
         textAlign: 'center',
       }}
     >
-
       {capturedImage && (
         <Box 
           sx={{ 
@@ -61,7 +80,7 @@ export default function PlateResult({
         <Box display="flex" gap={2}>
           <Button
             variant="contained"
-            onClick={onValidate}
+            onClick={handleValidate}
             fullWidth
             sx={{ bgcolor: 'green', color: 'white' }}
             aria-label="Validate Permit"
@@ -70,7 +89,7 @@ export default function PlateResult({
           </Button>
           <Button
             variant="outlined"
-            onClick={onNewScan}
+            onClick={handleNewScan}
             fullWidth
             aria-label="New Scan"
           >

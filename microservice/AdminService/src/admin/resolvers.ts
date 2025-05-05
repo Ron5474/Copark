@@ -27,8 +27,8 @@ export class AdminResolver {
   @Mutation(() => [User])
   @Authorized(["admin"])
   async suspendUser(
-    @Arg("enforcer", () => UserInput) enforcer: UserInput
+    @Arg("user", () => UserInput) user: UserInput
   ): Promise<User[]> {
-    return adminService.suspendUser(enforcer);
+    return adminService.suspendUser(user);
   }
 }

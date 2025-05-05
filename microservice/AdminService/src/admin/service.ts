@@ -51,6 +51,33 @@ export class AdminService {
     return enforcers;
   }
 
+  public async getDrivers(): Promise<User[]> {
+      const driverQuery = `
+          SELECT id,
+          data->>'name' AS name,
+          data->>'email' AS email,
+          data->>'accountStatus' AS accountStatus
+          FROM account
+          WHERE data->>'role' = '["driver"]'
+          AND data->>'accountStatus' != 'deleted';
+      `
+
+      const driverResult = await pool.query(driverQuery);
+
+      const drivers: User[] = [];
+
+      for (const row of driverResult.rows) {
+        drivers.push({
+          id: await this.encrypt(row.id),
+          name: row.name,
+          accountStatus: row.accountstatus,
+          email: row.email
+        });
+      }
+
+      return drivers;
+  }
+
   public async addEnforcer(enforcer: NewUser): Promise<User[]> {
     const insertQuery = `
     INSERT INTO account (data)
@@ -90,7 +117,7 @@ export class AdminService {
     return enforcers;
   }
 
-  public async suspendUser(enforcer: UserInput): Promise<User[]> {
+  public async suspendUser(user: UserInput): Promise<User[]> {
     const updateQuery = `
       UPDATE account
       SET data = jsonb_set(data, '{accountStatus}', '"suspended"')
@@ -98,12 +125,12 @@ export class AdminService {
       RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
     `;
   
-    const result = await pool.query(updateQuery, [await this.decrypt(enforcer.id)]);
+    const result = await pool.query(updateQuery, [await this.decrypt(user.id)]);
   
-    const enforcers: User[] = [];
+    const Users: User[] = [];
   
     for (const row of result.rows) {
-      enforcers.push({
+      Users.push({
         id: await this.encrypt(row.id),
         name: row.name,
         accountStatus: row.accountstatus,
@@ -111,33 +138,30 @@ export class AdminService {
       });
     }
   
-    return enforcers;
+    return Users;
   }
 
-  public async getDrivers(): Promise<User[]> {
-    const driverQuery = `
-        SELECT id,
-        data->>'name' AS name,
-        data->>'email' AS email,
-        data->>'accountStatus' AS accountStatus
-        FROM account
-        WHERE data->>'role' = '["driver"]'
-        AND data->>'accountStatus' != 'deleted';
-    `
-
-    const driverResult = await pool.query(driverQuery);
-
-    const drivers: User[] = [];
-
-    for (const row of driverResult.rows) {
-      drivers.push({
+  public async reinstateUser(user: UserInput): Promise<User[]> {
+    const updateQuery = `
+      UPDATE account
+      SET data = jsonb_set(data, '{accountStatus}', '"active"')
+      WHERE id = $1
+      RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
+    `;
+  
+    const result = await pool.query(updateQuery, [await this.decrypt(user.id)]);
+  
+    const Users: User[] = [];
+  
+    for (const row of result.rows) {
+      Users.push({
         id: await this.encrypt(row.id),
         name: row.name,
         accountStatus: row.accountstatus,
-        email: row.email
+        email: row.email,
       });
     }
-
-    return drivers;
+  
+    return Users;
   }
 }

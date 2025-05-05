@@ -144,7 +144,7 @@ test('Admin can suspend an enforcer', async () => {
   
     const suspendMutation = `
       mutation {
-        suspendUser(enforcer: { id: "${targetId}" }) {
+        suspendUser(user: { id: "${targetId}" }) {
           id
           name
           accountStatus

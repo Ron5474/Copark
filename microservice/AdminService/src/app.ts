@@ -42,7 +42,7 @@ async function bootstrap() {
         const user = await response.json();
         return !!user; // Return true if the user is authorized
       } catch (error) {
-        console.error('AuthChecker Error:', error);
+        // console.error('AuthChecker Error:', error);
         throw new Error('Unauthorized');
       }
     },

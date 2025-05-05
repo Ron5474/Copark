@@ -1,37 +1,82 @@
 'use client'
-import { Box, Typography, Paper, Button, Stack } from '@mui/material'
+
+import { Box, Typography, Paper, Button } from '@mui/material'
+import Image from 'next/image'
 
 export default function PlateResult({
   plate,
-  image,
+  capturedImage,
   onNewScan,
   onValidate,
-  showActions,
+  showActions = true,
 }: {
   plate: string
-  image?: string
+  capturedImage?: string | null
   onNewScan: () => void
   onValidate: () => void
-  showActions: boolean
+  showActions?: boolean
 }) {
   return (
-    <Paper sx={{ p: 2, bgcolor: '#dcdcdc', borderRadius: 2, mb: 2 }}>
-      <Typography fontWeight="bold">License plate Detected</Typography>
-      <Typography variant="body2" gutterBottom>plate Number: {plate}</Typography>
+    <Paper
+      elevation={3}
+      sx={{
+        p: 3,
+        bgcolor: '#dcdcdc',
+        borderRadius: 2,
+        textAlign: 'center',
+      }}
+    >
 
-      {image && (
-        <Box
-          component="img"
-          src={image}
-          alt="Captured License Plate"
-          sx={{ width: '100%', borderRadius: 2 }}
-        />
+      {capturedImage && (
+        <Box 
+          sx={{ 
+            width: '100%', 
+            height: 150, 
+            mb: 2,
+            display: 'flex',
+            justifyContent: 'center',
+            borderRadius: 2,
+            overflow: 'hidden'
+          }}
+        >
+          <Image
+            src={capturedImage}
+            alt="Captured license plate"
+            width={300}
+            height={200}
+            style={{ height: 'auto' }} 
+          />
+        </Box>
       )}
+
+      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+        License Plate Detected
+      </Typography>
+      
+      <Typography variant="h4" fontWeight="bold" mb={3}>
+        {plate}
+      </Typography>
+
       {showActions && (
-        <Stack direction="row" spacing={2}>
-          <Button fullWidth sx={{ bgcolor: '#7fc9c9' }} onClick={onNewScan}>New Scan</Button>
-          <Button fullWidth sx={{ bgcolor: '#7fc9c9' }} onClick={onValidate}>Validate Permit</Button>
-        </Stack>
+        <Box display="flex" gap={2}>
+          <Button
+            variant="contained"
+            onClick={onValidate}
+            fullWidth
+            sx={{ bgcolor: 'green', color: 'white' }}
+            aria-label="Validate Permit"
+          >
+            Validate
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={onNewScan}
+            fullWidth
+            aria-label="New Scan"
+          >
+            New Scan
+          </Button>
+        </Box>
       )}
     </Paper>
   )

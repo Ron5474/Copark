@@ -17,13 +17,13 @@ it('renders detected plate info', () => {
   render(
     <PlateResult
       plate={mockPlate}
-      image={mockImage}
+      capturedImage={mockImage}
       onNewScan={vi.fn()}
       onValidate={vi.fn()}
       showActions={true}
     />
   )
-  expect(screen.getByText(/plate Number: TEST123/i)).toBeDefined()
+  expect(screen.getByText(/TEST123/i)).toBeDefined()
 })
 
 it('calls callback functions on button click', async () => {
@@ -34,7 +34,7 @@ it('calls callback functions on button click', async () => {
   render(
     <PlateResult
       plate={mockPlate}
-      image={mockImage}
+      capturedImage={mockImage}
       onNewScan={onNewScan}
       onValidate={onValidate}
       showActions={true}
@@ -44,7 +44,7 @@ it('calls callback functions on button click', async () => {
   await user.click(screen.getByRole('button', { name: /New Scan/i }))
   expect(onNewScan).toHaveBeenCalled()
 
-  await user.click(screen.getByRole('button', { name: /Validate Permit/i }))
+  await user.click(screen.getByRole('button', { name: /Validate/i }))
   expect(onValidate).toHaveBeenCalled()
 })
 
@@ -52,7 +52,7 @@ it('does not show action buttons if showActions is false', () => {
   render(
     <PlateResult
       plate={mockPlate}
-      image={mockImage}
+      capturedImage={mockImage}
       onNewScan={vi.fn()}
       onValidate={vi.fn()}
       showActions={false}

@@ -12,7 +12,7 @@ export default function EnforcementAppBar() {
           alt="CoPark Enforce"
           width={40}
           height={40}
-          style={{ height: 'auto' }}
+          style={{ width: 'auto', height: '100%' }}
         />
         <Typography variant="h6" sx={{ ml: 2, fontWeight: 'bold' }}>
           Enforcement Dashboard

@@ -134,6 +134,7 @@ export default function CameraCaptureCard({
         disabled={!cameraOn}
         onClick={handleCapture}
         sx={{ bgcolor: cameraOn ? '#d3ffff' : '#ccc', mb: 2 }}
+        aria-label="Capture License Plate"
       >
         Capture License Plate
       </Button>

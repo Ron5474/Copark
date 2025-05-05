@@ -15,6 +15,7 @@ import {
   Typography,
  } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
+import { ThemeProvider } from '@mui/material/styles'
 import { useState } from 'react'
 
 import ShortTermStepper from '../../shortTerm/ProgressStepper'
@@ -28,6 +29,7 @@ export default function MemberVehicles() {
   const handleClose = () => setOpen(false)
   return (
     <Box sx={{ mt: '90px' }}>
+      <ThemeProvider theme={theme}>
       <ShortTermStepper/>
       <Box sx={{
           maxWidth: '95%',
@@ -87,6 +89,7 @@ export default function MemberVehicles() {
           </DialogContent>
         </Dialog>
       </Box>
+      </ThemeProvider>
     </Box>
   )
 }

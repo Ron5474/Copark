@@ -8,7 +8,7 @@ const encodedKey = new TextEncoder().encode(process.env.MASTER_SECRET)
 
 export class AuthService {
 
-   public async authenticate(credentials: Credentials): Promise<User|undefined> {
+  public async authenticate(credentials: Credentials): Promise<User|undefined> {
     const query = {
       text: `
         SELECT jsonb_build_object(
@@ -100,5 +100,35 @@ export class AuthService {
     // console.log("JWT ERROR:", err);
     throw new Error("Unauthorized3");
   }
-}
+  }
+
+  public async driverLogin(email: string): Promise<string| undefined> {
+    const query = {
+      text: `
+    WITH check_duplicate AS (
+        SELECT id
+        FROM account
+        WHERE data->>'email' = $1
+    )
+    INSERT INTO account(data)
+    SELECT jsonb_build_object(
+        'valid', 'true'::jsonb,
+        'email', $1::TEXT,
+        'roles', '["member"]'
+    )
+    WHERE NOT EXISTS (SELECT 1 FROM check_duplicate)
+    RETURNING id`,
+      values: [email]
+    }
+  
+    const { rows } = await pool.query(query)
+  
+    if (rows.length > 0) {
+      const userId = rows[0].id
+      const retid = await this.encrypt(userId)
+      return retid
+    } else {
+      return undefined
+    }
+  }
 }

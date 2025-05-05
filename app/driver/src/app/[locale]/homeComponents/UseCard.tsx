@@ -6,6 +6,7 @@
 
 import { Box, Typography } from "@mui/material";
 import PropTypes from "prop-types";
+import theme from "../theme";
 
 function HowToUseCard({number, image, description, variant}: {number: number, image: string, description: string, variant: string}) {
   return (
@@ -46,7 +47,7 @@ function HowToUseCard({number, image, description, variant}: {number: number, im
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: (theme) => theme.palette.secondary.main,
+        backgroundColor: theme.palette.secondary.main,
         borderRadius: '15px',
         zIndex: 2,
       }}>
@@ -85,7 +86,7 @@ function HowToUseCard({number, image, description, variant}: {number: number, im
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: (theme) => theme.palette.primary.main,
+        backgroundColor: theme.palette.primary.main,
         borderRadius: '15px',
         rotate: "45deg",
         zIndex: 2,
@@ -105,7 +106,7 @@ function HowToUseCard({number, image, description, variant}: {number: number, im
         backgroundColor: "rgba(255, 255, 255, 0.75)",
         padding: "30px 15px 30px 15px",
         borderRadius: "25px",
-        color: (theme) => theme.palette.secondary.main,
+        color: theme.palette.secondary.main,
       }}>
         <Typography sx={{
           fontSize: "20px",

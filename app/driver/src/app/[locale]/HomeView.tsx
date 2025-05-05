@@ -12,9 +12,12 @@ import ZoneField from "./homeComponents/ZoneField";
 import GetStartedButton from "./homeComponents/GetStartedButton";
 import HowToUseCard from "./homeComponents/UseCard";
 import { useTranslations } from "next-intl";
+import theme from "./theme";
 
 function HomeView() {
-  const t = useTranslations('landingPage');
+  const t = useTranslations("landingPage");
+  const primaryColorMain = theme.palette.primary.main;
+
   return (
     <>
     <CssBaseline />
@@ -51,7 +54,8 @@ function HomeView() {
       }}>
         <Typography sx={{
           fontSize: "40px",
-          color: (theme) => theme.palette.secondary.main,
+          // color: (theme) => theme.palette.secondary.main,
+          color: primaryColorMain,
           lineHeight: "40px"
         }}>
         {t('login prompt line 1')}

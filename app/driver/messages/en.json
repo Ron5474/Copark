@@ -19,5 +19,13 @@
     "How to use step 4": "Select your parking duration",
     "How to use step 5": "Pay and park",
     "How to use step 6": "Relax and enjoy"
+  },
+  "footer": {
+    "Do Not Sell My Personal Info": "Do Not Sell My Personal Info",
+    "Privacy Policy": "Privacy Policy",
+    "Terms of Service": "Terms of Service",
+    "Contact Us": "Contact Us",
+    "Dark Mode": "Dark Mode",
+    "Rights Reserved": "© 2025 Copark. All rights reserved."
   }
 }

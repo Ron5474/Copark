@@ -35,6 +35,6 @@ beforeEach(() => {
 
 
 it('Renders', async () => {
-  render(<Home />);
+  await render(<Home />);
   expect(await screen.queryByLabelText('copark-logo')).not.toBeNull();
 });

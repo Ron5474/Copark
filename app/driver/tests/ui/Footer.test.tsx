@@ -6,8 +6,9 @@
 
 import { render, screen, cleanup } from '@testing-library/react';
 import { it, expect, afterEach, vi, beforeEach } from 'vitest';
-import Footer from '../../src/app/[locale]/shared/Footer';
+import '../setup'
 
+import Footer from '../../src/app/[locale]/shared/Footer';
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()

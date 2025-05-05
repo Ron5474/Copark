@@ -6,6 +6,7 @@
 
 import { render, screen, cleanup } from '@testing-library/react';
 import { it, expect, afterEach, beforeEach, vi } from 'vitest';
+import '../setup'
 import Topbar from '../../src/app/[locale]/shared/Topbar';
 
 afterEach(() => {
@@ -48,6 +49,17 @@ beforeEach(() => {
       })
     ),
   }))
+
+  vi.mock('@/app/[locale]/shared/actions', async () => {
+    return {
+      getUser: vi.fn().mockResolvedValue({
+        name: 'Test User',
+        email: 'test@example.com',
+        image: 'https://example.com/image.jpg',
+        // add more user props as needed
+      }),
+    };
+  });
 })
 
 it('Renders', async () => {

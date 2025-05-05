@@ -7,6 +7,7 @@
 import { vi, it, afterEach, expect, beforeEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import '../setup'
 
 import GuestView from '../../src/app/[locale]/selectVehicle/guest/View'
 import MemberView from '../../src/app/[locale]/selectVehicle/member/View'
@@ -52,6 +53,17 @@ beforeEach(() => {
       }
     )),
   }))
+
+  vi.mock('@/app/[locale]/shared/actions', async () => {
+    return {
+      getUser: vi.fn().mockResolvedValue({
+        name: 'Test User',
+        email: 'test@example.com',
+        image: 'https://example.com/image.jpg',
+        // add more user props as needed
+      }),
+    };
+  });
 })
 
 it('Renders guest', async () => {

@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 import { middleware } from '../src/middleware'
 import { NextRequest } from 'next/server'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { url } from 'inspector'
+import { beforeEach, expect, it, vi } from 'vitest'
 
 const mockRedirect = vi.spyOn(NextResponse, 'redirect')
 

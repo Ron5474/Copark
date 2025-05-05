@@ -22,26 +22,18 @@ export default function ManageEnforcement({ onNavigate }) {
   }, []);
 
   const fetchEnforcers = async () => {
-    try {
-      const data = await getEnforcers();
-      setEnforcers(data);
-    } catch (error) {
-      console.error('Error fetching enforcers:', error);
-    }
+    const data = await getEnforcers();
+    setEnforcers(data);
   };
 
   const handleAddEnforcer = async () => {
-    try {
-      await addEnforcer(newEnforcer);
-      setOpenAddDialog(false);
-      setNewEnforcer({
-        name: '',
-        email: ''
-      });
-      fetchEnforcers();
-    } catch (error) {
-      console.error('Error adding enforcer:', error);
-    }
+    await addEnforcer(newEnforcer);
+    setOpenAddDialog(false);
+    setNewEnforcer({
+      name: '',
+      email: ''
+    });
+    fetchEnforcers();
   };
 
   return (

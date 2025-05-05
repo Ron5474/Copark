@@ -1,6 +1,6 @@
 'use server'
-import { EnforcementUser, NewEnforcementUser } from '../types';
 import { cookies } from 'next/headers';
+import { EnforcementUser, NewEnforcementUser } from './types';
 
 const API_URL = 'http://localhost:4000/graphql';
 

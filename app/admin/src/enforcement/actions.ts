@@ -1,6 +1,6 @@
 'use server'
-import { EnforcementUser, NewEnforcementUser } from '../types';
 import { cookies } from 'next/headers';
+import { User, NewUser } from '../types';
 
 const API_URL = 'http://localhost:4000/graphql';
 
@@ -10,7 +10,7 @@ const getAuthToken = async () => {
   return token;
 };
 
-export const getEnforcers = async (): Promise<EnforcementUser[]> => {
+export const getEnforcers = async (): Promise<User[]> => {
   try {
     const token = await getAuthToken();
     const response = await fetch(API_URL, {
@@ -33,16 +33,17 @@ export const getEnforcers = async (): Promise<EnforcementUser[]> => {
       }),
     });
 
-    const { data } = await response.json();
-    console.log(data);
-    return data.getEnforcers;
+    const result = await response.json();
+
+    console.log(result)
+
+    return result.data.getEnforcers;
   } catch (error) {
-    console.error('Error fetching enforcers:', error);
     throw error;
   }
 };
 
-export const addEnforcer = async (enforcer: NewEnforcementUser): Promise<EnforcementUser[]> => {
+export const addEnforcer = async (enforcer: NewUser): Promise<User[]> => {
   try {
     const token = await getAuthToken();
     const response = await fetch(API_URL, {
@@ -53,7 +54,7 @@ export const addEnforcer = async (enforcer: NewEnforcementUser): Promise<Enforce
       },
       body: JSON.stringify({
         query: `
-          mutation AddEnforcer($enforcer: NewEnforcementUser!) {
+          mutation AddEnforcer($enforcer: NewUser!) {
             addEnforcer(enforcer: $enforcer) {
               id
               name
@@ -68,10 +69,56 @@ export const addEnforcer = async (enforcer: NewEnforcementUser): Promise<Enforce
       }),
     });
 
-    const { data } = await response.json();
-    return data.addEnforcer;
+    const result = await response.json();
+    return result.data.addEnforcer;
   } catch (error) {
     console.error('Error adding enforcer:', error);
+    throw error;
+  }
+};
+
+export const suspendUser = async (id: string): Promise<User[]> => {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation SuspendUser($user: UserInput!) {
+            suspendUser(user: $user) {
+              id
+              name
+              email
+              accountStatus
+            }
+          }
+        `,
+        variables: {
+          user: {
+            id
+          },
+        },
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.errors) {
+      console.error('GraphQL Errors:', result.errors);
+      throw new Error(result.errors[0].message);
+    }
+
+    if (!result.data) {
+      throw new Error('No data returned from the server');
+    }
+
+    return result.data.suspendUser;
+  } catch (error) {
+    console.error('Error suspending enforcer:', error);
     throw error;
   }
 };

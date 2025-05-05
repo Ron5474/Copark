@@ -1,7 +1,7 @@
 export interface AuthUser {
   id: string,
   name: string,
-  roles: string[],
+  role: string[],
   /**
    * the email address of the user
    * @maxLength 320
@@ -23,7 +23,7 @@ export interface Credentials {
 export interface User {
   id: string
   name: string
-  role: string
+  role: string[]
 }
 
 export interface Authenticated {

@@ -9,7 +9,7 @@
 #######################################################################
 */
 
-'use client'
+// 'use client'
 // import {useState} from 'react'
 
 import Container from '@mui/material/Container';
@@ -20,13 +20,14 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import { signIn } from "next-auth/react"
+// import {login} from './actions'
 
 
 export default function LoginView() {
   // const { data: session } = useSession()
-  const handleClick = async () => {
+  const handleClick = async (provider: string) => {
     const locale = window.location.pathname.split("/")[1]
-    await signIn('google', { callbackUrl: `/${locale}` })
+    await signIn(provider, { callbackUrl: `/${locale}` })
   }
 
   return (
@@ -48,6 +49,11 @@ export default function LoginView() {
           startIcon={<GitHubIcon />}
           fullWidth
           sx={{color: 'black', borderColor: 'black'}}
+          onClick={() => {
+            console.log('Logging In')
+            // login()
+            handleClick('github')
+          }}
         >
           Sign In With GitHub
         </Button>
@@ -56,7 +62,11 @@ export default function LoginView() {
           startIcon={<GoogleIcon />}
           fullWidth
           sx={{color: 'black', borderColor: 'black'}}
-          onClick={handleClick}
+          onClick={() => {
+            console.log('Logging In')
+            // login()
+            handleClick('google')
+          }}
         >
           Sign In With Google
         </Button>
@@ -65,6 +75,11 @@ export default function LoginView() {
           startIcon={<FacebookIcon />}
           fullWidth
           sx={{color: 'black', borderColor: 'black'}}
+          onClick={() => {
+            console.log('Logging In')
+            // login()
+            handleClick('facebook')
+          }}
         >
           Sign In With Facebook
         </Button>

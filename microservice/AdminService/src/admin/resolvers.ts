@@ -1,22 +1,48 @@
-import { Resolver, Query, Mutation, Arg } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
 import { AdminService } from "./service";
-import { EnforcementUser, NewEnforcementUser } from "./schema";
+import { 
+  User,
+  NewUser,
+  UserInput
+} from "./schema";
 
 const adminService = new AdminService();
 
 @Resolver()
 export class AdminResolver {
-  @Query(() => [EnforcementUser])
-  // @Authorized(["admin"])
-  async getEnforcers(): Promise<EnforcementUser[]> {
+  @Query(() => [User])
+  @Authorized(["admin"])
+  async getEnforcers(): Promise<User[]> {
     return adminService.getEnforcers();
   }
 
-  @Mutation(() => [EnforcementUser])
-  // @Authorized(["admin"])
+  @Query(() => [User])
+  @Authorized(["admin"])
+  async getDrivers(): Promise<User[]> {
+    return adminService.getDrivers();
+  }
+
+  @Mutation(() => [User])
+  @Authorized(["admin"])
   async addEnforcer(
-    @Arg("enforcer") enforcer: NewEnforcementUser
-  ): Promise<EnforcementUser[]> {
+    @Arg("enforcer", () => NewUser) enforcer: NewUser
+  ): Promise<User[]> {
     return adminService.addEnforcer(enforcer);
+  }
+
+  @Mutation(() => [User])
+  @Authorized(["admin"])
+  async suspendUser(
+    @Arg("user", () => UserInput) user: UserInput
+  ): Promise<User[]> {
+    return adminService.suspendUser(user);
+  }
+
+  @Mutation(() => [User])
+  @Authorized(["admin"])
+  async reinstateUser(
+    @Arg("user", () => UserInput) user: UserInput
+  ): Promise<User[]> {
+    return adminService.reinstateUser(user);
   }
 }

@@ -15,6 +15,7 @@ export class AuthController extends Controller {
 
   @Post("login")
   public async login(@Body() credentials: Credentials): Promise<Authenticated | undefined> {
+    // console.log("authenticating user with credentials:", credentials);
     return new AuthService().authenticate(credentials);
   }
 

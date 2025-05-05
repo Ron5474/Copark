@@ -8,7 +8,7 @@
 #
 #######################################################################
 */
-import { vi, it, afterEach, expect } from 'vitest'
+import { vi, it, afterEach, expect, beforeEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 // import userEvent from '@testing-library/user-event'
 
@@ -19,8 +19,38 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
+beforeEach(() => {
+  vi.mock('next/navigation', () => ({
+    useRouter: () => ({
+      push: vi.fn(),
+    }),
+  }))
+
+  vi.mock('next-intl', () => ({
+    useTranslations: () => (
+      vi.fn((x: string) => {
+        switch (x) {
+          case 'Do Not Sell My Personal Info':
+            return 'Do Not Sell My Personal Info';
+          case 'Privacy Policy':
+            return 'Privacy Policy';
+          case 'Terms of Service':
+            return 'Terms of Service';
+          case 'Contact Us':
+            return 'Contact Us';
+          case 'Dark Mode':
+            return 'Dark Mode';
+          case 'Rights Reserved':
+            return '© 2025 Copark. All rights reserved.';
+          default:
+            return x;
+        }
+      })),
+    }));
+  })
+
 it('Renders', async () => {
-  render(<Page />)
+  await render(<Page />)
   expect(await screen.findByText('Log In')).toBeDefined()
 })
 

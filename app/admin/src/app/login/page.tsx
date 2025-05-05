@@ -28,19 +28,14 @@ export default function Page() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    try {
-      console.log("Login attempt with:", { email, password });
-      const authenticated = await login({ email, password })
-      if (authenticated) {
-        window.sessionStorage.setItem('name', authenticated.name)
-        console.log("Login successful:", authenticated);
 
-        // Redirect to the home page
-        router.push('/')
-      }
-    } finally {
-      setIsLoading(false);
+    const authenticated = await login({ email, password })
+    if (authenticated) {
+      window.sessionStorage.setItem('name', authenticated.name);
+      router.push('/');
     }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -90,7 +85,7 @@ export default function Page() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
-              />
+            />
             <TextField
               margin="normal"
               required
@@ -133,4 +128,4 @@ export default function Page() {
       </Box>
     </Container>
   );
-} 
+}

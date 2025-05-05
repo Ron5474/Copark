@@ -1,14 +1,18 @@
+'use client';
 /**
  * @file zoneField.tsx
  * @description This file contains the ZoneField component.
  * @author Swayam Shah
  */
 
-import { Button } from "@mui/material";
+import { Button, ThemeProvider } from "@mui/material";
 import proptypes from "prop-types";
+import theme from "../theme";
+
 
 function ZoneField({text}: {text: string}) {
   return (
+    <ThemeProvider theme={theme}>
     <Button sx={{
       width: "fit-content",
       color: (theme) => theme.palette.secondary.main,
@@ -21,6 +25,7 @@ function ZoneField({text}: {text: string}) {
        }}>
       {text}
     </Button>
+    </ThemeProvider>
   )
 }
 

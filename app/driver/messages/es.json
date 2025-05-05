@@ -8,6 +8,24 @@
   },
   "landingPage": {
     "card title": "Estaciona. Paga. Relájate.",
-    "zone-prompt": "Ingrese el número de zona"
+    "zone-prompt": "Ingrese el número de zona",
+    "login prompt line 1": "Ahórrate la molestia",
+    "login prompt line 2": "de ingresar la matrícula cada vez",
+    "Get Started": "Empezar",
+    "How to use": "Cómo usar",
+    "How to use step 1": "Ingrese su número de zona",
+    "How to use step 2": "Seleccione su tipo de vehículo",
+    "How to use step 3": "Ingrese su matrícula",
+    "How to use step 4": "Seleccione la duración de su estacionamiento",
+    "How to use step 5": "Pague y estacione",
+    "How to use step 6": "Relájese y disfrute"
+  },
+  "footer": {
+    "Do Not Sell My Personal Info": "No venda mi información personal",
+    "Privacy Policy": "Política de privacidad",
+    "Terms of Service": "Términos de servicio",
+    "Contact Us": "Contáctenos",
+    "Dark Mode": "Modo oscuro",
+    "Rights Reserved": "© 2025 Copark. Todos los derechos reservados."
   }
 }

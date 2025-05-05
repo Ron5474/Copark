@@ -1,4 +1,4 @@
-import { vi, it, afterEach, expect } from 'vitest'
+import { vi, it, afterEach, expect, beforeEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -10,18 +10,48 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
+beforeEach(() => {
+  vi.mock('next/navigation', () => ({
+    useRouter: () => ({
+      push: vi.fn(),
+    }),
+  }))
+
+  vi.mock('next-intl', () => ({
+    useTranslations: () => (
+      vi.fn((x: string) => {
+        switch (x) {
+          case 'Do Not Sell My Personal Info':
+            return 'Do Not Sell My Personal Info';
+          case 'Privacy Policy':
+            return 'Privacy Policy';
+          case 'Terms of Service':
+            return 'Terms of Service';
+          case 'Contact Us':
+            return 'Contact Us';
+          case 'Dark Mode':
+            return 'Dark Mode';
+          case 'Rights Reserved':
+            return '© 2025 Copark. All rights reserved.';
+          default:
+            return x;
+        }
+      })),
+    }));
+  })
+
 it('Renders', async () => {
-  render(<View />)
+  await render(<View />)
   expect(await screen.findByText('Add Vehicle')).toBeDefined()
 })
 
-it('Renders license plate field', () => {
-  render(<AddVehicle />)
+it('Renders license plate field', async () => {
+  await render(<AddVehicle />)
   expect(screen.findByLabelText('Enter license plate number')).toBeDefined()
 })
 
 it('Error if license # is empty', async () => {
-  render(<AddVehicle />)
+  await render(<AddVehicle />)
   const user = userEvent.setup()
   await user.click(screen.getByLabelText('Submit vehicle'))
 
@@ -29,7 +59,7 @@ it('Error if license # is empty', async () => {
 })
 
 it('Can not enter more than 10 characters', async () => {
-  render(<AddVehicle />)
+  await render(<AddVehicle />)
   const user = userEvent.setup()
   const input = screen.getByLabelText('Enter license plate number')
   await user.type(input, '012345678912345')
@@ -37,7 +67,7 @@ it('Can not enter more than 10 characters', async () => {
   expect((input as HTMLInputElement).value).toBe('0123456789')
 })
 
-it('Renders country menu', () => {
+it('Renders country menu', async () => {
   render(<AddVehicle />)
   expect(screen.getByLabelText('Select a country')).toBeDefined()
 })

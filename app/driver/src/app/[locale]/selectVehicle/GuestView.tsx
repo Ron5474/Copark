@@ -1,6 +1,3 @@
-
-'use client'
-
 import { Fragment } from 'react'
 import type { NextPage } from 'next'
 

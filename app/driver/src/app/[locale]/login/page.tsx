@@ -8,9 +8,7 @@
 #
 #######################################################################
 */
-
-'use client'
-
+"use client"
 import type { NextPage } from 'next'
 import { ThemeProvider } from '@mui/material/styles'
 

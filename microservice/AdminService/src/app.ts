@@ -16,7 +16,7 @@ async function bootstrap() {
     resolvers: resolvers,
     validate: true,
     authChecker: async ({ context }, roles) => {
-      console.log('AuthChecker called with roles:', roles);
+      // console.log('AuthChecker called with roles:', roles);
       // console.log('Context headers:', context.headers);
       const authHeader = context.headers.authorization;
 
@@ -42,7 +42,7 @@ async function bootstrap() {
         const user = await response.json();
         return !!user; // Return true if the user is authorized
       } catch (error) {
-        console.error('AuthChecker Error:', error);
+        // console.error('AuthChecker Error:', error);
         throw new Error('Unauthorized');
       }
     },

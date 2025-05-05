@@ -1,7 +1,6 @@
 -- This file is not included in the submission archive, anything you do here is just for manual "testing" via the Swagger UI --
 
 ----- Your insert statements go below here -----
-\connect test;
 INSERT INTO account(id, data)
 VALUES (
   '3662998e-a053-4789-b34a-4491468f56d6',
@@ -15,8 +14,9 @@ VALUES (
   )
 );
 
-INSERT INTO account(data)
+INSERT INTO account(id, data)
 VALUES (
+  '8dc65233-c590-45b7-9b10-a5b049600901',
   jsonb_build_object(
     'name', 'Enforcer 1',
     'email', 'enforcer1@outlook.com',

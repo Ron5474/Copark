@@ -5,8 +5,9 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GavelIcon from '@mui/icons-material/Gavel';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import HomeIcon from '@mui/icons-material/Home';
+import RestoreIcon from '@mui/icons-material/Restore'; // Add this import
 import { useRouter } from 'next/navigation';
-import { getEnforcers, addEnforcer } from '../../enforcement/actions';
+import { getEnforcers, addEnforcer, suspendUser } from '../../enforcement/actions';
 
 export default function ManageEnforcement({ onNavigate }) {
   const router = useRouter();
@@ -24,6 +25,16 @@ export default function ManageEnforcement({ onNavigate }) {
   const fetchEnforcers = async () => {
     const data = await getEnforcers();
     setEnforcers(data);
+  };
+
+  const handlesuspendUser = async (enforcerId) => {
+    try {
+      await suspendUser(enforcerId);
+      fetchEnforcers(); // Refresh the list after suspension
+    } catch (error) {
+      console.error('Error suspending enforcer:', error);
+      // You might want to add error handling UI here
+    }
   };
 
   const handleAddEnforcer = async () => {
@@ -72,10 +83,25 @@ export default function ManageEnforcement({ onNavigate }) {
               borderRadius: 1,
             }}
           >
-            <Typography>{enforcer.name}</Typography>
             <Box>
-              <IconButton>
-                <GavelIcon fontSize="large" />
+              <Typography>{enforcer.name}</Typography>
+              <Typography 
+                variant="caption" 
+                color={enforcer.accountStatus === 'suspended' ? 'error' : 'success.main'}
+              >
+                {enforcer.accountStatus}
+              </Typography>
+            </Box>
+            <Box>
+              <IconButton
+                onClick={() => handlesuspendUser(enforcer.id)}
+                color={enforcer.accountStatus === 'suspended' ? 'primary' : 'default'}
+              >
+                {enforcer.accountStatus === 'suspended' ? (
+                  <RestoreIcon fontSize="large" />
+                ) : (
+                  <GavelIcon fontSize="large" />
+                )}
               </IconButton>
               <IconButton>
                 <PersonOffIcon fontSize="large" />

@@ -16,6 +16,12 @@ export class AdminResolver {
     return adminService.getEnforcers();
   }
 
+  @Query(() => [User])
+  @Authorized(["admin"])
+  async getDrivers(): Promise<User[]> {
+    return adminService.getDrivers();
+  }
+
   @Mutation(() => [User])
   @Authorized(["admin"])
   async addEnforcer(
@@ -30,5 +36,13 @@ export class AdminResolver {
     @Arg("user", () => UserInput) user: UserInput
   ): Promise<User[]> {
     return adminService.suspendUser(user);
+  }
+
+  @Mutation(() => [User])
+  @Authorized(["admin"])
+  async reinstateUser(
+    @Arg("user", () => UserInput) user: UserInput
+  ): Promise<User[]> {
+    return adminService.reinstateUser(user);
   }
 }

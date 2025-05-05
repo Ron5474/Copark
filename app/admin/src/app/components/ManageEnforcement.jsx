@@ -28,13 +28,8 @@ export default function ManageEnforcement({ onNavigate }) {
   };
 
   const handlesuspendUser = async (enforcerId) => {
-    try {
-      await suspendUser(enforcerId);
-      fetchEnforcers(); // Refresh the list after suspension
-    } catch (error) {
-      console.error('Error suspending enforcer:', error);
-      // You might want to add error handling UI here
-    }
+    await suspendUser(enforcerId);
+    fetchEnforcers(); // Refresh the list after suspension
   };
 
   const handleAddEnforcer = async () => {
@@ -85,8 +80,8 @@ export default function ManageEnforcement({ onNavigate }) {
           >
             <Box>
               <Typography>{enforcer.name}</Typography>
-              <Typography 
-                variant="caption" 
+              <Typography
+                variant="caption"
                 color={enforcer.accountStatus === 'suspended' ? 'error' : 'success.main'}
               >
                 {enforcer.accountStatus}

@@ -5,7 +5,6 @@
  */
 
 import { Box, Typography } from "@mui/material";
-import PropTypes from "prop-types";
 import theme from "../theme";
 
 function HowToUseCard({number, image, description, variant}: {number: number, image: string, description: string, variant: string}) {
@@ -119,13 +118,6 @@ function HowToUseCard({number, image, description, variant}: {number: number, im
     </Box>
   );
 }
-
-HowToUseCard.proptypes = {
-  number: PropTypes.number.isRequired,
-  image: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  variant: PropTypes.string.isRequired,
-};
 
 export default HowToUseCard;
 

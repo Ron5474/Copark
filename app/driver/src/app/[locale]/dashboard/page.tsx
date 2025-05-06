@@ -17,6 +17,7 @@ import ViewVehicles from "../selectVehicle/member/Vehicle"
 import AddVehicle from "../selectVehicle/AddForm";
 import { userLoginSignUpAttempt } from "./actions";
 import BuyPermit from "../permit/View";
+import { signOut } from "next-auth/react";
 
 function Dashboard() {
   const [currentPage, setCurrentPage] = useState("dashboard");
@@ -28,7 +29,7 @@ function Dashboard() {
       if (!await getUser()) {
         router.push(`/${locale}/login`);
       } else if (!await userLoginSignUpAttempt()) {
-        router.push(`/${locale}/login`);
+        signOut({ callbackUrl: `/${locale}/login` });
       }   
     }
     loggedIn();

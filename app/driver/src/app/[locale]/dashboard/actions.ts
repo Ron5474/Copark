@@ -12,9 +12,9 @@ export async function userLoginSignUpAttempt(): Promise<string|undefined> {
       "Content-Type": "application/json",
       Authorization: `Bearer ${authCookie?.value}`,
     },
-  })
+  }) 
 
-  if (res.status === 400) {
+  if (res.status !== 201 && res.status !== 200 && res.status !== 204) {
     return undefined;
   }
   

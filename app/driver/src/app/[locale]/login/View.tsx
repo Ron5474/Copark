@@ -8,9 +8,7 @@
 #
 #######################################################################
 */
-
-// 'use client'
-// import {useState} from 'react'
+'use client'
 
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
@@ -20,6 +18,8 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import { signIn } from "next-auth/react"
+import { useEffect } from 'react';
+import { getUser } from '../shared/actions';
 // import {login} from './actions'
 
 
@@ -27,8 +27,17 @@ export default function LoginView() {
   // const { data: session } = useSession()
   const handleClick = async (provider: string) => {
     const locale = window.location.pathname.split("/")[1]
-    await signIn(provider, { callbackUrl: `/${locale}` })
+    await signIn(provider, { callbackUrl: `/${locale}/dashboard` })
   }
+
+  useEffect(() => {
+      getUser().then((res) => {
+        if (res) {
+          const locale = window.location.pathname.split("/")[1]
+          window.location.href = `/${locale}/dashboard`
+        }
+      });
+  }, [])
 
   return (
     <Container

@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/re
 import { useRouter } from 'next/navigation';
 import Page from '../../src/app/page';
 import ManageEnforcement from '../../src/app/components/ManageEnforcement';
-import { getEnforcers, addEnforcer, suspendUser } from '../../src/enforcement/actions';
+import { getEnforcers, addEnforcer, suspendUser, reinstateUser, deleteUser } from '../../src/enforcement/actions';
 
 // Mock Next.js navigation and cookies
 vi.mock('next/navigation', () => ({
@@ -80,7 +80,9 @@ vi.mock('@mui/material', () => ({
 vi.mock('../../src/enforcement/actions', () => ({
   getEnforcers: vi.fn(),
   addEnforcer: vi.fn(),
-  suspendUser: vi.fn()
+  suspendUser: vi.fn(),
+  reinstateUser: vi.fn(),
+  deleteUser: vi.fn()
 }));
 
 const mockRouter = {
@@ -284,5 +286,54 @@ it('closes add enforcer dialog when clicking outside', async () => {
   // Verify dialog is closed
   await waitFor(() => {
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+});
+
+it('handles reinstating a suspended enforcer', async () => {
+  // Mock the reinstate response
+  (reinstateUser as Mock).mockResolvedValue(mockEnforcers.map(e =>
+    e.id === '2' ? { ...e, accountStatus: 'active' } : e
+  ));
+
+  render(<ManageEnforcement onNavigate={() => {}} />);
+
+  // Wait for component to load
+  await waitFor(() => {
+    expect(screen.getByText('Test Enforcer 2')).toBeDefined();
+  });
+
+  // Find the restore button using aria-label
+  const restoreButton = screen.getByRole('button', { name: 'Restore user' });
+  
+  // Click the restore button
+  fireEvent.click(restoreButton);
+
+  // Verify the reinstate action was called with correct ID
+  await waitFor(() => {
+    expect(reinstateUser).toHaveBeenCalledWith('2');
+    expect(getEnforcers).toHaveBeenCalledTimes(2);
+  });
+});
+
+it('deletes an enforcer and removes them from display', async () => {
+  // Mock initial state and after deletion state
+  (getEnforcers as Mock).mockResolvedValueOnce(mockEnforcers)
+    .mockResolvedValueOnce(mockEnforcers.filter(e => e.id !== '1'));
+  
+  render(<ManageEnforcement onNavigate={() => {}} />);
+
+  // Wait for initial load and verify Test Enforcer exists
+  await waitFor(() => {
+    expect(screen.getByText('Test Enforcer')).toBeDefined();
+  });
+
+  // Get all delete buttons and click the first one
+  const deleteButtons = screen.getAllByLabelText('Delete user');
+  fireEvent.click(deleteButtons[0]);
+
+  // Verify deletion and UI update
+  await waitFor(() => {
+    expect(deleteUser).toHaveBeenCalledWith('1');
+    expect(screen.queryByText('Test Enforcer')).toBeNull();
   });
 });

@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import ViewVehicles from "../selectVehicle/member/Vehicle"
 import AddVehicle from "../selectVehicle/AddForm";
 import { userLoginSignUpAttempt } from "./actions";
+import BuyPermit from "../permit/View";
 
 function Dashboard() {
   const [currentPage, setCurrentPage] = useState("dashboard");
@@ -51,6 +52,9 @@ function Dashboard() {
           )}
           {currentPage === "add-vehicle" && (
             <AddVehicle />
+          )}
+          {currentPage === 'buy-permit' && (
+            <BuyPermit />
           )}
         </Box>
       </DashboardContext.Provider>

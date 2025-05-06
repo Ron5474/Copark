@@ -1,6 +1,6 @@
 /**
- * @file selectVehicle.test.tsx
- * @description This file contains the test cases for the Vehicle page in zone checkout.
+ * @file View.tsx
+ * @description This file contains the View for guest vehicles in zone checkout.
  * @author Bryant Oliver
  */
 

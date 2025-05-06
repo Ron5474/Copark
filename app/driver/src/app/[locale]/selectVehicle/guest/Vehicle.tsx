@@ -1,8 +1,10 @@
 /**
- * @file selectVehicle.test.tsx
- * @description This file contains the test cases for the Vehicle page in zone checkout.
+ * @file Vehicle.tsx
+ * @description This file contains the Vehicle page for zone guest checkout.
  * @author Bryant Oliver
  */
+
+'use client'
 
 import { Box } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
@@ -16,7 +18,7 @@ export default function GuestVehicle() {
     <Box sx={{ mt: '90px' }}>
       <ThemeProvider theme={theme}>
       <ShortTermStepper/>
-      <AddForm/>
+      <AddForm isGuest={true}/>
       </ThemeProvider>
     </Box>
   )

@@ -27,7 +27,7 @@ import {
 import theme from '../theme'
 
 
-export default function View() {
+export default function AddForm({ isGuest = false }: { isGuest?: boolean }) {
   const [plateNumber, setPlateNumber] = useState<string>('')
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
   const [country, setCountry] = useState<string>(Object.keys(locations)[0])
@@ -161,31 +161,34 @@ export default function View() {
           ))}
         </TextField>
       </Box>
-      <Box sx={{marginTop: '2vh'}}>
-        <Box sx={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
-          <Typography variant="body1" sx={{ margin: 0 }}>
-            Nickname
-          </Typography>
-          <Typography variant="body2" sx={{ margin: 0, fontStyle: 'italic' }}>
-            (optional)
-          </Typography>
+      {
+        isGuest ? null :
+        <Box sx={{marginTop: '2vh'}}>
+          <Box sx={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+            <Typography variant="body1" sx={{ margin: 0 }}>
+              Nickname
+            </Typography>
+            <Typography variant="body2" sx={{ margin: 0, fontStyle: 'italic' }}>
+              (optional)
+            </Typography>
+          </Box>
+          <TextField
+            required
+            fullWidth
+            value={nickname}
+            slotProps={{
+              input: {
+                inputProps: {
+                  'aria-label': 'Enter nickname',
+                }
+              },
+            }}
+            sx={textFieldStyle}
+            size="small"
+            onChange={(event) => setNickname(event.target.value)}
+          />
         </Box>
-        <TextField
-          required
-          fullWidth
-          value={nickname}
-          slotProps={{
-            input: {
-              inputProps: {
-                'aria-label': 'Enter nickname',
-              }
-            },
-          }}
-          sx={textFieldStyle}
-          size="small"
-          onChange={(event) => setNickname(event.target.value)}
-        />
-      </Box>
+      }
       <Button
         onClick={submitVehicle}
         aria-label='Submit vehicle'
@@ -199,7 +202,7 @@ export default function View() {
           textTransform: 'none',
         }}
       >
-        Continue
+        {isGuest ? "Continue" : "Save"}
       </Button>
     </Box>
   )

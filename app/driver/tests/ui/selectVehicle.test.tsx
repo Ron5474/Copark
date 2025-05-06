@@ -145,3 +145,18 @@ it('Enter nickname', async () => {
 
   expect((input as HTMLInputElement).value).toBe('Henry')
 })
+
+it('Open and close AddForm dialog', async () => {
+  render(<MemberView />)
+  const user = userEvent.setup()
+  const input = (await screen.findAllByLabelText('Add a vehicle'))[0]
+  await user.click(input)
+  const backdrop = document.querySelector('.MuiBackdrop-root')
+  if (backdrop) {
+    await user.click(backdrop)
+  }
+  await user.click(await screen.findByLabelText("Close vehicle form"))
+
+  expect(screen.queryByLabelText("Submit vehicle")).toBeNull()
+})
+

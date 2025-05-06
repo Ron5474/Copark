@@ -12,7 +12,11 @@ import {
   Button,
   Dialog,
   DialogContent,
+  FormControlLabel,
   IconButton,
+  Radio,
+  RadioGroup,
+  // Stack,
   Typography,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -24,12 +28,23 @@ import theme from "../../theme"
 
 export default function MemberVehicles({ isCheckout = false }: { isCheckout?: boolean }) {
   const [open, setOpen] = useState(false)
-  const [vehicles, setVehicles] = useState([])
+  const [vehicles, setVehicles] = useState<{ plate: string; state: string; name?: string }[]>([])
+  const [selectedPlate, setSelectedPlate] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    setVehicles([ // Integrate to backend here
+      // {
+      //   'plate': "1ABC123",
+      //   'state': "California",
+      //   'name': "CoParkMobile"
+      // }, 
+      // {
+      //   'plate': "9XYZ987",
+      //   'state': "California",
+      // }
+    ])
     setLoading(false)
-    setVehicles([])
   }, [])
 
   const handleOpen = () => setOpen(true)
@@ -67,33 +82,35 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
         >
           + Add Vehicle
         </Button>
-        <Dialog
-          open={open}
-          onClose={(event, reason) => {
-            if (reason !== 'backdropClick') handleClose()
-          }}
-          fullWidth
-        >
-          <DialogContent sx={{ p: 1, pb: 2, position: 'relative' }}>
-            <IconButton
-              onClick={handleClose}
-              aria-label="Close"
-              sx={{
-                position: 'absolute',
-                top: 8,
-                right: 8,
-                zIndex: 1,
-                backgroundColor: 'white',
-                '&:hover': {
-                  backgroundColor: '#f0f0f0',
-                },
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-            <AddForm />
-          </DialogContent>
-        </Dialog>
+        {open && (
+          <Dialog
+            open={open}
+            onClose={(event, reason) => {
+              if (reason !== 'backdropClick') handleClose()
+            }}
+            fullWidth
+          >
+            <DialogContent sx={{ p: 1, pb: 2, position: 'relative' }}>
+              <IconButton
+                onClick={handleClose}
+                aria-label="Close vehicle form"
+                sx={{
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                  zIndex: 1,
+                  backgroundColor: 'white',
+                  '&:hover': {
+                    backgroundColor: '#f0f0f0',
+                  },
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+              <AddForm />
+            </DialogContent>
+          </Dialog>
+        )}
       </Box>
       <Box
         sx={{
@@ -103,13 +120,74 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
           textAlign: 'center',
         }}
       >
-        {
-          loading ? <Box sx={{mt: '12vh'}}><Loader/></Box> :
-          vehicles.length
 
+        {
+
+          loading ? <Box sx={{mt: '12vh'}}><Loader/></Box> :
+          vehicles.length 
+          
           ?
 
-          <></>
+          <RadioGroup
+            name="vehicle-selection"
+            value={selectedPlate}
+            onChange={(event) => setSelectedPlate(event.target.value)}
+            sx={{ mt: 2 }}
+          >
+            <Typography sx={{ textAlign: 'left', mb: 1, color: '#4b4b4b' }}>
+              Vehicle Preference
+            </Typography>
+
+            {vehicles.map((v, i) => (
+              <FormControlLabel
+                key={i}
+                value={v.plate}
+                control={<Radio sx={{transform: 'scale(1.2)'}}/>}
+                label={
+                  <Box sx={{ display: 'flex', flexDirection: 'column', ml: 1 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                      {v.plate}{' '}
+                      <Typography component="span" variant="body1" sx={{ fontWeight: 400 }}>
+                        {v.state}
+                      </Typography>
+                    </Typography>
+                    {v.name && (
+                      <Typography variant="body2" sx={{ textAlign: 'left', color: '#666', mt: 0.5 }}>
+                        {v.name}
+                      </Typography>
+                    )}
+                  </Box>
+                }
+                sx={{
+                  width: '100%',
+                  m: 0,
+                  mb: 2,
+                  border: '1px solid #ccc',
+                  borderRadius: '8px',
+                  padding: 2,
+                  alignItems: 'flex-start',
+                  minHeight: '72px',
+                  backgroundColor: selectedPlate === v.plate ? '#f5f5f5' : 'white',
+                }}
+              />
+            ))}
+
+            <Button
+              fullWidth
+              variant="contained"
+              disabled={!selectedPlate}
+              sx={{
+                width: '100%',
+                marginTop: '5vh',
+                fontSize: '1.15rem',
+                color: 'white',
+                backgroundColor: theme.palette.primary.main,
+                textTransform: 'none',
+              }}
+            >
+              Continue
+            </Button>
+          </RadioGroup>
           
           :
 
@@ -135,7 +213,9 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
               Add Vehicle
             </Button>
           </Fragment>
+
         }
+
       </Box>
     </Fragment>
   )

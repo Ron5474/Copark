@@ -13,6 +13,7 @@ import theme from "../theme";
 import Topbar from "../shared/Topbar";
 import { getUser } from "../shared/actions";
 import { useRouter } from "next/navigation";
+import View from "../selectVehicle/member/View";
 
 function Dashboard() {
   const [currentPage, setCurrentPage] = useState("dashboard");
@@ -40,6 +41,9 @@ function Dashboard() {
             <Toolbar />
           {currentPage === "dashboard" && (
             <DashboardView />
+          )}
+          {currentPage === "add-vehicle" && (
+            <View />
           )}
         </Box>
       </DashboardContext.Provider>

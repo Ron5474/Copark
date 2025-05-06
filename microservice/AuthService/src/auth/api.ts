@@ -41,10 +41,12 @@ export class AuthController extends Controller {
   }
 
   @Post("check")
+  @Security("jwt")
   public async check(@Request() request: express.Request,
     @Body() roles: string[]
   ): Promise<SessionUser | OauthLoginData | undefined> {
     // console.log('eowefjioefjiowfejiowejiowefjioefwjioefjioef')
+    console.log(request.headers.authorization, roles)
     return new AuthService().check(request.headers.authorization, roles);
   }
 }

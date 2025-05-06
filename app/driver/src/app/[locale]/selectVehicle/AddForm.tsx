@@ -178,7 +178,7 @@ export default function AddForm({ isGuest = false }: { isGuest?: boolean }) {
           <TextField
             required
             fullWidth
-            value={nickname}
+            value={nickname || ''}
             slotProps={{
               input: {
                 inputProps: {

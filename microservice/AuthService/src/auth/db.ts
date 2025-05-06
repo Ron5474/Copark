@@ -1,4 +1,13 @@
 import {Pool} from 'pg'
+import dotenv from 'dotenv'
+
+dotenv.config({path: '../../.env'})
+
+console.log('Connecting to PostgreSQL database...')
+console.log('POSTGRES_HOST', process.env.POSTGRES_HOST)
+console.log('POSTGRES_PORT', process.env.POSTGRES_PORT)
+console.log('POSTGRES_USER', process.env.POSTGRES_USER)
+console.log('POSTGRES_PASSWORD', process.env.POSTGRES_PASSWORD)
 
 const pool = new Pool({
   host: (process.env.POSTGRES_HOST || 'localhost'),

@@ -4,9 +4,11 @@ import {
   Post,
   Body,
   Get,
-  Header
+  Security,
+  Request
 } from "tsoa";
-import { Credentials, Authenticated } from "./";
+import * as express from "express";
+import { Credentials, Authenticated, OauthLoginData } from "./";
 import { AuthService } from "./service";
 import { SessionUser } from "./index";
 
@@ -20,8 +22,10 @@ export class AuthController extends Controller {
   }
 
   @Post("login/driver")
-  public async driverLogin(@Body() email: string): Promise<string | undefined> {
-    return new AuthService().driverLogin(email)
+  @Security("jwt", ["driver"])
+  public async driverLogin(@Request() request: express.Request): Promise<string | undefined> {
+    
+    return new AuthService().driverLogin(request.user)
   }
 
   @Get("status")
@@ -29,12 +33,18 @@ export class AuthController extends Controller {
     return "Auth service is running!";
   }
 
+  @Get("driver/id")
+  @Security("jwt", ["driver"])
+  public async getDriverId(@Request() request: express.Request): Promise<string | undefined> {
+    // console.log("authenticating user with credentials:", credentials);
+    return new AuthService().getOauthUser(request.user);
+  }
+
   @Post("check")
-  public async check(
-    @Header("Authorization") authHeader: string,
+  public async check(@Request() request: express.Request,
     @Body() roles: string[]
-  ): Promise<SessionUser | undefined> {
+  ): Promise<SessionUser | OauthLoginData | undefined> {
     // console.log('eowefjioefjiowfejiowejiowefjioefwjioefjioef')
-    return new AuthService().check(authHeader, roles);
+    return new AuthService().check(request.headers.authorization, roles);
   }
 }

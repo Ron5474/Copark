@@ -6,12 +6,13 @@
 import {Request} from "express"
 import {AuthService} from './service'
 import {SessionUser} from '../index'
+import { OauthLoginData } from "."
 
 export function expressAuthentication(
   request: Request,
   securityName: string,
   scopes?: string[]
-): Promise<SessionUser> {
+): Promise<SessionUser|OauthLoginData> {
   // console.log(request.headers.authorization); 
   // console.log(scopes);
   return new AuthService().check(request.headers.authorization, scopes)

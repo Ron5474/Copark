@@ -52,8 +52,8 @@ function UserAvatar() {
   return (
     <>
       <Avatar
-        alt="User Avatar"
-        src={session?.user?.image || undefined}
+        alt={session?.user?.name==null?undefined:session?.user?.name}
+        src={session?.user?.image==null?undefined:session?.user?.image}
         sx={{
           width: 40,
           height: 40,        

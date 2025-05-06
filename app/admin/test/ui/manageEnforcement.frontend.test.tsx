@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/re
 import { useRouter } from 'next/navigation';
 import Page from '../../src/app/page';
 import ManageEnforcement from '../../src/app/components/ManageEnforcement';
-import { getEnforcers, addEnforcer, suspendUser } from '../../src/enforcement/actions';
+import { getEnforcers, addEnforcer, suspendUser, reinstateUser } from '../../src/enforcement/actions';
 
 // Mock Next.js navigation and cookies
 vi.mock('next/navigation', () => ({
@@ -80,7 +80,8 @@ vi.mock('@mui/material', () => ({
 vi.mock('../../src/enforcement/actions', () => ({
   getEnforcers: vi.fn(),
   addEnforcer: vi.fn(),
-  suspendUser: vi.fn()
+  suspendUser: vi.fn(),
+  reinstateUser: vi.fn()
 }));
 
 const mockRouter = {
@@ -286,3 +287,69 @@ it('closes add enforcer dialog when clicking outside', async () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 });
+
+it('handles reinstating a suspended enforcer', async () => {
+  // Mock the reinstate response
+  (reinstateUser as Mock).mockResolvedValue(mockEnforcers.map(e =>
+    e.id === '2' ? { ...e, accountStatus: 'active' } : e
+  ));
+
+  render(<ManageEnforcement onNavigate={() => {}} />);
+
+  // Wait for component to load
+  await waitFor(() => {
+    expect(screen.getByText('Test Enforcer 2')).toBeDefined();
+  });
+
+  // Find the restore button using aria-label
+  const restoreButton = screen.getByRole('button', { name: 'Restore user' });
+  
+  // Click the restore button
+  fireEvent.click(restoreButton);
+
+  // Verify the reinstate action was called with correct ID
+  await waitFor(() => {
+    expect(reinstateUser).toHaveBeenCalledWith('2');
+    expect(getEnforcers).toHaveBeenCalledTimes(2);
+  });
+});
+
+// it('handles full suspend/reinstate cycle', async () => {
+//   // First suspension
+//   (suspendUser as Mock).mockResolvedValueOnce([
+//     { ...mockEnforcers[0], accountStatus: 'suspended' },
+//     mockEnforcers[1]
+//   ]);
+
+//   // Then reinstatement
+//   (reinstateUser as Mock).mockResolvedValueOnce([
+//     { ...mockEnforcers[0], accountStatus: 'active' },
+//     mockEnforcers[1]
+//   ]);
+
+//   render(<ManageEnforcement onNavigate={() => {}} />);
+
+//   // Wait for initial render
+//   await waitFor(() => {
+//     expect(screen.getByText('Test Enforcer')).toBeDefined();
+//   });
+
+//   // Find and click suspend button using aria-label
+//   const suspendButton = screen.getByRole('button', { name: 'Suspend user' });
+//   fireEvent.click(suspendButton);
+
+//   // Verify suspension
+//   await waitFor(() => {
+//     expect(suspendUser).toHaveBeenCalledWith('1');
+    
+//     // Find and click restore button using aria-label
+//     const restoreButton = screen.getByRole('button', { name: 'Restore user' });
+//     fireEvent.click(restoreButton);
+//   });
+
+//   // Verify reinstatement
+//   await waitFor(() => {
+//     expect(reinstateUser).toHaveBeenCalledWith('1');
+//     expect(getEnforcers).toHaveBeenCalledTimes(3); // Initial + after suspend + after reinstate
+//   });
+// });

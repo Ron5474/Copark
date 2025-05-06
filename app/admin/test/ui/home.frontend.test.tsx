@@ -91,7 +91,7 @@ it('displays user name from session storage', () => {
   window.sessionStorage.setItem('name', 'Jason Xiong');
   render(<Page />);
   
-  expect(screen.getByText(/Logged in as: Jason Xiong/i)).toBeDefined();
+  expect(screen.getByText("Logged in as: Jason Xiong")).toBeDefined();
 });
 
 it('handles navigation to different sections', async () => {

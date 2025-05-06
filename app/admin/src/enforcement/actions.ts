@@ -106,19 +106,45 @@ export const suspendUser = async (id: string): Promise<User[]> => {
     });
 
     const result = await response.json();
-
-    if (result.errors) {
-      console.error('GraphQL Errors:', result.errors);
-      throw new Error(result.errors[0].message);
-    }
-
-    if (!result.data) {
-      throw new Error('No data returned from the server');
-    }
-
     return result.data.suspendUser;
   } catch (error) {
     console.error('Error suspending enforcer:', error);
+    throw error;
+  }
+};
+
+export const reinstateUser = async (id: string): Promise<User[]> => {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation ReinstateUser($user: UserInput!) {
+            reinstateUser(user: $user) {
+              id
+              name
+              email
+              accountStatus
+            }
+          }
+        `,
+        variables: {
+          user: {
+            id
+          },
+        },
+      }),
+    });
+
+    const result = await response.json();
+    return result.data.reinstateUser;
+  } catch (error) {
+    console.error('Error reinstating enforcer:', error);
     throw error;
   }
 };

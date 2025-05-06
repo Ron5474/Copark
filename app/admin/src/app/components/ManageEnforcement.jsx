@@ -6,11 +6,9 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import HomeIcon from '@mui/icons-material/Home';
 import RestoreIcon from '@mui/icons-material/Restore'; // Add this import
-import { useRouter } from 'next/navigation';
-import { getEnforcers, addEnforcer, suspendUser } from '../../enforcement/actions';
+import { getEnforcers, addEnforcer, suspendUser, reinstateUser } from '../../enforcement/actions';
 
 export default function ManageEnforcement({ onNavigate }) {
-  const router = useRouter();
   const [enforcers, setEnforcers] = useState([]);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [newEnforcer, setNewEnforcer] = useState({
@@ -27,9 +25,13 @@ export default function ManageEnforcement({ onNavigate }) {
     setEnforcers(data);
   };
 
-  const handlesuspendUser = async (enforcerId) => {
-    await suspendUser(enforcerId);
-    fetchEnforcers(); // Refresh the list after suspension
+  const handleUserStatus = async (enforcerId, currentStatus) => {
+    if (currentStatus === 'suspended') {
+      await reinstateUser(enforcerId);
+    } else {
+      await suspendUser(enforcerId);
+    }
+    fetchEnforcers(); // Refresh the list after status change
   };
 
   const handleAddEnforcer = async () => {
@@ -89,8 +91,9 @@ export default function ManageEnforcement({ onNavigate }) {
             </Box>
             <Box>
               <IconButton
-                onClick={() => handlesuspendUser(enforcer.id)}
+                onClick={() => handleUserStatus(enforcer.id, enforcer.accountStatus)}
                 color={enforcer.accountStatus === 'suspended' ? 'primary' : 'default'}
+                aria-label={enforcer.accountStatus === 'suspended' ? 'Restore user' : 'Suspend user'}
               >
                 {enforcer.accountStatus === 'suspended' ? (
                   <RestoreIcon fontSize="large" />

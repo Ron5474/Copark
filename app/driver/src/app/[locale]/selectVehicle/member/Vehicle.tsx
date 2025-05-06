@@ -26,29 +26,45 @@ import AddForm from '../AddForm'
 import Loader from '../../shared/Loader'
 import theme from "../../theme"
 
+
+interface Vehicle {
+  plate: string;
+  state: string;
+  name?: string;
+}
+
+
 export default function MemberVehicles({ isCheckout = false }: { isCheckout?: boolean }) {
   const [open, setOpen] = useState(false)
-  const [vehicles, setVehicles] = useState<{ plate: string; state: string; name?: string }[]>([])
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [selectedPlate, setSelectedPlate] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setVehicles([ // Integrate to backend here
-      // {
-      //   'plate': "1ABC123",
-      //   'state': "California",
-      //   'name': "CoParkMobile"
-      // }, 
-      // {
-      //   'plate': "9XYZ987",
-      //   'state': "California",
-      // }
+      {
+        'plate': "1ABC123",
+        'state': "California",
+        'name': "CoParkMobile"
+      }, 
+      {
+        'plate': "9XYZ987",
+        'state': "Washington",
+      }
     ])
     setLoading(false)
   }, [])
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+
+  const handleButton = () => {
+    const vehicle = vehicles.find((v: Vehicle) => v.plate === selectedPlate);
+    if (isCheckout)
+      console.log("next: ", vehicle)
+    else
+      console.log("edit: ", vehicle)
+  };
 
   return (
     <Fragment>
@@ -175,6 +191,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
             <Button
               fullWidth
               variant="contained"
+              onClick={handleButton}
               disabled={!selectedPlate}
               sx={{
                 width: '100%',
@@ -185,7 +202,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                 textTransform: 'none',
               }}
             >
-              Continue
+              {isCheckout ? "Continue" : "Edit"}
             </Button>
           </RadioGroup>
           

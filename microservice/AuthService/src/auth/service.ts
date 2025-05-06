@@ -134,6 +134,7 @@ export class AuthService {
   }
 
   public async driverLogin(data: OauthLoginData|SessionUser|undefined): Promise<string| undefined> {
+    try {
     if (data === undefined) {
       throw new Error("Unauthorized");
     }
@@ -150,7 +151,7 @@ export class AuthService {
   "'sub', $4::text, " +
   "'role', jsonb_build_array('driver')) " +
   "WHERE NOT EXISTS (" +
-  "SELECT 1 FROM account WHERE data->>'sub' = $4::text) RETURNING id",
+  "SELECT 1 FROM account WHERE data->>'sub' = $4::text OR (data->>'email' = $2::text AND data->'role' @> '[\"driver\"]'::jsonb)) RETURNING id",
   values: [
     data.name,
     data.email,
@@ -166,6 +167,10 @@ export class AuthService {
       return retid
     } else {
       return undefined
+    }
+  } catch (err) {
+    console.log(err)
+    throw new Error(err as string);
     }
   }
 }

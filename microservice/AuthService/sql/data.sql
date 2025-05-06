@@ -10,7 +10,7 @@ VALUES (
     'email', 'jxiong0822@outlook.com',
     'phone' , '123-456-7890',
     'pwhash', crypt('password1', gen_salt('bf')),
-    'role', '[admin]',
+    'role', '["admin"]',
     'accountStatus', 'active'
   )
 );
@@ -47,3 +47,27 @@ VALUES (
 --       'accountStatus', 'active'
 --     )
 -- );
+INSERT INTO account(id, data)
+VALUES (
+  '8dc65233-c590-45b7-9b10-a5b049600901',
+  jsonb_build_object(
+    'name', 'Enforcer 1',
+    'email', 'enforcer1@outlook.com',
+    'phone' , '123-456-7890',
+    'pwhash', crypt('password1', gen_salt('bf')),
+    'role', '["enforcement"]',
+    'accountStatus', 'active'
+  )
+);
+
+INSERT INTO account(data)
+VALUES (
+  jsonb_build_object(
+    'name', 'Enforcer 2',
+    'email', 'enforcer2@outlook.com',
+    'phone' , '123-456-7890',
+    'pwhash', crypt('password1', gen_salt('bf')),
+    'role', '["enforcement"]',
+    'accountStatus', 'active'
+  )
+);

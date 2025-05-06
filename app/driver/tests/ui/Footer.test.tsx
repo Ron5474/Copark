@@ -6,8 +6,9 @@
 
 import { render, screen, cleanup } from '@testing-library/react';
 import { it, expect, afterEach, vi, beforeEach } from 'vitest';
-import Footer from '../../src/app/[locale]/shared/Footer';
+import '../setup'
 
+import Footer from '../../src/app/[locale]/shared/Footer';
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
@@ -39,9 +40,10 @@ beforeEach(() => {
           default:
             return x;
         }
-      })),
-    }));
-  })
+      })
+    ),
+  }))
+})
 it('Renders', async () => {
   await render(<Footer />);
   expect(await screen.queryByText('Copark™')).not.toBeNull();

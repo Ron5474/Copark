@@ -33,7 +33,8 @@ export class AdminService {
         data->>'accountStatus' AS accountStatus
         FROM account
         WHERE data->>'role' = '["enforcement"]'
-        AND data->>'accountStatus' != 'deleted';
+        AND data->>'accountStatus' != 'deleted'
+        ORDER BY data->>'name';
     `
 
     const enforcementResult = await pool.query(enforcementQuery);
@@ -60,7 +61,8 @@ export class AdminService {
           data->>'accountStatus' AS accountStatus
           FROM account
           WHERE data->>'role' = '["driver"]'
-          AND data->>'accountStatus' != 'deleted';
+          AND data->>'accountStatus' != 'deleted'
+          ORDER BY data->>'name';
       `
 
       const driverResult = await pool.query(driverQuery);
@@ -146,6 +148,31 @@ export class AdminService {
     const updateQuery = `
       UPDATE account
       SET data = jsonb_set(data, '{accountStatus}', '"active"')
+      WHERE id = $1
+      AND data->>'accountStatus' = 'suspended'
+      RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
+    `;
+  
+    const result = await pool.query(updateQuery, [await this.decrypt(user.id)]);
+  
+    const Users: User[] = [];
+  
+    for (const row of result.rows) {
+      Users.push({
+        id: await this.encrypt(row.id),
+        name: row.name,
+        accountStatus: row.accountstatus,
+        email: row.email,
+      });
+    }
+  
+    return Users;
+  }
+
+  public async deleteUser(user: UserInput): Promise<User[]> {
+    const updateQuery = `
+      UPDATE account
+      SET data = jsonb_set(data, '{accountStatus}', '"deleted"')
       WHERE id = $1
       RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
     `;

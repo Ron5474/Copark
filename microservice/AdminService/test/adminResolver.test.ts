@@ -163,3 +163,142 @@ test('Admin can suspend an enforcer', async () => {
     expect(suspended[0].accountStatus).toBe('suspended')
   })
   
+  test('Admin can get a list of drivers', async () => {
+    const token = await loginAsAdmin();
+  
+    const query = `
+      query {
+        getDrivers {
+          id
+          name
+          email
+          accountStatus
+        }
+      }
+    `;
+  
+    const response = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ query })
+      .expect(200);
+  
+    expect(response.body.errors).toBeUndefined();
+    expect(response.body.data.getDrivers).toBeInstanceOf(Array);
+    expect(response.body.data.getDrivers.length).toBeGreaterThan(0);
+  });
+  
+  test('Admin can reinstate a suspended user', async () => {
+    const token = await loginAsAdmin();
+  
+    // First, suspend a user to reinstate later
+    const getEnforcersQuery = `
+      query {
+        getEnforcers {
+          id
+          name
+          accountStatus
+        }
+      }
+    `;
+  
+    const enforcerListResponse = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ query: getEnforcersQuery })
+      .expect(200);
+  
+    expect(enforcerListResponse.body.errors).toBeUndefined();
+    const enforcers = enforcerListResponse.body.data.getEnforcers;
+    expect(enforcers.length).toBeGreaterThan(0);
+  
+    const targetId = enforcers[0].id;
+  
+    // Suspend the user
+    const suspendMutation = `
+      mutation {
+        suspendUser(user: { id: "${targetId}" }) {
+          id
+          name
+          accountStatus
+        }
+      }
+    `;
+  
+    const suspendResponse = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ query: suspendMutation })
+      .expect(200);
+  
+    expect(suspendResponse.body.errors).toBeUndefined();
+    const suspended = suspendResponse.body.data.suspendUser;
+    expect(suspended[0].accountStatus).toBe('suspended');
+  
+    // Reinstate the user
+    const reinstateMutation = `
+      mutation {
+        reinstateUser(user: { id: "${targetId}" }) {
+          id
+          name
+          accountStatus
+        }
+      }
+    `;
+  
+    const reinstateResponse = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ query: reinstateMutation })
+      .expect(200);
+  
+    expect(reinstateResponse.body.errors).toBeUndefined();
+    const reinstated = reinstateResponse.body.data.reinstateUser;
+    expect(reinstated[0].accountStatus).toBe('active');
+  });
+
+test('Admin can delete an enforcer', async () => {
+  const token = await loginAsAdmin()
+
+  const getEnforcersQuery = `
+    query {
+      getEnforcers {
+        id
+        name
+        accountStatus
+      }
+    }
+  `
+
+  const enforcerListResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: getEnforcersQuery })
+    .expect(200)
+
+  expect(enforcerListResponse.body.errors).toBeUndefined()
+  const enforcers = enforcerListResponse.body.data.getEnforcers
+  expect(enforcers.length).toBeGreaterThan(0)
+
+  const targetId = enforcers[0].id
+
+  const deleteMutation = `
+    mutation {
+      deleteUser(user: { id: "${targetId}" }) {
+        id
+        name
+        accountStatus
+      }
+    }
+  `
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: deleteMutation })
+    .expect(200)
+
+  expect(deleteResponse.body.errors).toBeUndefined()
+  const deleted = deleteResponse.body.data.deleteUser
+  expect(deleted[0].accountStatus).toBe('deleted')
+})

@@ -6,6 +6,7 @@
 
 import { render, screen, cleanup } from '@testing-library/react';
 import { it, expect, afterEach, beforeEach, vi } from 'vitest';
+import '../setup'
 import Home from '../../src/app/[locale]/page';
 
 afterEach(() => {
@@ -20,6 +21,12 @@ beforeEach(() => {
     }),
   }))
 
+  vi.mock('@/app/api/auth/[...nextauth]/route', () => ({
+    handler: vi.fn(),
+    GET: vi.fn(),
+    POST: vi.fn(),
+  }))
+
   vi.mock('next-intl', () => ({
     useTranslations: () => (
       vi.fn((x: string) => {
@@ -29,9 +36,21 @@ beforeEach(() => {
         if (x === 'zone-prompt') {
           return 'Zone Prompt';
         }
-      })),
-    }));
-  })
+      })
+    ),
+  }))
+
+  vi.mock('@/app/[locale]/shared/actions', async () => {
+    return {
+      getUser: vi.fn().mockResolvedValue({
+        name: 'Test User',
+        email: 'test@example.com',
+        image: 'https://example.com/image.jpg',
+        // add more user props as needed
+      }),
+    };
+  });
+})
 
 
 it('Renders', async () => {

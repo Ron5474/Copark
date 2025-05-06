@@ -7,8 +7,10 @@
 import { vi, it, afterEach, expect, beforeEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import '../setup'
 
-import View from '../../src/app/[locale]/selectVehicle/guest/View'
+import GuestView from '../../src/app/[locale]/selectVehicle/guest/View'
+import MemberView from '../../src/app/[locale]/selectVehicle/member/View'
 import AddVehicle from '../../src/app/[locale]/selectVehicle/AddForm'
 
 afterEach(() => {
@@ -21,6 +23,12 @@ beforeEach(() => {
     useRouter: () => ({
       push: vi.fn(),
     }),
+  }))
+
+  vi.mock('@/app/api/auth/[...nextauth]/route', () => ({
+    handler: vi.fn(),
+    GET: vi.fn(),
+    POST: vi.fn(),
   }))
 
   vi.mock('next-intl', () => ({
@@ -42,13 +50,30 @@ beforeEach(() => {
           default:
             return x;
         }
-      })),
-    }));
-  })
+      }
+    )),
+  }))
 
-it('Renders', async () => {
-  await render(<View />)
+  vi.mock('@/app/[locale]/shared/actions', async () => {
+    return {
+      getUser: vi.fn().mockResolvedValue({
+        name: 'Test User',
+        email: 'test@example.com',
+        image: 'https://example.com/image.jpg',
+        // add more user props as needed
+      }),
+    };
+  });
+})
+
+it('Renders guest', async () => {
+  await render(<GuestView />)
   expect(await screen.findByText('Add Vehicle')).toBeDefined()
+})
+
+it('Renders member', async () => {
+  await render(<MemberView />)
+  expect(await screen.findByText('Which Vehicle?')).toBeDefined()
 })
 
 it('Renders license plate field', async () => {
@@ -81,11 +106,13 @@ it('Renders country menu', async () => {
 it('Changes country', async () => {
   render(<AddVehicle />)
   const user = userEvent.setup()
-  const field = screen.getByText('United States')
+  // const field = screen.getByText('United States')
+  const field = screen.getByLabelText('Select a country')
   await user.click(field)
   await user.click(screen.getByText('Mexico'))
 
-  expect(screen.queryByText('United States')).toBeNull()
+  // expect(screen.queryByText('United States')).toBeNull()
+  expect(field.textContent).toContain('Mexico')
 })
 
 it('Renders state menu', () => {
@@ -96,11 +123,13 @@ it('Renders state menu', () => {
 it('Changes state', async () => {
   render(<AddVehicle />)
   const user = userEvent.setup()
-  const field = screen.getByText('Alabama')
+  // const field = screen.getByText('Alabama')
+  const field = screen.getByLabelText('Select a state')
   await user.click(field)
   await user.click(screen.getByText('California'))
 
-  expect(screen.queryByText('Alabama')).toBeNull()
+  // expect(screen.queryByText('Alabama')).toBeNull()
+  expect(field.textContent).toContain('California')
 })
 
 it('Renders nickname entry', () => {

@@ -19,6 +19,11 @@ export class AuthController extends Controller {
     return new AuthService().authenticate(credentials);
   }
 
+  @Post("login/driver")
+  public async driverLogin(@Body() email: string): Promise<string | undefined> {
+    return new AuthService().driverLogin(email)
+  }
+
   @Get("status")
   public async status(): Promise<string> {
     return "Auth service is running!";

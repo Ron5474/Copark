@@ -1,3 +1,9 @@
+/**
+ * @file selectVehicle.test.tsx
+ * @description This file contains the test cases for the Vehicle page in zone checkout.
+ * @author Bryant Oliver
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -18,7 +24,7 @@ import {
  * https://mui.com/material-ui/react-button/
  */
 
-// import { login } from './actions'
+import theme from '../theme'
 
 
 export default function View() {
@@ -189,7 +195,7 @@ export default function View() {
           alignSelf: 'end',
           fontSize: '1.15rem',
           color: 'white',
-          backgroundColor: (theme) => theme.palette.primary.main,
+          backgroundColor: theme.palette.primary.main,
           textTransform: 'none',
         }}
       >

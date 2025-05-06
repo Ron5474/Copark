@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ThemeProvider } from "@emotion/react";
 import theme from "../theme";
+import { getUser } from "../shared/actions";
 
 
 function GetStartedButton() {
@@ -18,8 +19,12 @@ function GetStartedButton() {
   const t = useTranslations('landingPage');
 
 
-  const handleClick = () => {
+  const handleClick = async () => {
     const locale = window.location.pathname.split("/")[1];
+    if (await getUser()) {
+      router.push(`/${locale}/dashboard`);
+      return;
+    }
     router.push(`/${locale}/login`);
   };
 

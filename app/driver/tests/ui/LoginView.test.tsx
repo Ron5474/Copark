@@ -11,6 +11,7 @@
 import { vi, it, afterEach, expect, beforeEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 // import userEvent from '@testing-library/user-event'
+import '../setup'
 
 import Page from '../../src/app/[locale]/login/page'
 
@@ -24,6 +25,12 @@ beforeEach(() => {
     useRouter: () => ({
       push: vi.fn(),
     }),
+  }))
+
+  vi.mock('@/app/api/auth/[...nextauth]/route', () => ({
+    handler: vi.fn(),
+    GET: vi.fn(),
+    POST: vi.fn(),
   }))
 
   vi.mock('next-intl', () => ({
@@ -45,9 +52,21 @@ beforeEach(() => {
           default:
             return x;
         }
-      })),
-    }));
-  })
+      })
+    ),
+  }))
+
+  vi.mock('@/app/[locale]/shared/actions', async () => {
+    return {
+      getUser: vi.fn().mockResolvedValue({
+        name: 'Test User',
+        email: 'test@example.com',
+        image: 'https://example.com/image.jpg',
+        // add more user props as needed
+      }),
+    };
+  });
+})
 
 it('Renders', async () => {
   await render(<Page />)

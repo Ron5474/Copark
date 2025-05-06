@@ -40,6 +40,14 @@ export class AdminResolver {
 
   @Mutation(() => [User])
   @Authorized(["admin"])
+  async deleteUser(
+    @Arg("user", () => UserInput) user: UserInput
+  ): Promise<User[]> {
+    return adminService.deleteUser(user);
+  }
+
+  @Mutation(() => [User])
+  @Authorized(["admin"])
   async reinstateUser(
     @Arg("user", () => UserInput) user: UserInput
   ): Promise<User[]> {

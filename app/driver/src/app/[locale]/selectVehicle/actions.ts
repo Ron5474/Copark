@@ -1,4 +1,5 @@
 'use server'
+
 import { cookies } from 'next/headers'
 import { Vehicle } from '../types'
 
@@ -6,13 +7,14 @@ const API_URL = 'http://localhost:4001/graphql'
 
 const getAuthToken = async () => {
   const cookieStore = await cookies()
-  const token = cookieStore.get('session')?.value
+  const token = cookieStore.get('next-auth.session-token')?.value
   return token
 }
 
 export const getVehicles = async (): Promise<Vehicle[]> => {
   try {
     const token = await getAuthToken()
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -22,10 +24,10 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
       body: JSON.stringify({
         query: `
           query GetVehicles {
-            getMyVehicles {
-              plate,
-              country,
-              state,
+            myVehicles {
+              plate
+              country
+              state
               nickname
             }
           }
@@ -35,15 +37,22 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
 
     const result = await response.json()
 
-    return result.data.getMyVehicles
+    if (result.errors) {
+      console.error('GraphQL errors:', result.errors)
+      throw new Error('Failed to fetch vehicles')
+    }
+
+    return result.data.myVehicles
   } catch (error) {
+    console.error('Error fetching vehicles:', error)
     throw error
   }
 }
 
-export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle[]> => {
+export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
   try {
     const token = await getAuthToken()
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -52,25 +61,32 @@ export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle[]> => {
       },
       body: JSON.stringify({
         query: `
-          mutation RegisterVehicle($vehicle: Vehicle!) {
-            registerVehicle(vehicle: $vehicle) {
+          mutation RegisterVehicle($input: RegisterVehicleInput!) {
+            registerVehicle(input: $input) {
               id
-              name
-              email
-              accountStatus
+              plate
+              country
+              state
+              nickname
             }
           }
         `,
         variables: {
-          vehicle,
+          input: vehicle,
         },
       }),
     })
 
     const result = await response.json()
+
+    if (result.errors) {
+      console.error('GraphQL errors:', result.errors)
+      throw new Error('Failed to register vehicle')
+    }
+
     return result.data.registerVehicle
   } catch (error) {
-    console.error('Error adding enforcer:', error)
+    console.error('Error adding vehicle:', error)
     throw error
   }
 }

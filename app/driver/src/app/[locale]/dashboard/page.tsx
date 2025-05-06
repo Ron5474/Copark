@@ -15,6 +15,7 @@ import { getUser } from "../shared/actions";
 import { useRouter } from "next/navigation";
 import ViewVehicles from "../selectVehicle/member/Vehicle"
 import AddVehicle from "../selectVehicle/AddForm";
+import { userLoginSignUpAttempt } from "./actions";
 
 function Dashboard() {
   const [currentPage, setCurrentPage] = useState("dashboard");
@@ -25,7 +26,9 @@ function Dashboard() {
       const locale = window.location.pathname.split("/")[1];
       if (!await getUser()) {
         router.push(`/${locale}/login`);
-      }
+      } else if (!await userLoginSignUpAttempt()) {
+        router.push(`/${locale}/login`);
+      }   
     }
     loggedIn();
   }, [router]);

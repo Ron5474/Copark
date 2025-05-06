@@ -15,3 +15,6 @@ services:
       - ./microservice/AdminService/sql/databases.sql:/docker-entrypoint-initdb.d/4.databases.sql
       - ./microservice/AdminService/sql/schema.sql:/docker-entrypoint-initdb.d/5.schema.sql
       - ./microservice/AdminService/sql/data.sql:/docker-entrypoint-initdb.d/6.data.sql
+      - ./microservice/VehicleService/sql/databases.sql:/docker-entrypoint-initdb.d/7.databases.sql
+      - ./microservice/VehicleService/sql/schema.sql:/docker-entrypoint-initdb.d/8.schema.sql
+      - ./microservice/VehicleService/sql/data.sql:/docker-entrypoint-initdb.d/9.data.sql

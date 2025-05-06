@@ -14,3 +14,36 @@ VALUES (
     'accountStatus', 'active'
   )
 );
+
+-- INSERT INTO account(id, data)
+-- VALUES (
+--     'e314f688-d150-411e-aa4f-4b0e6e56319d',
+--     jsonb_build_object(
+--       'name', 'John Wick',
+--       'email', 'john@dog.com',
+--       'role', '["driver"]',
+--       'accountStatus', 'active'
+--     )
+-- );
+
+-- INSERT INTO account(id, data)
+-- VALUES (
+--     'f26adf21-f967-4283-8417-f72298bc7bbe',
+--     jsonb_build_object(
+--       'name', 'James Bond',
+--       'email', 'james007@mail.com',
+--       'role', '["driver"]',
+--       'accountStatus', 'active'
+--     )
+-- );
+
+-- INSERT INTO account(id, data)
+-- VALUES (
+--     '307ae958-ac4b-4842-aece-4c81d80443dd',
+--     jsonb_build_object(
+--       'name', 'Jason Bourne',
+--       'email', 'jason@forgot.com',
+--       'role', '["driver"]',
+--       'accountStatus', 'active'
+--     )
+-- );

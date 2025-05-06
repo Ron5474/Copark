@@ -6,7 +6,7 @@
 
 import { Fragment } from 'react'
 import type { NextPage } from 'next'
-import { CssBaseline } from '@mui/material'
+import { CssBaseline, Box } from '@mui/material'
 
 import TopBar from '../../shared/Topbar'
 import MemberVehicles from './Vehicle'
@@ -18,7 +18,9 @@ const View: NextPage = () => {
       <CssBaseline />
       <TopBar/>
       <MemberVehicles/>
-      <Footer/>
+      <Box sx={{position: 'fixed', bottom: 0, width: '100%'}}>
+        <Footer/>
+      </Box>
     </Fragment>
   )
 }

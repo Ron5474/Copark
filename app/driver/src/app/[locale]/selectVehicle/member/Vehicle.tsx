@@ -1,11 +1,12 @@
 /**
- * @file selectVehicle.test.tsx
- * @description This file contains the test cases for the Vehicle page in zone checkout.
+ * @file Vehicle.tsx
+ * @description This file contains the Vehicle page in zone member checkout.
  * @author Bryant Oliver
  */
 
 'use client'
 
+import { Fragment, useEffect } from 'react'
 import {
   Box,
   Button,
@@ -13,20 +14,29 @@ import {
   DialogContent,
   IconButton,
   Typography,
- } from '@mui/material'
+} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { ThemeProvider } from '@mui/material/styles'
 import { useState } from 'react'
 
 import ShortTermStepper from '../../shortTerm/ProgressStepper'
 import AddForm from '../AddForm'
+import Loader from '../../shared/Loader'
 import theme from "../../theme"
 
 export default function MemberVehicles() {
   const [open, setOpen] = useState(false)
+  const [vehicles, setVehicles] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(false)
+    setVehicles([])
+  }, [])
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+
   return (
     <Box sx={{ mt: '90px' }}>
       <ThemeProvider theme={theme}>
@@ -88,6 +98,48 @@ export default function MemberVehicles() {
             <AddForm />
           </DialogContent>
         </Dialog>
+      </Box>
+      <Box
+        sx={{
+          mt: '2vh',
+          maxWidth: '95%',
+          margin: 'auto',
+          textAlign: 'center',
+        }}
+      >
+        {
+          loading ? <Box sx={{mt: '12vh'}}><Loader/></Box> :
+          vehicles.length
+
+          ?
+
+          <></>
+          
+          :
+
+          <Fragment>
+            <Typography gutterBottom sx={{fontWeight: '600', color: '#6a6a6a', mt: '8vh'}}>
+              No vehicles yet
+            </Typography>
+            <Typography gutterBottom sx={{color: '#6a6a6a'}}>
+              Add your vehicle information to start parking
+            </Typography>
+            <Button
+              onClick={handleOpen}
+              aria-label='Add a vehicle'
+              sx={{
+                width: '100%',
+                marginTop: '8vh',
+                fontSize: '1.15rem',
+                color: 'white',
+                backgroundColor: theme.palette.primary.main,
+                textTransform: 'none',
+              }}
+            >
+              Add Vehicle
+            </Button>
+          </Fragment>
+        }
       </Box>
       </ThemeProvider>
     </Box>

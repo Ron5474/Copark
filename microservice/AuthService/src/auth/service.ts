@@ -134,7 +134,6 @@ export class AuthService {
   }
 
   public async driverLogin(data: OauthLoginData|SessionUser|undefined): Promise<string| undefined> {
-    try {
     if (data === undefined) {
       throw new Error("Unauthorized");
     }
@@ -167,10 +166,6 @@ export class AuthService {
       return retid
     } else {
       return undefined
-    }
-  } catch (err) {
-    console.log(err)
-    throw new Error(err as string);
     }
   }
 }

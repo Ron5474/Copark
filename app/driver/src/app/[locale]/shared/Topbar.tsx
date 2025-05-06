@@ -1,12 +1,24 @@
+'use client'
+
 import { AppBar, Box, IconButton } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import theme from "../theme";
 import UserAvatar from "./UserAvatar";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useContext } from "react";
 
+import { DashboardContext } from "../dashboard/context";
 
 function Topbar() {
   const primaryColorMain = theme.palette.primary.main;
   const primaryColorLight = theme.palette.primary.light;
+
+  const { currentPage, setCurrentPage } = useContext(DashboardContext);
+
+  const handleBackClick = () => {
+    setCurrentPage("dashboard");
+  };
+
   return (
   <AppBar position="fixed"
     sx={{
@@ -21,6 +33,11 @@ function Topbar() {
       alignItems: "center",
       borderBottom: `3px solid ${primaryColorMain}`,
     }}>
+      {currentPage !== "dashboard" && (
+          <IconButton onClick={handleBackClick} aria-label="back to dashboard">
+            <ArrowBackIcon sx={{ color: "black" }} />
+          </IconButton>
+        )}
       <picture>
         <source srcSet="/logo-noBg.png" type="image/png" />
         <img src="/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-logo" />

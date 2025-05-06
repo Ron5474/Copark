@@ -25,6 +25,7 @@ import {
  */
 
 import theme from '../theme'
+import { addVehicle } from './actions'
 
 
 export default function AddForm({ isGuest = false }: { isGuest?: boolean }) {
@@ -32,10 +33,12 @@ export default function AddForm({ isGuest = false }: { isGuest?: boolean }) {
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
   const [country, setCountry] = useState<string>(Object.keys(locations)[0])
   const [state, setState] = useState<string>(Object.values(locations)[0][0])
-  const [nickname, setNickname] = useState<string>('')
+  const [nickname, setNickname] = useState<string | undefined>()
 
-  const submitVehicle = () => {
+  const submitVehicle = async () => {
     setIsValidEntry(plateNumber.length > 0)
+    if (plateNumber.length > 0) return
+    await addVehicle({'plate': plateNumber, country, state, 'name': nickname})
   }
 
   useEffect(() => {

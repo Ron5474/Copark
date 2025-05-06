@@ -8,6 +8,7 @@ export class VehicleService {
       [userId]
     )
 
+    if (result.rows.length == 0) return []
     return result.rows.map(row => ({
       id: row.id,
       plate: row.data.plate,

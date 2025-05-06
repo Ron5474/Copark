@@ -14,7 +14,7 @@ export async function userLoginSignUpAttempt(): Promise<string|undefined> {
     },
   })
 
-  if (!res.ok) {
+  if (res.status === 400) {
     return undefined;
   }
   

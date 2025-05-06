@@ -24,14 +24,9 @@ import { useState } from 'react'
 
 import AddForm from '../AddForm'
 import Loader from '../../shared/Loader'
-import theme from "../../theme"
-
-
-interface Vehicle {
-  plate: string;
-  state: string;
-  name?: string;
-}
+import theme from '../../theme'
+import { Vehicle } from '../../types'
+import { getVehicles } from '../actions'
 
 
 export default function MemberVehicles({ isCheckout = false }: { isCheckout?: boolean }) {
@@ -41,19 +36,11 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setVehicles([ // Integrate to backend here
-      {
-        'plate': "1ABC123",
-        'state': "California",
-        'name': "CoParkMobile"
-      }, 
-      {
-        'plate': "9XYZ987",
-        'state': "Washington",
-      }
-    ])
+    (async () => {
+      setVehicles(await getVehicles());
+    })();
     setLoading(false)
-  }, [])
+  }, [vehicles])
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)

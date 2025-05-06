@@ -85,6 +85,31 @@ beforeEach(() => {
       headers: () => new Headers(),
     };
   });
+
+  vi.mock('../../src/app/[locale]/selectVehicle/actions', () => {
+    return {
+      getVehicles: vi.fn().mockResolvedValue([
+        {
+          plate: 'ABC123',
+          country: 'United States',
+          state: 'California',
+          nickname: 'My Car'
+        },
+        {
+          plate: 'XYZ789',
+          country: 'United States',
+          state: 'New York',
+          nickname: 'Work Car'
+        }
+      ]),
+      addVehicle: vi.fn().mockImplementation((vehicle) => {
+        return Promise.resolve({
+          id: '123e4567-e89b-12d3-a456-426614174000',
+          ...vehicle
+        });
+      })
+    };
+  });
 })
 
 it('Renders guest', async () => {

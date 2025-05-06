@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/re
 import { useRouter } from 'next/navigation';
 import Page from '../../src/app/page';
 import ManageEnforcement from '../../src/app/components/ManageEnforcement';
-import { getEnforcers, addEnforcer, suspendUser, reinstateUser } from '../../src/enforcement/actions';
+import { getEnforcers, addEnforcer, suspendUser, reinstateUser, deleteUser } from '../../src/enforcement/actions';
 
 // Mock Next.js navigation and cookies
 vi.mock('next/navigation', () => ({
@@ -81,7 +81,8 @@ vi.mock('../../src/enforcement/actions', () => ({
   getEnforcers: vi.fn(),
   addEnforcer: vi.fn(),
   suspendUser: vi.fn(),
-  reinstateUser: vi.fn()
+  reinstateUser: vi.fn(),
+  deleteUser: vi.fn()
 }));
 
 const mockRouter = {
@@ -314,42 +315,25 @@ it('handles reinstating a suspended enforcer', async () => {
   });
 });
 
-// it('handles full suspend/reinstate cycle', async () => {
-//   // First suspension
-//   (suspendUser as Mock).mockResolvedValueOnce([
-//     { ...mockEnforcers[0], accountStatus: 'suspended' },
-//     mockEnforcers[1]
-//   ]);
+it('deletes an enforcer and removes them from display', async () => {
+  // Mock initial state and after deletion state
+  (getEnforcers as Mock).mockResolvedValueOnce(mockEnforcers)
+    .mockResolvedValueOnce(mockEnforcers.filter(e => e.id !== '1'));
+  
+  render(<ManageEnforcement onNavigate={() => {}} />);
 
-//   // Then reinstatement
-//   (reinstateUser as Mock).mockResolvedValueOnce([
-//     { ...mockEnforcers[0], accountStatus: 'active' },
-//     mockEnforcers[1]
-//   ]);
+  // Wait for initial load and verify Test Enforcer exists
+  await waitFor(() => {
+    expect(screen.getByText('Test Enforcer')).toBeDefined();
+  });
 
-//   render(<ManageEnforcement onNavigate={() => {}} />);
+  // Get all delete buttons and click the first one
+  const deleteButtons = screen.getAllByLabelText('Delete user');
+  fireEvent.click(deleteButtons[0]);
 
-//   // Wait for initial render
-//   await waitFor(() => {
-//     expect(screen.getByText('Test Enforcer')).toBeDefined();
-//   });
-
-//   // Find and click suspend button using aria-label
-//   const suspendButton = screen.getByRole('button', { name: 'Suspend user' });
-//   fireEvent.click(suspendButton);
-
-//   // Verify suspension
-//   await waitFor(() => {
-//     expect(suspendUser).toHaveBeenCalledWith('1');
-    
-//     // Find and click restore button using aria-label
-//     const restoreButton = screen.getByRole('button', { name: 'Restore user' });
-//     fireEvent.click(restoreButton);
-//   });
-
-//   // Verify reinstatement
-//   await waitFor(() => {
-//     expect(reinstateUser).toHaveBeenCalledWith('1');
-//     expect(getEnforcers).toHaveBeenCalledTimes(3); // Initial + after suspend + after reinstate
-//   });
-// });
+  // Verify deletion and UI update
+  await waitFor(() => {
+    expect(deleteUser).toHaveBeenCalledWith('1');
+    expect(screen.queryByText('Test Enforcer')).toBeNull();
+  });
+});

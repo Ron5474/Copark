@@ -148,3 +148,44 @@ export const reinstateUser = async (id: string): Promise<User[]> => {
     throw error;
   }
 };
+
+export const deleteUser = async (id: string): Promise<User[]> => {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation DeleteUser($user: UserInput!) {
+            deleteUser(user: $user) {
+              id
+              name
+              email
+              accountStatus
+            }
+          }
+        `,
+        variables: {
+          user: {
+            id
+          },
+        },
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.errors) {
+      throw new Error(result.errors[0].message);
+    }
+
+    return result.data.deleteUser;
+  } catch (error) {
+    console.error('Error deleting enforcer:', error);
+    throw error;
+  }
+};

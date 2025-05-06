@@ -6,7 +6,7 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import HomeIcon from '@mui/icons-material/Home';
 import RestoreIcon from '@mui/icons-material/Restore'; // Add this import
-import { getEnforcers, addEnforcer, suspendUser, reinstateUser } from '../../enforcement/actions';
+import { getEnforcers, addEnforcer, suspendUser, reinstateUser, deleteUser } from '../../enforcement/actions';
 
 export default function ManageEnforcement({ onNavigate }) {
   const [enforcers, setEnforcers] = useState([]);
@@ -32,6 +32,11 @@ export default function ManageEnforcement({ onNavigate }) {
       await suspendUser(enforcerId);
     }
     fetchEnforcers(); // Refresh the list after status change
+  };
+
+  const handleDeleteUser = async (enforcerId) => {
+    await deleteUser(enforcerId);
+    fetchEnforcers(); // Refresh the list after deletion
   };
 
   const handleAddEnforcer = async () => {
@@ -101,7 +106,12 @@ export default function ManageEnforcement({ onNavigate }) {
                   <GavelIcon fontSize="large" />
                 )}
               </IconButton>
-              <IconButton>
+              <IconButton
+                onClick={() => handleDeleteUser(enforcer.id)}
+                color="error"
+                aria-label="Delete user"
+                disabled={enforcer.accountStatus === 'deleted'}
+              >
                 <PersonOffIcon fontSize="large" />
               </IconButton>
             </Box>

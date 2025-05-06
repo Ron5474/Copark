@@ -38,3 +38,27 @@ VALUES (
     'accountStatus', 'active'
   )
 );
+
+INSERT INTO account(data)
+VALUES (
+  jsonb_build_object(
+    'name', 'Driver 1',
+    'email', 'driver1@outlook.com',
+    'phone' , '123-456-7890',
+    'pwhash', crypt('password1', gen_salt('bf')),
+    'role', '["driver"]',
+    'accountStatus', 'active'
+  )
+);
+
+INSERT INTO account(data)
+VALUES (
+  jsonb_build_object(
+    'name', 'Driver 2',
+    'email', 'driver2@outlook.com',
+    'phone' , '123-456-7890',
+    'pwhash', crypt('password1', gen_salt('bf')),
+    'role', '["driver"]',
+    'accountStatus', 'active'
+  )
+);

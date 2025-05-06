@@ -33,7 +33,8 @@ export class AdminService {
         data->>'accountStatus' AS accountStatus
         FROM account
         WHERE data->>'role' = '["enforcement"]'
-        AND data->>'accountStatus' != 'deleted';
+        AND data->>'accountStatus' != 'deleted'
+        ORDER BY data->>'name';
     `
 
     const enforcementResult = await pool.query(enforcementQuery);
@@ -60,7 +61,8 @@ export class AdminService {
           data->>'accountStatus' AS accountStatus
           FROM account
           WHERE data->>'role' = '["driver"]'
-          AND data->>'accountStatus' != 'deleted';
+          AND data->>'accountStatus' != 'deleted'
+          ORDER BY data->>'name';
       `
 
       const driverResult = await pool.query(driverQuery);

@@ -87,3 +87,15 @@ test('getDrivers should return a list of drivers', async () => {
     expect(enforcers[1].name).toBe('Driver 2');
     expect(enforcers[1].accountStatus).toBe('active');
 });
+
+test('deleteUser should delete a user', async () => {
+    const enforcer: NewUser = { name: 'barracks Obama', email: 'barracks.obama@example.com' };
+    const addedEnforcers = await adminService.addEnforcer(enforcer);
+  
+    const enforcerInput: UserInput = { id: addedEnforcers[0].id };
+    const updatedEnforcers = await adminService.deleteUser(enforcerInput);
+  
+    expect(updatedEnforcers).toHaveLength(1);
+    expect(updatedEnforcers[0].name).toBe('barracks Obama');
+    expect(updatedEnforcers[0].accountStatus).toBe('deleted');
+});

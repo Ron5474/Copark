@@ -50,6 +50,27 @@ beforeEach(() => {
       }),
     };
   });
+
+  vi.mock('next/headers', () => {
+    const mockCookies = {
+      get: vi.fn((name) => {
+        if (name === 'auth-token') {
+          return { value: 'mocked-auth-token-123' };
+        }
+        return null;
+      }),
+      getAll: vi.fn(() => [
+        { name: 'auth-token', value: 'mocked-auth-token-123' },
+      ]),
+      set: vi.fn(),
+      delete: vi.fn(),
+    };
+
+    return {
+      cookies: () => mockCookies,
+      headers: () => new Headers(),
+    };
+  });
 })
 
 

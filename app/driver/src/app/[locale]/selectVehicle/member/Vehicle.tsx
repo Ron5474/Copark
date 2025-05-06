@@ -16,15 +16,13 @@ import {
   Typography,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { ThemeProvider } from '@mui/material/styles'
 import { useState } from 'react'
 
-import ShortTermStepper from '../../shortTerm/ProgressStepper'
 import AddForm from '../AddForm'
 import Loader from '../../shared/Loader'
 import theme from "../../theme"
 
-export default function MemberVehicles() {
+export default function MemberVehicles({ isCheckout = false }: { isCheckout?: boolean }) {
   const [open, setOpen] = useState(false)
   const [vehicles, setVehicles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -38,9 +36,7 @@ export default function MemberVehicles() {
   const handleClose = () => setOpen(false)
 
   return (
-    <Box sx={{ mt: '90px' }}>
-      <ThemeProvider theme={theme}>
-      <ShortTermStepper/>
+    <Fragment>
       <Box sx={{
           maxWidth: '95%',
           display: 'flex',
@@ -54,7 +50,7 @@ export default function MemberVehicles() {
           variant="h5"
           gutterBottom
         >
-          Which Vehicle?
+          {isCheckout ? "Which Vehicle?" : "Your Vehicles"}
         </Typography>
         <Button
           onClick={handleOpen}
@@ -141,7 +137,6 @@ export default function MemberVehicles() {
           </Fragment>
         }
       </Box>
-      </ThemeProvider>
-    </Box>
+    </Fragment>
   )
 }

@@ -13,7 +13,8 @@ import theme from "../theme";
 import Topbar from "../shared/Topbar";
 import { getUser } from "../shared/actions";
 import { useRouter } from "next/navigation";
-import View from "../selectVehicle/member/View";
+import ViewVehicles from "../selectVehicle/member/Vehicle"
+import AddVehicle from "../selectVehicle/AddForm";
 
 function Dashboard() {
   const [currentPage, setCurrentPage] = useState("dashboard");
@@ -42,8 +43,11 @@ function Dashboard() {
           {currentPage === "dashboard" && (
             <DashboardView />
           )}
+          {currentPage === "garage" && (
+            <ViewVehicles />
+          )}
           {currentPage === "add-vehicle" && (
-            <View />
+            <AddVehicle />
           )}
         </Box>
       </DashboardContext.Provider>

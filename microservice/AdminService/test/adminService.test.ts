@@ -20,6 +20,7 @@ afterAll(async () => {
 test('getEnforcers should return a list of enforcers', async () => {
     const enforcers = await adminService.getEnforcers();
 
+    console.log(enforcers)
     expect(enforcers).toHaveLength(2);
     expect(enforcers[0].name).toBe('Enforcer 1');
     expect(enforcers[0].accountStatus).toBe('active');

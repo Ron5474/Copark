@@ -8,4 +8,6 @@ const pool = new Pool({
   password: process.env.POSTGRES_PASSWORD,
 });
 
+console.log(process.env.POSTGRES_DB);
+
 export { pool };

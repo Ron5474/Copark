@@ -12,7 +12,7 @@ const pool = new Pool({
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
 })
-
+console.log(process.env.POSTGRES_DB)
 // console.log(typeof process.env.POSTGRES_PASSWORD, process.env.POSTGRES_PASSWORD)
 const run = async (file: string) => {
   const content = fs.readFileSync(file, 'utf8')

@@ -158,9 +158,9 @@ export class AuthService {
     data.picture,
     data.sub]
   }
-
+    
     const { rows } = await pool.query(query)
-  
+    
     if (rows.length > 0) {
       const userId = rows[0].id
       const retid = await this.encrypt(userId)

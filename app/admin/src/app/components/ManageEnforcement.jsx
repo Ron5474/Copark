@@ -90,17 +90,22 @@ export default function ManageEnforcement({ onNavigate }) {
         </Button>
       </Box>
 
-      <Paper sx={{ 
-        p: 3, 
-        background: '#ffffff', 
-        maxWidth: 900, 
-        mx: 'auto',
-        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
-        borderRadius: '15px'
-      }}>
+      <Box 
+        data-testid="enforcers-list"
+        sx={{ 
+          p: 3, 
+          background: '#ffffff', 
+          maxWidth: 900, 
+          mx: 'auto',
+          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
+          borderRadius: '15px'
+        }}
+      >
+        {<p>Enforcer Count: {enforcers.length}</p>}
         {enforcers.map((enforcer) => (
           <Box
             key={enforcer.id}
+            data-testid="enforcer-item"
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -175,7 +180,7 @@ export default function ManageEnforcement({ onNavigate }) {
             </Box>
           </Box>
         ))}
-      </Paper>
+      </Box>
 
       {/* Add Enforcer Dialog - Updated styles */}
       <Dialog 

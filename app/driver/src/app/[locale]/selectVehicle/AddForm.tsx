@@ -28,7 +28,7 @@ import theme from '../theme'
 import { addVehicle } from './actions'
 
 
-export default function AddForm({ isGuest = false }: { isGuest?: boolean }) {
+export default function AddForm({ isGuest = false, close = () => {} }: { isGuest?: boolean, close?: () => void }) {
   const [plateNumber, setPlateNumber] = useState<string>('')
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
   const [country, setCountry] = useState<string>(Object.keys(locations)[0])
@@ -39,6 +39,7 @@ export default function AddForm({ isGuest = false }: { isGuest?: boolean }) {
     setIsValidEntry(plateNumber.length > 0)
     if (plateNumber.length === 0) return
     await addVehicle({plate: plateNumber, country, state, nickname: nickname})
+    close()
   }
 
   useEffect(() => {

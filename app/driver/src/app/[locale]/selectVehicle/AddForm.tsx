@@ -37,8 +37,8 @@ export default function AddForm({ isGuest = false }: { isGuest?: boolean }) {
 
   const submitVehicle = async () => {
     setIsValidEntry(plateNumber.length > 0)
-    if (plateNumber.length > 0) return
-    await addVehicle({'plate': plateNumber, country, state, 'name': nickname})
+    if (plateNumber.length === 0) return
+    await addVehicle({plate: plateNumber, country, state, nickname: nickname})
   }
 
   useEffect(() => {

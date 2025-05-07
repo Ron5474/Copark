@@ -15,5 +15,5 @@ export interface Vehicle {
   plate: string
   country: string
   state: string
-  name?: string
+  nickname?: string
 }

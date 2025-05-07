@@ -172,9 +172,9 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                         {v.state}
                       </Typography>
                     </Typography>
-                    {v.name && (
+                    {v.nickname && (
                       <Typography variant="body2" sx={{ textAlign: 'left', color: '#666', mt: 0.5 }}>
-                        {v.name}
+                        {v.nickname}
                       </Typography>
                     )}
                   </Box>

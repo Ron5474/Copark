@@ -92,50 +92,46 @@ export class AuthService {
     }
   }
 
-  public async check(
-  authHeader?: string,
-  scopes?: string[]
-): Promise<SessionUser|OauthLoginData> {
-  if (!authHeader) {
-    throw new Error("Unauthorized");
-  }
+  public async check(authHeader?: string, scopes?: string[]): Promise<SessionUser|OauthLoginData> {
+    if (!authHeader) {
+      throw new Error("Unauthorized");
+    }
 
-  try {
-    const token = authHeader.split(" ")[1];
+    try {
+      const token = authHeader.split(" ")[1];
 
-    // console.log(token, encodedKey)
+      // console.log(token, encodedKey)
 
-    const { payload } = await jwtVerify(token, encodedKey);
-    if (payload.id) {
-      if (typeof payload.id !== 'string') {
-        throw new Error("Invalid token payload");
-      }
-      const uid = payload as unknown as SessionUser;
+      const { payload } = await jwtVerify(token, encodedKey);
+      if (payload.id) {
+        if (typeof payload.id !== 'string') {
+          throw new Error("Invalid token payload");
+        }
+        const uid = payload as unknown as SessionUser;
+        console.log('user id: ', uid?.id)
+        const user = await this.getUserById(uid.id);
+        if (!user) throw new Error("Unauthorized1");
 
-      const user = await this.getUserById(uid.id);
-      if (!user) throw new Error("Unauthorized1");
+        if (scopes && scopes.length > 0) {
+          if (!user.role || !scopes.some(role => user.role.includes (role))) {
+            throw new Error("Unauthorized2");
+          }
+        }
 
-      // console.log(scopes, user)
-      if (scopes && scopes.length > 0) {
-        if (!user.role || !scopes.some(role => user.role.includes (role))) {
-          throw new Error("Unauthorized2");
+        return { id: user.id };
+      } else {
+        if (payload.name && payload.email && payload.picture && payload.sub) {
+          const uid = payload as unknown as OauthLoginData;
+          return { name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub };
+        } else {
+          throw new Error("Invalid token payload");
         }
       }
-
-      return { id: user.id };
-    } else {
-      if (payload.name && payload.email && payload.picture && payload.sub) {
-        const uid = payload as unknown as OauthLoginData;
-        return { name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub };
-      } else {
-        throw new Error("Invalid token payload");
-      }
+    } catch (err) {
+      void err;
+      console.log("JWT ERROR:", err);
+      throw new Error("Unauthorized3");
     }
-  } catch (err) {
-    void err;
-    // console.log("JWT ERROR:", err);
-    throw new Error("Unauthorized3");
-  }
   }
 
   public async driverLogin(data: OauthLoginData|SessionUser|undefined): Promise<string| undefined> {

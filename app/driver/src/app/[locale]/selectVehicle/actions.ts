@@ -15,11 +15,19 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
   try {
     const token = await getAuthToken()
 
+    const res = await fetch("http://localhost:8000/api/v0/auth/driver/id", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    const driverToken = await res.json()
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${driverToken}`,
       },
       body: JSON.stringify({
         query: `
@@ -52,12 +60,21 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
 export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
   try {
     const token = await getAuthToken()
+    console.log('token addVehicle() : ', token)
+    const res = await fetch("http://localhost:8000/api/v0/auth/driver/id", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    const driverToken = await res.json()
+    console.log('driverToken: ', driverToken)
 
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${driverToken}`,
       },
       body: JSON.stringify({
         query: `
@@ -78,6 +95,7 @@ export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
     })
 
     const result = await response.json()
+    console.log('result: ', result)
 
     if (result.errors) {
       console.error('GraphQL errors:', result.errors)

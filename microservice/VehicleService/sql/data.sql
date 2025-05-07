@@ -1,6 +1,7 @@
 -- This file is not included in the submission archive, anything you do here is just for manual "testing" via the Swagger UI --
 
 ----- Your insert statements go below here -----
+\connect vehc;
 INSERT INTO vehicle (driver, data) VALUES
   (
     'e314f688-d150-411e-aa4f-4b0e6e56319d',

@@ -111,10 +111,9 @@ export class AuthService {
       if (!user) throw new Error("Unauthorized1");
 
       // console.log(scopes, user)
-      if (scopes) {
-        if (!user.role || !scopes.some(role => user.role.includes (role))) {
-          throw new Error("Unauthorized2");
-        }
+      // console.log(scopes?.length)
+      if (scopes?.length && (!user.role || !(scopes.every(role => user.role.includes(role))))) {
+        throw new Error("Unauthorized2");
       }
 
       return { id: user.id };

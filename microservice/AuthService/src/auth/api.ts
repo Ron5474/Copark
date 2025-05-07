@@ -46,7 +46,7 @@ export class AuthController extends Controller {
     @Body() roles: string[]
   ): Promise<SessionUser | OauthLoginData | undefined> {
     // console.log('eowefjioefjiowfejiowejiowefjioefwjioefjioef')
-    console.log(request.headers.authorization, roles)
+    // console.log("ROLE!S :" + request.headers.authorization, roles)
     return new AuthService().check(request.headers.authorization, roles);
   }
 }

@@ -10,7 +10,7 @@ import authApp from '../../AuthService/src/app'
 let server: http.Server
 let authServer: http.Server
 
-const AUTH_PORT = 3010
+const AUTH_PORT = 8000
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 
 beforeAll(async () => {
@@ -52,9 +52,9 @@ async function loginAsAdmin(): Promise<string | undefined> {
     .post('/api/v0/auth/login')
     .send(adminUser)
 
-//   console.log('Status:', response.status)
-//   console.log('Headers:', response.headers)
-//   console.log('Body:', response.body)
+  // console.log('Status:', response.status)
+  // console.log('Headers:', response.headers)
+  // console.log('Body:', response.body)
 
   if (response.status !== 200) {
     throw new Error(`Login failed with status ${response.status}`)
@@ -62,7 +62,10 @@ async function loginAsAdmin(): Promise<string | undefined> {
 
   return response.body?.id
 }
-
+// Test case for the `getEnforcers` query
+test('Admin can get a list of enforcers', async () => {
+  const token = await loginAsAdmin()
+})
 // Test case for the `getEnforcers` query
 test('Admin can get a list of enforcers', async () => {
   const token = await loginAsAdmin()

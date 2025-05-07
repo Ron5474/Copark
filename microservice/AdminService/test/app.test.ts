@@ -10,7 +10,7 @@ import authApp from '../../AuthService/src/app'
 let server: http.Server
 let authServer: http.Server
 
-const AUTH_PORT = 3010
+const AUTH_PORT = 8000
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 
 beforeAll(async () => {

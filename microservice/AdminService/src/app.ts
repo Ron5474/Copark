@@ -24,7 +24,10 @@ async function bootstrap() {
         throw new Error('Unauthorized: Missing Authorization header');
       }
 
+      // console.log(authHeader)
+
       try {
+        // console.log("required roles is " + roles)
         // Make a call to the authChecker microservice
         const response = await fetch('http://localhost:8000/api/v0/auth/check', {
           method: 'POST',
@@ -36,14 +39,15 @@ async function bootstrap() {
         });
 
         if (response.status !== 200) {
-          throw new Error('Unauthorized');
+          // console.error('AuthChecker Error:', response);
+          throw new Error('Unauthorized123');
         }
 
         const user = await response.json();
         return !!user; // Return true if the user is authorized
       } catch (error) {
         // console.error('AuthChecker Error:', error);
-        throw new Error('Unauthorized');
+        throw new Error('Unauthorized312');
       }
     },
     emitSchemaFile: {

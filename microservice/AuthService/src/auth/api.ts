@@ -41,7 +41,7 @@ export class AuthController extends Controller {
   }
 
   @Post("check")
-  @Security("jwt")
+  @Security("jwt", undefined)
   public async check(@Request() request: express.Request,
     @Body() roles: string[]
   ): Promise<SessionUser | OauthLoginData | undefined> {

@@ -30,7 +30,12 @@ export class AuthService {
   
     if (rows.length > 0) {
       const user = rows[0].user
-      const retid = await this.encrypt(user.id)
+      const retid = await new SignJWT({ id: user.id })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(encodedKey)
+      console.log("JWT:", retid)
       return { id: retid, name: user.name, role: user.role };
     } else {
       return undefined
@@ -110,8 +115,8 @@ export class AuthService {
       const user = await this.getUserById(uid.id);
       if (!user) throw new Error("Unauthorized1");
 
-      // console.log(scopes, user)
-      if (scopes) {
+      console.log(scopes, user)
+      if (scopes && scopes.length > 0) {
         if (!user.role || !scopes.some(role => user.role.includes (role))) {
           throw new Error("Unauthorized2");
         }
@@ -128,7 +133,7 @@ export class AuthService {
     }
   } catch (err) {
     void err;
-    // console.log("JWT ERROR:", err);
+    console.log("JWT ERROR:", err);
     throw new Error("Unauthorized3");
   }
   }

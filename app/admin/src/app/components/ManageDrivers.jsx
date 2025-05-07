@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Paper, Typography, IconButton } from '@mui/material';
-import GroupIcon from '@mui/icons-material/Group';
+import { Box, Paper, Typography, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, useTheme } from '@mui/material';
 import GavelIcon from '@mui/icons-material/Gavel';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import HomeIcon from '@mui/icons-material/Home';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { getDrivers, suspendUser, reinstateUser, deleteUser } from '../../driver/actions';
 
-export default function ManageDrivers({ onNavigate }) {
-  const [enforcers, setDrivers] = useState([]);
+export default function ManageEnforcement({ onNavigate }) {
+  const theme = useTheme();
+  const [drivers, setDrivers] = useState([]);
 
   useEffect(() => {
     fetchDrivers();
@@ -28,83 +28,137 @@ export default function ManageDrivers({ onNavigate }) {
     fetchDrivers();
   };
 
-  const handleDeleteUser = async (driverId) => {
-    await deleteUser(driverId);
+  const handleDeleteUser = async (enforcerId) => {
+    await deleteUser(enforcerId);
     fetchDrivers();
   };
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+    <Box sx={{
+      p: 4,
+      bgcolor: '#ffffff'
+    }}>
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        mb: 4,
+        borderBottom: `2px solid ${theme.palette.primary.main}`,
+        pb: 2
+      }}>
         <img src="/admin_logo.png" alt="CoPark Admin" style={{ height: 60, marginRight: 16 }} />
-        <Button
-          variant="contained"
-          startIcon={<GroupIcon />}
-          sx={{ mr: 2, bgcolor: '#bdbdbd', color: 'black' }}
+        <Typography
+          variant="h4"
+          sx={{
+            color: theme.palette.primary.main,
+            fontWeight: 700,
+            fontSize: "32px"
+          }}
         >
-          Manage Enforcer
-        </Button>
-        <Box sx={{ flexGrow: 1 }} />
+          Manage Drivers
+        </Typography>
       </Box>
 
-      <Paper sx={{ p: 2, background: '#e0e0e0', maxWidth: 900, mx: 'auto' }}>
-        {enforcers.map((enforcer) => (
+      <Paper sx={{
+        p: 3,
+        background: '#ffffff',
+        maxWidth: 900,
+        mx: 'auto',
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
+        borderRadius: '15px'
+      }}>
+        {drivers.map((enforcer) => (
           <Box
             key={enforcer.id}
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              bgcolor: 'white',
-              p: 2,
+              bgcolor: '#C6DDF4',
+              border: `1px solid ${theme.palette.primary.light}20`,
+              p: 3,
               mb: 2,
-              borderRadius: 1,
+              borderRadius: '15px',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)'
+              }
             }}
           >
             <Box>
-              <Typography>{enforcer.name}</Typography>
+              <Typography sx={{
+                fontSize: "20px",
+                fontWeight: 500,
+                color: theme.palette.primary.dark
+              }}>
+                {enforcer.name}
+              </Typography>
               <Typography
-                variant="caption"
-                color={enforcer.accountStatus === 'suspended' ? 'error' : 'success.main'}
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: enforcer.accountStatus === 'suspended' ? theme.palette.secondary.main : theme.palette.primary.main,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}
               >
                 {enforcer.accountStatus}
               </Typography>
             </Box>
-            <Box>
+            <Box sx={{ display: 'flex', gap: 1 }}>
               <IconButton
                 onClick={() => handleUserStatus(enforcer.id, enforcer.accountStatus)}
-                color={enforcer.accountStatus === 'suspended' ? 'primary' : 'default'}
+                sx={{
+                  // Same light background for both states
+                  bgcolor: `${theme.palette.primary.main} + 20`,
+                  color: theme.palette.primary.main,
+                  '&:hover': {
+                    bgcolor: theme.palette.primary.main,
+                    color: '#ffffff'
+                  }
+                }}
                 aria-label={enforcer.accountStatus === 'suspended' ? 'Restore user' : 'Suspend user'}
               >
                 {enforcer.accountStatus === 'suspended' ? (
-                  <RestoreIcon fontSize="large" />
+                  <RestoreIcon />
                 ) : (
-                  <GavelIcon fontSize="large" />
+                  <GavelIcon />
                 )}
               </IconButton>
               <IconButton
                 onClick={() => handleDeleteUser(enforcer.id)}
-                color="error"
+                sx={{
+                  bgcolor: theme.palette.secondary.main + '20',
+                  color: theme.palette.secondary.main,
+                  '&:hover': {
+                    bgcolor: theme.palette.secondary.main,
+                    color: '#ffffff'
+                  }
+                }}
                 aria-label="Delete user"
                 disabled={enforcer.accountStatus === 'deleted'}
               >
-                <PersonOffIcon fontSize="large" />
+                <PersonOffIcon />
               </IconButton>
             </Box>
           </Box>
         ))}
-        <Box sx={{ height: 120, background: '#d3d3d3', borderRadius: 1 }} />
       </Paper>
 
-      {/* Home Icon */}
       <Box sx={{ position: 'fixed', bottom: 24, right: 24 }}>
         <IconButton
-          color="primary"
+          sx={{
+            bgcolor: theme.palette.primary.main,
+            color: '#ffffff',
+            '&:hover': {
+              bgcolor: theme.palette.primary.dark
+            }
+          }}
           size="large"
           onClick={() => onNavigate('home')}
           aria-label="Go to Home"
         >
-          <HomeIcon sx={{ fontSize: 48 }} />
+          <HomeIcon sx={{ fontSize: 32 }} />
         </IconButton>
       </Box>
     </Box>

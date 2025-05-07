@@ -5,12 +5,23 @@
  */
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Box, Button, Typography } from '@mui/material'
 import { useEnforcement } from '../context/Context'
+// import { scanPlate } from '@/app/dashboard/actions'
+
 
 export default function CameraCaptureCard() {
-  const { cameraOn, setCameraOn, setCapturedImage, setPlate, setManualInput, setDetectionMethod } = useEnforcement()
+  const {
+    cameraOn,
+    setCameraOn,
+    setCapturedImage,
+    setPlate,
+    setManualInput,
+    setDetectionMethod
+  } = useEnforcement()
+
+  const [loadingOCR, setLoadingOCR] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -46,27 +57,63 @@ export default function CameraCaptureCard() {
     return () => stopAllTracks()
   }, [cameraOn, setCameraOn])
 
-  const handleCapture = () => {
+  const handleCapture = async () => {
     const video = videoRef.current
     const canvas = canvasRef.current
     if (!video || !canvas) return
-
+  
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
     const context = canvas.getContext('2d')
     if (!context) return
-
+  
     context.drawImage(video, 0, 0, canvas.width, canvas.height)
     const imageDataURL = canvas.toDataURL('image/png')
     stopAllTracks()
-
+  
     setCapturedImage(imageDataURL)
-    const simulatedPlate = 'ABC123'
-    setPlate(simulatedPlate)
-    setManualInput(simulatedPlate)
-    setDetectionMethod('camera')
     setCameraOn(false)
+    setDetectionMethod('camera')
+  
+    // setLoadingOCR(true)
+    // try {
+    //   const plateText = await scanPlate(imageDataURL)
+    //   setPlate(plateText)
+    //   setManualInput(plateText)
+    // } catch (err) {
+    //   console.error('OCR server action error:', err)
+    // } finally {
+    //   setLoadingOCR(false)
+    // }
+    setLoadingOCR(true)
+    try {
+      const blob = await (await fetch(imageDataURL)).blob()
+      const formData = new FormData()
+      formData.append('image', blob, 'capture.png')
+
+      const response = await fetch('http://localhost:4001/api/v0/vehicle/scan', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        console.error('OCR failed:', result.error)
+        return
+      }
+
+      const plateText = result.plate?.trim?.() || ''
+      setPlate(plateText)
+      setManualInput(plateText)
+    } catch (err) {
+      console.error('Local OCR call failed:', err)
+    } finally {
+      setLoadingOCR(false)
+    }
+
   }
+  
 
   return (
     <>
@@ -106,12 +153,12 @@ export default function CameraCaptureCard() {
 
       <Button
         fullWidth
-        disabled={!cameraOn}
+        disabled={!cameraOn || loadingOCR}
         onClick={handleCapture}
         sx={{ bgcolor: cameraOn ? '#d3ffff' : '#ccc', mb: 2 }}
         aria-label={`Capture License Plate ${cameraOn ? 'Enabled' : 'Disabled'}`}
       >
-        Capture License Plate
+        {loadingOCR ? 'Analyzing...' : 'Capture License Plate'}
       </Button>
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />

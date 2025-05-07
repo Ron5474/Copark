@@ -34,24 +34,26 @@
     "supertest": "^7.1.0",
     "ts-node": "^10.9.2",
     "ts-postgres": "^2.0.4",
-    "typescript": "*",
+    "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.1",
     "vite-plugin-eslint": "^1.8.1",
     "vitest": "^3.1.2"
   },
   "dependencies": {
-    "class-validator": "*",
+    "class-validator": "^0.14.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "graphql": "*",
-    "graphql-http": "*",
+    "graphql": "^16.11.0",
+    "graphql-http": "^1.22.4",
     "graphql-playground-html": "^1.6.29",
     "jose": "^4.14.4",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.15.6",
-    "tsoa": "*",
-    "type-graphql": "*"
+    "tsoa": "^6.6.0",
+    "type-graphql": "^2.0.0-rc.2",
+    "tesseract.js": "^4.1.1",
+    "multer": "^1.4.5-lts.1"
   },
   "nodemonConfig": {
     "watch": [

@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event'
 import '../setup'
 
 import GuestView from '../../src/app/[locale]/selectVehicle/guest/View'
-import MemberView from '../../src/app/[locale]/selectVehicle/member/View'
+import MemberVehicle from '../../src/app/[locale]/selectVehicle/member/Vehicle'
 import AddVehicle from '../../src/app/[locale]/selectVehicle/AddForm'
 
 import { getVehicles } from '../../src/app/[locale]/selectVehicle/actions'
@@ -119,7 +119,12 @@ it('Renders guest', async () => {
 })
 
 it('Renders member', async () => {
-  render(<MemberView />)
+  render(<MemberVehicle />)
+  expect(await screen.findByText('Your Vehicles')).toBeDefined()
+})
+
+it('Renders member checkout', async () => {
+  render(<MemberVehicle isCheckout={true} />)
   expect(await screen.findByText('Which Vehicle?')).toBeDefined()
 })
 
@@ -190,7 +195,7 @@ it('Enter nickname', async () => {
 })
 
 it('Open and close AddForm dialog', async () => {
-  render(<MemberView />)
+  render(<MemberVehicle />)
   const user = userEvent.setup()
   const input = (await screen.findAllByLabelText('Add a vehicle'))[0]
   await user.click(input)
@@ -203,22 +208,22 @@ it('Open and close AddForm dialog', async () => {
   expect(screen.queryByLabelText("Submit vehicle")).toBeNull()
 })
 
-it('Empty Cart appears', async () => {
+it('Empty garage appears', async () => {
   vi.mocked(getVehicles).mockResolvedValue([])
-  render(<MemberView />)
+  render(<MemberVehicle />)
   expect(await screen.findByText("No vehicles yet")).toBeDefined()
 })
 
 it('Selecting car', async () => {
-  render(<MemberView />)
+  render(<MemberVehicle />)
   const user = userEvent.setup()
   await user.click(await screen.findByText("C0P4RK"))
-  const button = await screen.findByText("Continue")
+  const button = await screen.findByText("Edit")
   expect(button.getAttribute('disabled')).toBeNull()
 })
 
 it('Adding vehicle closes the dialog', async () => {
-  render(<MemberView />)
+  render(<MemberVehicle />)
   const user = userEvent.setup()
   await user.click((await screen.findAllByLabelText("Add a vehicle"))[0])
   const input = screen.getByLabelText('Enter license plate number')
@@ -229,7 +234,7 @@ it('Adding vehicle closes the dialog', async () => {
 })
 
 // it('Adding vehicle displays new vehicle (rerenders)', async () => {
-//   render(<MemberView />)
+//   render(<MemberVehicle />)
 //   const user = userEvent.setup()
 //   await user.click((await screen.findAllByLabelText("Add a vehicle"))[0])
 //   const input = screen.getByLabelText('Enter license plate number')

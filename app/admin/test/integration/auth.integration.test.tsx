@@ -79,7 +79,7 @@ it('handles successful login', async () => {
 
   // Verify the fetch was called with correct parameters
   expect(global.fetch).toHaveBeenCalledWith(
-    'http://localhost:3010/api/v0/auth/login',
+    'http://localhost:8000/api/v0/auth/login',
     expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -171,7 +171,7 @@ it('handles server error during login', async () => {
   // Wait for the error to be thrown
   await waitFor(() => {
     expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:3010/api/v0/auth/login',
+      'http://localhost:8000/api/v0/auth/login',
       expect.objectContaining({
         method: 'POST',
       })

@@ -35,7 +35,7 @@ export class AuthService {
       .setIssuedAt()
       .setExpirationTime('30m')
       .sign(encodedKey)
-      console.log("JWT:", retid)
+      // console.log("JWT:", retid)
       return { id: retid, name: user.name, role: user.role };
     } else {
       return undefined
@@ -115,7 +115,7 @@ export class AuthService {
       const user = await this.getUserById(uid.id);
       if (!user) throw new Error("Unauthorized1");
 
-      console.log(scopes, user)
+      // console.log(scopes, user)
       if (scopes && scopes.length > 0) {
         if (!user.role || !scopes.some(role => user.role.includes (role))) {
           throw new Error("Unauthorized2");
@@ -133,7 +133,7 @@ export class AuthService {
     }
   } catch (err) {
     void err;
-    console.log("JWT ERROR:", err);
+    // console.log("JWT ERROR:", err);
     throw new Error("Unauthorized3");
   }
   }

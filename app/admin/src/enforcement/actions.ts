@@ -34,12 +34,22 @@ export const getEnforcers = async (): Promise<User[]> => {
     });
 
     const result = await response.json();
+    console.log('Raw GraphQL response:', result);
+    
+    if (result.errors) {
+      console.error('GraphQL errors:', result.errors);
+      return [];
+    }
 
-    console.log(result)
+    if (!result.data?.getEnforcers) {
+      console.warn('No enforcers data in response');
+      return [];
+    }
 
     return result.data.getEnforcers;
   } catch (error) {
-    throw error;
+    console.error('Error in getEnforcers:', error);
+    return [];
   }
 };
 

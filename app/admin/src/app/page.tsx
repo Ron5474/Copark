@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Home from './components/Home';
 import ManageEnforcement from './components/ManageEnforcement';
+import ManageDrivers from './components/ManageDrivers';
 
 export default function Page() {
   const [currentComponent, setCurrentComponent] = useState<string>('home');
@@ -18,7 +19,7 @@ export default function Page() {
       case 'enforcement':
         return <ManageEnforcement onNavigate={handleNavigate} />;
       case 'drivers':
-        return <div>Manage Drivers Component</div>;
+        return <ManageDrivers onNavigate={handleNavigate} />;
       case 'tickets':
         return <div>Tickets Component</div>;
       case 'statistics':

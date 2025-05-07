@@ -97,13 +97,13 @@ beforeEach(() => {
       plate: 'ABC123',
       country: 'United States',
       state: 'California',
-      name: 'My Car',
+      nickname: 'My Car',
     },
     {
       plate: 'XYZ789',
       country: 'United States',
       state: 'New York',
-      name: 'Work Car',
+      nickname: 'Work Car',
     },
     {
       plate: 'C0P4RK',
@@ -206,7 +206,7 @@ it('Open and close AddForm dialog', async () => {
 it('Empty Cart appears', async () => {
   vi.mocked(getVehicles).mockResolvedValue([])
   render(<MemberView />)
-  expect(screen.findByText("No vehicles yet")).toBeDefined()
+  expect(await screen.findByText("No vehicles yet")).toBeDefined()
 })
 
 it('Selecting car', async () => {
@@ -217,3 +217,24 @@ it('Selecting car', async () => {
   expect(button.getAttribute('disabled')).toBeNull()
 })
 
+it('Adding vehicle closes the dialog', async () => {
+  render(<MemberView />)
+  const user = userEvent.setup()
+  await user.click((await screen.findAllByLabelText("Add a vehicle"))[0])
+  const input = screen.getByLabelText('Enter license plate number')
+  await user.type(input, 'TEST123')
+
+  await user.click(await screen.findByText('Save'))
+  expect(screen.queryByText('Save')).toBeNull()
+})
+
+// it('Adding vehicle displays new vehicle (rerenders)', async () => {
+//   render(<MemberView />)
+//   const user = userEvent.setup()
+//   await user.click((await screen.findAllByLabelText("Add a vehicle"))[0])
+//   const input = screen.getByLabelText('Enter license plate number')
+//   await user.type(input, 'TEST123')
+//   await user.click(await screen.findByText('Save'))
+
+//   expect(await screen.findByText('TEST123')).toBeDefined()
+// })

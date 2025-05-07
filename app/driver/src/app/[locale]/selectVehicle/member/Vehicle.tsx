@@ -36,32 +36,20 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
 
   useEffect(() => {
     (async () => {
-      setVehicles(await getVehicles());
-    })();
-    // setVehicles([
-    //   {
-    //     plate: 'ABC123',
-    //     country: 'United States',
-    //     state: 'California',
-    //     name: 'My Car'
-    //   },
-    //   {
-    //     plate: 'XYZ789',
-    //     country: 'United States',
-    //     state: 'New York',
-    //     name: 'Work Car'
-    //   },
-    //   {
-    //     plate: 'C0P4RK',
-    //     country: 'United States',
-    //     state: 'California',
-    //   }
-    // ])
-    setLoading(false)
-  }, [setVehicles])
+      const fetchedVehicles = await getVehicles()
+      setVehicles(fetchedVehicles)
+      setLoading(false)
+    })()
+  }, [])
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+  const handleAdd = async () => {
+    setOpen(false)
+    setLoading(true)
+    setVehicles(await getVehicles())
+    setLoading(false)
+  }
 
   const handleButton = () => {
     const vehicle = vehicles.find((v: Vehicle) => v.plate === selectedPlate);
@@ -128,7 +116,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
               >
                 <CloseIcon />
               </IconButton>
-              <AddForm />
+              <AddForm close={handleAdd}/>
             </DialogContent>
           </Dialog>
         )}

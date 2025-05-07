@@ -16,7 +16,6 @@ import {
   IconButton,
   Radio,
   RadioGroup,
-  // Stack,
   Typography,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -39,8 +38,27 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
     (async () => {
       setVehicles(await getVehicles());
     })();
+    // setVehicles([
+    //   {
+    //     plate: 'ABC123',
+    //     country: 'United States',
+    //     state: 'California',
+    //     name: 'My Car'
+    //   },
+    //   {
+    //     plate: 'XYZ789',
+    //     country: 'United States',
+    //     state: 'New York',
+    //     name: 'Work Car'
+    //   },
+    //   {
+    //     plate: 'C0P4RK',
+    //     country: 'United States',
+    //     state: 'California',
+    //   }
+    // ])
     setLoading(false)
-  }, [vehicles])
+  }, [setVehicles])
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)

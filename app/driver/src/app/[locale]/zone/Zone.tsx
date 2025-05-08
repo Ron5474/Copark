@@ -13,12 +13,12 @@ import theme from '../theme'
 
 
 export default function Zone() {
-  const { zoneNumber, setZoneNumber } = useContext(ZoneContext)
+  const { zoneNumber, setZoneNumber, next } = useContext(ZoneContext)
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
 
   const submitZone = async () => {
     setIsValidEntry(zoneNumber.length > 0)
-
+    if (zoneNumber.length > 0) next()
   }
 
   const textFieldStyle = {
@@ -73,7 +73,6 @@ export default function Zone() {
           slotProps={{
             input: {
               inputProps: {
-                maxLength: 10,
                 'aria-label': 'Enter parking zone number',
               },
             },

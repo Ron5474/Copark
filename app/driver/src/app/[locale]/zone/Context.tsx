@@ -11,13 +11,13 @@ const ZoneContext = createContext<{
   setCurrentStep: React.Dispatch<React.SetStateAction<string>>
   zoneNumber: string
   setZoneNumber: React.Dispatch<React.SetStateAction<string>>
-  // next: () => void
+  next: () => void
 }>({
   currentStep: 'Zone',
   setCurrentStep: () => {},
   zoneNumber: '',
   setZoneNumber: () => {},
-  // next: () => {},
+  next: () => {},
 })
 
 
@@ -30,17 +30,18 @@ function ZoneProvider(props: ZoneProviderProps) {
   const [currentStep, setCurrentStep] = useState('Zone')
   const [zoneNumber, setZoneNumber] = useState('')
 
-  // const next = () => {
-  //   const index = steps.indexOf(currentStep)
-  //   if (index < steps.length - 1) {
-  //     setCurrentStep(steps[index + 1])
-  //   }
-  // }
+  const next = () => {
+    const index = steps.indexOf(currentStep)
+    if (index < steps.length - 1) {
+      setCurrentStep(steps[index + 1])
+    }
+  }
 
 
   const value = {
     currentStep, setCurrentStep,
     zoneNumber, setZoneNumber,
+    next,
   }
   return (
     <ZoneContext.Provider value={value}>

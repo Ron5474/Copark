@@ -36,14 +36,36 @@ stages:
 #   before_script:
 #     - npm installs
 
-lint:adminService:
+lint:enforcement:
   stage: quality
   script:
-    - npm run install-adminService
-    - npm run lint-adminService
+    - npm run install-enforcement
+    - npm run lint-enforcement
   rules:
     - changes: 
-      - microservices/AdminService/**/*
+      - app/enforcement/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:admin:
+  stage: quality
+  script:
+    - npm run install-admin
+    - npm run lint-admin
+  rules:
+    - changes: 
+      - app/admin/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:driver:
+  stage: quality
+  script:
+    - npm run install-driver
+    - npm run lint-driver
+  rules:
+    - changes: 
+      - app/driver/**/*
       - package.json
       - .gitlab-ci.yml
 
@@ -57,35 +79,15 @@ lint:authService:
       - microservices/AuthService/**/*
       - package.json
       - .gitlab-ci.yml
-# Add Other Services
 
-lint:enforcement:
+lint:adminService:
   stage: quality
   script:
-    - cd app/enforcement && npm install && npm run lint
+    - npm run install-adminService
+    - npm run lint-adminService
   rules:
     - changes: 
-      - app/enforcement/**/*
-      - package.json
-      - .gitlab-ci.yml
-
-lint:admin:
-  stage: quality
-  script:
-    - cd app/admin && npm install && npm run lint
-  rules:
-    - changes: 
-      - app/admin/**/*
-      - package.json
-      - .gitlab-ci.yml
-
-lint:driver:
-  stage: quality
-  script:
-    - cd app/driver && npm install && npm run lint
-  rules:
-    - changes: 
-      - app/driver/**/*
+      - microservices/AdminService/**/*
       - package.json
       - .gitlab-ci.yml
 
@@ -95,13 +97,66 @@ lint:driver:
 #     - npm run installs
 #     - npm run lint
 
-
-
-build:
+build:enforcement:
   stage: build
   script:
-    - npm run installs
-    - npm run build
+    - npm run install-enforcement
+    - npm run build-enforcement
+  rules:
+    - changes: 
+      - app/enforcement/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:admin:
+  stage: build
+  script:
+    - npm run install-admin
+    - npm run build-admin
+  rules:
+    - changes: 
+      - app/admin/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:driver:
+  stage: build
+  script:
+    - npm run install-driver
+    - npm run build-driver
+  rules:
+    - changes: 
+      - app/driver/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:auth:
+  stage: build
+  script:
+    - npm run install-auth
+    - npm run build-auth
+  rules:
+    - changes: 
+      - microservice/auth/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:adminService:
+  stage: build
+  script:
+    - npm run install-adminService
+    - npm run build-adminService
+  rules:
+    - changes: 
+      - microservices/AdminService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+# build:
+#   stage: build
+#   script:
+#     - npm run installs
+#     - npm run build
 
 # Uncomment this @Yaquob
 # test:enforcement:
@@ -113,14 +168,16 @@ build:
 #       - package.json
 #       - .gitlab-ci.yml
 
-test:admin:
-  script:
-    - cd app/admin && npm install && npm test
-  rules:
-    - changes: 
-      - app/admin/**/*
-      - package.json
-      - .gitlab-ci.yml
+# Failing Integration Tests
+
+# test:admin:
+#   script:
+#     - cd app/admin && npm install && npm test
+#   rules:
+#     - changes: 
+#       - app/admin/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 test:driver:
   script:

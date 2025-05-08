@@ -34,6 +34,7 @@ stages:
 #     - npm installs
 
 lint:adminService:
+  stage: quality
   script:
     - npm install-adminService
     - npm lint-adminService
@@ -44,6 +45,7 @@ lint:adminService:
       - .gitlab-ci.yml
 
 lint:authService:
+  stage: quality
   script:
     - npm install-auth
     - npm lint-auth
@@ -55,6 +57,7 @@ lint:authService:
 # Add Other Services
 
 lint:enforcement:
+  stage: quality
   script:
     - cd app/enforcement && npm install && npm run lint
   rules:
@@ -64,6 +67,7 @@ lint:enforcement:
       - .gitlab-ci.yml
 
 lint:admin:
+  stage: quality
   script:
     - cd app/admin && npm install && npm run lint
   rules:
@@ -73,6 +77,7 @@ lint:admin:
       - .gitlab-ci.yml
 
 lint:driver:
+  stage: quality
   script:
     - cd app/driver && npm install && npm run lint
   rules:

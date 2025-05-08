@@ -9,15 +9,13 @@ import { Box, Typography } from '@mui/material'
 import theme from '../theme'
 
 // Props for the stepper
-// type CustomStepperProps = {
-//   steps: string[]
-//   activeStep: number
-// }
+type CustomStepperProps = {
+  steps: string[]
+  activeStep: string
+}
 
-export default function CustomStepper(/*{ steps, activeStep }: CustomStepperProps*/) {
-  const steps = ['Zone', 'Duration', 'Vehicle', 'Payment', 'Review']
-  const activeStep = 2
-
+export default function CustomStepper({ steps, activeStep }: CustomStepperProps) {
+  const stepNum = steps.findIndex((step) => step === activeStep)
   return (
     <Box
       sx={{
@@ -31,8 +29,8 @@ export default function CustomStepper(/*{ steps, activeStep }: CustomStepperProp
       }}
     >
       {steps.map((label, index) => {
-        const isActive = index === activeStep
-        const isFuture = index > activeStep
+        const isActive = index === stepNum
+        const isFuture = index > stepNum
         const textColor = isFuture
           ? theme.palette.text.disabled
           : isActive

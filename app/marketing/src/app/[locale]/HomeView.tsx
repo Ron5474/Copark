@@ -6,11 +6,11 @@
 
 import { Box, Toolbar, Typography } from "@mui/material";
 import { CssBaseline } from "@mui/material";
-import Topbar from "./shared/Topbar";
-import Footer from "./shared/Footer";
-import ZoneField from "./homeComponents/ZoneField";
-import GetStartedButton from "./homeComponents/GetStartedButton";
-import HowToUseCard from "./homeComponents/UseCard";
+import Topbar from "./components/Topbar";
+import Footer from "./components/Footer";
+import ZoneField from "./components/ZoneField";
+import GetStartedButton from "./components/GetStartedButton";
+import HowToUseCard from "./components/UseCard";
 import { useTranslations } from "next-intl";
 import theme from "./theme";
 

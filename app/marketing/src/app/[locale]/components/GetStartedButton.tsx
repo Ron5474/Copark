@@ -20,7 +20,7 @@ function GetStartedButton() {
 
   const handleClick = async () => {
     const locale = window.location.pathname.split("/")[1];
-    router.push(`/driver/${locale}/login`);
+    router.push(`${process.env.NEXT_PUBLIC_DRIVER_APP_URL}/${locale}`);
   };
 
   return (

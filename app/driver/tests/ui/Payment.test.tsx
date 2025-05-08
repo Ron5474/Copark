@@ -6,11 +6,11 @@
 
 import { vi, it, afterEach, expect } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+// import userEvent from '@testing-library/user-event'
 import '../setup'
 
-import MemberView from '../../src/app/[locale]/zone/View'
-import Duration from '../../src/app/[locale]/zone/Duration'
+// import MemberView from '../../src/app/[locale]/zone/View'
+import Payment from '../../src/app/[locale]/zone/Payment'
 // import { ZoneContext } from '../../src/app/[locale]/zone/Context'
 
 
@@ -143,40 +143,7 @@ afterEach(() => {
 })
 
 
-it('Renders duration options', async () => {
-  render(<Duration />)
-  expect(await screen.findByText('Maximum Parking Time')).toBeDefined()
-})
-
-
-it('Error if option unchosen', async () => {
-  render(<Duration />)
-  const user = userEvent.setup()
-  await user.click(screen.getByLabelText('Confirm duration'))
-
-  expect(await screen.findByText('Please select a parking rate')).toBeDefined()
-})
-
-// it('Continue takes you to vehicle step', async () => {
-//   render(<MemberView />)
-//   const user = userEvent.setup()
-//   await user.click(screen.getByText('Maximum Parking Time'))
-//   await user.click(screen.getByLabelText('Confirm duration'))
-
-//   // expect(await screen.findByText('Which Vehicle?')).toBeDefined()
-//   expect(await screen.findByText('Please select a parking rate')).toBeDefined()
-// })
-
-it('Continue takes you to vehicle step', async () => {
-  render(<MemberView />)
-  const user = userEvent.setup()
-  const input = screen.getByLabelText('Enter parking zone number')
-  await user.type(input, '123')
-  await user.click(screen.getByText('Confirm Zone'))
-  
-  await user.click(screen.getByText('Maximum Parking Time'))
-  await user.click(screen.getByLabelText('Confirm duration'))
-
-  expect(await screen.findByText('Which Vehicle?')).toBeDefined()
-  // expect(await screen.findByText('Please select a parking rate')).toBeDefined()
+it('Renders Payment', async () => {
+  render(<Payment />)
+  expect(await screen.findByText('Which Payment Method?')).toBeDefined()
 })

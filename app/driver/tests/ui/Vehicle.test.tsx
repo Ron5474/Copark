@@ -9,13 +9,14 @@ import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '../setup'
 
-import GuestView from '../../src/app/[locale]/selectVehicle/guest/View'
-import MemberVehicle from '../../src/app/[locale]/selectVehicle/member/Vehicle'
-import AddVehicle from '../../src/app/[locale]/selectVehicle/AddForm'
+import GuestView from '../../src/app/[locale]/Vehicle/guest/View'
+import MemberVehicle from '../../src/app/[locale]/Vehicle/member/Vehicle'
+import AddVehicle from '../../src/app/[locale]/Vehicle/AddForm'
+import MemberView from '../../src/app/[locale]/zone/View'
 
-import { getVehicles } from '../../src/app/[locale]/selectVehicle/actions'
+import { getVehicles } from '../../src/app/[locale]/Vehicle/actions'
 
-vi.mock('../../src/app/[locale]/selectVehicle/actions', () => ({
+vi.mock('../../src/app/[locale]/Vehicle/actions', () => ({
   getVehicles: vi.fn(),
   addVehicle: vi.fn().mockImplementation((vehicle) =>
     Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174000', ...vehicle }))
@@ -197,8 +198,8 @@ it('Enter nickname', async () => {
 it('Open and close AddForm dialog', async () => {
   render(<MemberVehicle />)
   const user = userEvent.setup()
-  const input = (await screen.findAllByLabelText('Add a vehicle'))[0]
-  await user.click(input)
+  const add = (await screen.findAllByLabelText('Add a vehicle'))[0]
+  await user.click(add)
   const backdrop = document.querySelector('.MuiBackdrop-root')
   if (backdrop) {
     await user.click(backdrop)
@@ -208,18 +209,20 @@ it('Open and close AddForm dialog', async () => {
   expect(screen.queryByLabelText("Submit vehicle")).toBeNull()
 })
 
+it('Open and use escape to close AddForm dialog', async () => {
+  render(<MemberVehicle />)
+  const user = userEvent.setup()
+  const add = (await screen.findAllByLabelText('Add a vehicle'))[0]
+  await user.click(add)
+  await user.keyboard('[Escape]')
+
+  expect(screen.queryByLabelText("Submit vehicle")).toBeNull()
+})
+
 it('Empty garage appears', async () => {
   vi.mocked(getVehicles).mockResolvedValue([])
   render(<MemberVehicle />)
   expect(await screen.findByText("No vehicles yet")).toBeDefined()
-})
-
-it('Selecting car', async () => {
-  render(<MemberVehicle />)
-  const user = userEvent.setup()
-  await user.click(await screen.findByText("C0P4RK"))
-  const button = await screen.findByText("Edit")
-  expect(button.getAttribute('disabled')).toBeNull()
 })
 
 it('Adding vehicle closes the dialog', async () => {
@@ -231,6 +234,40 @@ it('Adding vehicle closes the dialog', async () => {
 
   await user.click(await screen.findByText('Save'))
   expect(screen.queryByText('Save')).toBeNull()
+})
+
+it('Error if vehicle unchosen', async () => {
+  render(<MemberVehicle />)
+  const user = userEvent.setup()
+  await user.click(await screen.findByText('Edit'))
+
+  expect(await screen.findByText('Please select a vehicle')).toBeDefined()
+})
+
+it('Edit vehicle button', async () => { // TODO edit this after edit vehicle is integrated
+  render(<MemberVehicle />)
+  const user = userEvent.setup()
+  await user.click(await screen.findByText("C0P4RK"))
+  await user.click(await screen.findByText('Edit'))
+
+  expect(await screen.findByText('Your Vehicles')).toBeDefined()
+})
+
+it('Continues to next page', async () => {
+  render(<MemberView />)
+  const user = userEvent.setup()
+
+  const input = screen.getByLabelText('Enter parking zone number')
+  await user.type(input, '123')
+  await user.click(screen.getByText('Confirm Zone'))
+  
+  await user.click(screen.getByText('Maximum Parking Time'))
+  await user.click(screen.getByLabelText('Confirm duration'))
+
+  await user.click(await screen.findByText("C0P4RK"))
+  await user.click(await screen.findByText('Continue'))
+
+  expect(await screen.findByText('Which Payment Method?')).toBeDefined()
 })
 
 // it('Adding vehicle displays new vehicle (rerenders)', async () => {

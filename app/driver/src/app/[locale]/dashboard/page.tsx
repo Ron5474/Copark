@@ -13,8 +13,8 @@ import theme from "../theme";
 import Topbar from "../shared/Topbar";
 import { getUser } from "../shared/actions";
 import { useRouter } from "next/navigation";
-import ViewVehicles from "../selectVehicle/member/Vehicle"
-import AddVehicle from "../selectVehicle/AddForm";
+import ViewVehicles from "../Vehicle/member/Vehicle"
+import AddVehicle from "../Vehicle/AddForm";
 import { userLoginSignUpAttempt } from "./actions";
 // import BuyPermit from "../permit/View";
 import BuyPermit from "../zone/View";

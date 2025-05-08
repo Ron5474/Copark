@@ -6,8 +6,8 @@
 
 import { render, screen, cleanup } from '@testing-library/react';
 import { it, expect, afterEach, beforeEach, vi } from 'vitest';
-import '../setup'
-import Home from '../../src/app/[locale]/page';
+import '../../driver/tests/setup'
+import Home from '../../driver/src/app/[locale]/page';
 
 afterEach(() => {
   cleanup()

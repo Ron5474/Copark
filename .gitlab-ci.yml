@@ -51,7 +51,6 @@ build:
 #     - npm run installs
 #     - npm test
 test:driver:
-  <<: *test_template
   script:
     - cd app/driver && npm install && npm test
   rules:

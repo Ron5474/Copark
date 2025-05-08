@@ -69,6 +69,17 @@ lint:driver:
       - package.json
       - .gitlab-ci.yml
 
+lint:marketing:
+  stage: quality
+  script:
+    - npm run install-marketing
+    - npm run lint-marketing
+  rules:
+    - changes: 
+      - app/marketing/**/*
+      - package.json
+      - .gitlab-ci.yml
+
 lint:authService:
   stage: quality
   script:
@@ -88,6 +99,28 @@ lint:adminService:
   rules:
     - changes: 
       - microservices/AdminService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:vehicleService:
+  stage: quality
+  script:
+    - npm run install-vehicleService
+    - npm run lint-vehicleService
+  rules:
+    - changes: 
+      - microservices/VehicleService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:ticketService:
+  stage: quality
+  script:
+    - npm run install-ticketService
+    - npm run lint-ticketService
+  rules:
+    - changes: 
+      - microservices/TicketService/**/*
       - package.json
       - .gitlab-ci.yml
 
@@ -127,6 +160,17 @@ build:driver:
   rules:
     - changes: 
       - app/driver/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:marketing:
+  stage: build
+  script:
+    - npm run install-marketing
+    - npm run build-marketing
+  rules:
+    - changes: 
+      - app/marketing/**/*
       - package.json
       - .gitlab-ci.yml
 

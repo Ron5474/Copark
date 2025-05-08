@@ -14,29 +14,59 @@ import EmailIcon from '@mui/icons-material/Email'
 import LockIcon from '@mui/icons-material/Lock'
 import Image from 'next/image'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+import { login } from './actions'
 
 export default function EnforcementLoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      setError('Both fields are required.')
-      return
-    }
+    // if (!email || !password) {
+    //   setError('Both fields are required.')
+    //   return
+    // }
 
+    // setLoading(true)
+    // setError('')
+
+    // try {
+    //   const response = await fetch('http://localhost:8000/api/v0/auth/login', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ email, password }),
+    //   })
+
+    //   const result = await response.json()
+
+    //   if (!response.ok) {
+    //     setError(result.error || 'Invalid credentials')
+    //   } else {
+    //     router.push('/')
+    //   }
+    // } catch (err) {
+    //   console.error(err)
+    //   setError('Something went wrong. Please try again.')
+    // } finally {
+    //   setLoading(false)
+    // }
     setLoading(true)
     setError('')
 
-    // TODO: Replace timeout with real authentication call (POST /api/login)
-    setTimeout(() => {
-      setLoading(false)
-
-      // TODO: Replace with auth logic, check credentials, store token, redirect
+    const authenticated = await login({ email, password })
+    if (authenticated) {
+      window.sessionStorage.setItem('name', authenticated.name);
+      router.push('/');
+    } else {
       setError('Invalid credentials')
-    }, 1000)
+    }
+    
+    setLoading(false);
+  
   }
 
   return (

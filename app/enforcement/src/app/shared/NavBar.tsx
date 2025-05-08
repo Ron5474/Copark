@@ -3,6 +3,8 @@
 import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material'
 import { useState } from 'react'
 
+import LogoutButton from '../login/LogoutButton'
+
 export default function EnforcementNavBar() {
   const [value, setValue] = useState(0)
 
@@ -25,7 +27,7 @@ export default function EnforcementNavBar() {
       >
         <BottomNavigationAction label="Plate look-up" />
         <BottomNavigationAction label="Issue Ticket" />
-        <BottomNavigationAction label="Log Out" />
+        <LogoutButton />
       </BottomNavigation>
     </Paper>
   )

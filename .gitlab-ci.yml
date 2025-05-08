@@ -163,16 +163,16 @@ build:driver:
       - package.json
       - .gitlab-ci.yml
 
-build:marketing:
-  stage: build
-  script:
-    - npm run install-marketing
-    - npm run build-marketing
-  rules:
-    - changes: 
-      - app/marketing/**/*
-      - package.json
-      - .gitlab-ci.yml
+# build:marketing:
+#   stage: build
+#   script:
+#     - npm run install-marketing
+#     - npm run build-marketing
+#   rules:
+#     - changes: 
+#       - app/marketing/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 build:auth:
   stage: build

@@ -3,7 +3,7 @@ dotenv.config()
 
 import { app, bootstrap } from './app'
 
-app.listen(4001, async () => {
+app.listen(4002, async () => {
   await bootstrap()
-  console.log('Running a GraphQL Playground at http://localhost:4001/playground')
+  console.log('Running a GraphQL Playground at http://localhost:4002/playground')
 })

@@ -1,9 +1,7 @@
-import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
+import { Resolver, Query, Authorized } from "type-graphql";
 import { TicketService } from "./service";
 import { 
   Ticket,
-  NewTicket,
-  TicketInput,
 } from "./schema";
 
 const ticketService = new TicketService();

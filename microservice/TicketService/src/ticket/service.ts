@@ -1,4 +1,4 @@
-import { Ticket, TicketInput, NewTicket } from "./schema";
+import { Ticket } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 

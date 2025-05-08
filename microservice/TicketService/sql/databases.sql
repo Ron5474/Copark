@@ -2,7 +2,9 @@
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-\connect auth;
+CREATE DATABASE ticket;
+
+\connect ticket;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 

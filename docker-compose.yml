@@ -18,6 +18,9 @@ services:
       - ./microservice/VehicleService/sql/databases.sql:/docker-entrypoint-initdb.d/7.databases.sql
       - ./microservice/VehicleService/sql/schema.sql:/docker-entrypoint-initdb.d/8.schema.sql
       - ./microservice/VehicleService/sql/data.sql:/docker-entrypoint-initdb.d/9.data.sql
+      - ./microservice/TicketService/sql/databases.sql:/docker-entrypoint-initdb.d/10.databases.sql
+      - ./microservice/TicketService/sql/schema.sql:/docker-entrypoint-initdb.d/11.schema.sql
+      - ./microservice/TicketService/sql/data.sql:/docker-entrypoint-initdb.d/12.data.sql
 
   test_postgres:
     container_name: test
@@ -38,3 +41,6 @@ services:
       - ./microservice/VehicleService/sql/databases.sql:/docker-entrypoint-initdb.d/7.databases.sql
       - ./microservice/VehicleService/sql/schema.sql:/docker-entrypoint-initdb.d/8.schema.sql
       - ./microservice/VehicleService/sql/data.sql:/docker-entrypoint-initdb.d/9.data.sql
+      - ./microservice/TicketService/sql/databases.sql:/docker-entrypoint-initdb.d/10.databases.sql
+      - ./microservice/TicketService/sql/schema.sql:/docker-entrypoint-initdb.d/11.schema.sql
+      - ./microservice/TicketService/sql/data.sql:/docker-entrypoint-initdb.d/12.data.sql

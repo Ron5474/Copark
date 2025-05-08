@@ -9,7 +9,7 @@ export class Ticket {
   vehicle!: string;
 
   @Field(() => String)  
-  issued_by!: string;
+  enforcer!: string;
 
   @Field(() => Date)  
   issuedDate!: Date;
@@ -33,7 +33,7 @@ export class NewTicket {
   vehicle!: string;
 
   @Field(() => String)  
-  issued_by!: string;
+  enforcer!: string;
 
   @Field(() => Number)  
   fine!: number;

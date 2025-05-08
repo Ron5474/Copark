@@ -3,7 +3,7 @@ import { test, beforeAll, afterAll, expect } from 'vitest'
 import supertest from 'supertest'
 import * as http from 'http'
 
-import { reset, shutdown } from './db'
+import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
 
@@ -28,11 +28,11 @@ beforeAll(async () => {
     })
   })
 
-  return reset()
+  return db.reset()
 })
 
 afterAll(() => {
-  shutdown()
+  db.shutdown()
   server.close()
   authServer.close()
 })

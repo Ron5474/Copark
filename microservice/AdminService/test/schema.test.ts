@@ -1,6 +1,6 @@
 import { test, beforeAll, afterAll, expect } from 'vitest';
 import * as http from 'http';
-import * as db from './db';
+import db from './db';
 import { app, bootstrap } from '../src/app';
 import { User, NewUser, UserInput } from '../src/admin/schema'; // Adjust to your schema import
 

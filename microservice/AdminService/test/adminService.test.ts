@@ -3,18 +3,18 @@
  */
 
 import { beforeAll, afterAll, test, expect } from 'vitest';
-import { reset, shutdown } from './db';
+import db from './db';
 import { AdminService } from '../src/admin/service';
 import { NewUser, UserInput } from '../src/admin/schema';
 
 const adminService = new AdminService();
 
 beforeAll(async () => {
-  await reset();
+  await db.reset();
 });
 
 afterAll(async () => {
-  await shutdown();
+  await db.shutdown();
 });
 
 test('getEnforcers should return a list of enforcers', async () => {

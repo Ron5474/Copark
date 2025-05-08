@@ -30,7 +30,7 @@ export class TicketService {
         SELECT 
         id,
         vehicle,
-        issued_by,
+        enforcer,
         data->>'issuedDate' AS issueddate,
         data->>'violation' AS violation,
         data->>'fine' AS fine,
@@ -49,7 +49,7 @@ export class TicketService {
       tickets.push({
         id: await this.encrypt(row.id),
         vehicle: await this.encrypt(row.vehicle),
-        issued_by: await this.encrypt(row.issued_by),
+        enforcer: await this.encrypt(row.enforcer),
         issuedDate: new Date(row.issueddate),
         violation: row.violation,
         fine: parseFloat(row.fine),

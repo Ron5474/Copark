@@ -1,6 +1,5 @@
--- This file is not included in the submission archive, anything you do here is just for manual "testing" via the Swagger UI --
+\connect auth;
 
------ Your insert statements go below here -----
 INSERT INTO account(id, data)
 VALUES (
   '3662998e-a053-4789-b34a-4491468f56d6',

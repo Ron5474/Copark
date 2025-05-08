@@ -89,7 +89,7 @@ it('Renders guest', async () => {
   expect(await screen.findByText('Copark™')).toBeDefined()
 })
 
-it('Renders member', async () => {
+it('Renders zone entry', async () => {
   render(<Zone />)
   expect(await screen.findByText('Where are you parking?')).toBeDefined()
 })
@@ -103,7 +103,7 @@ it('Error if zone # is empty', async () => {
   expect(await screen.findByText('Zone number is required')).toBeDefined()
 })
 
-it('Error if zone # is empty', async () => {
+it('Confirm Zone takes you to duration step', async () => {
   render(<MemberView />)
   const user = userEvent.setup()
   const input = screen.getByLabelText('Enter parking zone number')

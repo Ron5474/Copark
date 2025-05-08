@@ -21,11 +21,17 @@ variables:
   NEXT_PUBLIC_GITHUB_ID: ${NEXT_PUBLIC_GITHUB_ID}
   NEXT_PUBLIC_GITHUB_SECRET: ${NEXT_PUBLIC_GITHUB_SECRET}
   NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+
 stages:
   - quality
   - build
   - test
   - deploy
+
+.test_template: &test_template
+  stage: test
+  before_script:
+    - npm ci
 
 lint:
   stage: quality 
@@ -39,11 +45,20 @@ build:
     - npm run installs
     - npm run build
 
-test:
-  stage: test
+# test:
+#   stage: test
+#   script:
+#     - npm run installs
+#     - npm test
+test:driver:
+  <<: *test_template
   script:
-    - npm run installs
-    - npm test
+    - cd app/driver && npm test
+  rules:
+    - changes: 
+      - app/driver/**/*
+      - package.json
+      - .gitlab-ci.yml
 
 deploy:
   stage: deploy

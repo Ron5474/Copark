@@ -26,34 +26,6 @@ export default function EnforcementLoginPage() {
   const router = useRouter()
 
   const handleLogin = async () => {
-    // if (!email || !password) {
-    //   setError('Both fields are required.')
-    //   return
-    // }
-
-    // setLoading(true)
-    // setError('')
-
-    // try {
-    //   const response = await fetch('http://localhost:3010/api/v0/auth/login', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ email, password }),
-    //   })
-
-    //   const result = await response.json()
-
-    //   if (!response.ok) {
-    //     setError(result.error || 'Invalid credentials')
-    //   } else {
-    //     router.push('/')
-    //   }
-    // } catch (err) {
-    //   console.error(err)
-    //   setError('Something went wrong. Please try again.')
-    // } finally {
-    //   setLoading(false)
-    // }
     setLoading(true)
     setError('')
 

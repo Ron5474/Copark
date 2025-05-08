@@ -7,6 +7,13 @@ import EnforcementDashboardView from '@/app/dashboard/Content'
 import View from '@/app/page'
 import { EnforcementProvider } from '@/app/dashboard/context/Context'
 
+const push = vi.fn()
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push,
+  }),
+}))
+
 beforeEach(() => {
   cleanup()
   vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(() => Promise.resolve())

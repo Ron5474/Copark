@@ -4,7 +4,6 @@
  * @author Swayam Shah
  */
 import { Box, Button } from "@mui/material";
-// import { getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import theme from "../theme";
 function Footer() {
@@ -37,8 +36,8 @@ function Footer() {
           alignItems: "center",
           gap: "10px",
          }}>
-            <source srcSet="/logo-noBg.png" type="image/png" />
-            <img src="/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-footer-logo" />
+            <source srcSet="/assets/logo-noBg.png" type="image/png" />
+            <img src="/assets/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-footer-logo" />
             <h1 style={{ fontSize: "26px", color: "#000000", fontFamily: "[Poppins]", fontWeight: 300}}>Copark™</h1>
          </picture>
           <Box sx={{

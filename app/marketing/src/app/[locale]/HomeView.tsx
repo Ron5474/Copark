@@ -36,7 +36,7 @@ function HomeView() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        backgroundImage: "url('/cover.png')",
+        backgroundImage: "url('/assets/cover.png')",
         backgroundSize: "cover",
         width: "100%",
         height: "fit-content",
@@ -78,12 +78,12 @@ function HomeView() {
         flexDirection: "column",
         gap: "20px",
         marginTop: "10px",}}>
-      <HowToUseCard number={1} image="/howV1.jpeg" description={t('How to use step 1')} variant="secondary"/>
-      <HowToUseCard number={2} image="/howV1.jpeg" description={t('How to use step 2')} variant="primary"/>
-      <HowToUseCard number={3} image="/howV1.jpeg" description={t('How to use step 3')} variant="secondary"/>
-      <HowToUseCard number={4} image="/howV1.jpeg" description={t('How to use step 4')} variant="primary"/>
-      <HowToUseCard number={5} image="/howV1.jpeg" description={t('How to use step 5')} variant="secondary"/>
-      <HowToUseCard number={6} image="/howV1.jpeg" description={t('How to use step 6')} variant="primary"/>
+      <HowToUseCard number={1} image="/assets/howV1.jpeg" description={t('How to use step 1')} variant="secondary"/>
+      <HowToUseCard number={2} image="/assets/howV1.jpeg" description={t('How to use step 2')} variant="primary"/>
+      <HowToUseCard number={3} image="/assets/howV1.jpeg" description={t('How to use step 3')} variant="secondary"/>
+      <HowToUseCard number={4} image="/assets/howV1.jpeg" description={t('How to use step 4')} variant="primary"/>
+      <HowToUseCard number={5} image="/assets/howV1.jpeg" description={t('How to use step 5')} variant="secondary"/>
+      <HowToUseCard number={6} image="/assets/howV1.jpeg" description={t('How to use step 6')} variant="primary"/>
       </Box>
       </Box>
       <Footer />

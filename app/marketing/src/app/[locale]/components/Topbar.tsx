@@ -24,8 +24,8 @@ function Topbar() {
       borderBottom: `3px solid ${primaryColorMain}`,
     }}>
       <picture>
-        <source srcSet="/logo-noBg.png" type="image/png" />
-        <img src="/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-logo" />
+        <source srcSet="/assets/logo-noBg.png" type="image/png" />
+        <img src="/assets/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-logo" />
       </picture>
      <Box sx={{display: "flex", gap: "10px", alignItems: "center"}}>
       <IconButton>

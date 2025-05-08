@@ -38,10 +38,20 @@ lint:adminService:
     - npm install-adminService
     - npm lint-adminService
   rules:
+    - changes: 
       - microservices/AdminService/**/*
       - package.json
       - .gitlab-ci.yml
 
+lint:authService:
+  script:
+    - npm install-auth
+    - npm lint-auth
+  rules:
+    - changes: 
+      - microservices/AuthService/**/*
+      - package.json
+      - .gitlab-ci.yml
 # Add Other Services
 
 lint:enforcement:

@@ -6,13 +6,13 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // If there's no session and we're not on the login page, redirect to login
-  if (!session && pathname !== '/login') {
-    return NextResponse.redirect(new URL('/login', request.url))
+  if (!session && pathname !== '/enforcement/login') {
+    return NextResponse.redirect(new URL('/enforcement/login', request.url))
   }
 
   // If there's a session and we're on the login page, redirect to home
-  if (session && pathname === '/login') {
-    return NextResponse.redirect(new URL('/', request.url))
+  if (session && pathname === '/enforcement/login') {
+    return NextResponse.redirect(new URL('/enforcement', request.url))
   }
 
   return NextResponse.next()
@@ -27,6 +27,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/enforcement/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 } 

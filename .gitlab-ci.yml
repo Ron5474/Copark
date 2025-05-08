@@ -28,6 +28,9 @@ stages:
   - test
   - deploy
 
+# default:
+#   allow_failure: false
+
 # .test_template: &test_template
 #   stage: test
 #   before_script:
@@ -36,8 +39,8 @@ stages:
 lint:adminService:
   stage: quality
   script:
-    - npm install-adminService
-    - npm lint-adminService
+    - npm run install-adminService
+    - npm run lint-adminService
   rules:
     - changes: 
       - microservices/AdminService/**/*
@@ -47,8 +50,8 @@ lint:adminService:
 lint:authService:
   stage: quality
   script:
-    - npm install-auth
-    - npm lint-auth
+    - npm run install-auth
+    - npm run lint-auth
   rules:
     - changes: 
       - microservices/AuthService/**/*

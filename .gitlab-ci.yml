@@ -28,10 +28,10 @@ stages:
   - test
   - deploy
 
-.test_template: &test_template
-  stage: test
-  before_script:
-    - npm installs
+# .test_template: &test_template
+#   stage: test
+#   before_script:
+#     - npm installs
 
 lint:
   stage: quality 
@@ -53,7 +53,7 @@ build:
 test:driver:
   <<: *test_template
   script:
-    - cd app/driver && npm test
+    - cd app/driver && npm install && npm test
   rules:
     - changes: 
       - app/driver/**/*

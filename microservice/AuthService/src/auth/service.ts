@@ -35,7 +35,6 @@ export class AuthService {
       .setIssuedAt()
       .setExpirationTime('30m')
       .sign(encodedKey)
-      // console.log("JWT:", retid)
       return { id: retid, name: user.name, role: user.role };
     } else {
       return undefined
@@ -100,15 +99,12 @@ export class AuthService {
     try {
       const token = authHeader.split(" ")[1];
 
-      // console.log(token, encodedKey)
-
       const { payload } = await jwtVerify(token, encodedKey);
       if (payload.id) {
         if (typeof payload.id !== 'string') {
           throw new Error("Invalid token payload");
         }
         const uid = payload as unknown as SessionUser;
-        console.log('user id: ', uid?.id)
         const user = await this.getUserById(uid.id);
         if (!user) throw new Error("Unauthorized1");
 
@@ -143,21 +139,32 @@ export class AuthService {
     }
 
     const query = {
-      text: "INSERT INTO account (data) " +
-"SELECT jsonb_build_object(" +
-  "'name', $1::text, " +
-  "'email', $2::text, " +
-  "'picture', $3::text, " +
-  "'sub', $4::text, " +
-  "'role', jsonb_build_array('driver')) " +
-  "WHERE NOT EXISTS (" +
-  "SELECT 1 FROM account WHERE data->>'sub' = $4::text OR (data->>'email' = $2::text AND data->'role' @> '[\"driver\"]'::jsonb)) RETURNING id",
-  values: [
-    data.name,
-    data.email,
-    data.picture,
-    data.sub]
-  }
+      text: `
+      INSERT INTO account (data)
+      SELECT jsonb_build_object(
+        'name', $1::text,
+        'email', $2::text,
+        'picture', $3::text,
+        'sub', $4::text,
+        'role', jsonb_build_array('driver')
+      )
+      WHERE NOT EXISTS (
+        SELECT 1
+        FROM account
+        WHERE data->>'sub' = $4::text
+          OR (data->>'email' = $2::text
+              AND data->'role' @> '["driver"]'::jsonb
+             )
+      )
+      RETURNING id`,
+
+      values: [
+        data.name,
+        data.email,
+        data.picture,
+        data.sub
+      ]
+    }
     
     const { rows } = await pool.query(query)
     

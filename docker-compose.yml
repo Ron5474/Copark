@@ -18,3 +18,23 @@ services:
       - ./microservice/VehicleService/sql/databases.sql:/docker-entrypoint-initdb.d/7.databases.sql
       - ./microservice/VehicleService/sql/schema.sql:/docker-entrypoint-initdb.d/8.schema.sql
       - ./microservice/VehicleService/sql/data.sql:/docker-entrypoint-initdb.d/9.data.sql
+
+  test_postgres:
+    container_name: test
+    image: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./microservice/AuthService/sql/databases.sql:/docker-entrypoint-initdb.d/1.databases.sql
+      - ./microservice/AuthService/sql/schema.sql:/docker-entrypoint-initdb.d/2.schema.sql
+      - ./microservice/AuthService/sql/data.sql:/docker-entrypoint-initdb.d/3.data.sql
+      - ./microservice/AdminService/sql/databases.sql:/docker-entrypoint-initdb.d/4.databases.sql
+      - ./microservice/AdminService/sql/schema.sql:/docker-entrypoint-initdb.d/5.schema.sql
+      - ./microservice/AdminService/sql/data.sql:/docker-entrypoint-initdb.d/6.data.sql
+      - ./microservice/VehicleService/sql/databases.sql:/docker-entrypoint-initdb.d/7.databases.sql
+      - ./microservice/VehicleService/sql/schema.sql:/docker-entrypoint-initdb.d/8.schema.sql
+      - ./microservice/VehicleService/sql/data.sql:/docker-entrypoint-initdb.d/9.data.sql

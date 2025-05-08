@@ -16,7 +16,8 @@ import { useRouter } from "next/navigation";
 import ViewVehicles from "../selectVehicle/member/Vehicle"
 import AddVehicle from "../selectVehicle/AddForm";
 import { userLoginSignUpAttempt } from "./actions";
-import BuyPermit from "../permit/View";
+// import BuyPermit from "../permit/View";
+import BuyPermit from "../zone/View";
 import { signOut } from "next-auth/react";
 
 function Dashboard() {

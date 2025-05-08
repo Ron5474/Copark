@@ -6,33 +6,34 @@
 
 'use client'
 
-import { Fragment, useState } from 'react'
+import { Fragment, useContext } from 'react'
 import type { NextPage } from 'next'
 import { CssBaseline, Box } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
 
+import { ZoneContext, steps } from './Context'
 import ShortTermStepper from '../zone/ProgressStepper'
 import TopBar from '../shared/Topbar'
+import Zone from './Zone'
 import MemberVehicles from '../selectVehicle/member/Vehicle'
 import Footer from '../shared/Footer'
 import theme from '../theme'
 
 const View: NextPage = () => {
-  const [currentStep/*, setCurrentStep*/] = useState('Zone')
-  const steps = ['Zone', 'Duration', 'Vehicle', 'Payment', 'Review']
+  const { currentStep } = useContext(ZoneContext)
 
   return (
     <Fragment>
       <CssBaseline />
       <TopBar/>
-      <Box sx={{ mt: '90px' }}>
+      <Box sx={{ width: '92%', margin: 'auto' }}>
         <ThemeProvider theme={theme}>
         <ShortTermStepper steps={steps} activeStep={currentStep}/>
 
         {(() => {
           switch (currentStep) {
             case 'Zone':
-              return <div>Case X</div>
+              return <Zone/>
             case 'Duration':
               return <div>Case Y</div>
             case 'Vehicle':

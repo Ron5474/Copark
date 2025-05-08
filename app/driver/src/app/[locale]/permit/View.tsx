@@ -18,7 +18,7 @@ import {
 import { useContext } from 'react';
 import { DashboardContext } from '../dashboard/context';
 import theme from '../theme'
-import MemberVehicles from '../Vehicle/member/Vehicle';
+import MemberVehicles from '../vehicle/member/Vehicle';
 
 export default function BuyPermit() {
   const [selectedZone, setSelectedZone] = useState<string>('');

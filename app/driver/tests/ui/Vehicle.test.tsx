@@ -9,12 +9,12 @@ import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '../setup'
 
-import GuestView from '../../src/app/[locale]/Vehicle/guest/View'
-import MemberVehicle from '../../src/app/[locale]/Vehicle/member/Vehicle'
-import AddVehicle from '../../src/app/[locale]/Vehicle/AddForm'
+import GuestView from '../../src/app/[locale]/vehicle/guest/View'
+import MemberVehicle from '../../src/app/[locale]/vehicle/member/Vehicle'
+import AddVehicle from '../../src/app/[locale]/vehicle/AddForm'
 import MemberView from '../../src/app/[locale]/zone/View'
 
-import { getVehicles } from '../../src/app/[locale]/Vehicle/actions'
+import { getVehicles } from '../../src/app/[locale]/vehicle/actions'
 
 vi.mock('../../src/app/[locale]/Vehicle/actions', () => ({
   getVehicles: vi.fn(),

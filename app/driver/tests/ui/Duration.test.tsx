@@ -14,6 +14,16 @@ import Duration from '../../src/app/[locale]/zone/Duration'
 // import { ZoneContext } from '../../src/app/[locale]/zone/Context'
 
 
+vi.mock('../../src/app/[locale]/selectVehicle/actions', () => ({
+  getVehicles: vi.fn().mockResolvedValue([{
+    plate: 'C0P4RK',
+    country: 'United States',
+    state: 'California',
+  }]),
+  addVehicle: vi.fn().mockImplementation((vehicle) =>
+    Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174000', ...vehicle }))
+}))
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),

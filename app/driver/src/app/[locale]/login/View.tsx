@@ -20,24 +20,26 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import { signIn } from "next-auth/react"
 import { useEffect } from 'react';
 import { getUser } from '../shared/actions';
+import { useRouter } from '@/i18n/navigation';
+import { useLocale } from 'next-intl';
 // import {login} from './actions'
 
 
 export default function LoginView() {
   // const { data: session } = useSession()
+  const router = useRouter()
+  const locale = useLocale()
   const handleClick = async (provider: string) => {
-    const locale = window.location.pathname.split("/")[1]
-    await signIn(provider, { callbackUrl: `/${locale}/dashboard` })
+    await signIn(provider, { callbackUrl: `/driver/${locale}/dashboard`, basePath: '/driver' })
   }
 
   useEffect(() => {
       getUser().then((res) => {
         if (res) {
-          const locale = window.location.pathname.split("/")[1]
-          window.location.href = `/${locale}/dashboard`
+          router.push('/dashboard')
         }
       });
-  }, [])
+  }, [router])
 
   return (
     <Container

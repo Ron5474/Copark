@@ -11,6 +11,7 @@
 "use client"
 import type { NextPage } from 'next'
 import { ThemeProvider } from '@mui/material/styles'
+import { SessionProvider } from 'next-auth/react'
 
 import theme from '../theme'
 import LoginView from './View'
@@ -21,16 +22,18 @@ import { Box, CssBaseline } from '@mui/material'
 const Page: NextPage = () => {
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <TopBar />
-      <LoginView />
-      <Box sx={{
-        position: 'relative',
-        bottom: 0,
-        marginBottom: '0px',
-      }}>
-      <Footer />
-      </Box>
+      <SessionProvider basePath="/driver">
+        <CssBaseline />
+        <TopBar />
+        <LoginView />
+        <Box sx={{
+          position: 'relative',
+          bottom: 0,
+          marginBottom: '0px',
+        }}>
+        <Footer />
+        </Box>
+      </SessionProvider>
     </ThemeProvider>
   )
 }

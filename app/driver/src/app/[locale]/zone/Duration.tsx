@@ -16,7 +16,7 @@ import theme from '../theme'
 
 export default function Zone() {
   const { next } = useContext(ZoneContext)
-  const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
+  const [isValidSelection, setIsValidSelection] = useState<boolean>(true)
   const [durationOption, setDurationOption] = useState('')
 
   const options = [
@@ -26,17 +26,18 @@ export default function Zone() {
 
   const submitDuration = () => {
     const isValid = !!durationOption
-    setIsValidEntry(isValid)
+    setIsValidSelection(isValid)
     if (isValid) next()
   }
 
   return (
     <Box
       sx={{
-        'display': 'flex',
-        'flexDirection': 'column',
-        'margin': 'auto',
-        'maxWidth': 'calc(100vh * 0.5)',
+        width: '92%',
+        display: 'flex',
+        flexDirection: 'column',
+        margin: 'auto',
+        maxWidth: 'calc(100vh * 0.5)',
       }}
     >
       <Typography variant="h5" gutterBottom sx={{ mt: '1vh' }}>
@@ -48,14 +49,16 @@ export default function Zone() {
       </Typography>
 
       <RadioGroup
-        name="duration-options"
         value={durationOption}
-        onChange={(e) => setDurationOption(e.target.value)}
+        onChange={(e) => {
+          setDurationOption(e.target.value)
+          setIsValidSelection(true)
+        }}
         sx={{
           mt: '2vh',
           border: '1px solid',
-          borderColor: isValidEntry ? '#ccc' : 'error.main',
-          borderRadius: '8px',
+          borderColor: isValidSelection ? '#ccc' : 'error.main',
+          borderRadius: '5px',
           overflow: 'hidden',
           transition: 'border-color 0.2s',
         }}
@@ -85,9 +88,9 @@ export default function Zone() {
         ))}
       </RadioGroup>
 
-      {!isValidEntry && (
+      {!isValidSelection && (
         <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-          Please select a parking rate option.
+          Please select a parking rate
         </Typography>
       )}
       <Button

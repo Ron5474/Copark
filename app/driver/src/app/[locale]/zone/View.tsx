@@ -26,7 +26,7 @@ const View: NextPage = () => {
     <Fragment>
       <CssBaseline />
       <TopBar />
-      <Box sx={{ width: '92%', margin: 'auto' }}>
+      <Box sx={{ /*width: '92%',*/ margin: 'auto' }}>
         <ThemeProvider theme={theme}>
           <ZoneProvider>
             <ZoneView />

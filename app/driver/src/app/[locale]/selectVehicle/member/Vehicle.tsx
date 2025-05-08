@@ -6,7 +6,7 @@
 
 'use client'
 
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useState, useContext } from 'react'
 import {
   Box,
   Button,
@@ -19,8 +19,8 @@ import {
   Typography,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { useState } from 'react'
 
+import ZoneContext from '../../zone/Context'
 import AddForm from '../AddForm'
 import Loader from '../../shared/Loader'
 import theme from '../../theme'
@@ -29,9 +29,11 @@ import { getVehicles } from '../actions'
 
 
 export default function MemberVehicles({ isCheckout = false }: { isCheckout?: boolean }) {
+  const { setVehicle, next } = useContext(ZoneContext)
   const [open, setOpen] = useState(false)
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [selectedPlate, setSelectedPlate] = useState<string | null>(null)
+  const [isValidSelection, setIsValidSelection] = useState<boolean>(true)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -52,17 +54,21 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
   }
 
   const handleButton = () => {
-    const vehicle = vehicles.find((v: Vehicle) => v.plate === selectedPlate);
+    if (!selectedPlate) {
+      setIsValidSelection(false)
+      return
+    }
+    setVehicle(vehicles.find((v: Vehicle) => v.plate === selectedPlate))
     if (isCheckout)
-      console.log("next: ", vehicle)
+      next()
     else
-      console.log("edit: ", vehicle)
-  };
+      console.log("edit")
+  }
 
   return (
     <Fragment>
       <Box sx={{
-          maxWidth: '95%',
+          maxWidth: '92%',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -124,7 +130,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
       <Box
         sx={{
           mt: '2vh',
-          maxWidth: '95%',
+          maxWidth: '92%',
           margin: 'auto',
           textAlign: 'center',
         }}
@@ -132,60 +138,78 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
 
         {
 
-          loading ? <Box sx={{mt: '12vh'}}><Loader/></Box> :
+          loading ? <Box sx={{mt: '8vh'}}><Loader/></Box> :
           vehicles.length 
           
           ?
 
-          <RadioGroup
-            name="vehicle-selection"
-            value={selectedPlate}
-            onChange={(event) => setSelectedPlate(event.target.value)}
-            sx={{ mt: 2 }}
-          >
+          <Box sx={{ mt: 2 }}>
             <Typography sx={{ textAlign: 'left', mb: 1, color: '#4b4b4b' }}>
               Vehicle Preference
             </Typography>
 
-            {vehicles.map((v, i) => (
-              <FormControlLabel
-                key={i}
-                value={v.plate}
-                control={<Radio sx={{transform: 'scale(1.2)'}}/>}
-                label={
-                  <Box sx={{ display: 'flex', flexDirection: 'column', ml: 1 }}>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                      {v.plate}{' '}
-                      <Typography component="span" variant="body1" sx={{ fontWeight: 400 }}>
-                        {v.state}
-                      </Typography>
-                    </Typography>
-                    {v.nickname && (
-                      <Typography variant="body2" sx={{ textAlign: 'left', color: '#666', mt: 0.5 }}>
-                        {v.nickname}
-                      </Typography>
-                    )}
-                  </Box>
-                }
-                sx={{
-                  width: '100%',
-                  m: 0,
-                  mb: 2,
-                  border: '1px solid #ccc',
-                  borderRadius: '8px',
-                  padding: 2,
-                  alignItems: 'flex-start',
-                  minHeight: '72px',
-                  backgroundColor: selectedPlate === v.plate ? '#f5f5f5' : 'white',
+            <Box
+              sx={{
+                border: '1px solid',
+                borderColor: isValidSelection ? '#ccc' : 'error.main',
+                borderRadius: '5px',
+                overflow: 'hidden',
+                transition: 'border-color 0.2s',
+              }}
+            >
+              <RadioGroup
+                value={selectedPlate}
+                onChange={(event) => {
+                  setSelectedPlate(event.target.value)
+                  setIsValidSelection(true)
                 }}
-              />
-            ))}
+              >
+                {vehicles.map((v, i) => (
+                  <FormControlLabel
+                    key={i}
+                    value={v.plate}
+                    control={<Radio sx={{ transform: 'scale(1.2)' }} />}
+                    label={
+                      <Box sx={{ display: 'flex', flexDirection: 'column', ml: 1 }}>
+                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                          {v.plate}{' '}
+                          <Typography component="span" variant="body1" sx={{ fontWeight: 400 }}>
+                            {v.state}
+                          </Typography>
+                        </Typography>
+                        {v.nickname && (
+                          <Typography variant="body2" sx={{ textAlign: 'left', color: '#666', mt: 0.5 }}>
+                            {v.nickname}
+                          </Typography>
+                        )}
+                      </Box>
+                    }
+                    sx={{
+                      m: 0,
+                      px: 2,
+                      py: 1.5,
+                      borderTop: i !== 0 ? '1px solid #ccc' : 'none',
+                      backgroundColor: selectedPlate === v.plate ? '#f5f5f5' : 'white',
+                      transition: 'background-color 0.2s',
+                      '&:hover': {
+                        backgroundColor: '#f9f9f9',
+                      },
+                    }}
+                  />
+                ))}
+              </RadioGroup>
+            </Box>
+
+            {!isValidSelection && (
+              <Typography color="error" variant="body2" sx={{ mt: 1, textAlign: 'left' }}>
+                Please select a vehicle
+              </Typography>
+            )}
 
             <Button
               fullWidth
               variant="contained"
               onClick={handleButton}
-              disabled={!selectedPlate}
               sx={{
                 width: '100%',
                 marginTop: '5vh',
@@ -197,7 +221,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
             >
               {isCheckout ? "Continue" : "Edit"}
             </Button>
-          </RadioGroup>
+          </Box>
           
           :
 

@@ -35,10 +35,11 @@ export default function Zone() {
   return (
     <Box
       sx={{
-        'display': 'flex',
-        'flexDirection': 'column',
-        'margin': 'auto',
-        'maxWidth': 'calc(100vh * 0.5)',
+        width: '92%',
+        display: 'flex',
+        flexDirection: 'column',
+        margin: 'auto',
+        maxWidth: 'calc(100vh * 0.5)',
       }}
     >
       <Typography
@@ -61,11 +62,6 @@ export default function Zone() {
           required
           fullWidth
           error={!isValidEntry}
-          helperText={
-            isValidEntry ?
-            null :
-            "Zone number is required"
-          }
           value={zoneNumber}
           sx={textFieldStyle}
           size="small"
@@ -78,6 +74,11 @@ export default function Zone() {
           }}
           onChange={(event) => setZoneNumber(event.target.value)}
         />
+        {!isValidEntry && (
+          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+            Zone number is required
+          </Typography>
+        )}
       </Box>
       <Button
         onClick={submitZone}

@@ -38,7 +38,6 @@ export default function Zone() {
         'display': 'flex',
         'flexDirection': 'column',
         'margin': 'auto',
-        'height': '100vh',
         'maxWidth': 'calc(100vh * 0.5)',
       }}
     >

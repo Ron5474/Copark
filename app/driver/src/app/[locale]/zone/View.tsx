@@ -15,6 +15,7 @@ import { ZoneProvider, ZoneContext, steps } from './Context'
 import ShortTermStepper from '../zone/ProgressStepper'
 import TopBar from '../shared/Topbar'
 import Zone from './Zone'
+import Duration from './Duration'
 import MemberVehicles from '../selectVehicle/member/Vehicle'
 import Footer from '../shared/Footer'
 import theme from '../theme'
@@ -50,7 +51,7 @@ const ZoneView = () => {
           case 'Zone':
             return <Zone />
           case 'Duration':
-            return <div>Case Y</div>
+            return <Duration />
           case 'Vehicle':
             return <MemberVehicles isCheckout={true} />
           case 'Payment':

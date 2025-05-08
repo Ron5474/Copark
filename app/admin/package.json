@@ -7,9 +7,7 @@
     "build": "next build",
     "start": "next start -p 3002",
     "lint": "next lint",
-    "test": "vitest run --coverage",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage"
+    "test": "vitest run --coverage"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

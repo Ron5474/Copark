@@ -66,9 +66,11 @@ export default function ManageEnforcement({ onNavigate }) {
         boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
         borderRadius: '15px'
       }}>
+        {<p>Driver Count: {drivers.length}</p>}
         {drivers.map((enforcer) => (
           <Box
             key={enforcer.id}
+            data-testid="driver-item"
             sx={{
               display: 'flex',
               alignItems: 'center',

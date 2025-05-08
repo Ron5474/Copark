@@ -29,7 +29,7 @@ async function bootstrap() {
       try {
         // console.log("required roles is " + roles)
         // Make a call to the authChecker microservice
-        const response = await fetch('http://localhost:8000/api/v0/auth/check', {
+        const response = await fetch('http://localhost:3010/api/v0/auth/check', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

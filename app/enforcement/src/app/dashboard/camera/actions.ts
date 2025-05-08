@@ -10,7 +10,7 @@ export const scanPlate = async (imageDataURL: string): Promise<string> => {
     if (!sessionToken) throw new Error('Missing session token')
 
     // Get backend token from AuthService
-    const authRes = await fetch('http://localhost:8000/api/v0/auth/driver/id', {
+    const authRes = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${sessionToken}`,

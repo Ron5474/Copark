@@ -15,7 +15,7 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
   try {
     const token = await getAuthToken()
 
-    const res = await fetch("http://localhost:8000/api/v0/auth/driver/id", {
+    const res = await fetch("http://localhost:3010/api/v0/auth/driver/id", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -61,7 +61,7 @@ export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
   try {
     const token = await getAuthToken()
     console.log('token addVehicle() : ', token)
-    const res = await fetch("http://localhost:8000/api/v0/auth/driver/id", {
+    const res = await fetch("http://localhost:3010/api/v0/auth/driver/id", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

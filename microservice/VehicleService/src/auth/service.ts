@@ -5,7 +5,7 @@ export class AuthService {
     const token = authHeader?.split(' ')[1]
     if (!token) throw new Error('Unauthorized')
 
-    const response = await fetch('http://localhost:8000/api/v0/auth/check', {
+    const response = await fetch('http://localhost:3010/api/v0/auth/check', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

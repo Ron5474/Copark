@@ -5,13 +5,27 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get('session')
   const { pathname } = request.nextUrl
 
+  // Add debug logging to see what's happening
+  console.log('Middleware running for path:', pathname)
+  console.log('Session present:', !!session)
+
+  // Static files should bypass middleware
+  if (pathname.startsWith('/_next')) {
+    return NextResponse.next()
+  }
+
+  // Normalize path to handle both /login and /admin/login
+  const isLoginPath = pathname === '/login' || pathname === '/admin/login'
+
   // If there's no session and we're not on the login page, redirect to login
-  if (!session && pathname !== '/admin/login') {
+  if (!session && !isLoginPath) {
+    console.log('No session, redirecting to login')
     return NextResponse.redirect(new URL('/admin/login', request.url))
   }
 
   // If there's a session and we're on the login page, redirect to home
-  if (session && pathname === '/admin/login') {
+  if (session && isLoginPath) {
+    console.log('Has session, redirecting to home')
     return NextResponse.redirect(new URL('/admin', request.url))
   }
 
@@ -20,13 +34,9 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/admin/((?!api|_next/static|_next/image|favicon.ico).*)',
+    // Match all paths under /admin and root paths
+    '/admin/:path*',
+    '/',
+    '/login'
   ],
-} 
+}

@@ -61,5 +61,5 @@ it('bypasses middleware for static files', async () => {
     })
 
     await middleware(request)
-    expect(mockRedirect).toHaveBeenCalledWith(new URL('/admin/login', 'http://localhost:3000'))
+    expect(mockRedirect).not.toHaveBeenCalled() // Static files should bypass middleware completely
 })

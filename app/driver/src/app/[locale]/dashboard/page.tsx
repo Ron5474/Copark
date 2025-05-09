@@ -12,54 +12,57 @@ import { ThemeProvider, Toolbar, Box, CssBaseline } from "@mui/material";
 import theme from "../theme";
 import Topbar from "../shared/Topbar";
 import { getUser } from "../shared/actions";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import ViewVehicles from "../vehicle/member/Vehicle"
 import AddVehicle from "../vehicle/AddForm";
 import { userLoginSignUpAttempt } from "./actions";
 // import BuyPermit from "../permit/View";
 import BuyPermit from "../zone/View";
 import { signOut } from "next-auth/react";
+import { useLocale } from "next-intl";
+import { SessionProvider } from "next-auth/react";
 
 function Dashboard() {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const router = useRouter();
-
+  const locale = useLocale();
   useEffect(() => {
     const loggedIn = async () => {
-      const locale = window.location.pathname.split("/")[1];
       if (!await getUser()) {
-        router.push(`/${locale}/login`);
+        router.push(`/login`);
       } else if (!await userLoginSignUpAttempt()) {
-        signOut({ callbackUrl: `/${locale}/login` });
+        signOut({ callbackUrl: `/driver/${locale}/login` });
       }   
     }
     loggedIn();
-  }, [router]);
+  }, [router, locale]);
 
   return (
     <ThemeProvider theme={theme}>
-      <DashboardContext.Provider value={{
-        currentPage: currentPage,
-        setCurrentPage: setCurrentPage}}>
-          <CssBaseline />
-          <Topbar />
-          <Box sx={{ height: '100vh' }}>
-            <Toolbar />
-            <Toolbar />
-          {currentPage === "dashboard" && (
-            <DashboardView />
-          )}
-          {currentPage === "garage" && (
-            <ViewVehicles />
-          )}
-          {currentPage === "add-vehicle" && (
-            <AddVehicle />
-          )}
-          {currentPage === 'buy-permit' && (
-            <BuyPermit />
-          )}
-        </Box>
-      </DashboardContext.Provider>
+      <SessionProvider basePath="/driver/api/auth"> 
+        <DashboardContext.Provider value={{
+          currentPage: currentPage,
+          setCurrentPage: setCurrentPage}}>
+            <CssBaseline />
+            <Topbar />
+            <Box sx={{ height: '100vh' }}>
+              <Toolbar />
+              <Toolbar />
+            {currentPage === "dashboard" && (
+              <DashboardView />
+            )}
+            {currentPage === "garage" && (
+              <ViewVehicles />
+            )}
+            {currentPage === "add-vehicle" && (
+              <AddVehicle />
+            )}
+            {currentPage === 'buy-permit' && (
+              <BuyPermit />
+            )}
+          </Box>
+        </DashboardContext.Provider>
+      </SessionProvider>
     </ThemeProvider>
   );
 }

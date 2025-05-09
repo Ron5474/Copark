@@ -22,7 +22,7 @@ import { Box, CssBaseline } from '@mui/material'
 const Page: NextPage = () => {
   return (
     <ThemeProvider theme={theme}>
-      <SessionProvider basePath="/driver">
+      <SessionProvider basePath="/driver/api/auth">
         <CssBaseline />
         <TopBar />
         <LoginView />

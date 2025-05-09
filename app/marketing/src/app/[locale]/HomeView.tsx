@@ -69,7 +69,22 @@ function HomeView() {
           </Typography>
       </Box>
       <GetStartedButton />
-
+      <Box sx={{
+        marginTop: "30px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        backgroundImage: "url('/assets/Discount.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        width: "100%",
+        borderRadius: "30px",
+        padding: "40px",
+        paddingTop: "15px",
+      }}>
+        <Typography sx={{color: 'white', fontSize: "24px", fontWeight: 700, textAlign: 'center'}}>{t('discount promotion 1')}</Typography>
+        <Typography sx={{color: 'white', fontSize: "18px", fontWeight: 400, textAlign: 'center', marginBottom: '20vh'}}>{t('discount promotion 2')}</Typography>
+      </Box>
       <Typography sx={{color: "black", fontSize: "32px", fontWeight: 700, marginTop: "30px"}}>
         {t('How to use')}:
       </Typography>

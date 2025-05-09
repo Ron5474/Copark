@@ -30,11 +30,7 @@ export class AuthService {
   
     if (rows.length > 0) {
       const user = rows[0].user
-      const retid = await new SignJWT({ id: user.id })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('30m')
-      .sign(encodedKey)
+      const retid = await this.encrypt(user.id)
       return { id: retid, name: user.name, role: user.role };
     } else {
       return undefined

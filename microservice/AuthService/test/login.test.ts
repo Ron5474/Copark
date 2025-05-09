@@ -30,6 +30,11 @@ const fake_driver = {
   "id": "fake-id"
 }
 
+const admin = {
+  "email": "jxiong0822@outlook.com",
+  "password": "password1"
+}
+
 beforeEach( async () => {
     return db.reset()
 })
@@ -82,6 +87,11 @@ test('getOauthUser() user with id throws error', async () => {
 test('getOauthUser() fake user returns undefined', async () => {
   const user = await new AuthService().getOauthUser(driver)
   expect(user).not.toBeDefined()
+})
+
+test('Admin can login successfully', async () => {
+  const user = await new AuthService().authenticate(admin)
+  expect(user.name).toBe('Jason Xiong')
 })
 
 // test('Incorrect User Login', async () => {

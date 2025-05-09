@@ -47,6 +47,7 @@
       "lint-driver": "cd app/driver && npm run lint",
       "lint-marketing": "cd app/marketing && npm run lint",
       "test": "npm run test-driver && npm run test-ticketService && npm run test-marketing",
+      "test-admin": "cd app/admin && npm run test",
       "test-driver": "cd app/driver && npm run test",
       "test-ticketService": "cd microservice/TicketService && npm run test",
       "test-marketing": "cd app/marketing && npm run test"

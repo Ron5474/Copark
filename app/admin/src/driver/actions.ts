@@ -33,6 +33,7 @@ export const getDrivers = async (): Promise<User[]> => {
   });
 
   const result = await response.json();
+
   return result.data.getDrivers;
 };
 

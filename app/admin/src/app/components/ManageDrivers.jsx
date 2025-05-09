@@ -6,7 +6,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { getDrivers, suspendUser, reinstateUser, deleteUser } from '../../driver/actions';
 
-export default function ManageEnforcement({ onNavigate }) {
+export default function ManageDrivers({ onNavigate }) {
   const theme = useTheme();
   const [drivers, setDrivers] = useState([]);
 

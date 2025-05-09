@@ -94,6 +94,12 @@ test('Admin can login successfully', async () => {
   expect(user.name).toBe('Jason Xiong')
 })
 
+test('Incorrect admin fails login', async () => {
+  const incorrect = {'email': 'ronak@books.com', 'password': 'secure-password'}
+  const user = await new AuthService().authenticate(incorrect)
+  expect(user).not.toBeDefined()
+})
+
 // test('Incorrect User Login', async () => {
 //   const user = await authenticate({email: 'anna@books.com', password: 'fakepass'})
 //   expect(user).not.toBeDefined()

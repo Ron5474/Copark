@@ -10,8 +10,8 @@ dotenv.config({path: '../../.env'})
 // console.log('POSTGRES_PASSWORD', process.env.POSTGRES_PASSWORD)
 
 const pool = new Pool({
-  host: (process.env.POSTGRES_HOST || 'localhost'),
-  port: process.env.POSTGRES_PORT ? parseInt(process.env.POSTGRES_PORT, 10) : 5432,
+  host: process.env.POSTGRES_HOST,
+  port: parseInt(process.env.POSTGRES_PORT as string, 10),
   database: process.env.POSTGRES_AUTH_DB,
   // database: 'auth',
   user: process.env.POSTGRES_USER,

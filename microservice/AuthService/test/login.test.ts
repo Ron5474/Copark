@@ -9,7 +9,7 @@
 #######################################################################
 */
 
-import {test, beforeAll, afterAll, expect, vi} from 'vitest'
+import {test, afterAll, expect, vi, beforeEach} from 'vitest'
 
 import db from './db'
 import {AuthService} from '../src/auth/service'
@@ -20,7 +20,7 @@ vi.mock('server-only', () => ({}))
 //   encrypt: vi.fn(() => Promise.resolve('valid-jwt'))
 // }))
 
-beforeAll( async () => {
+beforeEach( async () => {
     return db.reset()
 })
 

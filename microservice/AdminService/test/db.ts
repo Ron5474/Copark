@@ -10,7 +10,7 @@ process.env.POSTGRES_PORT = '5433'
 
 const pool = new Pool({
   host: 'localhost',
-  port: parseInt(process.env.POSTGRES_PORT, 10),
+  port: 5433,
   database: process.env.POSTGRES_DB,
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
@@ -27,16 +27,14 @@ const run = async (file: string) => {
     line = line.trim()
     if (!line || line.startsWith('--')) continue
 
-    // Detect \connect and switch database
     if (line.startsWith('\\connect')) {
       const [, newDbRaw] = line.split(/\s+/)
-      const newDb = newDbRaw.replace(/;$/, '') // remove trailing semicolon
-      // console.log(`Switching to database: ${newDb}`)
+      const newDb = newDbRaw.replace(/;$/, '') 
 
       // End previous pool and create a new one for the new database
-      if (currentPool !== pool) {
-        await currentPool.end()
-      }
+      // if (currentPool !== pool) {
+      //   await currentPool.end()
+      // }
 
       currentPool = new Pool({
         host: 'localhost',
@@ -45,7 +43,6 @@ const run = async (file: string) => {
         user: process.env.POSTGRES_USER,
         password: process.env.POSTGRES_PASSWORD,
       })
-      console.log('WOW!!!!!!!' + newDb)
 
       continue
     }

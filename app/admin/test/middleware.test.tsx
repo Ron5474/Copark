@@ -10,29 +10,29 @@ beforeEach(() => {
 })
 
 it('redirects to login for protected routes without session', async () => {
-    const request = new NextRequest(new URL('http://localhost:3000/'), {
+    const request = new NextRequest(new URL('http://localhost:3000/admin'), {
         headers: new Headers({
             'cookie': ''
         })
     })
 
     await middleware(request)
-    expect(mockRedirect).toHaveBeenCalledWith(new URL('/login', 'http://localhost:3000/'))
+    expect(mockRedirect).toHaveBeenCalledWith(new URL('/admin/login', 'http://localhost:3000'))
 })
 
 it('allows access to login page without session', async () => {
-    const request = new NextRequest(new URL('http://localhost:3000/login'), {
+    const request = new NextRequest(new URL('http://localhost:3000/admin/login'), {
         headers: new Headers({
             'cookie': ''
         })
     })
 
     await middleware(request)
-    expect(mockRedirect).not.toHaveBeenCalled()  
+    expect(mockRedirect).not.toHaveBeenCalled()
 })
 
 it('allows access to protected routes with valid session', async () => {
-    const request = new NextRequest(new URL('http://localhost:3000/'), {
+    const request = new NextRequest(new URL('http://localhost:3000/admin'), {
         headers: new Headers({
             'cookie': 'session=valid-session-id'
         })
@@ -43,14 +43,14 @@ it('allows access to protected routes with valid session', async () => {
 })
 
 it('redirects to home when accessing login with valid session', async () => {
-    const request = new NextRequest(new URL('http://localhost:3000/login'), {
+    const request = new NextRequest(new URL('http://localhost:3000/admin/login'), {
         headers: new Headers({
             'cookie': 'session=valid-session-id'
         })
     })
 
     await middleware(request)
-    expect(mockRedirect).toHaveBeenCalledWith(new URL('/', 'http://localhost:3000/'))
+    expect(mockRedirect).toHaveBeenCalledWith(new URL('/admin', 'http://localhost:3000'))
 })
 
 it('bypasses middleware for static files', async () => {
@@ -61,6 +61,5 @@ it('bypasses middleware for static files', async () => {
     })
 
     await middleware(request)
-
-    expect(mockRedirect).toHaveBeenCalledWith(new URL('login', 'http://localhost:3000/'))
+    expect(mockRedirect).toHaveBeenCalledWith(new URL('/admin/login', 'http://localhost:3000'))
 })

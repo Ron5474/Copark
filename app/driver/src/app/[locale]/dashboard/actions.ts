@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 
 export async function userLoginSignUpAttempt(): Promise<string|undefined> {
   const cookieStore = await cookies();
-  const authCookie = cookieStore.get("next-auth.session-token");
+  const authCookie = cookieStore.get(process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME as string);
 
   const res = await fetch("http://localhost:3010/api/v0/auth/driver/login", {
     method: "POST",

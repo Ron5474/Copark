@@ -7,7 +7,7 @@ const API_URL = 'http://localhost:4001/graphql'
 
 const getAuthToken = async () => {
   const cookieStore = await cookies()
-  const token = cookieStore.get('next-auth.session-token')?.value
+  const token = cookieStore.get(process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME as string)?.value
   return token
 }
 

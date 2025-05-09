@@ -121,7 +121,6 @@ export class AuthService {
       }
     } catch (err) {
       void err;
-      console.log("JWT ERROR:", err);
       throw new Error("Unauthorized3");
     }
   }

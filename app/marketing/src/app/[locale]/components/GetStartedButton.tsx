@@ -8,6 +8,7 @@
 import { Button } from "@mui/material";
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
 import { ThemeProvider } from "@emotion/react";
 import theme from "../theme";
@@ -16,10 +17,9 @@ import theme from "../theme";
 function GetStartedButton() {
   const router = useRouter();
   const t = useTranslations('landingPage');
-
+  const locale = useLocale();
 
   const handleClick = async () => {
-    const locale = window.location.pathname.split("/")[1];
     router.push(`${process.env.NEXT_PUBLIC_DRIVER_APP_URL}/${locale}`);
   };
 

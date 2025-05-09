@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: {params: Promise<{ locale: st
     title: t('title'),
     icons: {
       icon: [
-        { url: '/favicon.ico' },
+        { url: '/assets/favicon.ico' },
       ]
     }
   };

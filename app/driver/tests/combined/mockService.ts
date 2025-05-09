@@ -25,17 +25,58 @@ const auth = (server: Server): void => {
   )
 }
 
-const vehicle = (server: Server): void => {
+const vehicle = (server: Server, failGet=false, failAdd=false): void => {
   server.use(
     http.post(vehicleURL, async ({ request }) => {
       const body = await request.json()
 
-      if (body && typeof body === 'object' && 'query' in body && typeof body.query === 'string' && body.query.includes('query GetVehicles')) {
-        return HttpResponse.json({
-          data: {
-            myVehicles: vehicles,
-          },
-        })
+      if (body && typeof body === 'object' && typeof body.query === 'string') {
+        if (body.query.includes('query GetVehicles')) {
+          if (!failGet) {
+            return HttpResponse.json({
+              data: {
+                myVehicles: vehicles,
+              },
+            })
+          } else {
+            return HttpResponse.json({
+              errors: [{ message: 'Failed to connect' }],
+            }, { status: 200 })
+          }
+        }
+
+        if (body.query.includes('mutation RegisterVehicle')) {
+          const inputVehicle = body.variables?.input
+
+          if (inputVehicle) {
+            if (!failAdd) {
+              
+              const newVehicle = {
+                id: String(vehicles.length + 1),
+                ...inputVehicle,
+              }
+
+              vehicles.push(newVehicle)
+
+              return HttpResponse.json({
+                data: {
+                  registerVehicle: newVehicle,
+                },
+              })
+            } else {
+              return HttpResponse.json({
+                errors: [{ message: 'Failed to connect' }],
+              }, { status: 200 })
+            }
+          }
+
+          return HttpResponse.json(
+            {
+              errors: [{ message: 'Missing input variable' }],
+            },
+            { status: 400 }
+          )
+        }
       }
 
       return HttpResponse.json(

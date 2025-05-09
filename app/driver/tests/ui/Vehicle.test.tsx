@@ -1,5 +1,5 @@
 /**
- * @file selectVehicle.test.tsx
+ * @file Vehicle.test.tsx
  * @description This file contains the test cases for the Vehicle page in zone checkout.
  * @author Bryant Oliver
  */
@@ -16,7 +16,7 @@ import MemberView from '../../src/app/[locale]/zone/View'
 
 import { getVehicles } from '../../src/app/[locale]/vehicle/actions'
 
-vi.mock('../../src/app/[locale]/Vehicle/actions', () => ({
+vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
   getVehicles: vi.fn(),
   addVehicle: vi.fn().mockImplementation((vehicle) =>
     Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174000', ...vehicle }))

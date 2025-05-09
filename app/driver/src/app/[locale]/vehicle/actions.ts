@@ -22,7 +22,6 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
       },
     })
     const driverToken = await res.json()
-
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -60,7 +59,6 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
 export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
   try {
     const token = await getAuthToken()
-    console.log('token addVehicle() : ', token)
     const res = await fetch("http://localhost:3010/api/v0/auth/driver/id", {
       method: "GET",
       headers: {
@@ -68,7 +66,6 @@ export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
       },
     })
     const driverToken = await res.json()
-    console.log('driverToken: ', driverToken)
 
     const response = await fetch(API_URL, {
       method: 'POST',
@@ -95,7 +92,6 @@ export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
     })
 
     const result = await response.json()
-    console.log('result: ', result)
 
     if (result.errors) {
       console.error('GraphQL errors:', result.errors)

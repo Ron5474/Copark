@@ -14,7 +14,7 @@ import Duration from '../../src/app/[locale]/zone/Duration'
 // import { ZoneContext } from '../../src/app/[locale]/zone/Context'
 
 
-vi.mock('../../src/app/[locale]/Vehicle/actions', () => ({
+vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
   getVehicles: vi.fn().mockResolvedValue([{
     plate: 'C0P4RK',
     country: 'United States',

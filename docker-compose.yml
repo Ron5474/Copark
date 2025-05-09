@@ -21,6 +21,8 @@ services:
       - ./microservice/TicketService/sql/databases.sql:/docker-entrypoint-initdb.d/10.databases.sql
       - ./microservice/TicketService/sql/schema.sql:/docker-entrypoint-initdb.d/11.schema.sql
       - ./microservice/TicketService/sql/data.sql:/docker-entrypoint-initdb.d/12.data.sql
+      - ./microservice/PermitService/sql/databases.sql:/docker-entrypoint-initdb.d/13.databases.sql
+      - ./microservice/PermitService/sql/schema.sql:/docker-entrypoint-initdb.d/14.schema.sql
 
   test_postgres:
     container_name: test
@@ -44,3 +46,5 @@ services:
       - ./microservice/TicketService/sql/databases.sql:/docker-entrypoint-initdb.d/10.databases.sql
       - ./microservice/TicketService/sql/schema.sql:/docker-entrypoint-initdb.d/11.schema.sql
       - ./microservice/TicketService/sql/data.sql:/docker-entrypoint-initdb.d/12.data.sql
+      - ./microservice/PermitService/sql/databases.sql:/docker-entrypoint-initdb.d/13.databases.sql
+      - ./microservice/PermitService/sql/schema.sql:/docker-entrypoint-initdb.d/14.schema.sql

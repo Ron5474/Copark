@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 
 import { auth, vehicle } from './mockService'
+import { getVehicles, addVehicle } from '../../src/app/[locale]/vehicle/actions'
 import VehicleList from '../../src/app/[locale]/vehicle/member/Vehicle'
 // import AddForm from '../../src/app/[locale]/vehicle/AddForm'
 
@@ -63,55 +64,34 @@ vi.mock('next-intl', () => ({
 
 
 
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+
+beforeEach(() => {
+  vi.resetModules()
+  auth(server)
+  vehicle(server)
+})
+
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
   server.resetHandlers()
 })
 
-beforeAll( async () => {
-  return server.listen()
-})
-
-afterAll(() => {
-  server.close()
-})
-
-beforeEach(() => {
-  vi.resetModules()
-  // vi.spyOn(console, 'error').mockImplementation(() => {})
-  auth(server)
-  vehicle(server)
-})
-
 
 
 it('Garage empty', async () => {
   render( <VehicleList/> )
-
   expect(await screen.findByText("No vehicles yet")).toBeDefined()
 })
 
-// it('Vehicle fetch fail', async () => {
-//   vehicle(server, true) // Fail fetch
-//   await expect(async () => {
-//     render(<VehicleList />)
-//     await waitFor(() => expect(fetch).toHaveBeenCalled())
-//   }).rejects.toThrow()
-// })
+it('Vehicle fetch fail', async () => {
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  vehicle(server, true) // force failure
+  await expect(getVehicles()).rejects.toThrow('Failed to fetch vehicles')
+})
 
-// it('shows an error if vehicle fetch fails', async () => {
-//   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-//   vehicle(server, true) // fail fetch
-
-//   render(<VehicleList />)
-
-//   await waitFor(() => {
-//     expect(errorSpy).toHaveBeenCalled()
-//   })
-
-//   errorSpy.mockRestore()
-// })
 
 it('Add vehicle', async () => {
   render(<VehicleList />)
@@ -124,16 +104,13 @@ it('Add vehicle', async () => {
   expect(await screen.findByText('TEST123')).toBeDefined()
 })
 
-// it('Vehicle add failed', async () => {
-//   vehicle(server, false, true) // fail add
-//   await expect(async () => {
-//     render(<AddForm />)
-
-//     const user = userEvent.setup()
-//     const input = screen.getByLabelText('Enter license plate number')
-//     await user.type(input, 'TEST123')
-//     await user.click(await screen.findByText('Save'))
-
-//     await waitFor(() => expect(fetch).toHaveBeenCalled())
-//   }).rejects.toThrow()
-// })
+it('Vehicle add failed', async () => {
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  vehicle(server, false, true) // fail add
+  const newVehicle = {
+    plate: '1ABC123',
+    country: 'United States',
+    state: 'California',
+  }
+  await expect(addVehicle(newVehicle)).rejects.toThrow('Failed to register vehicle')
+})

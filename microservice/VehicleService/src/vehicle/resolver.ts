@@ -3,6 +3,7 @@ import { Request } from 'express'
 import { Vehicle, RegisterVehicleInput, UpdateVehicleInput } from './schema'
 import { VehicleService } from './service'
 
+
 const service = new VehicleService()
 
 @Resolver()
@@ -18,7 +19,7 @@ export class VehicleResolver {
   @Authorized('driver')
   @Mutation(() => Vehicle)
   async registerVehicle(
-    @Arg('input') input: RegisterVehicleInput,
+    @Arg('input', () => RegisterVehicleInput) input: RegisterVehicleInput,
     @Ctx() request: Request
   ): Promise<Vehicle> {
     const userId = request.user?.id
@@ -29,7 +30,7 @@ export class VehicleResolver {
   @Authorized('driver')
   @Mutation(() => Vehicle)
   async updateVehicle(
-    @Arg('input') input: UpdateVehicleInput,
+    @Arg('input', () => UpdateVehicleInput) input: UpdateVehicleInput,
     @Ctx() request: Request
   ): Promise<Vehicle> {
     const userId = request.user?.id
@@ -40,7 +41,7 @@ export class VehicleResolver {
   @Authorized('admin', 'enforcement')
   @Query(() => Vehicle, { nullable: true })
   async findVehicleByPlate(
-    @Arg('plate') plate: string
+    @Arg('plate', () => String) plate: string
   ): Promise<Vehicle | null> {
     return await service.findVehicleByPlate(plate)
   }
@@ -48,7 +49,7 @@ export class VehicleResolver {
   @Authorized('admin', 'enforcement')
   @Query(() => Vehicle, { nullable: true })
   async checkForVehicleID(
-    @Arg('vehicleID') vehicleID: string
+    @Arg('vehicleID', () => String) vehicleID: string
   ): Promise<Vehicle | null> {
     return await service.getVehicleById({ id: vehicleID })
   }

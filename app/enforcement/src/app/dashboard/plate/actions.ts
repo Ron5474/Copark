@@ -7,13 +7,14 @@ const API_URL = 'http://localhost:4001/graphql'
 
 const getAuthToken = async () => {
   const cookieStore = await cookies()
-  const token = cookieStore.get('next-auth.session-token')?.value
+  const token = cookieStore.get('session')?.value
   return token
 }
 
 export const findVehicleByPlate = async (plate: string): Promise<Vehicle | null> => {
   try {
     const token = await getAuthToken()
+    console.log(token)
     if (!token) throw new Error('Unauthorized: Missing session token')
 
     const response = await fetch(API_URL, {

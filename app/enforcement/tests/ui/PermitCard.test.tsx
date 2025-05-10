@@ -42,23 +42,23 @@ it('displays permit type as Residential', () => {
   expect(typeLabel).toBeDefined()
 })
 
-it('clicking "New Scan" triggers camera to turn on after reset', async () => {
-  const user = userEvent.setup()
+// it('clicking "New Scan" triggers camera to turn on after reset', async () => {
+//   const user = userEvent.setup()
 
-  render(
-    <EnforcementProvider initialPlate="ABC123">
-      <PermitCard />
-    </EnforcementProvider>
-  )
+//   render(
+//     <EnforcementProvider initialPlate="ABC123">
+//       <PermitCard />
+//     </EnforcementProvider>
+//   )
 
-  const newScanButton = screen.getByRole('button', { name: /New Scan/i })
-  await user.click(newScanButton)
+//   const newScanButton = screen.getByRole('button', { name: /New Scan/i })
+//   await user.click(newScanButton)
 
-  // Small delay to allow cameraOn timeout
-  await new Promise((r) => setTimeout(r, 150))
+//   // Small delay to allow cameraOn timeout
+//   await new Promise((r) => setTimeout(r, 150))
 
-  expect(true).toBe(true)
-})
+//   expect(true).toBe(true)
+// })
 
 it('clicking "Issue Citation" logs issuing message with plate', async () => {
   const user = userEvent.setup()

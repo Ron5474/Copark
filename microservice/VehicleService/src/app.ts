@@ -43,7 +43,6 @@
 
 // export { app, bootstrap }
 import express, { Express } from 'express'
-import cors from 'cors'
 import path from 'path'
 import { createHandler } from 'graphql-http/lib/use/express'
 import { renderPlaygroundPage } from 'graphql-playground-html'
@@ -52,19 +51,11 @@ import { buildSchema } from 'type-graphql'
 
 import { resolvers } from './resolvers'
 import { expressAuthChecker } from './auth/checker'
-import ocrRouter from './rest/ocr'
 
 const app: Express = express()
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}))
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-
-app.use('/api/v0/vehicle', ocrRouter)
 
 async function bootstrap() {
   const schema = await buildSchema({

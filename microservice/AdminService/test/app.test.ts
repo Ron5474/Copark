@@ -5,7 +5,7 @@ import * as http from 'http'
 
 import db from './db'
 import { app, bootstrap } from '../src/app'
-import { createAuthApp } from '../../AuthService/src/app'
+import authApp from '../../AuthService/src/app'
 
 let server: http.Server
 let authServer: http.Server
@@ -20,7 +20,7 @@ beforeAll(async () => {
   await bootstrap()
 
   // Start your Auth server
-  authServer = http.createServer(createAuthApp())
+  authServer = http.createServer(authApp)
   await new Promise<void>((resolve) => {
     authServer.listen(AUTH_PORT, () => {
     //   console.log(`Auth service running on ${AUTH_SERVICE_URL}`)
@@ -43,10 +43,10 @@ const adminUser = {
   password: 'password1',
 }
 
-const enforcerToAdd = {
-  name: 'New Enforcer',
-  email: 'newenforcer@domain.com',
-}
+// const enforcerToAdd = {
+//   name: 'New Enforcer',
+//   email: 'newenforcer@domain.com',
+// }
 
 async function loginAsAdmin(): Promise<string | undefined> {
   const response = await supertest(AUTH_SERVICE_URL)

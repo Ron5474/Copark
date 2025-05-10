@@ -6,61 +6,54 @@ import { beforeEach, expect, it, vi } from 'vitest'
 const mockRedirect = vi.spyOn(NextResponse, 'redirect')
 
 beforeEach(() => {
-    vi.clearAllMocks()
+  vi.clearAllMocks()
 })
 
-it('redirects to login for protected routes without session', async () => {
-    const request = new NextRequest(new URL('http://localhost:3000/'), {
-        headers: new Headers({
-            'cookie': ''
-        })
-    })
+it('redirects to enforcement login if session is missing and path is protected', async () => {
+  const request = new NextRequest(new URL('http://localhost:3001/enforcement'), {
+    headers: new Headers({ cookie: '' }),
+  })
 
-    await middleware(request)
-    expect(mockRedirect).toHaveBeenCalledWith(new URL('/login', 'http://localhost:3000/'))
+  await middleware(request)
+  expect(mockRedirect).toHaveBeenCalledWith(
+    new URL('/enforcement/login', 'http://localhost:3001')
+  )
 })
 
-it('allows access to login page without session', async () => {
-    const request = new NextRequest(new URL('http://localhost:3000/login'), {
-        headers: new Headers({
-            'cookie': ''
-        })
-    })
+it('allows access to enforcement login page without session', async () => {
+  const request = new NextRequest(new URL('http://localhost:3001/enforcement/login'), {
+    headers: new Headers({ cookie: '' }),
+  })
 
-    await middleware(request)
-    expect(mockRedirect).not.toHaveBeenCalled()  
+  await middleware(request)
+  expect(mockRedirect).not.toHaveBeenCalled()
 })
 
 it('allows access to protected routes with valid session', async () => {
-    const request = new NextRequest(new URL('http://localhost:3000/'), {
-        headers: new Headers({
-            'cookie': 'session=valid-session-id'
-        })
-    })
+  const request = new NextRequest(new URL('http://localhost:3001/enforcement'), {
+    headers: new Headers({ cookie: 'session=valid-session-id' }),
+  })
 
-    await middleware(request)
-    expect(mockRedirect).not.toHaveBeenCalled()
+  await middleware(request)
+  expect(mockRedirect).not.toHaveBeenCalled()
 })
 
-it('redirects to home when accessing login with valid session', async () => {
-    const request = new NextRequest(new URL('http://localhost:3000/login'), {
-        headers: new Headers({
-            'cookie': 'session=valid-session-id'
-        })
-    })
+it('redirects to /enforcement if logged in and accesses login page', async () => {
+  const request = new NextRequest(new URL('http://localhost:3001/enforcement/login'), {
+    headers: new Headers({ cookie: 'session=valid-session-id' }),
+  })
 
-    await middleware(request)
-    expect(mockRedirect).toHaveBeenCalledWith(new URL('/', 'http://localhost:3000/'))
+  await middleware(request)
+  expect(mockRedirect).toHaveBeenCalledWith(
+    new URL('/enforcement', 'http://localhost:3001')
+  )
 })
 
 it('bypasses middleware for static files', async () => {
-    const request = new NextRequest(new URL('http://localhost:3000/_next/static/test.js'), {
-        headers: new Headers({
-            'cookie': ''
-        })
-    })
+  const request = new NextRequest(new URL('http://localhost:3001/_next/static/test.js'), {
+    headers: new Headers({ cookie: '' }),
+  })
 
-    await middleware(request)
-
-    expect(mockRedirect).toHaveBeenCalledWith(new URL('login', 'http://localhost:3000/'))
+  await middleware(request)
+  expect(mockRedirect).not.toHaveBeenCalled()
 })

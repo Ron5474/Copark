@@ -1,7 +1,31 @@
 import { pool } from './db'
-import { Vehicle, RegisterVehicleInput, UpdateVehicleInput } from './schema'
+import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID } from './schema'
+import { SignJWT, jwtVerify } from 'jose'
+
+const encodedKey = new TextEncoder().encode(process.env.MASTER_SECRET + 'apiexit')
 
 export class VehicleService {
+
+  private async encrypt(userId: string): Promise<string> {
+      return new SignJWT({ id: userId })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('30m')
+        .sign(encodedKey)
+    }
+
+  private async decrypt(token: string): Promise<string | undefined> {
+    try {
+      const { payload } = await jwtVerify(token, encodedKey)
+
+      return payload.id as string; // Extract the `id` from the payload
+    } catch (error) {
+      void error;
+      // console.error('Failed to decrypt token:', error);
+      return undefined; // Return undefined if the token is invalid or expired
+    }
+  }
+
   public async getMyVehicles(userId: string): Promise<Vehicle[]> {
     const result = await pool.query(
       `SELECT id, data FROM vehicle WHERE driver = $1`,
@@ -16,6 +40,27 @@ export class VehicleService {
       state: row.data.state,
       nickname: row.data.nickname
     }))
+  }
+  
+  public async getVehicleById(vehicleId: VehicleID): Promise<Vehicle | null> {
+
+    const vehicleDecrypted = await this.decrypt(vehicleId.id)
+
+    const result = await pool.query(
+      `SELECT data FROM vehicle WHERE id = $1`,
+      [vehicleDecrypted]
+    )
+
+    if (result.rowCount === 0) return null
+
+    const row = result.rows[0]
+    return {
+      id: await this.encrypt(row.id),
+      plate: row.data.plate,
+      country: row.data.country,
+      state: row.data.state,
+      nickname: row.data.nickname
+    }
   }
 
   public async registerVehicle(userId: string, input: RegisterVehicleInput): Promise<Vehicle> {

@@ -41,6 +41,10 @@ const mock_vehicle2 = {
   "nickname": "electric fiat"
 }
 
+const update_vehicle1 = {
+  "state": "Texas"
+}
+
 test('getMyVehicles - Returns Correct Number (0)', async () => {
 
   const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)
@@ -61,4 +65,10 @@ test('getMyVehicles - does not show Driver2 vehicles belonging to Driver1', asyn
   expect(vehicles.length).toBe(0)
 })
 
+test('updateVehicle - updates vehicle table correctly', async () => {
+  const vehicle = await new VehicleService().registerVehicle(mock_driver1_ID, mock_vehicle1)
+  await new VehicleService().updateVehicle(mock_driver1_ID, {id: vehicle.id, ...update_vehicle1})
+  const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)
+  expect(vehicles[0].state).toBe('Texas')
+})
 

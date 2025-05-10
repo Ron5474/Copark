@@ -70,7 +70,7 @@ export class AuthService {
   //   return new SignJWT({ id: userId })
   //     .setProtectedHeader({ alg: 'HS256' })
   //     .setIssuedAt()
-  //     .setExpirationTime('30m')
+  //     .setExpirationTime('5y')
   //     .sign(internalKey)
   // }
 

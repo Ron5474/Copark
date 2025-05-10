@@ -40,7 +40,7 @@ const validJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjYwMjk2N2Y1LTNlM2YtNGNjMS04M2U4L
 // const nextAuthJWT = "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiQnJ5YW50IE9saXZlciIsImVtYWlsIjoiYmNvbGl2ZXJAdWNzYy5lZHUiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwic3ViIjoiMTA5MTY0MjQwOTk2MDE1NjkwNTQwIiwiaWF0IjoxNzQ2NTczODA5LCJleHAiOjE3NDkxNjU4MDl9.SXrO5Rr0JNcEYXWjR5BLM44fSZzR6Uv0yKy2YxRw1bw"
 const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
 const invalidNextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3NzAxNjAsImV4cCI6MTc3ODMwNjE2MCwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsImVtYWlsIjoianJvY2tldEBleGFtcGxlLmNvbSJ9.THjfN4vdCqJ5HremhRJ7NajSSPxLCImilD2q3zwym0s"
-const numJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6NSwiaWF0IjoxNzQ2ODI1NTk0LCJleHAiOjE3NDY4MjczOTR9.3fEO-PYg4rFRv2VHl9ylULqf03C6BXtGw5IWB_wZ2hc"
+const numJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6NSwiaWF0IjoxNzQ2ODM4NzA2LCJleHAiOjE5MDQ2MjY3MDZ9.XYbiNsZsIVBgANgCzeKsu5R6Zw4_sRm0H1GDrsVNvyE"
 
 const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -153,12 +153,8 @@ test('AuthService Check() throws error for driver with invalid JWT', async () =>
   await expect(new AuthService().check(`Bearer ${invalidNextAuthJWT}`, ["driver"])).rejects.toThrow('Unauthorized3')
 })
 
-test('AuthService Check() throws error for driver with invalid JWT', async () => {
+test('AuthService Check() throws error for driver with JWT containing Integer', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
   await expect(new AuthService().check(`Bearer ${numJWT}`, ["admin"])).rejects.toThrow('Unauthorized3')
 })
-// test('Incorrect User Login', async () => {
-//   const user = await authenticate({email: 'anna@books.com', password: 'fakepass'})
-//   expect(user).not.toBeDefined()
-// })

@@ -35,18 +35,6 @@ async function encrypt(userId: string): Promise<string> {
     .sign(encodedKey)
   }
 
-// async function decrypt(token: string): Promise<string | undefined> {
-//   try {
-//     const { payload } = await jwtVerify(token, encodedKey)
-
-//     return payload.id as string; // Extract the `id` from the payload
-//   } catch (error) {
-//     void error;
-//     // console.error('Failed to decrypt token:', error);
-//     return undefined; // Return undefined if the token is invalid or expired
-//   }
-// }
-// Minor Change
 let mock_driver1_ID: string;
 let mock_driver2_ID: string;
 

@@ -40,6 +40,7 @@ afterAll(() => {
   server.close()
   authServer.close()
 })
+
 const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
 
 // const driver = {
@@ -85,4 +86,23 @@ test('Driver can get a list of their vehicles', async () => {
       .expect(200)
 
     expect(response.body.data.myVehicles.length).toBe(0)
-  })
+})
+
+test('cant get a list of vehicles without auth', async () => {
+  const query = `
+    query {
+      myVehicles {
+        id
+        plate
+        country
+        state
+      }
+    }
+  `
+  const response = await supertest(server)
+    .post('/graphql')
+    .send({ query })
+    .expect(200)
+
+  expect(response.body.errors).toBeDefined()
+})

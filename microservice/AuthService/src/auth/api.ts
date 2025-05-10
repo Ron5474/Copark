@@ -31,8 +31,8 @@ export class AuthController extends Controller {
 
   @Post("driver/login")
   @Security("jwt", ["driver"])
-  public async driverLogin(@Request() request: express.Request): Promise<string | undefined> {
-    return new AuthService().driverLogin(request.user)
+  public async driverSignup(@Request() request: express.Request): Promise<string | undefined> {
+    return new AuthService().driverSignup(request.user)
   }
 
   @Get("driver/id")

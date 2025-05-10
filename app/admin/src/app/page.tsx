@@ -26,8 +26,6 @@ export default function Page() {
         return <div>Statistics Component</div>;
       case 'reports':
         return <div>Reports Component</div>;
-      default:
-        return <Home onNavigate={handleNavigate} />;
     }
   };
 

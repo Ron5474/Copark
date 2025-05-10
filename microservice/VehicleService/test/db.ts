@@ -58,15 +58,15 @@ const run = async (file: string) => {
 }
 
 
-const path = '../'
+const path = resolve(__dirname, '../../')
 
 const reset = async () => {
-  await run(path + 'AuthService/sql/schema.sql')
-  await run(path + 'AuthService/sql/data.sql')
+  await run(path + '/AuthService/sql/schema.sql')
+  await run(path + '/AuthService/sql/data.sql')
   // await run(path + 'AdminService/sql/schema.sql')
   // await run(path + 'AdminService/sql/data.sql')
-  await run(path + 'VehicleService/sql/schema.sql')
-  await run(path + 'VehicleService/sql/data.sql')
+  await run(path + '/VehicleService/sql/schema.sql')
+  await run(path + '/VehicleService/sql/data.sql')
 }
 
 const shutdown = () => {

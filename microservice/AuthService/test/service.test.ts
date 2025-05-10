@@ -53,30 +53,30 @@ afterAll(() => {
 })
 
 test('OAuth User can login successfully', async () => {
-  const user = await new AuthService().driverLogin(driver)
+  const user = await new AuthService().driverSignup(driver)
   expect(user).toBeDefined()
 })
 
 test('OAuth User login twice returns undefined', async () => {
-  await new AuthService().driverLogin(driver)
-  const user = await new AuthService().driverLogin(driver)
+  await new AuthService().driverSignup(driver)
+  const user = await new AuthService().driverSignup(driver)
   expect(user).not.toBeDefined()
 })
 
 test('OAuth Undefined user throws error', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
-  await expect(new AuthService().driverLogin(undefined)).rejects.toThrow('Unauthorized')
+  await expect(new AuthService().driverSignup(undefined)).rejects.toThrow('Unauthorized')
 })
 
 test('OAuth user with id throws error', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
-  await expect(new AuthService().driverLogin(fake_driver)).rejects.toThrow('Unauthorized')
+  await expect(new AuthService().driverSignup(fake_driver)).rejects.toThrow('Unauthorized')
 })
 
 test('getOauthUser() returns JWT for the current user', async () => {
-  await new AuthService().driverLogin(driver)
+  await new AuthService().driverSignup(driver)
   const user = await new AuthService().getOauthUser(driver)
   expect(user).toMatch(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/) // JWT Regex Comparison
 })

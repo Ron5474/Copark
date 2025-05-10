@@ -19,18 +19,18 @@
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20.17.32",
+    "@types/node-fetch": "^2.6.4",
     "@types/pg": "^8.11.14",
     "@types/supertest": "^6.0.3",
     "@types/swagger-ui-express": "^4.1.8",
-    "@types/node-fetch": "^2.6.4",
     "@vitest/coverage-v8": "^3.1.2",
     "concurrently": "^9.1.2",
     "eslint": "^9.26.0",
     "eslint-config-typescript": "^3.0.0",
     "globals": "8",
     "joi": "^17.13.3",
-    "nodemon": "^3.1.10",
     "node-fetch": "^2.6.7",
+    "nodemon": "^3.1.10",
     "supertest": "^7.1.0",
     "ts-node": "^10.9.2",
     "ts-postgres": "^2.0.4",
@@ -51,7 +51,9 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.15.6",
     "tsoa": "*",
-    "type-graphql": "*"
+    "type-graphql": "*",
+    "reflect-metadata": "^0.2.2"
+
   },
   "nodemonConfig": {
     "watch": [

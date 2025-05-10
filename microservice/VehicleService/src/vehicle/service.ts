@@ -2,7 +2,7 @@ import { pool } from './db'
 import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID } from './schema'
 import { SignJWT, jwtVerify } from 'jose'
 
-const encodedKey = new TextEncoder().encode(process.env.MASTER_SECRET + 'apiexit')
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
 export class VehicleService {
 

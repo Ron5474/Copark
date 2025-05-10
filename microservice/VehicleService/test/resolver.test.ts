@@ -1,4 +1,5 @@
 import { test, beforeAll, afterAll, expect } from 'vitest'
+// @ts-ignore
 import supertest from 'supertest'
 import * as http from 'http'
 

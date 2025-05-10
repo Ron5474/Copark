@@ -17,7 +17,7 @@ import { SignJWT, jwtVerify } from 'jose'
 
 vi.mock('server-only', () => ({}))
 
-const encodedKey = new TextEncoder().encode(process.env.MASTER_SECRET + 'apiexit')
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
 beforeEach( async () => {
     return db.reset()

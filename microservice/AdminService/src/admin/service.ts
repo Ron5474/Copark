@@ -2,7 +2,7 @@ import { User, UserInput, NewUser } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
-const encodedKey = new TextEncoder().encode(process.env.MASTER_SECRET + 'apiexit')
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
 export class AdminService {
   private async encrypt(userId: string): Promise<string> {

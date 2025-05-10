@@ -85,11 +85,22 @@ mutation RegisterVehicle($input: RegisterVehicleInput!) {
   }
 }`
 
+const updateVehicleQuery = `
+mutation UpdateVehicle($input: UpdateVehicleInput!) {
+  updateVehicle(input: $input) {
+    id
+    plate
+    country
+    state
+    nickname
+  }
+}`
+
 const vehicleInput = {
   input: {
     plate: "TEST123",
     country: "US",
-    state: "CA",
+    state: "California",
     nickname: "Test Vehicle"
   }
 }
@@ -105,6 +116,16 @@ test('Driver can get a list of their vehicles', async () => {
 
     expect(response.body.data.myVehicles.length).toBe(0)
   })
+
+  test('cant get a list of vehicles without auth', async () => {
+    const response = await supertest(server)
+      .post('/graphql')
+      .send({ query: getVehiclequery })
+      .expect(200)
+  
+    expect(response.body.errors).toBeDefined()
+  })
+  
 
   test('Driver can register a vehicle', async () => {
     const token = await loginAsDriver()
@@ -123,4 +144,39 @@ test('Driver can get a list of their vehicles', async () => {
       .send({ query: getVehiclequery })
 
     expect(listResponse.body.data.myVehicles[0].plate).toBe("TEST123")
+  })
+
+  test('Driver can update a vehicle', async () => {
+    const token = await loginAsDriver()
+
+    const veh = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ 
+        query: regVehicleQuery,
+        variables: vehicleInput
+      })
+    const vID = veh.body.data.registerVehicle.id
+    const newUpdate = {
+      input: {
+        "id": vID,
+        "state": "Texas",
+        "country": "US",
+        "nickname": "Test Vehicle"
+      }
+    }
+    await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ 
+        query: updateVehicleQuery,
+        variables: newUpdate
+      })
+      
+    const listResponse = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ query: getVehiclequery })
+
+    expect(listResponse.body.data.myVehicles[0].state).toBe("Texas")
   })

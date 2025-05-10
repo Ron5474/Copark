@@ -5,7 +5,7 @@ import * as http from 'http'
 
 import db from './db'
 import { app, bootstrap } from '../src/app'
-import authApp from '../../AuthService/src/app'
+import { createAuthApp } from '../../AuthService/src/app'
 
 let server: http.Server
 let authServer: http.Server
@@ -20,7 +20,7 @@ beforeAll(async () => {
   await bootstrap()
 
   // Start your Auth server
-  authServer = http.createServer(authApp)
+  authServer = http.createServer(createAuthApp())
   await new Promise<void>((resolve) => {
     authServer.listen(AUTH_PORT, () => {
     //   console.log(`Auth service running on ${AUTH_SERVICE_URL}`)
@@ -125,7 +125,8 @@ const response = await supertest(server)
     .send({ query })
     .expect(200)
 
-expect(response.body.errors).toBeDefined()
+expect(response.body.errors).toBeDefined();
+expect(response.body.errors[0].message).toBe("Unauthorized312")
 })
 
 test('GET /playground returns the GraphQL Playground HTML', async () => {

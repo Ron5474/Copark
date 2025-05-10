@@ -44,4 +44,12 @@ export class VehicleResolver {
   ): Promise<Vehicle | null> {
     return await service.findVehicleByPlate(plate)
   }
+
+  @Authorized('admin', 'enforcement')
+  @Query(() => Vehicle, { nullable: true })
+  async checkForVehicleID(
+    @Arg('vehicleID') vehicleID: string
+  ): Promise<Vehicle | null> {
+    return await service.getVehicleById({ id: vehicleID })
+  }
 }

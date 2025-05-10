@@ -1,22 +1,67 @@
-import { Field, ObjectType, /*InputType, */ID } from 'type-graphql'
+import { Field, ObjectType, InputType, ID } from 'type-graphql'
 
 @ObjectType()
-export class Permit {
-  @Field(() => ID)
-  id!: string
+export class Receipt {
 
   @Field(() => String)
-  permitType!: string
+  type!: string
 
   @Field(() => String)
   purchaseDate!: string
 
   @Field(() => String)
-  expiresDate!: string
+  activeDate!: string
 
-  // @Field(() => String)
-  // price!: string
+  @Field(() => String)
+  expireDate!: string
 
-  // @Field(() => String)
-  // paymentMethod!: string
+  @Field(() => Number)
+  price!: number
+}
+
+@InputType()
+export class PurchaseZoneInput {
+
+  @Field(() => ID)
+  vehicle!: string
+
+  @Field(() => String)
+  zone!: string
+
+  @Field(() => Object)
+  duration!: {minutes?: number, hours?: number}
+
+  @Field(() => String)
+  paymentMethod!: string
+}
+
+@InputType()
+export class IsValidInput {
+
+  @Field(() => ID)
+  vehicle!: string
+}
+
+@InputType()
+export class IsValidPermitInput {
+
+  @Field(() => ID)
+  vehicle!: string
+
+  @Field(() => String)
+  zone!: string
+}
+
+
+@InputType()
+export class IsValid {
+
+  @Field(() => Boolean)
+  isValid!: boolean
+
+  @Field(() => String)
+  type!: string
+
+  @Field(() => String)
+  zone!: string
 }

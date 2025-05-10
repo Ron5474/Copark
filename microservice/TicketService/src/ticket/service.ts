@@ -1,4 +1,4 @@
-import { Ticket } from "./schema";
+import { Ticket, NewTicket } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -59,7 +59,60 @@ export class TicketService {
 
     }
 
-    console.log(tickets);
+    // console.log(tickets);
     return tickets;
+  }
+
+  public async createTicket(newTicket: NewTicket): Promise<Ticket[]> {
+    const enforcerId = await this.decrypt(newTicket.enforcer);
+    const vehicleId = await this.decrypt(newTicket.vehicle);
+
+    //TODO: Check if the enforcerId and vehicleId are valid, will need services in enforcer and vehicle microservices
+    
+
+    const insertQuery = `
+        INSERT INTO ticket (vehicle, enforcer, data)
+        VALUES ($1, $2, jsonb_build_object(
+            'issuedDate', $3,
+            'violation', $4,
+            'fine', $5,
+            'ticketStatus', $6,
+            'images', $7
+        ))
+        RETURNING id, vehicle, enforcer, 
+                  data->>'issuedDate' AS issueddate,
+                  data->>'violation' AS violation,
+                  data->>'fine' AS fine,
+                  data->>'ticketStatus' AS ticketstatus,
+                  data->>'images' AS images;
+    `;
+
+    const issuedDate = new Date().toISOString();
+    const ticketStatus = 'active';
+
+    const result = await pool.query(insertQuery, [
+        vehicleId,
+        enforcerId,
+        issuedDate,
+        newTicket.violation,
+        newTicket.fine,
+        ticketStatus,
+        newTicket.images || null,
+    ]);
+
+    const row = result.rows[0];
+
+    const ticket: Ticket = {
+        id: await this.encrypt(row.id),
+        vehicle: await this.encrypt(row.vehicle),
+        enforcer: await this.encrypt(row.enforcer),
+        issuedDate: new Date(row.issueddate),
+        violation: row.violation,
+        fine: parseFloat(row.fine),
+        ticketStatus: row.ticketstatus,
+        images: row.images,
+    };
+
+    return [ticket];
   }
 }

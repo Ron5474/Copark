@@ -1,5 +1,4 @@
 import express, { Express } from 'express'
-import cors from 'cors'
 import path from 'path'
 import { createHandler } from 'graphql-http/lib/use/express'
 import { renderPlaygroundPage } from 'graphql-playground-html'
@@ -10,11 +9,6 @@ import { resolvers } from './resolvers'
 import { expressAuthChecker } from './auth/checker'
 
 const app: Express = express()
-
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))

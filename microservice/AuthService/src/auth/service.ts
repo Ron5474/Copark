@@ -66,6 +66,14 @@ export class AuthService {
       .sign(internalKey)
   }
 
+  // public async encryptNum(userId: number): Promise<string> {
+  //   return new SignJWT({ id: userId })
+  //     .setProtectedHeader({ alg: 'HS256' })
+  //     .setIssuedAt()
+  //     .setExpirationTime('5y')
+  //     .sign(internalKey)
+  // }
+
   private async getUserById(id: string): Promise<AuthUser | undefined> {
     const query = {
       text: "SELECT id, data as data FROM account WHERE id = $1 AND data->>'deleted' IS NULL",

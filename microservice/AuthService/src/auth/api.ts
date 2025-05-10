@@ -5,7 +5,8 @@ import {
   Body,
   Get,
   Security,
-  Request
+  Request,
+  Response
 } from "tsoa";
 import * as express from "express";
 import { Credentials, Authenticated, OauthLoginData } from "./";
@@ -16,21 +17,22 @@ import { SessionUser } from "./index";
 export class AuthController extends Controller {
 
   @Post("login")
+  @Response('404', 'Not Found')
   public async login(@Body() credentials: Credentials): Promise<Authenticated | undefined> {
     // console.log("authenticating user with credentials:", credentials);
-    return new AuthService().authenticate(credentials);
+    return new AuthService().authenticate(credentials)
+      .then(async (user: Authenticated|undefined): Promise<Authenticated|undefined> => {
+        if (!user) {
+          this.setStatus(404)
+        }
+        return user
+      })
   }
 
   @Post("driver/login")
   @Security("jwt", ["driver"])
   public async driverLogin(@Request() request: express.Request): Promise<string | undefined> {
-    
     return new AuthService().driverLogin(request.user)
-  }
-
-  @Get("status")
-  public async status(): Promise<string> {
-    return "Auth service is running!";
   }
 
   @Get("driver/id")

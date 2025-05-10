@@ -48,21 +48,42 @@ const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSl
 //     "sub": "1234567890",
 //   }
 
-async function loginAsDriver(): Promise<string | undefined> {
+const adminUser = {
+  email: 'jxiong0822@outlook.com',
+  password: 'password1',
+}
+
+async function loginAs(who: string): Promise<string | undefined> {
+  if (who === "driver") {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/driver/login')
       .set('Authorization', `Bearer ${nextAuthJWT}`)
-  
+
     // console.log('Status:', response.status)
     // console.log('Headers:', response.headers)
     // console.log('Body:', response.body)
-  
+
     if (response.status !== 200) {
       throw new Error(`Login failed with status ${response.status}`)
     }
-  
+
     return response.body
+  } else {
+    const response = await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/login')
+      .send(adminUser)
+
+    // console.log('Status:', response.status)
+    // console.log('Headers:', response.headers)
+    // console.log('Body:', response.body)
+
+    if (response.status !== 200) {
+      throw new Error(`Login failed with status ${response.status}`)
+    }
+
+    return response.body?.id
   }
+}
 
 const getVehiclequery = `
       query {
@@ -96,6 +117,28 @@ mutation UpdateVehicle($input: UpdateVehicleInput!) {
   }
 }`
 
+const findByPlateQuery = `
+query findVehicleByPlate($plate: String!) {
+  findVehicleByPlate(plate: $plate) {
+    id
+    plate
+    country
+    state
+    nickname
+  }
+}`
+
+const checkVehicleIDQuery = `
+query checkForVehicleID($vehicleID: String!) {
+  checkForVehicleID(vehicleID: $vehicleID) {
+    id
+    plate
+    country
+    state
+    nickname
+  }
+}`
+
 const vehicleInput = {
   input: {
     plate: "TEST123",
@@ -105,8 +148,12 @@ const vehicleInput = {
   }
 }
 
+const findByPlateInput = {
+  plate: "TEST123"
+}
+
 test('Driver can get a list of their vehicles', async () => {
-    const token = await loginAsDriver()
+    const token = await loginAs("driver")
 
     const response = await supertest(server)
       .post('/graphql')
@@ -128,7 +175,7 @@ test('Driver can get a list of their vehicles', async () => {
   
 
   test('Driver can register a vehicle', async () => {
-    const token = await loginAsDriver()
+    const token = await loginAs("driver")
 
     await supertest(server)
       .post('/graphql')
@@ -147,7 +194,7 @@ test('Driver can get a list of their vehicles', async () => {
   })
 
   test('Driver can update a vehicle', async () => {
-    const token = await loginAsDriver()
+    const token = await loginAs("driver")
 
     const veh = await supertest(server)
       .post('/graphql')
@@ -172,11 +219,55 @@ test('Driver can get a list of their vehicles', async () => {
         query: updateVehicleQuery,
         variables: newUpdate
       })
-      
+
     const listResponse = await supertest(server)
       .post('/graphql')
       .set('Authorization', 'Bearer ' + token)
       .send({ query: getVehiclequery })
 
     expect(listResponse.body.data.myVehicles[0].state).toBe("Texas")
+  })
+
+  test('Admin can find a vehicle using plate', async () => {
+    const userToken = await loginAs("driver")
+    const token = await loginAs("admin")
+
+    await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + userToken)
+      .send({ 
+        query: regVehicleQuery,
+        variables: vehicleInput
+      })
+    
+    const listResponse = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ query: findByPlateQuery,
+        variables: findByPlateInput
+       })
+
+    expect(listResponse.body.data.findVehicleByPlate.plate).toBe("TEST123")
+  })
+  
+  test('Admin can find a vehicle using VehicleID', async () => {
+    const userToken = await loginAs("driver")
+    const token = await loginAs("admin")
+
+    const res = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + userToken)
+      .send({ 
+        query: regVehicleQuery,
+        variables: vehicleInput
+      })
+    const vID = res.body.data.registerVehicle.id
+    const listResponse = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ query: checkVehicleIDQuery,
+        variables: {vehicleID: vID}
+       })
+       
+    expect(listResponse.body.data.checkForVehicleID.plate).toBe("TEST123")
   })

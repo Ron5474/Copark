@@ -4,7 +4,7 @@ import { Field, ObjectType, InputType, ID } from 'type-graphql'
 export class Receipt {
 
   @Field(() => String)
-  permitType!: string
+  type!: string
 
   @Field(() => String)
   purchaseDate!: string
@@ -20,7 +20,7 @@ export class Receipt {
 }
 
 @InputType()
-export class PurchaseZonePermitInput {
+export class PurchaseZoneInput {
 
   @Field(() => ID)
   vehicle!: string
@@ -33,4 +33,35 @@ export class PurchaseZonePermitInput {
 
   @Field(() => String)
   paymentMethod!: string
+}
+
+@InputType()
+export class IsValidInput {
+
+  @Field(() => ID)
+  vehicle!: string
+}
+
+@InputType()
+export class IsValidPermitInput {
+
+  @Field(() => ID)
+  vehicle!: string
+
+  @Field(() => String)
+  zone!: string
+}
+
+
+@InputType()
+export class IsValid {
+
+  @Field(() => Boolean)
+  isValid!: boolean
+
+  @Field(() => String)
+  type!: string
+
+  @Field(() => String)
+  zone!: string
 }

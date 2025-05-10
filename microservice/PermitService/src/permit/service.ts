@@ -1,21 +1,50 @@
 import { pool } from './db'
-import { Permit/*, RegisterVehicleInput, UpdateVehicleInput*/ } from './schema'
+import { Receipt, PurchaseZonePermitInput } from './schema'
 
 export class PermitService {
-  public async getMyPermits(userId: string): Promise<Permit[]> {
-    const result = await pool.query(`
-      SELECT id, vehicle, data
-      FROM permit
-      WHERE vehicle = $1`,
-      [userId]
+  public async purchaseMyZonePermit(input: PurchaseZonePermitInput): Promise<Receipt> {
+
+    const totalMinutes = (input.duration?.hours || 0) * 60 + (input.duration?.minutes || 0)
+
+
+    // price service use here
+    const price = 3.00 / 60 * totalMinutes
+
+
+    // Stripe processing goes here
+
+
+    const today = new Date()
+
+    const purchaseDate = today.toISOString()
+    const activeDate = today.toISOString()
+    
+    const durationMs = totalMinutes * 60 * 1000
+    const expireDate = new Date(today.getTime() + durationMs).toISOString()
+
+    const data = {
+      permitType: 'zone',
+      zone: input.zone,
+      purchaseDate,
+      activeDate,
+      expireDate,
+      price,
+      paymentMethod: input.paymentMethod,
+    }
+
+    const { rows } = await pool.query(`
+      INSERT INTO permit (vehicle, data)
+      VALUES ($1, $2)
+      RETURNING data`,
+      [input.vehicle, data]
     )
 
-    if (result.rows.length == 0) return []
-    return result.rows.map(row => ({
-      id: row.id,
-      permitType: row.data.permitType,
-      purchaseDate: row.data.purchaseDate,
-      expiresDate: row.data.expiresDate,
-    }))
+    if (rows.length == 0) throw new Error('Purchase unsuccessful')
+    return new Receipt(
+      rows[0].data.permitType,
+      rows[0].data.purchaseDate,
+      rows[0].data.activeDate,
+      rows[0].data.expiresDate,
+    )
   }
 }

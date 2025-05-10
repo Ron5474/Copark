@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { it, expect, afterEach} from 'vitest'
 
 import ManualEntryCard from '@/app/dashboard/plate/ManualEntry'
-import PlateResult from '@/app/dashboard/plate/PlateResult'
 import { EnforcementProvider } from '@/app/dashboard/context/Context'
+import PermitCard from '@/app/dashboard/permit/Card'
 
 afterEach(() => {
     cleanup()
@@ -17,7 +17,7 @@ it('searching sets plate from manual input', async () => {
     <EnforcementProvider>
       <>
         <ManualEntryCard />
-        <PlateResult />
+        <PermitCard />
       </>
     </EnforcementProvider>
   )
@@ -28,7 +28,7 @@ it('searching sets plate from manual input', async () => {
   const searchBtn = screen.getByRole('button', { name: /search/i })
   await user.click(searchBtn)
 
-  expect(await screen.findByText('ABC123')).toBeDefined()
+  expect(await screen.findByText('Plate Number : ABC123')).toBeDefined()
 })
 
 it('shows error when trying to search with empty input', async () => {

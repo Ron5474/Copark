@@ -26,9 +26,7 @@ export default function ManualEntryCard({
     manualInput,
     setManualInput,
     setPlate,
-    setDetectionMethod,
-    setCapturedImage,
-    setCameraOn,
+    setIsValidated,
   } = useEnforcement()
 
   const [internalError, setInternalError] = useState(false)
@@ -44,9 +42,7 @@ export default function ManualEntryCard({
     }
     setError(false)
     setPlate(trimmed.toUpperCase())
-    setDetectionMethod('manual')
-    setCapturedImage(null)
-    setCameraOn(false)
+    setIsValidated(true)
   }
 
   return (

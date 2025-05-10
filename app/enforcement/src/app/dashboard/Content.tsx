@@ -1,12 +1,7 @@
 'use client'
 
-import { Container, Box, Typography, Button } from '@mui/material'
-import { useEffect } from 'react'
-
-import CameraCaptureCard from './camera/CameraBox'
+import { Container, Box, Typography } from '@mui/material'
 import ManualEntryCard from './plate/ManualEntry'
-import PlateResult from './plate/PlateResult'
-import EditPlateCard from './plate/EditPlateCard'
 import PermitCard from './permit/Card'
 import IssueViolationForm from './permit/IssueViolationForm'
 import { useEnforcement } from './context/Context'
@@ -14,37 +9,19 @@ import { useEnforcement } from './context/Context'
 export default function EnforcementDashboardView() {
   const {
     plate,
-    setManualInput,
-    setCameraOn,
-    detectionMethod,
-    isEditing,
-    setIsEditing,
     isValidated,
     isIssuingViolation,
     setIsIssuingViolation,
   } = useEnforcement()
 
-  useEffect(() => {
-    return () => {
-      setCameraOn(false)
-    }
-  }, [setCameraOn])
-
-  const handleEditPlate = () => {
-    setIsEditing(true)
-    if (plate) setManualInput(plate)
-  }
-
   return (
     <Container maxWidth="xs" sx={{ py: 3, mt: 8 }}>
-      {!plate && !isEditing && (
+      {!plate && (
         <>
-          <CameraCaptureCard />
-
           <Box display="flex" alignItems="center" mt={3} mb={1}>
             <Box sx={{ flex: 1, height: 1, bgcolor: 'red' }} />
             <Typography variant="body2" sx={{ mx: 2, fontWeight: 'bold', color: 'red' }}>
-              OR Manual Entry
+              Manual Entry
             </Typography>
             <Box sx={{ flex: 1, height: 1, bgcolor: 'red' }} />
           </Box>
@@ -53,29 +30,6 @@ export default function EnforcementDashboardView() {
         </>
       )}
 
-      {isEditing && <EditPlateCard />}
-
-      {plate && !isEditing && !isValidated && (
-        <>
-          <PlateResult showActions={true} />
-
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={handleEditPlate}
-            sx={{ mt: 2 }}
-            aria-label="Edit Plate Number"
-          >
-            Edit Plate Number
-          </Button>
-
-          {detectionMethod === 'camera' && (
-            <Typography variant="caption" display="block" textAlign="center" mt={1} color="text.secondary">
-              Detected via camera. Tap Edit if the detection is incorrect.
-            </Typography>
-          )}
-        </>
-      )}
       {plate && isValidated && !isIssuingViolation && <PermitCard />}
 
       {plate && isIssuingViolation && (

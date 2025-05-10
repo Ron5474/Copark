@@ -5,13 +5,20 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get('session')
   const { pathname } = request.nextUrl
 
-  // If there's no session and we're not on the login page, redirect to login
-  if (!session && pathname !== '/enforcement/login') {
+  // Static files should bypass middleware
+  if (pathname.startsWith('/_next')) {
+    return NextResponse.next()
+  }
+
+  const isLoginPath = pathname === '/login' || pathname === '/enforcement/login'
+
+  if (!session && !isLoginPath) {
+    console.log('No session, redirecting to login')
     return NextResponse.redirect(new URL('/enforcement/login', request.url))
   }
 
-  // If there's a session and we're on the login page, redirect to home
-  if (session && pathname === '/enforcement/login') {
+  if (session && isLoginPath) {
+    console.log('Has session, redirecting to home')
     return NextResponse.redirect(new URL('/enforcement', request.url))
   }
 
@@ -20,13 +27,8 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/enforcement/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/enforcement/:path*',
+    '/',
+    '/login'
   ],
-} 
+}

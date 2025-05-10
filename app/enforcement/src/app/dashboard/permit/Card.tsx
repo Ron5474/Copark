@@ -7,9 +7,7 @@ export default function PermitCard() {
   const {
     plate,
     setPlate,
-    setCapturedImage,
     setManualInput,
-    setCameraOn,
     setIsValidated,
     setIsIssuingViolation 
   } = useEnforcement()
@@ -20,10 +18,8 @@ export default function PermitCard() {
 
   const handleNewScan = () => {
     setPlate(null)
-    setCapturedImage(null)
     setManualInput('')
     setIsValidated(false)
-    setTimeout(() => setCameraOn(true), 100)
   }
 
   const handleIssueCitation = () => {

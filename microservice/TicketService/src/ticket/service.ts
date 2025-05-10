@@ -68,6 +68,7 @@ export class TicketService {
     const vehicleId = await this.decrypt(newTicket.vehicle);
 
     //TODO: Check if the enforcerId and vehicleId are valid, will need services in enforcer and vehicle microservices
+    
 
     const insertQuery = `
         INSERT INTO ticket (vehicle, enforcer, data)

@@ -165,8 +165,6 @@ it('navigates to Manage Enforcers section', async () => {
   const manageEnforcementButton = screen.getByText('Manage Enforcement');
   fireEvent.click(manageEnforcementButton);
 
-  console.log(screen.debug()); // Inspect DOM after clicking
-
   await waitFor(() => {
     expect(screen.getByText('Manage Enforcers')).toBeDefined();
   });
@@ -188,8 +186,6 @@ it('navigates to Tickets section', async () => {
 
   const ticketsButton = screen.getByText('Override Tickets');
   fireEvent.click(ticketsButton);
-
-  console.log(screen.debug()); // Inspect the DOM
 
   await waitFor(() => {
     expect(screen.getByText('Tickets Component')).toBeDefined();

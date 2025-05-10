@@ -133,7 +133,7 @@ it('handles navigation to different sections', async () => {
   fireEvent.click(manageEnforcementButton);
 
   await waitFor(() => {
-    expect(screen.findByText('Manage Enforcer')).toBeDefined();
+    expect(screen.findByText('Manage Enforcers')).toBeDefined();
   });
 });
 

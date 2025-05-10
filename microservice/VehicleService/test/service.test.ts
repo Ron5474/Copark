@@ -79,3 +79,13 @@ test('updateVehicle - Throws error because no vehicle exists', async () => {
   .rejects.toThrow('Vehicle not found or not owned by user')
 })
 
+test('findVehicleByPlate - Returns Correct Vehicle', async () => {
+  await new VehicleService().registerVehicle(mock_driver1_ID, mock_vehicle2)
+  const vehicle = await new VehicleService().findVehicleByPlate(mock_vehicle2.plate)
+  expect(vehicle.nickname).toBe(mock_vehicle2.nickname)
+})
+
+test('findVehicleByPlate - Returns null if no Vehicle found', async () => {
+  const vehicle = await new VehicleService().findVehicleByPlate(mock_vehicle2.plate)
+  expect(vehicle).toBeNull()
+})

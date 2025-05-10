@@ -39,12 +39,13 @@ export class PermitService {
       [input.vehicle, data]
     )
 
-    if (rows.length == 0) throw new Error('Purchase unsuccessful')
-    return new Receipt(
-      rows[0].data.permitType,
-      rows[0].data.purchaseDate,
-      rows[0].data.activeDate,
-      rows[0].data.expiresDate,
-    )
+    // if (rows.length == 0) throw new Error('Purchase unsuccessful')
+    return {
+      permitType: rows[0].data.permitType,
+      purchaseDate: rows[0].data.purchaseDate,
+      activeDate: rows[0].data.activeDate,
+      expireDate: rows[0].data.expireDate,
+      price: rows[0].data.price,
+    }
   }
 }

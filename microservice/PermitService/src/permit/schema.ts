@@ -2,12 +2,6 @@ import { Field, ObjectType, InputType, ID } from 'type-graphql'
 
 @ObjectType()
 export class Receipt {
-  constructor(permitType: string, purchaseDate: string, activeDate: string, expiresDate: string) {
-    this.permitType = permitType
-    this.purchaseDate = purchaseDate
-    this.activeDate = activeDate
-    this.expireDate = expiresDate
-  }
 
   @Field(() => String)
   permitType!: string
@@ -20,6 +14,9 @@ export class Receipt {
 
   @Field(() => String)
   expireDate!: string
+
+  @Field(() => Number)
+  price!: number
 }
 
 @InputType()
@@ -31,7 +28,7 @@ export class PurchaseZonePermitInput {
   @Field(() => String)
   zone!: string
 
-  @Field(() => String)
+  @Field(() => Object)
   duration!: {minutes?: number, hours?: number}
 
   @Field(() => String)

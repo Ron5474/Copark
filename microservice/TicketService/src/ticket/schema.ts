@@ -38,6 +38,9 @@ export class NewTicket {
   @Field(() => Number)  
   fine!: number;
 
+  @Field(() => String)  
+  violation!: string;
+
   @Field(() => String, { nullable: true })  
   images?: string;
 }

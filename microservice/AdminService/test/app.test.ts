@@ -125,7 +125,8 @@ const response = await supertest(server)
     .send({ query })
     .expect(200)
 
-expect(response.body.errors).toBeDefined()
+expect(response.body.errors).toBeDefined();
+expect(response.body.errors[0].message).toBe("Unauthorized312")
 })
 
 test('GET /playground returns the GraphQL Playground HTML', async () => {

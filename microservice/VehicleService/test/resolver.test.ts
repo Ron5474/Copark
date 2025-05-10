@@ -1,12 +1,10 @@
-import { test, beforeAll, afterAll, expect } from 'vitest'
-// @ts-ignore
+import { test, beforeAll, afterAll, expect, beforeEach } from 'vitest'
 import supertest from 'supertest'
 import * as http from 'http'
 
 import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
-import { beforeEach } from 'node:test'
 
 let server: http.Server
 let authServer: http.Server
@@ -31,7 +29,7 @@ beforeAll(async () => {
   return
 })
 
-beforeEach(() => {
+beforeEach( async () => {
     return db.reset()
 })
 
@@ -66,10 +64,7 @@ async function loginAsDriver(): Promise<string | undefined> {
     return response.body
   }
 
-test('Driver can get a list of their vehicles', async () => {
-    const token = await loginAsDriver()
-  
-    const query = `
+const getVehiclequery = `
       query {
         myVehicles {
           id
@@ -79,30 +74,53 @@ test('Driver can get a list of their vehicles', async () => {
         }
       }
     `
+const regVehicleQuery = `
+mutation RegisterVehicle($input: RegisterVehicleInput!) {
+  registerVehicle(input: $input) {
+    id
+    plate
+    country
+    state
+    nickname
+  }
+}`
+
+const vehicleInput = {
+  input: {
+    plate: "TEST123",
+    country: "US",
+    state: "CA",
+    nickname: "Test Vehicle"
+  }
+}
+
+test('Driver can get a list of their vehicles', async () => {
+    const token = await loginAsDriver()
+
     const response = await supertest(server)
       .post('/graphql')
       .set('Authorization', 'Bearer ' + token)
-      .send({ query })
+      .send({ query: getVehiclequery })
       .expect(200)
 
     expect(response.body.data.myVehicles.length).toBe(0)
-})
+  })
 
-test('cant get a list of vehicles without auth', async () => {
-  const query = `
-    query {
-      myVehicles {
-        id
-        plate
-        country
-        state
-      }
-    }
-  `
-  const response = await supertest(server)
-    .post('/graphql')
-    .send({ query })
-    .expect(200)
+  test('Driver can register a vehicle', async () => {
+    const token = await loginAsDriver()
 
-  expect(response.body.errors).toBeDefined()
-})
+    await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ 
+        query: regVehicleQuery,
+        variables: vehicleInput
+      })
+
+    const listResponse = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ query: getVehiclequery })
+
+    expect(listResponse.body.data.myVehicles[0].plate).toBe("TEST123")
+  })

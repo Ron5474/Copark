@@ -27,11 +27,11 @@ export class VehicleService {
   }
 
   public async getMyVehicles(userId: string): Promise<Vehicle[]> {
-    const userDecrypted = await this.decrypt(userId)
+    // const userDecrypted = await this.decrypt(userId)
 
     const result = await pool.query(
       `SELECT id, data FROM vehicle WHERE driver = $1`,
-      [userDecrypted]
+      [userId]
     )
 
     if (result.rows.length == 0) return []
@@ -67,11 +67,10 @@ export class VehicleService {
   }
 
   public async registerVehicle(userId: string, input: RegisterVehicleInput): Promise<Vehicle> {
-    const userDecrypted = await this.decrypt(userId)
-    
+    // const userDecrypted = await this.decrypt(userId)
     const result = await pool.query(
       `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
-      [userDecrypted, input]
+      [userId, input]
     )
 
     return {
@@ -84,11 +83,11 @@ export class VehicleService {
     const { id, ...patch } = input
 
     const vehicleID = await this.decrypt(id)
-    const userIdDecrypted = await this.decrypt(userId)
+    // const userIdDecrypted = await this.decrypt(userId)
 
     const existing = await pool.query(
       `SELECT data FROM vehicle WHERE id = $1 AND driver = $2`,
-      [vehicleID, userIdDecrypted]
+      [vehicleID, userId]
     )
 
     if (existing.rowCount === 0) throw new Error('Vehicle not found or not owned by user')

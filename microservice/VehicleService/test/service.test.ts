@@ -89,3 +89,29 @@ test('findVehicleByPlate - Returns null if no Vehicle found', async () => {
   const vehicle = await new VehicleService().findVehicleByPlate(mock_vehicle2.plate)
   expect(vehicle).toBeNull()
 })
+
+test('getVehicleById - Returns Correct Vehicle', async () => {
+  const vehicleService = new VehicleService();
+
+  // Register a vehicle to test retrieval
+  const registeredVehicle = await vehicleService.registerVehicle(mock_driver1_ID, mock_vehicle1);
+
+  // Retrieve the vehicle by its ID
+  const retrievedVehicle = await vehicleService.getVehicleById({ id: registeredVehicle.id });
+
+  // Validate the retrieved vehicle matches the registered vehicle
+  expect(retrievedVehicle).not.toBeNull();
+  expect(retrievedVehicle?.plate).toBe(mock_vehicle1.plate);
+  expect(retrievedVehicle?.country).toBe(mock_vehicle1.country);
+  expect(retrievedVehicle?.state).toBe(mock_vehicle1.state);
+});
+
+test('getVehicleById - Returns null if Vehicle not found', async () => {
+  const vehicleService = new VehicleService();
+
+  // Attempt to retrieve a vehicle with a non-existent ID
+  const retrievedVehicle = await vehicleService.getVehicleById({ id: 'non-existent-id' });
+
+  // Validate that the result is null
+  expect(retrievedVehicle).toBeNull();
+});

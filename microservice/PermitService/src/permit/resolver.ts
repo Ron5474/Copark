@@ -16,7 +16,7 @@ export class PermitResolver {
   @Authorized('driver')
   @Mutation(() => Receipt)
   async purchaseZonePermit(
-    @Arg("input") input: PurchaseZoneInput,
+    @Arg("input", () => PurchaseZoneInput) input: PurchaseZoneInput,
     @Ctx() request: Request
   ): Promise<Receipt> {
     const userId = request.user?.id
@@ -36,13 +36,45 @@ export class PermitResolver {
   }
 
   @Authorized('enforcement')
-  @Mutation(() => IsValid)
+  @Query(() => IsValid)
   async isValidZonePermit(
-    @Arg("input", ) input: IsValidPermitInput,
+    @Arg("input", () => IsValidPermitInput) input: IsValidPermitInput,
     @Ctx() request: Request
   ): Promise<IsValid> {
     const userId = request.user?.id
     if (!userId) throw new Error('Unauthorized')
-    return await service.isValidZonePermit(input)
+    
+    let vehicleId = input.vehicle
+
+    const vehicleQuery = `
+      query FindVehicleByPlate($plate: String!) {
+        findVehicleByPlate(plate: $plate) {
+          id
+        }
+      }
+    `
+    const vehicleRes = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${request.headers.authorization}`,
+      },
+      body: JSON.stringify({
+        query: vehicleQuery,
+        variables: { plate: vehicleId },
+      }),
+    })
+
+    const vehicleJson = await vehicleRes.json()
+    const found = vehicleJson?.data?.findVehicleByPlate?.id
+
+    if (!found) {
+      return {isValid: false, type: 'Vehicle Not Found', zone: input.zone}
+    }
+
+    vehicleId = found
+
+
+    return await service.isValidZonePermit({vehicle: vehicleId, zone: input.zone})
   }
 }

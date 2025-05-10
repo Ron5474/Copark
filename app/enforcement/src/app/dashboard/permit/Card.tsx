@@ -27,7 +27,8 @@ export default function PermitCard() {
   }
 
   const isValid = permitResult?.isValid
-  const type = permitResult?.type ?? 'N/A'
+  // const type = permitResult?.type ?? 'N/A'
+  const zone = permitResult?.zone
 
   return (
     <Paper sx={{ p: 2, bgcolor: '#d3ffff', borderRadius: 2, mb: 2 }}>
@@ -36,13 +37,14 @@ export default function PermitCard() {
           <Typography fontWeight="bold" color="green">Valid Permit</Typography>
           <Typography>Valid parking permit found.</Typography>
           <Typography>Plate Number: {plate}</Typography>
-          <Typography>Permit type: {type}</Typography>
+          <Typography>Zone: {zone}</Typography>
         </>
       ) : (
         <>
           <Typography fontWeight="bold" color="red">Invalid Permit</Typography>
           <Typography>No valid permit found for this vehicle.</Typography>
           <Typography>Plate Number: {plate}</Typography>
+          <Typography>Zone: {zone}</Typography>
         </>
       )}
 

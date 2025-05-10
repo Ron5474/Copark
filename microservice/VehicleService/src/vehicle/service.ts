@@ -117,7 +117,7 @@ export class VehicleService {
 
     const row = result.rows[0]
     return {
-      id: await this.encrypt(row.id),
+      id: row.id,
       plate: row.data.plate,
       country: row.data.country,
       state: row.data.state,

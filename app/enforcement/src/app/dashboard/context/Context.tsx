@@ -19,6 +19,8 @@ type EnforcementContextType = {
   setIsIssuingViolation: (val: boolean) => void
   permitResult: PermitResult
   setPermitResult: (val: PermitResult) => void
+  zone: string
+  setZone: (zone: string) => void
 }
 
 const EnforcementContext = createContext<EnforcementContextType | undefined>(undefined)
@@ -37,6 +39,7 @@ export function EnforcementProvider({
   const [isValidated, setIsValidated] = useState(false)
   const [isIssuingViolation, setIsIssuingViolation] = useState(false)
   const [permitResult, setPermitResult] = useState<PermitResult>(null)
+  const [zone, setZone] = useState<string>('')
 
   return (
     <EnforcementContext.Provider
@@ -51,6 +54,8 @@ export function EnforcementProvider({
         setIsIssuingViolation,
         permitResult,
         setPermitResult,
+        zone,
+        setZone,
       }}
     >
       {children}

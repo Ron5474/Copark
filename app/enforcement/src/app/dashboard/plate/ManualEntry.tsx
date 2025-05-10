@@ -7,6 +7,7 @@ import {
   InputAdornment,
   IconButton,
   Typography,
+  TextField,
 } from '@mui/material'
 import { useState } from 'react'
 import SearchIcon from '@mui/icons-material/Search'
@@ -28,6 +29,8 @@ export default function ManualEntryCard({
     setPlate,
     setIsValidated,
     setPermitResult,
+    zone,
+    setZone,
   } = useEnforcement()
 
   const [internalError, setInternalError] = useState(false)
@@ -36,7 +39,9 @@ export default function ManualEntryCard({
 
   const handleSearch = async () => {
     const trimmed = manualInput.trim()
-    if (!trimmed) {
+    const trimmedZone = zone.trim()
+
+    if (!trimmed || !trimmedZone) {
       setError(true)
       return
     }
@@ -44,43 +49,54 @@ export default function ManualEntryCard({
     setError(false)
 
     try {
-      const result = await checkPermit(trimmed.toUpperCase())
+      const result = await checkPermit(trimmed.toUpperCase(), trimmedZone.toUpperCase())
       setPlate(trimmed.toUpperCase())
       setPermitResult(result)
       setIsValidated(true)
     } catch (err) {
       console.error('Permit check failed:', err)
-      setPermitResult({ isValid: false, type: 'N/A', zone: 'N/A' })
+      setPermitResult({ isValid: false, type: 'N/A', zone: trimmedZone })
       setIsValidated(true)
     }
   }
 
   return (
-    <FormControl fullWidth variant="standard">
-      <InputLabel htmlFor="plate">License Plate</InputLabel>
-      <Input
-        id="plate"
-        value={manualInput}
-        onChange={(e) => {
-          setManualInput(e.target.value)
-          setError(false)
-        }}
-        endAdornment={
-          showSearchButton && (
-            <InputAdornment position="end">
-              <IconButton onClick={handleSearch} aria-label="Search">
-                <SearchIcon />
-              </IconButton>
-            </InputAdornment>
-          )
-        }
-        sx={{ textAlign: 'center' }}
+    <>
+      <FormControl fullWidth variant="standard">
+        <InputLabel htmlFor="plate">License Plate</InputLabel>
+        <Input
+          id="plate"
+          value={manualInput}
+          onChange={(e) => {
+            setManualInput(e.target.value)
+            setError(false)
+          }}
+          endAdornment={
+            showSearchButton && (
+              <InputAdornment position="end">
+                <IconButton onClick={handleSearch} aria-label="Search">
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            )
+          }
+          sx={{ textAlign: 'center' }}
+        />
+      </FormControl>
+
+      <TextField
+        label="Zone"
+        variant="standard"
+        fullWidth
+        sx={{ mt: 2 }}
+        value={zone}
+        onChange={(e) => setZone(e.target.value)}
       />
       {error && (
-        <Typography color="error" variant="caption">
-          Please enter a license plate
-        </Typography>
+          <Typography color="error" variant="caption">
+            Please enter a license plate and zone
+          </Typography>
       )}
-    </FormControl>
+    </>
   )
 }

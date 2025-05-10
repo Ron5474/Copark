@@ -45,7 +45,7 @@ export default function EnforcementLoginPage() {
     <Container maxWidth="xs">
       <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
       <Image
-        src="/copark-enforce-logo.png"
+        src="/enforcement/copark-enforce-logo.png"
         alt="CoPark Enforce"
         width={80}
         height={80}

@@ -72,3 +72,10 @@ test('updateVehicle - updates vehicle table correctly', async () => {
   expect(vehicles[0].state).toBe('Texas')
 })
 
+test('updateVehicle - Throws error because no vehicle exists', async () => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(new VehicleService().updateVehicle(mock_driver1_ID, {id: mock_driver2_ID, ...update_vehicle1}))
+  .rejects.toThrow('Vehicle not found or not owned by user')
+})
+

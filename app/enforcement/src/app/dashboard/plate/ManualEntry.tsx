@@ -9,9 +9,9 @@ import {
   Typography,
 } from '@mui/material'
 import { useState } from 'react'
-
 import SearchIcon from '@mui/icons-material/Search'
 import { useEnforcement } from '../context/Context'
+import { checkPermit } from '../permit/actions'
 
 export default function ManualEntryCard({
   showSearchButton = true,
@@ -27,22 +27,32 @@ export default function ManualEntryCard({
     setManualInput,
     setPlate,
     setIsValidated,
+    setPermitResult,
   } = useEnforcement()
 
   const [internalError, setInternalError] = useState(false)
-
   const error = inputError ?? internalError
   const setError = setInputError ?? setInternalError
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     const trimmed = manualInput.trim()
     if (!trimmed) {
       setError(true)
       return
     }
+
     setError(false)
-    setPlate(trimmed.toUpperCase())
-    setIsValidated(true)
+
+    try {
+      const result = await checkPermit(trimmed.toUpperCase())
+      setPlate(trimmed.toUpperCase())
+      setPermitResult(result)
+      setIsValidated(true)
+    } catch (err) {
+      console.error('Permit check failed:', err)
+      setPermitResult({ isValid: false, type: 'N/A', zone: 'N/A' })
+      setIsValidated(true)
+    }
   }
 
   return (
@@ -58,9 +68,9 @@ export default function ManualEntryCard({
         endAdornment={
           showSearchButton && (
             <InputAdornment position="end">
-                <IconButton onClick={handleSearch} aria-label="Search">
-                  <SearchIcon />
-                </IconButton>
+              <IconButton onClick={handleSearch} aria-label="Search">
+                <SearchIcon />
+              </IconButton>
             </InputAdornment>
           )
         }
@@ -71,7 +81,6 @@ export default function ManualEntryCard({
           Please enter a license plate
         </Typography>
       )}
-
     </FormControl>
   )
 }

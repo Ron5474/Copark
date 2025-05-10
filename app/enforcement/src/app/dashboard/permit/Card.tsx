@@ -9,16 +9,15 @@ export default function PermitCard() {
     setPlate,
     setManualInput,
     setIsValidated,
-    setIsIssuingViolation 
+    setIsIssuingViolation,
+    permitResult,
+    setPermitResult,
   } = useEnforcement()
-
-   // Replace this with real validation logic
-  const valid = plate?.toUpperCase() !== 'XYZ'
-  const type = 'Residential'
 
   const handleNewScan = () => {
     setPlate(null)
     setManualInput('')
+    setPermitResult(null)
     setIsValidated(false)
   }
 
@@ -27,26 +26,33 @@ export default function PermitCard() {
     setIsIssuingViolation(true)
   }
 
+  const isValid = permitResult?.isValid
+  const type = permitResult?.type ?? 'N/A'
+
   return (
     <Paper sx={{ p: 2, bgcolor: '#d3ffff', borderRadius: 2, mb: 2 }}>
-      {valid ? (
+      {isValid ? (
         <>
           <Typography fontWeight="bold" color="green">Valid Permit</Typography>
           <Typography>Valid parking permit found.</Typography>
-          <Typography>Plate Number : {plate}</Typography>
+          <Typography>Plate Number: {plate}</Typography>
           <Typography>Permit type: {type}</Typography>
         </>
       ) : (
         <>
           <Typography fontWeight="bold" color="red">Invalid Permit</Typography>
           <Typography>No valid permit found for this vehicle.</Typography>
-          <Typography>Plate Number : {plate}</Typography>
+          <Typography>Plate Number: {plate}</Typography>
         </>
       )}
 
       <Stack direction="row" spacing={2} mt={2}>
-        <Button fullWidth sx={{ bgcolor: '#7fc9c9' }} onClick={handleNewScan} aria-label="New Scan" >New Scan</Button>
-        <Button fullWidth sx={{ bgcolor: '#7fc9c9' }} onClick={handleIssueCitation}>Issue Citation</Button>
+        <Button fullWidth sx={{ bgcolor: '#7fc9c9' }} onClick={handleNewScan} aria-label="New Scan">
+          New Scan
+        </Button>
+        <Button fullWidth sx={{ bgcolor: '#7fc9c9' }} onClick={handleIssueCitation}>
+          Issue Citation
+        </Button>
       </Stack>
     </Paper>
   )

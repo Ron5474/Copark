@@ -20,20 +20,45 @@ export class Receipt {
 }
 
 @InputType()
-export class PurchaseZoneInput {
+export class DurationInput {
+  @Field(() => Number, { nullable: true })
+  minutes?: number
 
+  @Field(() => Number, { nullable: true })
+  hours?: number
+}
+
+@InputType()
+export class PurchaseZoneInput {
   @Field(() => ID)
   vehicle!: string
 
   @Field(() => String)
   zone!: string
 
-  @Field(() => Object)
-  duration!: {minutes?: number, hours?: number}
+  @Field(() => DurationInput)
+  duration!: DurationInput
 
   @Field(() => String)
   paymentMethod!: string
 }
+
+
+// @InputType()
+// export class PurchaseZoneInput {
+
+//   @Field(() => ID)
+//   vehicle!: string
+
+//   @Field(() => String)
+//   zone!: string
+
+//   @Field(() => Object)
+//   duration!: {minutes?: number, hours?: number}
+
+//   @Field(() => String)
+//   paymentMethod!: string
+// }
 
 @InputType()
 export class IsValidInput {
@@ -53,7 +78,8 @@ export class IsValidPermitInput {
 }
 
 
-@InputType()
+// @InputType()
+@ObjectType()
 export class IsValid {
 
   @Field(() => Boolean)

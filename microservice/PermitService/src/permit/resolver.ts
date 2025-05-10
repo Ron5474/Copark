@@ -1,4 +1,4 @@
-import { Resolver, /*Query,*/ Mutation, Arg, Ctx, Authorized } from 'type-graphql'
+import { Resolver, Query,  Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { Request } from 'express'
 import { Receipt, PurchaseZoneInput, IsValidInput, IsValid, IsValidPermitInput } from './schema'
 import { PermitService } from './service'
@@ -7,6 +7,11 @@ const service = new PermitService()
 
 @Resolver()
 export class PermitResolver {
+
+  @Query(() => String)
+  permitServiceStatus(): string {
+    return "Permit service is running"
+  }
   
   @Authorized('driver')
   @Mutation(() => Receipt)
@@ -22,7 +27,7 @@ export class PermitResolver {
   @Authorized('enforcement')
   @Mutation(() => IsValid)
   async isValidPermit(
-    @Arg("input") input: IsValidInput,
+    @Arg("input", () => IsValidInput) input: IsValidInput,
     @Ctx() request: Request
   ): Promise<IsValid> {
     const userId = request.user?.id
@@ -33,7 +38,7 @@ export class PermitResolver {
   @Authorized('enforcement')
   @Mutation(() => IsValid)
   async isValidZonePermit(
-    @Arg("input") input: IsValidPermitInput,
+    @Arg("input", ) input: IsValidPermitInput,
     @Ctx() request: Request
   ): Promise<IsValid> {
     const userId = request.user?.id

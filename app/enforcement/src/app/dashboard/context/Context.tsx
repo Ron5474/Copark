@@ -2,6 +2,12 @@
 
 import React, { createContext, useContext, useState } from 'react'
 
+type PermitResult = {
+  isValid: boolean
+  type: string
+  zone: string
+} | null
+
 type EnforcementContextType = {
   plate: string | null
   setPlate: (plate: string | null) => void
@@ -11,6 +17,8 @@ type EnforcementContextType = {
   setIsValidated: (val: boolean) => void
   isIssuingViolation: boolean
   setIsIssuingViolation: (val: boolean) => void
+  permitResult: PermitResult
+  setPermitResult: (val: PermitResult) => void
 }
 
 const EnforcementContext = createContext<EnforcementContextType | undefined>(undefined)
@@ -28,6 +36,7 @@ export function EnforcementProvider({
   const [manualInput, setManualInput] = useState(initialManualInput)
   const [isValidated, setIsValidated] = useState(false)
   const [isIssuingViolation, setIsIssuingViolation] = useState(false)
+  const [permitResult, setPermitResult] = useState<PermitResult>(null)
 
   return (
     <EnforcementContext.Provider
@@ -40,6 +49,8 @@ export function EnforcementProvider({
         setIsValidated,
         isIssuingViolation,
         setIsIssuingViolation,
+        permitResult,
+        setPermitResult,
       }}
     >
       {children}

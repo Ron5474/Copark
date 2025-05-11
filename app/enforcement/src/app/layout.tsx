@@ -2,7 +2,7 @@ export const metadata = {
   title: 'CoPark Enforcement',
   icons: {
     icon: [
-      { url: '/favicon.ico' },
+      { url: '/assets/favicon.ico' },
     ]
   }
 }

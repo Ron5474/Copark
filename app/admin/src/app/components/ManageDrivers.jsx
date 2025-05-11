@@ -45,7 +45,7 @@ export default function ManageDrivers({ onNavigate }) {
         borderBottom: `2px solid ${theme.palette.primary.main}`,
         pb: 2
       }}>
-        <img src="/admin_logo.png" alt="CoPark Admin" style={{ height: 60, marginRight: 16 }} />
+        <img src="/assets/admin_logo.png" alt="CoPark Admin" style={{ height: 60, marginRight: 16 }} />
         <Typography
           variant="h4"
           sx={{

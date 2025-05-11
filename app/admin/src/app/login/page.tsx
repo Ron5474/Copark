@@ -60,7 +60,7 @@ export default function Page() {
         >
           <Box sx={{ mb: 3, width: '100%', display: 'flex', justifyContent: 'center' }}>
             <Image
-              src="/admin_logo.png"
+              src="/assets/admin_logo.png"
               alt="Admin Logo"
               width={200}
               height={0}

@@ -1,4 +1,4 @@
-import { Ticket, NewTicket } from "./schema";
+import { Ticket, NewTicket, ModifyTicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -68,7 +68,6 @@ export class TicketService {
     const vehicleId = await this.decrypt(newTicket.vehicle);
 
     //TODO: Check if the enforcerId and vehicleId are valid, will need services in enforcer and vehicle microservices
-    
 
     const insertQuery = `
         INSERT INTO ticket (vehicle, enforcer, data)
@@ -115,4 +114,40 @@ export class TicketService {
 
     return [ticket];
   }
+
+  public async modifyTicket(input: ModifyTicketInput): Promise<boolean> {
+    const { id, ...updates } = input;
+
+    if (!id) {
+      throw new Error("Missing ticket ID.");
+    }
+
+    // Filter out undefined fields
+    const entries = Object.entries(updates).filter(
+      ([_, value]) => value !== undefined
+    );
+
+    if (entries.length === 0) {
+      throw new Error("No fields provided to update.");
+    }
+
+    const setFragments = entries.map(([key], idx) =>
+      `data = jsonb_set(data, '{${key}}', $${idx + 2}::jsonb, true)`
+    );
+
+    const values = entries.map(([_, val]) => JSON.stringify(val));
+
+    const query = {
+      text: `
+        UPDATE ticket
+        SET ${setFragments.join(', ')}
+        WHERE id = $1
+      `,
+      values: [id, ...values]
+    };
+
+    const result = await pool.query(query);
+  return (result.rowCount ?? 0) > 0;
+}
+
 }

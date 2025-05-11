@@ -3,18 +3,18 @@
  */
 
 import { beforeAll, afterAll, test, expect } from 'vitest';
-import { reset, shutdown } from './db';
+import db from './db';
 import { TicketService } from '../src/ticket/service';
 import { NewTicket, TicketInput } from '../src/ticket/schema';
 
 const ticketService = new TicketService();
 
 beforeAll(async () => {
-  await reset();
+  await db.reset();
 });
 
 afterAll(async () => {
-  await shutdown();
+  await db.shutdown();
 });
 
 test('getTickets should return a list of enforcers', async () => {

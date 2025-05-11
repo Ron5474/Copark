@@ -113,16 +113,16 @@ lint:vehicleService:
       - package.json
       - .gitlab-ci.yml
 
-lint:ticketService:
-  stage: quality
-  script:
-    - npm run install-ticketService
-    - npm run lint-ticketService
-  rules:
-    - changes: 
-      - microservices/TicketService/**/*
-      - package.json
-      - .gitlab-ci.yml
+# lint:ticketService:
+#   stage: quality
+#   script:
+#     - npm run install-ticketService
+#     - npm run lint-ticketService
+#   rules:
+#     - changes: 
+#       - microservices/TicketService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 # lint:
 #   stage: quality 

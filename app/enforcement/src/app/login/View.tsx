@@ -101,6 +101,7 @@ export default function EnforcementLoginPage() {
           onClick={handleLogin}
           disabled={loading}
           sx={{ backgroundColor: '#b2f2bb', color: 'black', fontWeight: 'bold' }}
+          aria-label='login-button'
         >
           {loading ? 'Logging in...' : 'Login'}
         </Button>

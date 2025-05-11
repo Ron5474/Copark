@@ -32,10 +32,49 @@ export class MyPermits {
   expired!: Permit[]
 }
 
+@ObjectType()
+export class Duration {
+  @Field(() => Number)
+  minutes?: number
 
+  @Field(() => Number)
+  hours?: number
+}
+
+@ObjectType()
+export class ZoneDetails {
+
+  @Field(() => Number)
+  hourly!: number
+
+  @Field(() => Duration)
+  maxDuration!: Duration
+
+  @Field(() => String)
+  openTime!: string
+
+  @Field(() => String)
+  closeTime!: string
+}
 
 @ObjectType()
 export class Receipt {
+
+  @Field(() => Number)
+  tax!: number
+
+  @Field(() => Number)
+  service!: number
+
+  @Field(() => Number)
+  subTotal!: number
+
+  @Field(() => Number)
+  total!: number
+}
+
+@ObjectType()
+export class Confirmation {
 
   @Field(() => String)
   type!: string
@@ -52,9 +91,14 @@ export class Receipt {
   @Field(() => String)
   expireDate!: string
 
-  @Field(() => Number)
-  price!: number
+  @Field(() => Receipt)
+  receipt!: Receipt
+
+  @Field(() => String)
+  paymentMethod!: string
 }
+
+
 
 @InputType()
 export class DurationInput {
@@ -79,30 +123,6 @@ export class PurchaseZoneInput {
   @Field(() => String)
   paymentMethod!: string
 }
-
-
-// @InputType()
-// export class PurchaseZoneInput {
-
-//   @Field(() => ID)
-//   vehicle!: string
-
-//   @Field(() => String)
-//   zone!: string
-
-//   @Field(() => Object)
-//   duration!: {minutes?: number, hours?: number}
-
-//   @Field(() => String)
-//   paymentMethod!: string
-// }
-
-// @InputType()
-// export class IsValidInput {
-
-//   @Field(() => ID)
-//   vehicle!: string
-// }
 
 @InputType()
 export class IsValidPermitInput {

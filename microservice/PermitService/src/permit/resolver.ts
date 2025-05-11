@@ -1,6 +1,6 @@
 import { Resolver, Query,  Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { Request } from 'express'
-import { Receipt, PurchaseZoneInput, IsValid, IsValidPermitInput, IsValidPolice, MyPermits } from './schema'
+import { Confirmation, PurchaseZoneInput, IsValid, IsValidPermitInput, IsValidPolice, MyPermits } from './schema'
 import { PermitService } from './service'
 
 const service = new PermitService()
@@ -14,11 +14,11 @@ export class PermitResolver {
   }
   
   @Authorized('driver')
-  @Mutation(() => Receipt)
+  @Mutation(() => Confirmation)
   async purchaseZonePermit(
     @Arg("input", () => PurchaseZoneInput) input: PurchaseZoneInput,
     @Ctx() request: Request
-  ): Promise<Receipt> {
+  ): Promise<Confirmation> {
     const userId = request.user?.id
     if (!userId) throw new Error('Unauthorized')
     return await service.purchaseMyZonePermit(input)
@@ -155,4 +155,16 @@ export class PermitResolver {
 
     return await service.getMyPermits(input)
   }
+
+  // @Authorized('driver')
+  // @Query(() => Number)
+  // async zoneQuote(
+  //   @Arg("input", () => PurchaseZoneInput) input: PurchaseZoneInput,
+  //   @Ctx() request: Request
+  // ): Promise<number> {
+  //   const userId = request.user?.id
+  //   if (!userId) throw new Error('Unauthorized')
+
+  //   return await service.getMyPermits(input)
+  // }
 }

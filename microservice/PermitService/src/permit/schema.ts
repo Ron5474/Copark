@@ -1,10 +1,44 @@
 import { Field, ObjectType, InputType, ID } from 'type-graphql'
 
 @ObjectType()
+export class Permit {
+
+  @Field(() => String)
+  vehicle!: string
+
+  @Field(() => String)
+  type!: string
+
+  @Field(() => String)
+  zone!: string
+
+  @Field(() => String)
+  activeDate!: string
+
+  @Field(() => String)
+  expireDate!: string
+}
+
+// @ObjectType()
+// export class MyPermits {
+
+//   @Field(() => [Permit])
+//   active!: Permit[]
+
+//   @Field(() => [Permit])
+//   expired!: Permit[]
+// }
+
+
+
+@ObjectType()
 export class Receipt {
 
   @Field(() => String)
   type!: string
+
+  @Field(() => String)
+  zone!: string
 
   @Field(() => String)
   purchaseDate!: string
@@ -60,12 +94,12 @@ export class PurchaseZoneInput {
 //   paymentMethod!: string
 // }
 
-@InputType()
-export class IsValidInput {
+// @InputType()
+// export class IsValidInput {
 
-  @Field(() => ID)
-  vehicle!: string
-}
+//   @Field(() => ID)
+//   vehicle!: string
+// }
 
 @InputType()
 export class IsValidPermitInput {
@@ -77,8 +111,6 @@ export class IsValidPermitInput {
   zone!: string
 }
 
-
-// @InputType()
 @ObjectType()
 export class IsValid {
 
@@ -90,4 +122,11 @@ export class IsValid {
 
   @Field(() => String)
   zone!: string
+}
+
+@ObjectType()
+export class IsValidPolice {
+
+  @Field(() => Boolean)
+  isValid!: boolean
 }

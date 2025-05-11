@@ -225,6 +225,30 @@ build:adminService:
 
 test:auth:
   stage: test
+  image: node:lts
+  services:
+    - docker:dind
+  variables:
+    PIPELINE: true
+    POSTGRES_HOST: ${POSTGRES_HOST}
+    POSTGRES_PORT: ${POSTGRES_PORT}
+    POSTGRES_DB: ${POSTGRES_DB}
+    POSTGRES_USER: ${POSTGRES_USER}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # MICROSERVICE_INTERNAL_SECRET: not-a-very-secret-secret
+    NEXT_PUBLIC_GOOGLE_ID: ${NEXT_PUBLIC_GOOGLE_ID}
+    NEXT_PUBLIC_GOOGLE_SECRET: ${NEXT_PUBLIC_GOOGLE_SECRET}
+    NEXT_PUBLIC_FACEBOOK_CLIENT_ID: ${NEXT_PUBLIC_FACEBOOK_CLIENT_ID}
+    NEXT_PUBLIC_FACEBOOK_SECRET: ${NEXT_PUBLIC_FACEBOOK_SECRET}
+    NEXT_PUBLIC_GITHUB_ID: ${NEXT_PUBLIC_GITHUB_ID}
+    NEXT_PUBLIC_GITHUB_SECRET: ${NEXT_PUBLIC_GITHUB_SECRET}
+    NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "/certs/client"
+  before_script:
+    - apt-get update && apt-get install -y docker.io
   script:
     - npm run compose && npm run test-auth
   rules:

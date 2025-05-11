@@ -31,17 +31,19 @@ export function EnforcementProvider({
   children,
   initialPlate = null,
   initialManualInput = '',
+  initialZone = '',
 }: {
   children: React.ReactNode
   initialPlate?: string | null
   initialManualInput?: string
+  initialZone?: string
 }) {
   const [plate, setPlate] = useState<string | null>(initialPlate)
   const [manualInput, setManualInput] = useState(initialManualInput)
   const [isValidated, setIsValidated] = useState(false)
   const [isIssuingViolation, setIsIssuingViolation] = useState(false)
   const [permitResult, setPermitResult] = useState<PermitResult>(null)
-  const [zone, setZone] = useState<string>('')
+  const [zone, setZone] = useState<string>(initialZone)
   const [officerName, setOfficerName] = useState(() => {
     if (typeof window !== 'undefined') {
       return sessionStorage.getItem('name') || ''

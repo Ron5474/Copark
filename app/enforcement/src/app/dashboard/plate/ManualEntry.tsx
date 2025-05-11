@@ -16,12 +16,8 @@ import { checkPermit } from '../permit/actions'
 
 export default function ManualEntryCard({
   showSearchButton = true,
-  inputError,
-  setInputError,
 }: {
   showSearchButton?: boolean
-  inputError?: boolean
-  setInputError?: (val: boolean) => void
 }) {
   const {
     manualInput,
@@ -33,20 +29,18 @@ export default function ManualEntryCard({
     setZone,
   } = useEnforcement()
 
-  const [internalError, setInternalError] = useState(false)
-  const error = inputError ?? internalError
-  const setError = setInputError ?? setInternalError
+  const [inputError, setInputError] = useState(false)
 
   const handleSearch = async () => {
     const trimmed = manualInput.trim()
     const trimmedZone = zone.trim()
 
     if (!trimmed || !trimmedZone) {
-      setError(true)
+      setInputError(true)
       return
     }
 
-    setError(false)
+    setInputError(false)
 
     try {
       const result = await checkPermit(trimmed.toUpperCase(), trimmedZone.toUpperCase())
@@ -69,7 +63,7 @@ export default function ManualEntryCard({
           value={manualInput}
           onChange={(e) => {
             setManualInput(e.target.value)
-            setError(false)
+            setInputError(false)
           }}
           endAdornment={
             showSearchButton && (
@@ -92,7 +86,7 @@ export default function ManualEntryCard({
         value={zone}
         onChange={(e) => setZone(e.target.value)}
       />
-      {error && (
+      {inputError && (
           <Typography color="error" variant="caption">
             Please enter a license plate and zone
           </Typography>

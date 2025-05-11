@@ -12,6 +12,7 @@ export default function PermitCard() {
     setIsIssuingViolation,
     permitResult,
     setPermitResult,
+    zone,
   } = useEnforcement()
 
   const handleNewScan = () => {
@@ -28,7 +29,7 @@ export default function PermitCard() {
 
   const isValid = permitResult?.isValid
   // const type = permitResult?.type ?? 'N/A'
-  const zone = permitResult?.zone
+  // const zone = permitResult?.zone
 
   return (
     <Paper sx={{ p: 2, bgcolor: '#d3ffff', borderRadius: 2, mb: 2 }}>

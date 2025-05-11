@@ -52,7 +52,7 @@ it('can type in the plate input', async () => {
   expect((input as HTMLInputElement).value).toBe('helloworld')
 })
 
-it('sets plate from manual input when searching', async () => {
+it('Zone and plate are required', async () => {
   render(
       <EnforcementProvider>
         <EnforcementDashboardView />
@@ -60,12 +60,12 @@ it('sets plate from manual input when searching', async () => {
     )
   const user = userEvent.setup()
   const input = screen.getByLabelText('License Plate')
-  const searchButton = screen.getByRole('button', { name: /Search/i })
+  const searchButton = screen.getByLabelText('Search')
 
   await user.type(input, 'TEST123')
   await user.click(searchButton)
 
-  expect(await screen.getByText('Plate Number : TEST123')).toBeDefined()
+  expect(await screen.getByText('Please enter a license plate and zone')).toBeDefined()
 })
 
 // it('starts a new scan use types a new license plate', async () => {

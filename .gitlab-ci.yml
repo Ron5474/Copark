@@ -250,7 +250,7 @@ test:auth:
   before_script:
     - apt-get update && apt-get install -y docker.io
   script:
-    - docker compose up && npm run test-auth
+    - docker-compose up --build && npm run test-auth
   rules:
     - changes:
         - microservice/AuthService/**/*

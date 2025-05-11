@@ -248,7 +248,7 @@ test:auth:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_DRIVER: overlay2
   before_script:
-    - apt-get update && apt-get install -y docker.io
+    - apt-get update && apt-get install -y docker.io && apt-get install docker-compose-v2
     - docker --version
   script:
     - docker-compose up --build && npm run test-auth

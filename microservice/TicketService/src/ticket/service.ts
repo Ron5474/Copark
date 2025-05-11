@@ -63,20 +63,24 @@ export class TicketService {
     return tickets;
   }
 
-  public async createTicket(newTicket: NewTicket): Promise<Ticket[]> {
+  public async createTicket(newTicket: NewTicket): Promise<Ticket> {
+
+    // console.log(newTicket);
     const enforcerId = await this.decrypt(newTicket.enforcer);
     const vehicleId = await this.decrypt(newTicket.vehicle);
-
+    if (!enforcerId || !vehicleId) {
+      throw new Error("Invalid enforcer or vehicle ID.");
+    }
     //TODO: Check if the enforcerId and vehicleId are valid, will need services in enforcer and vehicle microservices
 
     const insertQuery = `
         INSERT INTO ticket (vehicle, enforcer, data)
         VALUES ($1, $2, jsonb_build_object(
-            'issuedDate', $3,
-            'violation', $4,
-            'fine', $5,
-            'ticketStatus', $6,
-            'images', $7
+            'issuedDate', $3::TIMESTAMP,
+            'violation', $4::TEXT,
+            'fine', $5::NUMERIC,
+            'ticketStatus', $6::TEXT,
+            'images', $7::TEXT
         ))
         RETURNING id, vehicle, enforcer, 
                   data->>'issuedDate' AS issueddate,
@@ -112,7 +116,8 @@ export class TicketService {
         images: row.images,
     };
 
-    return [ticket];
+    // console.log(ticket.id);
+    return ticket;
   }
 
   public async modifyTicket(input: ModifyTicketInput): Promise<Ticket | null> {

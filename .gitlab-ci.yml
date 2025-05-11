@@ -225,10 +225,10 @@ lint:enforcement:
 
 test:auth:
   stage: test
-  image: node:lts
+  image: docker:24.0.5
   services:
     - name: docker:dind
-      command: ["--tls=false"]
+      command: ["--host=tcp://0.0.0.0:2375"]
   variables:
     PIPELINE: true
     POSTGRES_HOST: ${POSTGRES_HOST}
@@ -244,16 +244,16 @@ test:auth:
     NEXT_PUBLIC_GITHUB_ID: ${NEXT_PUBLIC_GITHUB_ID}
     NEXT_PUBLIC_GITHUB_SECRET: ${NEXT_PUBLIC_GITHUB_SECRET}
     NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
-    DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
-    DOCKER_DRIVER: overlay2
   before_script:
-    - apt-get update && apt-get install -y docker.io
+    - apk add --no-cache curl npm
     - curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     - chmod +x /usr/local/bin/docker-compose
     - docker-compose --version
   script:
-    - docker-compose up --build && npm run test-auth
+    - docker-compose up -d
+    - sleep 10
+    - npm run test-auth
   rules:
     - changes:
         - microservice/AuthService/**/*

@@ -102,10 +102,10 @@ test('createTicket should return a newTicket', async () => {
 
     const modifiedTicket: ModifyTicketInput = {
         id: ticket.id,
-        vehicle: ticket.vehicle,
+        vehicle: await encrypt('12341234-0000-0000-0000-000000000000'),
         fine: 9,
-        violation: 'blowing up a red light',
-        images: 'image1.jpg',
+        violation: 'vaporizing a small child',
+        images: 'image213.jpg',
     };
 
     const modifiedTicketResult = await ticketService.modifyTicket(modifiedTicket);
@@ -115,3 +115,60 @@ test('createTicket should return a newTicket', async () => {
     expect(modifiedTicketResult).toHaveProperty('violation', modifiedTicket.violation);
     expect(modifiedTicketResult).toHaveProperty('images', modifiedTicket.images);
   });
+
+test('createTicket should error with no ticket ID', async () => {
+    const newTicket: NewTicket = {
+        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+        fine: 100000000,
+        violation: 'blowing up a red light',
+        images: 'image1.jpg',
+    };
+
+    const ticket = await ticketService.createTicket(newTicket);
+
+    const modifiedTicket: ModifyTicketInput = {
+        id: ticket.id + 'extra',
+        vehicle: await encrypt('12341234-0000-0000-0000-000000000000'),
+        fine: 9,
+        violation: 'vaporizing a small child',
+        images: 'image213.jpg',
+    };
+
+    await expect(ticketService.modifyTicket(modifiedTicket))
+        .rejects
+        .toThrow('Invalid or missing ticket ID.');
+  });
+
+test('createTicket should error with no update fields', async () => {
+  const newTicket: NewTicket = {
+      vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+      enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+      fine: 100000000,
+      violation: 'blowing up a red light',
+      images: 'image1.jpg',
+  };
+
+  const ticket = await ticketService.createTicket(newTicket);
+
+  const modifiedTicket: ModifyTicketInput = {
+      id: ticket.id,
+  };
+
+  await expect(ticketService.modifyTicket(modifiedTicket))
+      .rejects
+      .toThrow('No fields provided to update.');
+});
+
+test('createTicket should error with no update fields', async () => {
+  const modifiedTicket: ModifyTicketInput = {
+      id: await encrypt('00000000-0000-0000-0000-000000000000'),
+      fine: 100000000,
+      violation: 'blowing up a red light',
+      images: 'image1.jpg',
+  };
+
+  await expect(ticketService.modifyTicket(modifiedTicket))
+      .rejects
+      .toThrow('No update found.');
+});

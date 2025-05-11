@@ -123,10 +123,6 @@ export class TicketService {
   public async modifyTicket(input: ModifyTicketInput): Promise<Ticket | null> {
     const { id, ...updates } = input;
 
-    if (!id) {
-      throw new Error("Missing ticket ID.");
-    }
-
     const decryptedID = await this.decrypt(id);
 
     if (!decryptedID) {
@@ -166,7 +162,7 @@ export class TicketService {
     const result = await pool.query(query);
 
     if (result.rows.length === 0) {
-      return null;
+      throw new Error("No update found.");
     }
 
     const row = result.rows[0];

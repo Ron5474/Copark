@@ -116,8 +116,8 @@ test('AuthService Check() works fine with correct admin JWT', async () => {
 })
 
 // test('generate JWT', async () => {
-//   // const jwt = await new AuthService().encrypt('602967f5-3e3f-4cc1-83e8-20ee2acfc519')
-//   const jwt = await new AuthService().encryptNum(5)
+//   const jwt = await new AuthService().encrypt('602967f5-3e3f-4cc1-83e8-20ee2acfc519')
+//   // const jwt = await new AuthService().encryptNum(5)
 //   console.log('JWT:', jwt)
 //   expect(jwt).toBeDefined()
 // })

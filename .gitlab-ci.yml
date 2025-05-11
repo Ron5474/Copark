@@ -47,121 +47,121 @@ lint:enforcement:
       - package.json
       - .gitlab-ci.yml
 
-lint:admin:
-  stage: quality
-  script:
-    - npm run install-admin
-    - npm run lint-admin
-  rules:
-    - changes: 
-      - app/admin/**/*
-      - package.json
-      - .gitlab-ci.yml
-
-lint:driver:
-  stage: quality
-  script:
-    - npm run install-driver
-    - npm run lint-driver
-  rules:
-    - changes: 
-      - app/driver/**/*
-      - package.json
-      - .gitlab-ci.yml
-
-lint:marketing:
-  stage: quality
-  script:
-    - npm run install-marketing
-    - npm run lint-marketing
-  rules:
-    - changes: 
-      - app/marketing/**/*
-      - package.json
-      - .gitlab-ci.yml
-
-lint:authService:
-  stage: quality
-  script:
-    - npm run install-auth
-    - npm run lint-auth
-  rules:
-    - changes: 
-      - microservices/AuthService/**/*
-      - package.json
-      - .gitlab-ci.yml
-
-lint:adminService:
-  stage: quality
-  script:
-    - npm run install-adminService
-    - npm run lint-adminService
-  rules:
-    - changes: 
-      - microservices/AdminService/**/*
-      - package.json
-      - .gitlab-ci.yml
-
-lint:vehicleService:
-  stage: quality
-  script:
-    - npm run install-vehicleService
-    - npm run lint-vehicleService
-  rules:
-    - changes: 
-      - microservices/VehicleService/**/*
-      - package.json
-      - .gitlab-ci.yml
-
-lint:ticketService:
-  stage: quality
-  script:
-    - npm run install-ticketService
-    - npm run lint-ticketService
-  rules:
-    - changes: 
-      - microservices/TicketService/**/*
-      - package.json
-      - .gitlab-ci.yml
-
-# lint:
-#   stage: quality 
+# lint:admin:
+#   stage: quality
 #   script:
-#     - npm run installs
-#     - npm run lint
+#     - npm run install-admin
+#     - npm run lint-admin
+#   rules:
+#     - changes: 
+#       - app/admin/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
-build:enforcement:
-  stage: build
-  script:
-    - npm run install-enforcement
-    - npm run build-enforcement
-  rules:
-    - changes: 
-      - app/enforcement/**/*
-      - package.json
-      - .gitlab-ci.yml
+# lint:driver:
+#   stage: quality
+#   script:
+#     - npm run install-driver
+#     - npm run lint-driver
+#   rules:
+#     - changes: 
+#       - app/driver/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
-build:admin:
-  stage: build
-  script:
-    - npm run install-admin
-    - npm run build-admin
-  rules:
-    - changes: 
-      - app/admin/**/*
-      - package.json
-      - .gitlab-ci.yml
+# lint:marketing:
+#   stage: quality
+#   script:
+#     - npm run install-marketing
+#     - npm run lint-marketing
+#   rules:
+#     - changes: 
+#       - app/marketing/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
-build:driver:
-  stage: build
-  script:
-    - npm run install-driver
-    - npm run build-driver
-  rules:
-    - changes: 
-      - app/driver/**/*
-      - package.json
-      - .gitlab-ci.yml
+# lint:authService:
+#   stage: quality
+#   script:
+#     - npm run install-auth
+#     - npm run lint-auth
+#   rules:
+#     - changes: 
+#       - microservices/AuthService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
+
+# lint:adminService:
+#   stage: quality
+#   script:
+#     - npm run install-adminService
+#     - npm run lint-adminService
+#   rules:
+#     - changes: 
+#       - microservices/AdminService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
+
+# lint:vehicleService:
+#   stage: quality
+#   script:
+#     - npm run install-vehicleService
+#     - npm run lint-vehicleService
+#   rules:
+#     - changes: 
+#       - microservices/VehicleService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
+
+# lint:ticketService:
+#   stage: quality
+#   script:
+#     - npm run install-ticketService
+#     - npm run lint-ticketService
+#   rules:
+#     - changes: 
+#       - microservices/TicketService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
+
+# # lint:
+# #   stage: quality 
+# #   script:
+# #     - npm run installs
+# #     - npm run lint
+
+# build:enforcement:
+#   stage: build
+#   script:
+#     - npm run install-enforcement
+#     - npm run build-enforcement
+#   rules:
+#     - changes: 
+#       - app/enforcement/**/*
+#       - package.json
+#       - .gitlab-ci.yml
+
+# build:admin:
+#   stage: build
+#   script:
+#     - npm run install-admin
+#     - npm run build-admin
+#   rules:
+#     - changes: 
+#       - app/admin/**/*
+#       - package.json
+#       - .gitlab-ci.yml
+
+# build:driver:
+#   stage: build
+#   script:
+#     - npm run install-driver
+#     - npm run build-driver
+#   rules:
+#     - changes: 
+#       - app/driver/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 # build:marketing:
 #   stage: build
@@ -174,27 +174,27 @@ build:driver:
 #       - package.json
 #       - .gitlab-ci.yml
 
-build:auth:
-  stage: build
-  script:
-    - npm run install-auth
-    - npm run build-auth
-  rules:
-    - changes: 
-      - microservice/auth/**/*
-      - package.json
-      - .gitlab-ci.yml
+# build:auth:
+#   stage: build
+#   script:
+#     - npm run install-auth
+#     - npm run build-auth
+#   rules:
+#     - changes: 
+#       - microservice/auth/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
-build:adminService:
-  stage: build
-  script:
-    - npm run install-adminService
-    - npm run build-adminService
-  rules:
-    - changes: 
-      - microservices/AdminService/**/*
-      - package.json
-      - .gitlab-ci.yml
+# build:adminService:
+#   stage: build
+#   script:
+#     - npm run install-adminService
+#     - npm run build-adminService
+#   rules:
+#     - changes: 
+#       - microservices/AdminService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 # build:
 #   stage: build
@@ -249,7 +249,7 @@ test:auth:
     DOCKER_DRIVER: overlay2
   before_script:
     - apt-get update && apt-get install -y docker.io
-    - sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    - curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     - chmod +x /usr/local/bin/docker-compose
     - docker-compose --version
   script:

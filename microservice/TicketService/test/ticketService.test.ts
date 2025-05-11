@@ -7,7 +7,7 @@ import { SignJWT } from 'jose';
 
 import db from './db';
 import { TicketService } from '../src/ticket/service';
-import { NewTicket, TicketInput } from '../src/ticket/schema';
+import { ModifyTicketInput, NewTicket, TicketInput } from '../src/ticket/schema';
 
 const ticketService = new TicketService();
 
@@ -88,3 +88,30 @@ test('createTicket should error with bad id', async () => {
         .rejects
         .toThrow('Invalid enforcer or vehicle ID.');
 });
+
+test('createTicket should return a newTicket', async () => {
+    const newTicket: NewTicket = {
+        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+        fine: 100000000,
+        violation: 'blowing up a red light',
+        images: 'image1.jpg',
+    };
+
+    const ticket = await ticketService.createTicket(newTicket);
+
+    const modifiedTicket: ModifyTicketInput = {
+        id: ticket.id,
+        vehicle: ticket.vehicle,
+        fine: 9,
+        violation: 'blowing up a red light',
+        images: 'image1.jpg',
+    };
+
+    const modifiedTicketResult = await ticketService.modifyTicket(modifiedTicket);
+    expect(modifiedTicketResult).toHaveProperty('id');
+    expect(modifiedTicketResult).toHaveProperty('vehicle', modifiedTicket.vehicle);
+    expect(modifiedTicketResult).toHaveProperty('fine', modifiedTicket.fine);
+    expect(modifiedTicketResult).toHaveProperty('violation', modifiedTicket.violation);
+    expect(modifiedTicketResult).toHaveProperty('images', modifiedTicket.images);
+  });

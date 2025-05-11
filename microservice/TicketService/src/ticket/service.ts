@@ -127,6 +127,12 @@ export class TicketService {
       throw new Error("Missing ticket ID.");
     }
 
+    const decryptedID = await this.decrypt(id);
+
+    if (!decryptedID) {
+      throw new Error("Invalid or missing ticket ID.");
+    }
+
     // Filter out undefined fields
     const entries = Object.entries(updates).filter(
       ([_, value]) => value !== undefined
@@ -138,7 +144,7 @@ export class TicketService {
 
     // Apply each field using jsonb_set sequentially
     let setExpr = 'data';
-    const values: string[] = [id];
+    const values: string[] = [decryptedID];
     let valueIndex = 2;
 
     for (const [key, value] of entries) {
@@ -165,7 +171,6 @@ export class TicketService {
 
     const row = result.rows[0];
 
-    // Assuming you have a Ticket class/constructor or just return the plain object:
     return {
       id: row.id,
       ...row.data

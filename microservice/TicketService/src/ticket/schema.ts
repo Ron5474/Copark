@@ -57,6 +57,9 @@ export class ModifyTicketInput {
   id!: string;
 
   @Field(() => String, { nullable: true })  
+  vehicle?: string;
+
+  @Field(() => String, { nullable: true })  
   violation?: string;
 
   @Field(() => Number, { nullable: true })  

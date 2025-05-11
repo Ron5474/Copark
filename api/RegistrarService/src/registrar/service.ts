@@ -1,9 +1,4 @@
-
-import { pool } from "./db";
-import { SessionUser } from "../index";
-import { AuthUser, Credentials, User, OauthLoginData } from "./index";
-
-import { SignJWT, jwtVerify } from 'jose'
+import { SignJWT } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
@@ -16,24 +11,43 @@ export class RegistrarService {
       .sign(internalKey)
   }
 
-  private async getUserById(id: string): Promise<AuthUser | undefined> {
-    const query = {
-      text: "SELECT id, data as data FROM account WHERE id = $1 AND data->>'deleted' IS NULL",
-      values: [id],
-    };
+  public async hasOutstandingTickets(email: string): Promise<boolean> {
+    const token = await this.encrypt("admin"); // Use admin token since we're querying as admin
 
-    const res = await pool.query(query);
-    if (res.rows.length === 0) {
-      return undefined;
-    } else {
-      const user = res.rows[0];
-      const data = user.data;
-      return {
-        id: user.id,
-        name: data.name,
-        email: data.email,
-        role: data.role,
-      };
+    const query = `
+      query GetUserTickets($email: String!) {
+        getUserTickets(email: $email) {
+          ticketStatus
+        }
+      }
+    `;
+
+    try {
+      const response = await fetch('http://localhost:4002/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          query,
+          variables: { email }
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.errors) {
+        throw new Error(result.errors[0].message);
+      }
+
+      return result.data.getUserTickets.some(
+        (ticket: { ticketStatus: string }) => ticket.ticketStatus === 'unpaid'
+      );
+
+    } catch (error) {
+      console.error('Error checking tickets:', error);
+      throw error;
     }
   }
 }

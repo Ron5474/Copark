@@ -5,6 +5,8 @@ import { resolve } from 'path'
 
 dotenv.config({ path: resolve(__dirname, '../../../../.env') })
 
+console.log(`ticket service is connected to ${process.env.POSTGRES_DB} database`)
+
 const pool = new Pool({
   host: process.env.POSTGRES_HOST,
   port: parseInt(process.env.POSTGRES_PORT as string, 10),

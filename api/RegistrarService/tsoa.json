@@ -20,6 +20,7 @@
     }
   },
   "routes": {
-    "routesDir": "build"
+    "routesDir": "build",
+    "authenticationModule": "./src/auth/expressAuth.ts"
   }
 }

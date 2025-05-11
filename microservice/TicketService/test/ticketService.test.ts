@@ -56,3 +56,35 @@ test('createTicket should return a newTicket', async () => {
     expect(ticket).toHaveProperty('violation', newTicket.violation);
     expect(ticket).toHaveProperty('images', newTicket.images);
 });
+
+test('createTicket should return a newTicket (with no image)', async () => {
+    const newTicket: NewTicket = {
+        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+        fine: 100,
+        violation: 'speeding',
+    };
+
+    const ticket = await ticketService.createTicket(newTicket);
+
+    // console.log(ticket)
+    expect(ticket).toHaveProperty('id');
+    expect(ticket).toHaveProperty('vehicle', newTicket.vehicle);
+    expect(ticket).toHaveProperty('enforcer', newTicket.enforcer);
+    expect(ticket).toHaveProperty('fine', newTicket.fine);
+    expect(ticket).toHaveProperty('violation', newTicket.violation);
+    expect(ticket).not.toHaveProperty('images', newTicket.images);
+});
+
+test('createTicket should error with bad id', async () => {
+    const newTicket: NewTicket = {
+        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        enforcer: 'not a uuid',
+        fine: 100,
+        violation: 'speeding',
+    };
+
+    await expect(ticketService.createTicket(newTicket))
+        .rejects
+        .toThrow('Invalid enforcer or vehicle ID.');
+});

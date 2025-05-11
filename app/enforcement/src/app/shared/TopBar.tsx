@@ -18,7 +18,7 @@ export default function EnforcementAppBar() {
     >
       <Toolbar>
         <Image
-          src="/enforcement/copark-enforce-logo.png"
+          src="/assets/copark-enforce-logo.png"
           alt="CoPark Enforce"
           width={40}
           height={40}

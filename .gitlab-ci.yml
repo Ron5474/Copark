@@ -223,6 +223,16 @@ build:adminService:
 #       - package.json
 #       - .gitlab-ci.yml
 
+test:auth:
+  stage: test
+  script:
+    - npm run compose && npm run test-auth
+  rules:
+    - changes:
+        - microservice/AuthService/**/*
+        - package.json
+        - .gitlab-ci.yml
+
 test:driver:
   script:
     - cd app/driver && npm install && npm test

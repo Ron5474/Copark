@@ -15,6 +15,18 @@ VALUES (
   )
 );
 
+INSERT INTO account(data)
+VALUES (
+  jsonb_build_object(
+    'name', 'Ronak Patel',
+    'email', 'ronak@books.com',
+    'phone' , '123-456-7890',
+    'pwhash', crypt('password1', gen_salt('bf')),
+    'role', '["admin"]',
+    'accountStatus', 'active'
+  )
+);
+
 INSERT INTO account(id, data)
 VALUES (
   '8dc65233-c590-45b7-9b10-a5b049600901',

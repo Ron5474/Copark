@@ -5,7 +5,7 @@ import {
   // Response, 
   Query,
   Route, 
-  // Security, 
+  Security, 
   Request,
   Get } from 'tsoa'
 
@@ -16,7 +16,7 @@ import { SessionUser } from '../'
 @Route('police')
 export class PoliceController extends Controller {
   @Get('check/plate')
-  // @Security('jwt', ['police'])
+  @Security('jwt', ['police'])
   public async checkPermitByPlate(
     @Query() plate: string,
     @Request() request: express.Request & {user: SessionUser}

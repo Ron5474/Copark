@@ -32,3 +32,18 @@ export class UserInput {
   @Field(() => ID)
   id!: string;
 }
+
+@InputType()
+export class PoliceCredential {
+  @Field(() => String)
+  name!: string
+
+  @Field(() => String)
+  email!: string
+}
+
+@ObjectType()
+export class PoliceUser {
+  @Field(() => ID)
+  id!: string
+}

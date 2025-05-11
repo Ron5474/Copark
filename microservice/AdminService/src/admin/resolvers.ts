@@ -3,7 +3,9 @@ import { AdminService } from "./service";
 import { 
   User,
   NewUser,
-  UserInput
+  UserInput,
+  PoliceUser,
+  PoliceCredential
 } from "./schema";
 
 const adminService = new AdminService();
@@ -28,6 +30,14 @@ export class AdminResolver {
     @Arg("enforcer", () => NewUser) enforcer: NewUser
   ): Promise<User[]> {
     return adminService.addEnforcer(enforcer);
+  }
+
+  @Mutation(() => PoliceUser)
+  @Authorized(["admin"])
+  async addPolice(
+    @Arg("police", () => PoliceCredential) police: PoliceCredential
+  ): Promise<PoliceUser | undefined> {
+    return adminService.addPolice(police)
   }
 
   @Mutation(() => [User])

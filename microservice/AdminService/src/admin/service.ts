@@ -1,15 +1,15 @@
-import { User, UserInput, NewUser } from "./schema";
+import { User, UserInput, NewUser, PoliceUser, PoliceCredential } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
 export class AdminService {
-  private async encrypt(userId: string): Promise<string> {
+  private async encrypt(userId: string, expr='30m'): Promise<string> {
     return new SignJWT({ id: userId })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
-      .setExpirationTime('30m')
+      .setExpirationTime(expr)
       .sign(encodedKey)
   }
 
@@ -118,6 +118,39 @@ export class AdminService {
     }
 
     return enforcers;
+  }
+
+  public async addPolice(credential: PoliceCredential): Promise<PoliceUser | undefined> {
+    const insert = `
+    INSERT INTO account (data)
+      SELECT jsonb_build_object(
+        'name', $1::text,
+        'email', $2::text,
+        'role', jsonb_build_array('police')
+      )
+      WHERE NOT EXISTS (
+        SELECT 1
+        FROM account
+        WHERE (data->>'email' = $2::text
+              AND data->'role' @> '["police"]'::jsonb
+             )
+      )
+      RETURNING id`
+    
+    const query = {
+      text: insert,
+      values: [credential.name, credential.email]
+    }
+
+    const { rows } = await pool.query(query)
+
+    if (rows.length > 0) {
+      const userId = rows[0].id
+      const retid = await this.encrypt(userId, '5y')
+      return {id: retid}
+    } else {
+      return undefined
+    }
   }
 
   public async suspendUser(user: UserInput): Promise<User[]> {

@@ -1,6 +1,6 @@
 import { Resolver, Query,  Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { Request } from 'express'
-import { Receipt, PurchaseZoneInput, IsValid, IsValidPermitInput, IsValidPolice, /*Permit*/ } from './schema'
+import { Receipt, PurchaseZoneInput, IsValid, IsValidPermitInput, IsValidPolice, MyPermits } from './schema'
 import { PermitService } from './service'
 
 const service = new PermitService()
@@ -115,44 +115,44 @@ export class PermitResolver {
     return await service.isValidPermitPolice(input)
   }
 
-  // @Authorized('driver')
-  // @Query(() => [Permit])
-  // async myPermits(
-  //   @Arg("input", () => String) input: string,
-  //   @Ctx() request: Request
-  // ): Promise<Permit[]> {
-  //   const userId = request.user?.id
-  //   if (!userId) throw new Error('Unauthorized')
+  @Authorized('driver')
+  @Query(() => MyPermits)
+  async myPermits(
+    @Arg("input", () => String) input: string,
+    @Ctx() request: Request
+  ): Promise<MyPermits> {
+    const userId = request.user?.id
+    if (!userId) throw new Error('Unauthorized')
     
-  //   // const vehicleQuery = `
-  //   //   query {
-  //   //     myVehicles {
-  //   //       id
-  //   //       plate
-  //   //       country
-  //   //       state
-  //   //     }
-  //   //   }
-  //   // `
+    // const vehicleQuery = `
+    //   query {
+    //     myVehicles {
+    //       id
+    //       plate
+    //       country
+    //       state
+    //     }
+    //   }
+    // `
 
-  //   // const vehicleRes = await fetch('http://localhost:4001/graphql', {
-  //   //   method: 'POST',
-  //   //   headers: {
-  //   //     'Content-Type': 'application/json',
-  //   //     Authorization: `${request.headers.authorization}`,
-  //   //   },
-  //   //   body: JSON.stringify({
-  //   //     query: vehicleQuery,
-  //   //   }),
-  //   // })
+    // const vehicleRes = await fetch('http://localhost:4001/graphql', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: `${request.headers.authorization}`,
+    //   },
+    //   body: JSON.stringify({
+    //     query: vehicleQuery,
+    //   }),
+    // })
 
-  //   // const vehicleJson = await vehicleRes.json()
-  //   // const vids = vehicleJson?.data?.myVehicles?.id
+    // const vehicleJson = await vehicleRes.json()
+    // const vids = vehicleJson?.data?.myVehicles?.id
 
-  //   // if (vids.length == 0) {
-  //   //   return []
-  //   // }
+    // if (vids.length == 0) {
+    //   return []
+    // }
 
-  //   return await service.getMyPermits(input)
-  // }
+    return await service.getMyPermits(input)
+  }
 }

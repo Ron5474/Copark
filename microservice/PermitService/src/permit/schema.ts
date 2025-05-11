@@ -19,15 +19,18 @@ export class Permit {
   expireDate!: string
 }
 
-// @ObjectType()
-// export class MyPermits {
+@ObjectType()
+export class MyPermits {
 
-//   @Field(() => [Permit])
-//   active!: Permit[]
+  @Field(() => [Permit])
+  future!: Permit[]
 
-//   @Field(() => [Permit])
-//   expired!: Permit[]
-// }
+  @Field(() => [Permit])
+  active!: Permit[]
+
+  @Field(() => [Permit])
+  expired!: Permit[]
+}
 
 
 

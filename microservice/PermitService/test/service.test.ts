@@ -49,6 +49,13 @@ test('Purchasing different duration', async () => {
   expect(receipt.type).toBe('zone')
 })
 
+// test('Transaction failed', async () => {
+//   // eslint-disable-next-line @typescript-eslint/no-empty-function
+//   vi.spyOn(console, 'error').mockImplementation(() => {})
+//   await expect(new PermitService().purchaseMyZonePermit({...permitDetails, duration: {minutes: 0, hours: 2}}))
+//       .rejects.toThrow('Purchase unsuccessful')
+// })
+
 // test('Vehicle has valid permit', async () => {
 //   await new PermitService().purchaseMyZonePermit(permitDetails)
 //   const { isValid } = await new PermitService().isValidPermit(enforcementDetails)
@@ -91,10 +98,13 @@ test('Vehicle does not have valid permit (Police)', async () => {
   expect(isValid).toBe(false)
 })
 
-// test('Transaction failed', async () => {
-//   // eslint-disable-next-line @typescript-eslint/no-empty-function
-//   vi.spyOn(console, 'error').mockImplementation(() => {})
-//   await expect(new PermitService().purchaseMyZonePermit({...permitDetails, duration: {minutes: 0, hours: 2}}))
-//       .rejects.toThrow('Purchase unsuccessful')
-// })
+test('getMyPermits returns empty', async () => {
+  const { active } = await new PermitService().getMyPermits(permitDetails.vehicle)
+  expect(active.length).toBe(0)
+})
 
+test('getMyPermits returns active permit', async () => {
+  await new PermitService().purchaseMyZonePermit(permitDetails)
+  const { active } = await new PermitService().getMyPermits(permitDetails.vehicle)
+  expect(active.length).toBe(1)
+})

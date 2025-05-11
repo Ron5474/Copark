@@ -1,5 +1,5 @@
 import { pool } from './db'
-import { Receipt, PurchaseZoneInput, IsValid, IsValidPermitInput, IsValidPolice } from './schema'
+import { Receipt, PurchaseZoneInput, IsValid, IsValidPermitInput, IsValidPolice, MyPermits } from './schema'
 
 export class PermitService {
   public async purchaseMyZonePermit(input: PurchaseZoneInput): Promise<Receipt> {
@@ -109,41 +109,48 @@ export class PermitService {
     return { isValid: true }
   }
 
-//   public async getMyPermits(vid: string): Promise<IsValid> {
+  public async getMyPermits(vid: string): Promise<MyPermits> {
 
-//     // const result = await pool.query(`
-//     //     WITH active AS (
-//     //       SELECT f.member1 AS id, m.data->>'name' AS name
-//     //       FROM friend f
-//     //       JOIN member m ON m.id = f.member1
-//     //       WHERE f.member2 = $1
-//     //       AND (m.data->>'active')::boolean = true
-//     //       AND (f.data->>'accepted')::boolean = false
-//     //       AND (f.data->>'active')::boolean = true
-//     //     ),
-//     //     expired AS (
-//     //       SELECT f.member2 AS id, m.data->>'name' AS name
-//     //       FROM friend f
-//     //       JOIN member m ON m.id = f.member2
-//     //       WHERE f.member1 = $1
-//     //       AND (m.data->>'active')::boolean = true
-//     //       AND (f.data->>'accepted')::boolean = false
-//     //       AND (f.data->>'active')::boolean = true
-//     //     )
-//     //     SELECT
-//     //       COALESCE((SELECT json_agg(inbound) FROM inbound), '[]') AS inbound,
-//     //       COALESCE((SELECT json_agg(outbound) FROM outbound), '[]') AS outbound;
-//     //   `,
-//     //   [vid]
-//     // )
-
-//     if (result.rowCount === 0) return { isValid: false, type: 'N/A', zone: input.zone }
-
-//     const row = result.rows[0]
-//     return {
-//       isValid: true,
-//       type: row.data.type,
-//       zone: row.data.type,
-//     }
-//   }
+    const result = await pool.query(`
+        WITH future AS (
+          SELECT data->>'vehicle' AS vehicle,
+            data->>'type' AS type,
+            data->>'zone' AS zone,
+            data->>'activeDate' AS activeDate,
+            data->>'expireDate' AS expireDate
+          FROM permit
+          WHERE vehicle = $1
+          AND now() <= (data->>'activeDate')::timestamptz
+        ),
+        active AS (
+          SELECT data->>'vehicle' AS vehicle,
+            data->>'type' AS type,
+            data->>'zone' AS zone,
+            data->>'activeDate' AS activeDate,
+            data->>'expireDate' AS expireDate
+          FROM permit
+          WHERE vehicle = $1
+          AND now() >= (data->>'activeDate')::timestamptz
+          AND now() <= (data->>'expireDate')::timestamptz
+        ),
+        expired AS (
+          SELECT data->>'vehicle' AS vehicle,
+            data->>'type' AS type,
+            data->>'zone' AS zone,
+            data->>'activeDate' AS activeDate,
+            data->>'expireDate' AS expireDate
+          FROM permit
+          WHERE vehicle = $1
+          AND now() >= (data->>'expireDate')::timestamptz
+        )
+        SELECT
+          COALESCE((SELECT json_agg(future) FROM future), '[]') AS future,
+          COALESCE((SELECT json_agg(active) FROM active), '[]') AS active,
+          COALESCE((SELECT json_agg(expired) FROM expired), '[]') AS expired;
+      `,
+      [vid]
+    )
+    
+    return result.rows[0]
+  }
 }

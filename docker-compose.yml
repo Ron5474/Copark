@@ -1,4 +1,17 @@
 services:
+  app:
+    container_name: app
+    env_file: .env
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+      - "3002:3002"
+      - "3009:3009"
+      - "8080:8080"
+      
   postgres:
     container_name: database
     image: postgres

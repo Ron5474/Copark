@@ -174,25 +174,39 @@ export class TicketService {
   }
 
   public async deleteTicket(id: TicketInput): Promise<Ticket | null> {
-  const query = `
-    UPDATE ticket
-    SET data = jsonb_set(data, '{ticketStatus}', '"deleted"', true)
-    WHERE id = $1
-    RETURNING id, data
-  `;
 
-  const result = await pool.query(query, [id]);
+    const decryptedID = await this.decrypt(id.id);
 
-  if (result.rows.length === 0) {
-    return null;
+    const query = `
+      UPDATE ticket
+      SET data = jsonb_set(data, '{ticketStatus}', '"deleted"', true)
+      WHERE id = $1
+      RETURNING id, vehicle, enforcer, 
+                data->>'issuedDate' AS issueddate,
+                data->>'violation' AS violation,
+                data->>'fine' AS fine,
+                data->>'ticketStatus' AS ticketstatus,
+                data->>'images' AS images
+    `;
+
+    const result = await pool.query(query, [decryptedID]);
+
+    if (result.rows.length === 0) {
+      throw new Error("No delete found.");
+    }
+
+    const row = result.rows[0];
+
+    return {
+      id: await this.encrypt(row.id),
+      vehicle: await this.encrypt(row.vehicle),
+      enforcer: await this.encrypt(row.enforcer),
+      issuedDate: new Date(row.issueddate),
+      violation: row.violation,
+      fine: parseFloat(row.fine),
+      ticketStatus: row.ticketstatus,
+      images: row.images,
+    } as Ticket;
   }
-
-  const row = result.rows[0];
-
-  return {
-    id: row.id,
-    ...row.data
-  } as Ticket;
-}
 
 }

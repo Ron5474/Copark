@@ -172,3 +172,47 @@ test('createTicket should error with no update fields', async () => {
       .rejects
       .toThrow('No update found.');
 });
+
+test('deleteTicket should delete a ticket', async () => {
+    const newTicket: NewTicket = {
+        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+        fine: 12344321,
+        violation: 'blowing up a red light',
+        images: 'image1.jpg',
+    };
+
+    const ticket = await ticketService.createTicket(newTicket);
+
+    const deletedTicket: TicketInput = {
+        id: ticket.id,
+    };
+
+    const deletedTicketRes = await ticketService.deleteTicket(deletedTicket);
+    // console.log(deletedTicketRes);
+    expect(deletedTicketRes).toHaveProperty('id');
+    expect(deletedTicketRes).toHaveProperty('vehicle', newTicket.vehicle);
+    expect(deletedTicketRes).toHaveProperty('enforcer', newTicket.enforcer);
+    expect(deletedTicketRes).toHaveProperty('fine', newTicket.fine);
+    expect(deletedTicketRes).toHaveProperty('violation', newTicket.violation);
+  });
+
+test('deleteTicket should delete a ticket', async () => {
+    const newTicket: NewTicket = {
+        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+        fine: 12344321,
+        violation: 'blowing up a red light',
+        images: 'image1.jpg',
+    };
+
+    const ticket = await ticketService.createTicket(newTicket);
+
+    const deletedTicket: TicketInput = {
+        id: ticket.id + 'extra',
+    };
+
+    await expect(ticketService.deleteTicket(deletedTicket))
+      .rejects
+      .toThrow('No delete found.');
+  });

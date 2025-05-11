@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { Request } from 'express'
 import { Vehicle, RegisterVehicleInput, UpdateVehicleInput } from './schema'
 import { VehicleService } from './service'
+import { SessionUser } from '../types/express'
 
 
 const service = new VehicleService()
@@ -10,9 +11,8 @@ const service = new VehicleService()
 export class VehicleResolver {
   @Authorized('driver')
   @Query(() => [Vehicle])
-  async myVehicles(@Ctx() request: Request): Promise<Vehicle[]> {
-    const userId = request.user?.id
-    if (!userId) throw new Error('Unauthorized')
+  async myVehicles(@Ctx() request: Request & {user: SessionUser}): Promise<Vehicle[]> {
+    const userId = request.user.id
     return await service.getMyVehicles(userId)
   }
 
@@ -20,10 +20,9 @@ export class VehicleResolver {
   @Mutation(() => Vehicle)
   async registerVehicle(
     @Arg('input', () => RegisterVehicleInput) input: RegisterVehicleInput,
-    @Ctx() request: Request
+    @Ctx() request: Request & {user: SessionUser}
   ): Promise<Vehicle> {
-    const userId = request.user?.id
-    if (!userId) throw new Error('Unauthorized')
+    const userId = request.user.id
     return await service.registerVehicle(userId, input)
   }
 
@@ -31,10 +30,9 @@ export class VehicleResolver {
   @Mutation(() => Vehicle)
   async updateVehicle(
     @Arg('input', () => UpdateVehicleInput) input: UpdateVehicleInput,
-    @Ctx() request: Request
+    @Ctx() request: Request & {user: SessionUser}
   ): Promise<Vehicle> {
-    const userId = request.user?.id
-    if (!userId) throw new Error('Unauthorized')
+    const userId = request.user.id
     return await service.updateVehicle(userId, input)
   }
 

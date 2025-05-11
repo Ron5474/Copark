@@ -1,4 +1,4 @@
-import { Ticket, NewTicket } from "./schema";
+import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -63,21 +63,24 @@ export class TicketService {
     return tickets;
   }
 
-  public async createTicket(newTicket: NewTicket): Promise<Ticket[]> {
+  public async createTicket(newTicket: NewTicket): Promise<Ticket> {
+
+    // console.log(newTicket);
     const enforcerId = await this.decrypt(newTicket.enforcer);
     const vehicleId = await this.decrypt(newTicket.vehicle);
-
+    if (!enforcerId || !vehicleId) {
+      throw new Error("Invalid enforcer or vehicle ID.");
+    }
     //TODO: Check if the enforcerId and vehicleId are valid, will need services in enforcer and vehicle microservices
-    
 
     const insertQuery = `
         INSERT INTO ticket (vehicle, enforcer, data)
         VALUES ($1, $2, jsonb_build_object(
-            'issuedDate', $3,
-            'violation', $4,
-            'fine', $5,
-            'ticketStatus', $6,
-            'images', $7
+            'issuedDate', $3::TIMESTAMP,
+            'violation', $4::TEXT,
+            'fine', $5::NUMERIC,
+            'ticketStatus', $6::TEXT,
+            'images', $7::TEXT
         ))
         RETURNING id, vehicle, enforcer, 
                   data->>'issuedDate' AS issueddate,
@@ -113,6 +116,83 @@ export class TicketService {
         images: row.images,
     };
 
-    return [ticket];
+    // console.log(ticket.id);
+    return ticket;
   }
+
+  public async modifyTicket(input: ModifyTicketInput): Promise<Ticket | null> {
+    const { id, ...updates } = input;
+
+    const decryptedID = await this.decrypt(id);
+
+    if (!decryptedID) {
+      throw new Error("Invalid or missing ticket ID.");
+    }
+
+    // Filter out undefined fields
+    const entries = Object.entries(updates).filter(
+      ([_, value]) => value !== undefined
+    );
+
+    if (entries.length === 0) {
+      throw new Error("No fields provided to update.");
+    }
+
+    // Apply each field using jsonb_set sequentially
+    let setExpr = 'data';
+    const values: string[] = [decryptedID];
+    let valueIndex = 2;
+
+    for (const [key, value] of entries) {
+      setExpr = `jsonb_set(${setExpr}, '{${key}}', $${valueIndex}::jsonb, true)`;
+      values.push(JSON.stringify(value));
+      valueIndex++;
+    }
+
+    const query = {
+      text: `
+        UPDATE ticket
+        SET data = ${setExpr}
+        WHERE id = $1
+        RETURNING id, data
+      `,
+      values
+    };
+
+    const result = await pool.query(query);
+
+    if (result.rows.length === 0) {
+      throw new Error("No update found.");
+    }
+
+    const row = result.rows[0];
+
+    return {
+      id: row.id,
+      ...row.data
+    } as Ticket;
+  }
+
+  public async deleteTicket(id: TicketInput): Promise<Ticket | null> {
+  const query = `
+    UPDATE ticket
+    SET data = jsonb_set(data, '{ticketStatus}', '"deleted"', true)
+    WHERE id = $1
+    RETURNING id, data
+  `;
+
+  const result = await pool.query(query, [id]);
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const row = result.rows[0];
+
+  return {
+    id: row.id,
+    ...row.data
+  } as Ticket;
+}
+
 }

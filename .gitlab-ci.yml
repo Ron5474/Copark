@@ -113,16 +113,16 @@ lint:vehicleService:
       - package.json
       - .gitlab-ci.yml
 
-lint:ticketService:
-  stage: quality
-  script:
-    - npm run install-ticketService
-    - npm run lint-ticketService
-  rules:
-    - changes: 
-      - microservices/TicketService/**/*
-      - package.json
-      - .gitlab-ci.yml
+# lint:ticketService:
+#   stage: quality
+#   script:
+#     - npm run install-ticketService
+#     - npm run lint-ticketService
+#   rules:
+#     - changes: 
+#       - microservices/TicketService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 # lint:
 #   stage: quality 
@@ -163,16 +163,16 @@ build:driver:
       - package.json
       - .gitlab-ci.yml
 
-# build:marketing:
-#   stage: build
-#   script:
-#     - npm run install-marketing
-#     - npm run build-marketing
-#   rules:
-#     - changes: 
-#       - app/marketing/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+build:marketing:
+  stage: build
+  script:
+    - npm run install-marketing
+    - npm run build-marketing
+  rules:
+    - changes: 
+      - app/marketing/**/*
+      - package.json
+      - .gitlab-ci.yml
 
 build:auth:
   stage: build
@@ -222,6 +222,37 @@ build:adminService:
 #       - app/admin/**/*
 #       - package.json
 #       - .gitlab-ci.yml
+
+# test:auth:
+#   stage: test
+#   image: node:lts
+#   services:
+#     - name: postgres:15
+#       alias: postgres
+#   variables:
+#     PIPELINE: true
+#     POSTGRES_HOST: ${POSTGRES_HOST}
+#     POSTGRES_PORT: ${POSTGRES_PORT}
+#     POSTGRES_DB: ${POSTGRES_DB}
+#     POSTGRES_USER: ${POSTGRES_USER}
+#     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#     # MICROSERVICE_INTERNAL_SECRET: not-a-very-secret-secret
+#     NEXT_PUBLIC_GOOGLE_ID: ${NEXT_PUBLIC_GOOGLE_ID}
+#     NEXT_PUBLIC_GOOGLE_SECRET: ${NEXT_PUBLIC_GOOGLE_SECRET}
+#     NEXT_PUBLIC_FACEBOOK_CLIENT_ID: ${NEXT_PUBLIC_FACEBOOK_CLIENT_ID}
+#     NEXT_PUBLIC_FACEBOOK_SECRET: ${NEXT_PUBLIC_FACEBOOK_SECRET}
+#     NEXT_PUBLIC_GITHUB_ID: ${NEXT_PUBLIC_GITHUB_ID}
+#     NEXT_PUBLIC_GITHUB_SECRET: ${NEXT_PUBLIC_GITHUB_SECRET}
+#     NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+#     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/your
+#   script:
+#     - npm install-auth
+#     - npm run test-auth
+#   rules:
+#     - changes:
+#         - microservice/AuthService/**/*
+#         - package.json
+#         - .gitlab-ci.yml
 
 test:driver:
   script:

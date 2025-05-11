@@ -50,3 +50,24 @@ export class TicketInput {
   @Field(() => ID)
   id!: string;
 }
+
+@InputType()
+export class ModifyTicketInput {
+  @Field(() => ID)
+  id!: string;
+
+  @Field(() => String, { nullable: true })  
+  vehicle?: string;
+
+  @Field(() => String, { nullable: true })  
+  violation?: string;
+
+  @Field(() => Number, { nullable: true })  
+  fine?: number;
+
+  @Field(() => String, { nullable: true })  
+  ticketStatus?: string;
+
+  @Field(() => String, { nullable: true })  
+  images?: string;
+}

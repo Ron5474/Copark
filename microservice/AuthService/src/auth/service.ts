@@ -140,7 +140,7 @@ export class AuthService {
     if ('id' in data) {
       throw new Error("Unauthorized");
     }
-
+    try {
     const query = {
       text: `
       INSERT INTO account (data)
@@ -178,5 +178,9 @@ export class AuthService {
     } else {
       return undefined
     }
+  } catch (err) {
+    console.error("Error in driverLogin:", err);
+    throw new Error("Unauthorized");
+  }
   }
 }

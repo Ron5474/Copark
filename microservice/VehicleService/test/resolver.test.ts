@@ -152,6 +152,16 @@ const findByPlateInput = {
   plate: "TEST123"
 }
 
+test('Non-Driver cannot get a list of their vehicles', async () => {
+  const token = await loginAs("admin")
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: getVehiclequery })
+    .expect(200)
+  expect(response.body.errors.length).toBeGreaterThan(0)
+})
+
 test('Driver can get a list of their vehicles', async () => {
     const token = await loginAs("driver")
 
@@ -164,7 +174,7 @@ test('Driver can get a list of their vehicles', async () => {
     expect(response.body.data.myVehicles.length).toBe(0)
   })
 
-  test('cant get a list of vehicles without auth', async () => {
+  test('Cannot get a list of vehicles without auth', async () => {
     const response = await supertest(server)
       .post('/graphql')
       .send({ query: getVehiclequery })

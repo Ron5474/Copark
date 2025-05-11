@@ -2,7 +2,7 @@
   "name": "microservices",
   "version": "1.0.0",
   "scripts": {
-    "prestart": "npm run build",
+    "bstart": "npm run build && npm run start",
     "start": "node build/server.js",
     "build": "tsc",
     "dev": "nodemon",

@@ -248,8 +248,10 @@ test:auth:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_DRIVER: overlay2
   before_script:
-    - apt-get update && apt-get install -y docker.io && apt-get install docker-compose-v2
-    - docker --version
+    - apt-get update && apt-get install -y docker.io
+    - sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    - chmod +x /usr/local/bin/docker-compose
+    - docker-compose --version
   script:
     - docker-compose up --build && npm run test-auth
   rules:

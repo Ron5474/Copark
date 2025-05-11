@@ -1,7 +1,10 @@
-import { Resolver, Query, Authorized } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
 import { TicketService } from "./service";
 import { 
   Ticket,
+  NewTicket,
+  ModifyTicketInput,
+  TicketInput
 } from "./schema";
 
 const ticketService = new TicketService();
@@ -14,11 +17,21 @@ export class TicketResolver {
     return ticketService.getTickets();
   }
 
-  // @Mutation(() => [User])
-  // @Authorized(["admin"])
-  // async addEnforcer(
-  //   @Arg("enforcer", () => NewUser) enforcer: NewUser
-  // ): Promise<User[]> {
-  //   return adminService.addEnforcer(enforcer);
-  // }
+  @Mutation(() => Ticket)
+  @Authorized(["enforcer, admin"])
+  async createTicket(@Arg("newTicket", () => NewTicket) newTicket: NewTicket): Promise<Ticket> {
+    return ticketService.createTicket(newTicket);
+  }
+
+  @Mutation(() => Ticket, { nullable: true })
+  @Authorized(["enforcer, admin"])
+  async modifyTicket(@Arg("input", () => ModifyTicketInput) input: ModifyTicketInput): Promise<Ticket | null> {
+    return ticketService.modifyTicket(input);
+  }
+
+  @Mutation(() => Ticket, { nullable: true })
+  @Authorized(["enforcer, admin"])
+  async deleteTicket(@Arg("id", () => TicketInput) id: TicketInput): Promise<Ticket | null> {
+    return ticketService.deleteTicket(id);
+  }
 }

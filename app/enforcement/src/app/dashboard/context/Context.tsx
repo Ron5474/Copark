@@ -42,9 +42,16 @@ export function EnforcementProvider({
   const [isIssuingViolation, setIsIssuingViolation] = useState(false)
   const [permitResult, setPermitResult] = useState<PermitResult>(null)
   const [zone, setZone] = useState<string>('')
+  // const [officerName, setOfficerName] = useState(() => {
+  //   return sessionStorage.getItem('name') || ''
+  // })
   const [officerName, setOfficerName] = useState(() => {
-    return sessionStorage.getItem('name') || ''
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('name') || ''
+    }
+    return '' // default fallback for server
   })
+
 
   return (
     <EnforcementContext.Provider

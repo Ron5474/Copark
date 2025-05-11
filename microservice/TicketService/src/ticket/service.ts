@@ -1,4 +1,4 @@
-import { Ticket, NewTicket, ModifyTicketInput } from "./schema";
+import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -115,7 +115,7 @@ export class TicketService {
     return [ticket];
   }
 
-  public async modifyTicket(input: ModifyTicketInput): Promise<boolean> {
+  public async modifyTicket(input: ModifyTicketInput): Promise<Ticket | null> {
     const { id, ...updates } = input;
 
     if (!id) {
@@ -131,23 +131,62 @@ export class TicketService {
       throw new Error("No fields provided to update.");
     }
 
-    const setFragments = entries.map(([key], idx) =>
-      `data = jsonb_set(data, '{${key}}', $${idx + 2}::jsonb, true)`
-    );
+    // Apply each field using jsonb_set sequentially
+    let setExpr = 'data';
+    const values: string[] = [id];
+    let valueIndex = 2;
 
-    const values = entries.map(([_, val]) => JSON.stringify(val));
+    for (const [key, value] of entries) {
+      setExpr = `jsonb_set(${setExpr}, '{${key}}', $${valueIndex}::jsonb, true)`;
+      values.push(JSON.stringify(value));
+      valueIndex++;
+    }
 
     const query = {
       text: `
         UPDATE ticket
-        SET ${setFragments.join(', ')}
+        SET data = ${setExpr}
         WHERE id = $1
+        RETURNING id, data
       `,
-      values: [id, ...values]
+      values
     };
 
     const result = await pool.query(query);
-  return (result.rowCount ?? 0) > 0;
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    const row = result.rows[0];
+
+    // Assuming you have a Ticket class/constructor or just return the plain object:
+    return {
+      id: row.id,
+      ...row.data
+    } as Ticket;
+  }
+
+  public async deleteTicket(id: TicketInput): Promise<Ticket | null> {
+  const query = `
+    UPDATE ticket
+    SET data = jsonb_set(data, '{ticketStatus}', '"deleted"', true)
+    WHERE id = $1
+    RETURNING id, data
+  `;
+
+  const result = await pool.query(query, [id]);
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const row = result.rows[0];
+
+  return {
+    id: row.id,
+    ...row.data
+  } as Ticket;
 }
 
 }

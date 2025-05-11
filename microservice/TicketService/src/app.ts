@@ -47,6 +47,7 @@ async function bootstrap() {
         return !!user; // Return true if the user is authorized
       } catch (error) {
         // console.error('AuthChecker Error:', error);
+        void error;
         throw new Error('Unauthorized312');
       }
     },

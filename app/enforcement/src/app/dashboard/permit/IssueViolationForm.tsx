@@ -24,8 +24,7 @@ export default function IssueViolationForm({
 }: {
   onCancel: () => void
 }) {
-  const { plate } = useEnforcement()
-  const officer = 'John Wick'
+  const { plate, officerName } = useEnforcement()
   const [reason, setReason] = useState('')
   const [note, setNote] = useState('')
   const [photos, setPhotos] = useState<File[]>([])
@@ -40,7 +39,7 @@ export default function IssueViolationForm({
 
   const handleSubmit = () => {
     const data = {
-      officer,
+      officer: officerName,
       plate,
       date,
       reason,
@@ -59,9 +58,9 @@ export default function IssueViolationForm({
       </Typography>
 
       <Stack spacing={2}>
-        <TextField label="Officer" value={officer} InputProps={{ readOnly: true }} fullWidth />
-        <TextField label="License Plate" value={plate ?? ''} InputProps={{ readOnly: true }} fullWidth />
-        <TextField label="Date" value={date} InputProps={{ readOnly: true }} fullWidth />
+        <TextField label="Officer" value={officerName} fullWidth />
+        <TextField label="License Plate" value={plate ?? ''} fullWidth />
+        <TextField label="Date" value={date}  fullWidth />
 
         <TextField
           label="Reason"

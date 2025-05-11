@@ -21,6 +21,8 @@ type EnforcementContextType = {
   setPermitResult: (val: PermitResult) => void
   zone: string
   setZone: (zone: string) => void
+  officerName: string
+  setOfficerName: (name: string) => void
 }
 
 const EnforcementContext = createContext<EnforcementContextType | undefined>(undefined)
@@ -40,6 +42,9 @@ export function EnforcementProvider({
   const [isIssuingViolation, setIsIssuingViolation] = useState(false)
   const [permitResult, setPermitResult] = useState<PermitResult>(null)
   const [zone, setZone] = useState<string>('')
+  const [officerName, setOfficerName] = useState(() => {
+    return sessionStorage.getItem('name') || ''
+  })
 
   return (
     <EnforcementContext.Provider
@@ -56,6 +61,8 @@ export function EnforcementProvider({
         setPermitResult,
         zone,
         setZone,
+        officerName,
+        setOfficerName,
       }}
     >
       {children}

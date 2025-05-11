@@ -36,7 +36,7 @@ export class VehicleResolver {
     return await service.updateVehicle(userId, input)
   }
 
-  @Authorized('admin', 'enforcement')
+  @Authorized('admin', 'enforcement', 'police')
   @Query(() => Vehicle, { nullable: true })
   async findVehicleByPlate(
     @Arg('plate', () => String) plate: string

@@ -28,6 +28,8 @@ const enforcementDetails = {
   vehicle: '12345678-1234-1234-1234-567890abcdef',
 }
 
+const policeDetails = '12345678-1234-1234-1234-567890abcdef'
+
 beforeEach( async () => {
   return db.reset()
 })
@@ -35,6 +37,7 @@ beforeEach( async () => {
 afterAll(() => {
   db.shutdown()
 })
+
 
 test('Purchasing permit works', async () => {
   const receipt = await new PermitService().purchaseMyZonePermit(permitDetails)
@@ -46,17 +49,17 @@ test('Purchasing different duration', async () => {
   expect(receipt.type).toBe('zone')
 })
 
-test('Vehicle has valid permit', async () => {
-  await new PermitService().purchaseMyZonePermit(permitDetails)
-  const { isValid } = await new PermitService().isValidPermit(enforcementDetails)
-  expect(isValid).toBe(true)
-})
+// test('Vehicle has valid permit', async () => {
+//   await new PermitService().purchaseMyZonePermit(permitDetails)
+//   const { isValid } = await new PermitService().isValidPermit(enforcementDetails)
+//   expect(isValid).toBe(true)
+// })
 
-test('Vehicle does not have valid permit', async () => {
-  await new PermitService().purchaseMyZonePermit(permitDetails)
-  const { isValid } = await new PermitService().isValidPermit({ vehicle: '11111111-1234-1234-1234-567890abcdef' })
-  expect(isValid).toBe(false)
-})
+// test('Vehicle does not have valid permit', async () => {
+//   await new PermitService().purchaseMyZonePermit(permitDetails)
+//   const { isValid } = await new PermitService().isValidPermit({ vehicle: '11111111-1234-1234-1234-567890abcdef' })
+//   expect(isValid).toBe(false)
+// })
 
 test('Vehicle has valid permit', async () => {
   await new PermitService().purchaseMyZonePermit(permitDetails)
@@ -73,6 +76,18 @@ test('Vehicle does not have valid permit', async () => {
 test('Vehicle has permit, wrong zone', async () => {
   await new PermitService().purchaseMyZonePermit(permitDetails)
   const { isValid } = await new PermitService().isValidZonePermit({...enforcementDetails, zone: '12' })
+  expect(isValid).toBe(false)
+})
+
+test('Vehicle has valid permit (Police)', async () => {
+  await new PermitService().purchaseMyZonePermit(permitDetails)
+  const { isValid } = await new PermitService().isValidPermitPolice(policeDetails)
+  expect(isValid).toBe(true)
+})
+
+test('Vehicle does not have valid permit (Police)', async () => {
+  await new PermitService().purchaseMyZonePermit(permitDetails)
+  const { isValid } = await new PermitService().isValidPermitPolice('11111111-1234-1234-1234-567890abcdef')
   expect(isValid).toBe(false)
 })
 

@@ -1,4 +1,4 @@
-import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
+import { Ticket, NewTicket, ModifyTicketInput, TicketInput, EmailInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -209,4 +209,65 @@ export class TicketService {
     } as Ticket;
   }
 
+  public async getTicketsForEmail(email: EmailInput): Promise<Ticket | null> {
+
+    //convert email to userID
+    let userID: string;
+
+    try {
+        const response = await fetch(
+          `http://localhost:3010/api/v0/auth/id?email=${encodeURIComponent(email.email)}`, 
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+      );
+
+        if (response.status !== 200) {
+          console.error('Email Fetching Error', response);
+          throw new Error('Fetched to get user ID');
+        }
+
+        userID = await response.json();
+      } catch (error) {
+        void error;
+        throw new Error('Fetched to get user ID, check auth service');
+      }
+
+    // get vehicles for userID
+
+    const graphqlQuery = {
+      query: `
+        query {
+          myVehicles {
+            id
+          }
+        }
+      `
+    };
+
+  const graphqlResponse = await fetch('http://localhost:4001/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'Authorization': 'Bearer ' + (userID)
+    },
+    body: JSON.stringify(graphqlQuery)
+  });
+
+  const graphqlResult = await graphqlResponse.json();
+
+  if (!graphqlResult.data || !graphqlResult.data.myVehicles) {
+    throw new Error('Failed to fetch vehicles from GraphQL API');
+  }
+
+  const vehicleIds = graphqlResult.data.myVehicles.map((v: any) => v.id);
+
+  if (vehicleIds.length === 0) return [];
+
+
+    // get tickets for vehicles
+    }
 }

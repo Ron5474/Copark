@@ -213,3 +213,14 @@ it('navigates to Reports section', async () => {
     expect(screen.getByText('Reports Component')).toBeDefined();
   });
 });
+
+it('navigates to API Users section', async () => {
+  render(<Page />);
+
+  const apiUsersButton = screen.getByText('Manage API Users');
+  fireEvent.click(apiUsersButton);
+
+  await waitFor(() => {
+    expect(screen.getByText('Manage API Users')).toBeDefined();
+  });
+});

@@ -96,7 +96,7 @@ export class AuthService {
     }
   }
 
-  public async getIDByEmail(email: string): Promise<string | undefined> {
+  public async getIDByEmail(email: string): Promise<string | null> {
     const query = {
       text: "SELECT id FROM account WHERE data->>'email' = $1 AND data->>'deleted' IS NULL",
       values: [email],
@@ -104,7 +104,7 @@ export class AuthService {
 
     const res = await pool.query(query);
     if (res.rows.length === 0) {
-      return undefined;
+      return null;
     } else {
       const userId = res.rows[0].id;
       return this.encrypt(userId);

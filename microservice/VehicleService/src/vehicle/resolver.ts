@@ -58,7 +58,7 @@ export class VehicleResolver {
 
   // need to add code for security in getTicketsForEmail
   // @Authorized('admin', 'enforcement')
-  @Query(() => VehicleID, { nullable: true })
+  @Query(() => [VehicleID], { nullable: true })
   async getVehicleByUserId(
     @Arg('userID', () => String) userID: string
   ): Promise<VehicleID[] | null> {

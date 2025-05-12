@@ -77,3 +77,10 @@ export class ModifyTicketInput {
   @Field(() => String, { nullable: true })  
   images?: string;
 }
+
+@ObjectType()
+export class hasTicket {
+
+  @Field(() => Boolean)
+  hasTicket!: boolean
+}

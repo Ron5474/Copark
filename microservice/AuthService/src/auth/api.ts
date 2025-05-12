@@ -54,10 +54,10 @@ export class AuthController extends Controller {
   }
 
   @Get("id")
-  public async getIDByEmail(@Query() email: string): Promise<string | undefined> {
+  // @Security("jwt", ["payroll", "registrar"])
+  public async getIDByEmail(@Query() email: string): Promise<{id: string | null}> {
     const id = await new AuthService().getIDByEmail(email);
-    console.log("Resolved ID:", id); // debug log
-    return id;
+    return {id: id ?? null};
   }
 
 }

@@ -1,4 +1,4 @@
-import { Ticket, NewTicket, ModifyTicketInput, TicketInput, EmailInput } from "./schema";
+import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -209,60 +209,7 @@ export class TicketService {
     } as Ticket;
   }
 
-  public async getTicketsForEmail(email: EmailInput): Promise<Ticket[] | undefined> {
-
-    //convert email to userID
-    let userID: string;
-
-    try {
-        const response = await fetch(
-          `http://localhost:3010/api/v0/auth/id?email=${encodeURIComponent(email.email)}`, 
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-      );
-
-        if (response.status !== 200) {
-          console.error('Email Fetching Error', response);
-          throw new Error('Fetched to get user ID');
-        }
-
-        userID = await response.json();
-      } catch (error) {
-        void error;
-        throw new Error('Fetched to get user ID, check auth service');
-      }
-
-    // get vehicles for userID
-
-    const vehicleQuery = {
-    query: `
-      query {
-        getVehicleByUserId(userID: "${userID}") {
-          id
-        }
-      }
-    `
-  };
-
-  const vehicleResponse = await fetch('http://localhost:4001/graphql', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Authorization': 'Bearer ' + (userID)
-    },
-    body: JSON.stringify(vehicleQuery)
-  });
-
-  const vehicleResult = await vehicleResponse.json();
-
-  const vehicleIDs: string[] =
-    vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id) ?? [];
-
-  if (vehicleIDs.length === 0) return undefined;
+  public async getTicketsForEmail(vehicleIDs: string[]): Promise<Ticket[] | undefined> {
 
   // get tickets for vehicles
   const query = `

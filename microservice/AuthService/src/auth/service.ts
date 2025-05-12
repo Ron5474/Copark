@@ -8,6 +8,7 @@ import { SignJWT, jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+
 export class AuthService {
   public async authenticate(credentials: Credentials): Promise<User|undefined> {
     const query = {
@@ -92,6 +93,21 @@ export class AuthService {
         email: data.email,
         role: data.role,
       };
+    }
+  }
+
+  public async getIDByEmail(email: string): Promise<string | null> {
+    const query = {
+      text: "SELECT id FROM account WHERE data->>'email' = $1 AND data->>'deleted' IS NULL",
+      values: [email],
+    };
+
+    const res = await pool.query(query);
+    if (res.rows.length === 0) {
+      return null;
+    } else {
+      const userId = res.rows[0].id;
+      return this.encrypt(userId);
     }
   }
 

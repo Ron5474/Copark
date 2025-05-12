@@ -1,10 +1,86 @@
 import { Field, ObjectType, InputType, ID } from 'type-graphql'
 
 @ObjectType()
-export class Receipt {
+export class Permit {
+
+  @Field(() => String)
+  vehicle!: string
 
   @Field(() => String)
   type!: string
+
+  @Field(() => String)
+  zone!: string
+
+  @Field(() => String)
+  activeDate!: string
+
+  @Field(() => String)
+  expireDate!: string
+}
+
+@ObjectType()
+export class MyPermits {
+
+  @Field(() => [Permit])
+  future!: Permit[]
+
+  @Field(() => [Permit])
+  active!: Permit[]
+
+  @Field(() => [Permit])
+  expired!: Permit[]
+}
+
+@ObjectType()
+export class Duration {
+  @Field(() => Number)
+  minutes?: number
+
+  @Field(() => Number)
+  hours?: number
+}
+
+@ObjectType()
+export class ZoneDetails {
+
+  @Field(() => Number)
+  hourly!: number
+
+  @Field(() => Duration)
+  maxDuration!: Duration
+
+  @Field(() => String)
+  openTime!: string
+
+  @Field(() => String)
+  closeTime!: string
+}
+
+@ObjectType()
+export class Receipt {
+
+  @Field(() => Number)
+  tax!: number
+
+  @Field(() => Number)
+  service!: number
+
+  @Field(() => Number)
+  subTotal!: number
+
+  @Field(() => Number)
+  total!: number
+}
+
+@ObjectType()
+export class Confirmation {
+
+  @Field(() => String)
+  type!: string
+
+  @Field(() => String)
+  zone!: string
 
   @Field(() => String)
   purchaseDate!: string
@@ -15,9 +91,14 @@ export class Receipt {
   @Field(() => String)
   expireDate!: string
 
-  @Field(() => Number)
-  price!: number
+  @Field(() => Receipt)
+  receipt!: Receipt
+
+  @Field(() => String)
+  paymentMethod!: string
 }
+
+
 
 @InputType()
 export class DurationInput {
@@ -43,30 +124,6 @@ export class PurchaseZoneInput {
   paymentMethod!: string
 }
 
-
-// @InputType()
-// export class PurchaseZoneInput {
-
-//   @Field(() => ID)
-//   vehicle!: string
-
-//   @Field(() => String)
-//   zone!: string
-
-//   @Field(() => Object)
-//   duration!: {minutes?: number, hours?: number}
-
-//   @Field(() => String)
-//   paymentMethod!: string
-// }
-
-@InputType()
-export class IsValidInput {
-
-  @Field(() => ID)
-  vehicle!: string
-}
-
 @InputType()
 export class IsValidPermitInput {
 
@@ -77,8 +134,6 @@ export class IsValidPermitInput {
   zone!: string
 }
 
-
-// @InputType()
 @ObjectType()
 export class IsValid {
 
@@ -90,4 +145,11 @@ export class IsValid {
 
   @Field(() => String)
   zone!: string
+}
+
+@ObjectType()
+export class IsValidPolice {
+
+  @Field(() => Boolean)
+  isValid!: boolean
 }

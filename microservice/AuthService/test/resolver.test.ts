@@ -9,7 +9,7 @@
 #######################################################################
 */
 
-import { test, beforeAll, afterAll } from 'vitest'
+import { test, beforeAll, afterAll, expect } from 'vitest'
 import supertest from 'supertest'
 import * as http from 'http'
 
@@ -84,3 +84,14 @@ test('check admin works successfully', async () => {
     .send(["admin"])
     .expect(200)
 })
+
+test('Can get userID by Email', async () => {  
+  const response = await supertest(server)
+    .get('/api/v0/auth/id')
+    .query({ email: 'jxiong32@outlook.com' })
+    .expect(200)
+
+  expect(response.body).toBeDefined()
+  expect(typeof response.body).toBe('object')
+})
+

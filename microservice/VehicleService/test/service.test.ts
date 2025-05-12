@@ -18,7 +18,7 @@ import { Vehicle } from '../src/vehicle/schema'
 
 vi.mock('server-only', () => ({}))
 
-// const encodedKey = new TextEncoder().encode(process.env.MASTER_SECRET + 'apiexit')
+// const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
 beforeEach(() => {
     return db.reset()
@@ -51,9 +51,16 @@ afterAll(() => {
 let mock_driver1_ID: string;
 let mock_driver2_ID: string;
 
+// async function logEncrypted() {
+//   console.log(await encrypt("b20ec061-2957-4c3b-b193-c8b40138e8f1"));
+//   console.log(await encrypt("e314f688-d150-411e-aa4f-4b0e6e56319d"));
+// }
+
+const invalidDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyMGVjMDYxLTI5NTctNGMzYi1iMTkzLWM4YjQwMTM4ZThmMSIsImlhdCI6MTc0NzAzMTc1OCwiZXhwIjoxNzQ3MDMzNTU4fQ.-pzb7zf-K4HGSliBzSSC76CaJPu_NO6HtNxCgbl25uI"
+const validDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImUzMTRmNjg4LWQxNTAtNDExZS1hYTRmLTRiMGU2ZTU2MzE5ZCIsImlhdCI6MTc0NzAzMjE0MSwiZXhwIjoxNzQ3MDMzOTQxfQ.aPTJ9DYW1eCjCDjrcgYrPgfB5It_s1sawbypgxSglFA"
+// logEncrypted();
+
 beforeEach(async () => {
-  // mock_driver1_ID = await encrypt("b20ec061-2957-4c3b-b193-c8b40138e8f1");
-  // mock_driver2_ID = await encrypt("6c83442f-90ca-46ae-bf31-a79ed4a0d1ce");
   mock_driver1_ID = "b20ec061-2957-4c3b-b193-c8b40138e8f1"
   mock_driver2_ID = "6c83442f-90ca-46ae-bf31-a79ed4a0d1ce"
 });
@@ -144,4 +151,16 @@ test('getVehicleById - Returns null if Vehicle not found', async () => {
 
   // Validate that the result is null
   expect(retrievedVehicle).toBeNull();
+});
+
+test('getVehicleByUserId - Returns Empty Array if no vehicle not found', async () => {
+  const vehicleService = new VehicleService();
+  const vehicles = await vehicleService.getVehicleByUserId(invalidDriverJWT);
+  expect(vehicles.length).toBe(0);
+});
+
+test('getVehicleByUserId - Returns Array of length 1', async () => {
+  const vehicleService = new VehicleService();
+  const vehicles = await vehicleService.getVehicleByUserId(validDriverJWT);
+  expect(vehicles.length).toBe(1);
 });

@@ -174,25 +174,79 @@ export class TicketService {
   }
 
   public async deleteTicket(id: TicketInput): Promise<Ticket | null> {
-  const query = `
-    UPDATE ticket
-    SET data = jsonb_set(data, '{ticketStatus}', '"deleted"', true)
-    WHERE id = $1
-    RETURNING id, data
-  `;
 
-  const result = await pool.query(query, [id]);
+    const decryptedID = await this.decrypt(id.id);
 
-  if (result.rows.length === 0) {
-    return null;
+    const query = `
+      UPDATE ticket
+      SET data = jsonb_set(data, '{ticketStatus}', '"deleted"', true)
+      WHERE id = $1
+      RETURNING id, vehicle, enforcer, 
+                data->>'issuedDate' AS issueddate,
+                data->>'violation' AS violation,
+                data->>'fine' AS fine,
+                data->>'ticketStatus' AS ticketstatus,
+                data->>'images' AS images
+    `;
+
+    const result = await pool.query(query, [decryptedID]);
+
+    if (result.rows.length === 0) {
+      throw new Error("No delete found.");
+    }
+
+    const row = result.rows[0];
+
+    return {
+      id: await this.encrypt(row.id),
+      vehicle: await this.encrypt(row.vehicle),
+      enforcer: await this.encrypt(row.enforcer),
+      issuedDate: new Date(row.issueddate),
+      violation: row.violation,
+      fine: parseFloat(row.fine),
+      ticketStatus: row.ticketstatus,
+      images: row.images,
+    } as Ticket;
   }
 
-  const row = result.rows[0];
+  public async getTicketsForEmail(vehicleIDs: string[]): Promise<Ticket[] | undefined> {
 
-  return {
-    id: row.id,
-    ...row.data
-  } as Ticket;
-}
+  // get tickets for vehicles
+  const query = `
+  SELECT id, vehicle, enforcer,
+        data->>'issuedDate' AS issueddate,
+        data->>'violation' AS violation,
+        data->>'fine' AS fine,
+        data->>'ticketStatus' AS ticketstatus,
+        data->>'images' AS images
+  FROM ticket
+  WHERE vehicle = ANY($1::text[])
+    AND data->>'ticketStatus' NOT IN ('deleted', 'paid')
+  `;
 
+  const result = await pool.query(query, [vehicleIDs]);
+  
+  //format
+  interface TicketRow {
+    id: string;
+    vehicle: string;
+    enforcer: string;
+    issueddate: string;
+    violation: string;
+    fine: string;
+    ticketstatus: string;
+    images: string | undefined;
+  }
+
+  return await Promise.all(result.rows.map(async (row: TicketRow): Promise<Ticket> => ({
+    id: await this.encrypt(row.id),
+    vehicle: await this.encrypt(row.vehicle),
+    enforcer: await this.encrypt(row.enforcer),
+    issuedDate: new Date(row.issueddate),
+    violation: row.violation,
+    fine: parseFloat(row.fine),
+    ticketStatus: row.ticketstatus,
+    images: row.images,
+  })));
+  }
 }

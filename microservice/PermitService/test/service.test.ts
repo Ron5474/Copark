@@ -28,6 +28,8 @@ const enforcementDetails = {
   vehicle: '12345678-1234-1234-1234-567890abcdef',
 }
 
+const policeDetails = '12345678-1234-1234-1234-567890abcdef'
+
 beforeEach( async () => {
   return db.reset()
 })
@@ -35,6 +37,7 @@ beforeEach( async () => {
 afterAll(() => {
   db.shutdown()
 })
+
 
 test('Purchasing permit works', async () => {
   const receipt = await new PermitService().purchaseMyZonePermit(permitDetails)
@@ -46,17 +49,24 @@ test('Purchasing different duration', async () => {
   expect(receipt.type).toBe('zone')
 })
 
-test('Vehicle has valid permit', async () => {
-  await new PermitService().purchaseMyZonePermit(permitDetails)
-  const { isValid } = await new PermitService().isValidPermit(enforcementDetails)
-  expect(isValid).toBe(true)
-})
+// test('Transaction failed', async () => {
+//   // eslint-disable-next-line @typescript-eslint/no-empty-function
+//   vi.spyOn(console, 'error').mockImplementation(() => {})
+//   await expect(new PermitService().purchaseMyZonePermit({...permitDetails, duration: {minutes: 0, hours: 2}}))
+//       .rejects.toThrow('Purchase unsuccessful')
+// })
 
-test('Vehicle does not have valid permit', async () => {
-  await new PermitService().purchaseMyZonePermit(permitDetails)
-  const { isValid } = await new PermitService().isValidPermit({ vehicle: '11111111-1234-1234-1234-567890abcdef' })
-  expect(isValid).toBe(false)
-})
+// test('Vehicle has valid permit', async () => {
+//   await new PermitService().purchaseMyZonePermit(permitDetails)
+//   const { isValid } = await new PermitService().isValidPermit(enforcementDetails)
+//   expect(isValid).toBe(true)
+// })
+
+// test('Vehicle does not have valid permit', async () => {
+//   await new PermitService().purchaseMyZonePermit(permitDetails)
+//   const { isValid } = await new PermitService().isValidPermit({ vehicle: '11111111-1234-1234-1234-567890abcdef' })
+//   expect(isValid).toBe(false)
+// })
 
 test('Vehicle has valid permit', async () => {
   await new PermitService().purchaseMyZonePermit(permitDetails)
@@ -76,10 +86,25 @@ test('Vehicle has permit, wrong zone', async () => {
   expect(isValid).toBe(false)
 })
 
-// test('Transaction failed', async () => {
-//   // eslint-disable-next-line @typescript-eslint/no-empty-function
-//   vi.spyOn(console, 'error').mockImplementation(() => {})
-//   await expect(new PermitService().purchaseMyZonePermit({...permitDetails, duration: {minutes: 0, hours: 2}}))
-//       .rejects.toThrow('Purchase unsuccessful')
-// })
+test('Vehicle has valid permit (Police)', async () => {
+  await new PermitService().purchaseMyZonePermit(permitDetails)
+  const { isValid } = await new PermitService().isValidPermitPolice(policeDetails)
+  expect(isValid).toBe(true)
+})
 
+test('Vehicle does not have valid permit (Police)', async () => {
+  await new PermitService().purchaseMyZonePermit(permitDetails)
+  const { isValid } = await new PermitService().isValidPermitPolice('11111111-1234-1234-1234-567890abcdef')
+  expect(isValid).toBe(false)
+})
+
+test('getMyPermits returns empty', async () => {
+  const { active } = await new PermitService().getMyPermits(permitDetails.vehicle)
+  expect(active.length).toBe(0)
+})
+
+test('getMyPermits returns active permit', async () => {
+  await new PermitService().purchaseMyZonePermit(permitDetails)
+  const { active } = await new PermitService().getMyPermits(permitDetails.vehicle)
+  expect(active.length).toBe(1)
+})

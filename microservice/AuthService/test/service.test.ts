@@ -14,6 +14,7 @@ import {test, afterAll, expect, vi, beforeEach} from 'vitest'
 import db from './db'
 import {AuthService} from '../src/auth/service'
 import { OauthLoginData, SessionUser } from '../src'
+import { pool } from '../src/auth/db';
 
 vi.mock('server-only', () => ({}))
 
@@ -158,3 +159,35 @@ test('AuthService Check() throws error for driver with JWT containing Integer', 
   vi.spyOn(console, 'error').mockImplementation(() => {})
   await expect(new AuthService().check(`Bearer ${numJWT}`, ["admin"])).rejects.toThrow('Unauthorized3')
 })
+
+test('getIDByEmail returns encrypted ID for valid email', async () => {
+  const authService = new AuthService();
+
+  // Mock database response
+  vi.spyOn(pool, 'query').mockResolvedValueOnce({
+    rows: [{ id: '1234' }],
+    rowCount: 1,
+  } as any);
+
+  const email = 'test@example.com';
+  const result = await authService.getIDByEmail(email);
+
+  expect(result).toBeDefined();
+  expect(result).toMatch(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/);
+});
+
+
+test('getIDByEmail returns undefined for invalid email', async () => {
+  const authService = new AuthService();
+
+  // Mock database response
+  vi.spyOn(pool, 'query').mockResolvedValueOnce({
+    rows: [],
+    rowCount: 0,
+  } as any);
+
+  const email = 'invalid@example.com';
+  const result = await authService.getIDByEmail(email);
+
+  expect(result).toBeNull();
+});

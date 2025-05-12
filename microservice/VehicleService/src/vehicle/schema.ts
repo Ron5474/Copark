@@ -48,7 +48,7 @@ export class UpdateVehicleInput {
   nickname?: string
 }
 
-@InputType()
+@ObjectType()
 export class VehicleID {
   @Field(() => ID)
   id!: string

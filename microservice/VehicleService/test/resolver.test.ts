@@ -139,6 +139,13 @@ query checkForVehicleID($vehicleID: String!) {
   }
 }`
 
+const getVehicleByUserIdQuery = `
+query GetVehicleByUserId($userID: String!) {
+  getVehicleByUserId(userID: $userID) {
+    id
+  }
+}`
+
 const vehicleInput = {
   input: {
     plate: "TEST123",
@@ -280,4 +287,16 @@ test('Driver can get a list of their vehicles', async () => {
        })
        
     expect(listResponse.body.data.checkForVehicleID.plate).toBe("TEST123")
+  })
+
+  test('Admin can find a VehicleID using userID', async () => {
+    // const token = await loginAs("admin")
+
+    const listResponse = await supertest(server)
+      .post('/graphql')
+      // .set('Authorization', 'Bearer ' + token)
+      .send({ query: getVehicleByUserIdQuery,
+        variables: {userID: "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImUzMTRmNjg4LWQxNTAtNDExZS1hYTRmLTRiMGU2ZTU2MzE5ZCIsImlhdCI6MTc0NzAzMjE0MSwiZXhwIjoxNzQ3MDMzOTQxfQ.aPTJ9DYW1eCjCDjrcgYrPgfB5It_s1sawbypgxSglFA"}
+       })
+    expect(listResponse.body.data.getVehicleByUserId.length).toBe(1)
   })

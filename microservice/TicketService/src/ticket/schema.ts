@@ -52,6 +52,12 @@ export class TicketInput {
 }
 
 @InputType()
+export class EmailInput {
+  @Field(() => String)
+  email!: string;
+}
+
+@InputType()
 export class ModifyTicketInput {
   @Field(() => ID)
   id!: string;
@@ -70,4 +76,11 @@ export class ModifyTicketInput {
 
   @Field(() => String, { nullable: true })  
   images?: string;
+}
+
+@ObjectType()
+export class hasTicket {
+
+  @Field(() => Boolean)
+  hasTicket!: boolean
 }

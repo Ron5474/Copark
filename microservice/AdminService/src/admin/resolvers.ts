@@ -3,7 +3,9 @@ import { AdminService } from "./service";
 import { 
   User,
   NewUser,
-  UserInput
+  UserInput,
+  APIUser,
+  APICredential
 } from "./schema";
 
 const adminService = new AdminService();
@@ -28,6 +30,14 @@ export class AdminResolver {
     @Arg("enforcer", () => NewUser) enforcer: NewUser
   ): Promise<User[]> {
     return adminService.addEnforcer(enforcer);
+  }
+
+  @Mutation(() => APIUser)
+  @Authorized(["admin"])
+  async addAPIUser(
+    @Arg("organization", () => APICredential) organization: APICredential
+  ): Promise<APIUser | undefined> {
+    return adminService.addAPIUser(organization)
   }
 
   @Mutation(() => [User])

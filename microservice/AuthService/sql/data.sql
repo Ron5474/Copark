@@ -27,6 +27,20 @@ VALUES (
   )
 );
 
+-- Adding Test Data for OAuth
+INSERT INTO account(id, data)
+VALUES (
+  '39f48f9f-2693-446b-ad98-8e0db1ef14bd',
+  jsonb_build_object(
+    'name', 'Ronak Patel',
+    'email', 'roapatel@ucsc.edu',
+    'picture' , 'https://www.google.com/img',
+    'sub', '12345678',
+    'role', '["driver"]',
+    'accountStatus', 'active'
+  )
+);
+
 INSERT INTO account(id, data)
 VALUES (
   '8dc65233-c590-45b7-9b10-a5b049600901',

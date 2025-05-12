@@ -27,3 +27,16 @@ VALUES (
     'images', '[]'
   )
 );
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
+  'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
+  '8dc65233-c590-45b7-9b10-a5b049600901',
+  jsonb_build_object(
+    'issuedDate', NOW(),
+    'violation', 'parking',
+    'fine', 50,
+    'ticketStatus', 'unpaid',
+    'images', '[]'
+  )
+);

@@ -74,7 +74,7 @@ export class TicketResolver {
     const vehicleQuery = {
     query: `
       query {
-        getVehicleByUserId(userID: "${userID}") {
+        getVehicleByUserId(userID: "${userID.id}") {
           id
         }
       }

@@ -3,20 +3,21 @@ import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID } from './
 import { SignJWT, jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
+const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class VehicleService {
 
-  private async encrypt(userId: string): Promise<string> {
+  private async encrypt(userId: string, key=encodedKey): Promise<string> {
       return new SignJWT({ id: userId })
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
         .setExpirationTime('30m')
-        .sign(encodedKey)
+        .sign(key)
     }
 
-  private async decrypt(token: string): Promise<string | undefined> {
+  private async decrypt(token: string, key=encodedKey): Promise<string | undefined> {
     try {
-      const { payload } = await jwtVerify(token, encodedKey)
+      const { payload } = await jwtVerify(token, key)
 
       return payload.id as string; // Extract the `id` from the payload
     } catch (error) {
@@ -68,8 +69,7 @@ export class VehicleService {
 
   public async getVehicleByUserId(userID: string): Promise<VehicleID[]> {
 
-    const userDecrypted = await this.decrypt(userID)
-
+    const userDecrypted = await this.decrypt(userID, emailEncodedKey)
     const result = await pool.query(
       `SELECT id FROM vehicle WHERE driver = $1`,
       [userDecrypted]
@@ -78,7 +78,8 @@ export class VehicleService {
     if (result.rowCount === 0) return []
 
     return Promise.all(result.rows.map(async row => ({
-      id: await this.encrypt(row.id),
+      // id: await this.encrypt(row.id),
+      id: row.id
     })))
   }
 

@@ -220,7 +220,7 @@ export class TicketService {
         data->>'ticketStatus' AS ticketstatus,
         data->>'images' AS images
   FROM ticket
-  WHERE vehicle = ANY($1::text[])
+  WHERE vehicle = ANY($1::uuid[])
     AND data->>'ticketStatus' NOT IN ('deleted', 'paid')
   `;
 

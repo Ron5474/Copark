@@ -12,7 +12,7 @@ const ticketService = new TicketService();
 @Resolver()
 export class TicketResolver {
   @Query(() => [Ticket])
-  @Authorized(["driver"])
+  @Authorized(["admin"])
   async getTickets(): Promise<Ticket[]> {
     return ticketService.getTickets();
   }

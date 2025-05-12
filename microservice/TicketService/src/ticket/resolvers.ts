@@ -34,4 +34,6 @@ export class TicketResolver {
   async deleteTicket(@Arg("id", () => TicketInput) id: TicketInput): Promise<Ticket | null> {
     return ticketService.deleteTicket(id);
   }
+
+  //need to add getTicketByEmail
 }

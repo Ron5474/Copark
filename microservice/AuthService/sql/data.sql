@@ -54,6 +54,19 @@ VALUES (
   )
 );
 
+INSERT INTO account(id, data)
+VALUES (
+  '0f99f921-594e-4387-9d05-e6e80d8aa54a',
+  jsonb_build_object(
+    'name', 'Static Driver 1',
+    'email', 'staticdriver1@outlook.com',
+    'phone' , '123-456-7890',
+    'pwhash', crypt('password1', gen_salt('bf')),
+    'role', '["driver"]',
+    'accountStatus', 'active'
+  )
+);
+
 INSERT INTO account(data)
 VALUES (
   jsonb_build_object(

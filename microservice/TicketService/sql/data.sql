@@ -30,7 +30,7 @@ VALUES (
 
 INSERT INTO ticket (vehicle, enforcer, data)
 VALUES (
-  'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
+  'b69c877b-cfde-430c-8856-a2354d2e0d06',
   '8dc65233-c590-45b7-9b10-a5b049600901',
   jsonb_build_object(
     'issuedDate', NOW(),

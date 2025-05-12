@@ -46,3 +46,16 @@ INSERT INTO vehicle (driver, data) VALUES
       'nickname', 'Truck'
     )
   );
+
+INSERT INTO vehicle (id, driver, data) VALUES
+  (
+    'b69c877b-cfde-430c-8856-a2354d2e0d06',
+    '0f99f921-594e-4387-9d05-e6e80d8aa54a',
+    jsonb_build_object(
+      'plate', '7ABC123',
+      'country', 'US',
+      'state', 'NY',
+      'nickname', 'Flying car'
+    )
+  );
+

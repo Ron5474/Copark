@@ -1,4 +1,4 @@
-import { User, UserInput, NewUser, PoliceUser, PoliceCredential } from "./schema";
+import { User, UserInput, NewUser, APIUser, APICredential } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -121,26 +121,26 @@ export class AdminService {
     return enforcers;
   }
 
-  public async addPolice(credential: PoliceCredential): Promise<PoliceUser | undefined> {
+  public async addAPIUser(credential: APICredential): Promise<APIUser | undefined> {
     const insert = `
     INSERT INTO account (data)
       SELECT jsonb_build_object(
         'name', $1::text,
         'email', $2::text,
-        'role', jsonb_build_array('police')
+        'role', jsonb_build_array($3::text)
       )
       WHERE NOT EXISTS (
         SELECT 1
         FROM account
         WHERE (data->>'email' = $2::text
-              AND data->'role' @> '["police"]'::jsonb
+              AND data->'role' @> jsonb_build_array($3::text)
              )
       )
       RETURNING id`
     
     const query = {
       text: insert,
-      values: [credential.name, credential.email]
+      values: [credential.name, credential.email, credential.role]
     }
 
     const { rows } = await pool.query(query)

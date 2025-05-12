@@ -34,16 +34,19 @@ export class UserInput {
 }
 
 @InputType()
-export class PoliceCredential {
+export class APICredential {
   @Field(() => String)
   name!: string
 
   @Field(() => String)
   email!: string
+
+  @Field(() => String)
+  role!: string
 }
 
 @ObjectType()
-export class PoliceUser {
+export class APIUser {
   @Field(() => ID)
   id!: string
 }

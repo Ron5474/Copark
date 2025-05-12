@@ -9,6 +9,18 @@ VALUES (
     'phone' , '123-456-7890',
     'pwhash', crypt('password1', gen_salt('bf')),
     'role', '["admin"]',
+    'accountStatus', 'inactive'
+  )
+);
+
+INSERT INTO account(data)
+VALUES (
+  jsonb_build_object(
+    'name', 'Ronak Patel',
+    'email', 'ronak@books.com',
+    'phone' , '123-456-7890',
+    'pwhash', crypt('password1', gen_salt('bf')),
+    'role', '["admin"]',
     'accountStatus', 'active'
   )
 );

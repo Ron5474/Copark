@@ -3,7 +3,7 @@ import * as http from 'http'
 import supertest from 'supertest'
 
 import { app, bootstrap } from '../src/app'
-import { Vehicle } from '../src/vehicle/schema'
+import { Vehicle, VehicleID } from '../src/vehicle/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
@@ -28,12 +28,20 @@ export const VehicleData = {
   
 test('User schema loads correctly', () => {
   // Create instance of User
-  const testUser = new Vehicle();
-  testUser.id = VehicleData.id;
-  testUser.plate = VehicleData.plate;
-  testUser.country = VehicleData.country;
-  testUser.state = VehicleData.state;
-  testUser.nickname = VehicleData.nickname;
+  const testUser = new Vehicle()
+  testUser.id = VehicleData.id
+  testUser.plate = VehicleData.plate
+  testUser.country = VehicleData.country
+  testUser.state = VehicleData.state
+  testUser.nickname = VehicleData.nickname
+
+  expect(testUser).toBeDefined()
+});
+
+test('VehicleID schema loads correctly', () => {
+  // Create instance of User
+  const testUser = new VehicleID()
+  testUser.id = VehicleData.id
 
   expect(testUser).toBeDefined()
 });

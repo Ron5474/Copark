@@ -4,8 +4,8 @@ import {
   User,
   NewUser,
   UserInput,
-  PoliceUser,
-  PoliceCredential
+  APIUser,
+  APICredential
 } from "./schema";
 
 const adminService = new AdminService();
@@ -32,12 +32,12 @@ export class AdminResolver {
     return adminService.addEnforcer(enforcer);
   }
 
-  @Mutation(() => PoliceUser)
+  @Mutation(() => APIUser)
   @Authorized(["admin"])
-  async addPolice(
-    @Arg("police", () => PoliceCredential) police: PoliceCredential
-  ): Promise<PoliceUser | undefined> {
-    return adminService.addPolice(police)
+  async addAPIUser(
+    @Arg("organization", () => APICredential) organization: APICredential
+  ): Promise<APIUser | undefined> {
+    return adminService.addAPIUser(organization)
   }
 
   @Mutation(() => [User])

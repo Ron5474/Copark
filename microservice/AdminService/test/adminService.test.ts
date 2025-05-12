@@ -5,7 +5,7 @@
 import { beforeAll, afterAll, test, expect } from 'vitest';
 import db from './db';
 import { AdminService } from '../src/admin/service';
-import { NewUser, UserInput } from '../src/admin/schema';
+import { APICredential, NewUser, UserInput } from '../src/admin/schema';
 
 const adminService = new AdminService();
 
@@ -99,4 +99,13 @@ test('deleteUser should delete a user', async () => {
     expect(updatedEnforcers).toHaveLength(1);
     expect(updatedEnforcers[0].name).toBe('barracks Obama');
     expect(updatedEnforcers[0].accountStatus).toBe('deleted');
+});
+
+test('AddAPIUser returns undefined for repeated addition', async () => {
+    const apiUser: APICredential = { name: 'Santa Cruz PD', email: 'scpd@gmail.com', role: 'police' };
+    await adminService.addAPIUser(apiUser)
+
+    const enforcers = await adminService.addAPIUser(apiUser);
+
+    expect(enforcers).toBeUndefined()
 });

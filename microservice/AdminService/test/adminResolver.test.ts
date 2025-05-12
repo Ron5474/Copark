@@ -302,3 +302,27 @@ test('Admin can delete an enforcer', async () => {
   const deleted = deleteResponse.body.data.deleteUser
   expect(deleted[0].accountStatus).toBe('deleted')
 })
+
+test('Admin can add a payroll organization', async () => {
+  const token = await loginAsAdmin()
+
+  const mutation = `
+    mutation {addAPIUser(organization: {
+      name: "Santa Cruz PD"
+      email: "scpd@gmail.com"
+      role: "police"
+      }){
+      id
+      }
+    }
+  `
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: mutation })
+    .expect(200)
+
+  expect(response.body.errors).toBeUndefined()
+  expect(response.body.data.addAPIUser.id).toBeDefined()
+})

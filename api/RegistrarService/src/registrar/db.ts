@@ -1,24 +1,24 @@
 import {Pool} from 'pg'
 import dotenv from 'dotenv'
 
-// dotenv.config({path: '../../.env'})
 import { resolve } from 'path'
 
-dotenv.config({ path: resolve(__dirname, '../../../../../.env') })
+dotenv.config({ path: resolve(__dirname, '../../.env') })
 
-// console.log('Connecting to PostgreSQL database...')
-// console.log('POSTGRES_HOST', process.env.POSTGRES_HOST)
-// console.log('POSTGRES_PORT', process.env.POSTGRES_PORT)
-// console.log('POSTGRES_USER', process.env.POSTGRES_USER)
-// console.log('POSTGRES_PASSWORD', process.env.POSTGRES_PASSWORD)
-
-const pool = new Pool({
+const vehiclePool = new Pool({
   host: process.env.POSTGRES_HOST,
   port: parseInt(process.env.POSTGRES_PORT as string, 10),
-  database: process.env.POSTGRES_AUTH_DB,
-  // database: 'auth',
+  database: 'vehc',
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
 })
 
-export {pool}
+const ticketPool = new Pool({
+  host: process.env.POSTGRES_HOST,
+  port: parseInt(process.env.POSTGRES_PORT as string, 10),
+  database: 'ticket',
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+})
+
+export {vehiclePool, ticketPool}

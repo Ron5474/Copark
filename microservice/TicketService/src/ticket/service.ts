@@ -209,7 +209,7 @@ export class TicketService {
     } as Ticket;
   }
 
-  public async getTicketsForEmail(email: EmailInput): Promise<Ticket | null> {
+  public async getTicketsForEmail(email: EmailInput): Promise<Ticket[] | undefined> {
 
     //convert email to userID
     let userID: string;
@@ -238,36 +238,68 @@ export class TicketService {
 
     // get vehicles for userID
 
-    const graphqlQuery = {
-      query: `
-        query {
-          myVehicles {
-            id
-          }
+    const vehicleQuery = {
+    query: `
+      query {
+        getVehicleByUserId(userID: "${userID}") {
+          id
         }
-      `
-    };
+      }
+    `
+  };
 
-  const graphqlResponse = await fetch('http://localhost:4001/graphql', {
+  const vehicleResponse = await fetch('http://localhost:4001/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       // 'Authorization': 'Bearer ' + (userID)
     },
-    body: JSON.stringify(graphqlQuery)
+    body: JSON.stringify(vehicleQuery)
   });
 
-  const graphqlResult = await graphqlResponse.json();
+  const vehicleResult = await vehicleResponse.json();
 
-  if (!graphqlResult.data || !graphqlResult.data.myVehicles) {
-    throw new Error('Failed to fetch vehicles from GraphQL API');
+  const vehicleIDs: string[] =
+    vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id) ?? [];
+
+  if (vehicleIDs.length === 0) return undefined;
+
+  // get tickets for vehicles
+  const query = `
+  SELECT id, vehicle, enforcer,
+        data->>'issuedDate' AS issueddate,
+        data->>'violation' AS violation,
+        data->>'fine' AS fine,
+        data->>'ticketStatus' AS ticketstatus,
+        data->>'images' AS images
+  FROM ticket
+  WHERE vehicle = ANY($1::text[])
+    AND data->>'ticketStatus' NOT IN ('deleted', 'paid')
+  `;
+
+  const result = await pool.query(query, [vehicleIDs]);
+  
+  //format
+  interface TicketRow {
+    id: string;
+    vehicle: string;
+    enforcer: string;
+    issueddate: string;
+    violation: string;
+    fine: string;
+    ticketstatus: string;
+    images: string | undefined;
   }
 
-  const vehicleIds = graphqlResult.data.myVehicles.map((v: any) => v.id);
-
-  if (vehicleIds.length === 0) return [];
-
-
-    // get tickets for vehicles
-    }
+  return await Promise.all(result.rows.map(async (row: TicketRow): Promise<Ticket> => ({
+    id: await this.encrypt(row.id),
+    vehicle: await this.encrypt(row.vehicle),
+    enforcer: await this.encrypt(row.enforcer),
+    issuedDate: new Date(row.issueddate),
+    violation: row.violation,
+    fine: parseFloat(row.fine),
+    ticketStatus: row.ticketstatus,
+    images: row.images,
+  })));
+  }
 }

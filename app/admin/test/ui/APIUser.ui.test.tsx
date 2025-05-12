@@ -104,6 +104,27 @@ it('opens add dialog when add button is clicked', () => {
   expect(screen.getByRole('dialog')).toBeDefined()
 })
 
+it('opens add dialog and closes it properly', async () => {
+  cleanup()
+  render(
+    <ThemeProvider theme={theme}>
+      <ManageAPIUsers onNavigate={mockNavigate} />
+    </ThemeProvider>
+  )
+
+  // Open dialog
+  fireEvent.click(screen.getByText('Add API User'))
+  expect(screen.getByRole('dialog')).toBeDefined()
+
+  // Close dialog
+  fireEvent.click(screen.getByText('Cancel'))
+  
+  // Wait for dialog to close
+  await waitFor(() => {
+    expect(screen.queryByRole('dialog')).toBeNull()
+  }, { timeout: 2000 }) // Increase timeout to ensure dialog close animation completes
+})
+
 it('navigates home when home button is clicked', () => {
   cleanup(); 
   render(

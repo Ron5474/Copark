@@ -131,7 +131,7 @@ export class TicketService {
 
     // Filter out undefined fields
     const entries = Object.entries(updates).filter(
-      ([_, value]) => value !== undefined
+      ([, value]) => value !== undefined
     );
 
     if (entries.length === 0) {

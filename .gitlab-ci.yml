@@ -330,7 +330,8 @@ conatainerize:build-docker-image:
     - conatainerize:setup
   image: node:20  # or your preferred Node version
   services:
-    - docker:24-dind
+    - name: docker:24-dind
+      alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""

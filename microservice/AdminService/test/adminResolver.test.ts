@@ -62,10 +62,7 @@ async function loginAsAdmin(): Promise<string | undefined> {
 
   return response.body?.id
 }
-// Test case for the `getEnforcers` query
-test('Admin can get a list of enforcers', async () => {
-  const token = await loginAsAdmin()
-})
+
 // Test case for the `getEnforcers` query
 test('Admin can get a list of enforcers', async () => {
   const token = await loginAsAdmin()

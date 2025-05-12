@@ -12,7 +12,7 @@ export default defineConfig({
       provider: 'v8',
       include: [
         'src/**',
-        'test/**',
+        // 'test/**',
       ],
       exclude: [
         'src/server.ts',

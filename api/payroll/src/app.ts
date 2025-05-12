@@ -16,10 +16,16 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
+
 app.use('/api/v0/docs', swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
-  res.send(
-    swaggerUi.generateHTML(await import('../build/swagger.json'))
-  )
+  if (process.env.API_DOCS) {
+    res.send(
+      swaggerUi.generateHTML(await import('../build/swagger.json'))
+    )
+  }
+  else {
+    res.sendStatus(404)
+  }
 })
 
 const router = Router()

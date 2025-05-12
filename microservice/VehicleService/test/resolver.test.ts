@@ -48,6 +48,8 @@ const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSl
 //     "sub": "1234567890",
 //   }
 
+const validDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjM5ZjQ4ZjlmLTI2OTMtNDQ2Yi1hZDk4LThlMGRiMWVmMTRiZCIsImlhdCI6MTc0NzA2NzM2NSwiZXhwIjoxOTA0ODU1MzY1fQ.U90qXFiG-nLiqqbL32KwhGaLdlZc0NyA6XDnetN1SRQ"
+
 const adminUser = {
   email: 'jxiong0822@outlook.com',
   password: 'password1',
@@ -296,7 +298,7 @@ test('Driver can get a list of their vehicles', async () => {
       .post('/graphql')
       // .set('Authorization', 'Bearer ' + token)
       .send({ query: getVehicleByUserIdQuery,
-        variables: {userID: "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImUzMTRmNjg4LWQxNTAtNDExZS1hYTRmLTRiMGU2ZTU2MzE5ZCIsImlhdCI6MTc0NzAzMjE0MSwiZXhwIjoxNzQ3MDMzOTQxfQ.aPTJ9DYW1eCjCDjrcgYrPgfB5It_s1sawbypgxSglFA"}
+        variables: {userID: validDriverJWT}
        })
     expect(listResponse.body.data.getVehicleByUserId.length).toBe(1)
   })

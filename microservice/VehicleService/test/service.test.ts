@@ -19,6 +19,7 @@ import { Vehicle } from '../src/vehicle/schema'
 vi.mock('server-only', () => ({}))
 
 // const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
+// const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 beforeEach(() => {
     return db.reset()
@@ -32,8 +33,8 @@ afterAll(() => {
 //   return new SignJWT({ id: userId })
 //     .setProtectedHeader({ alg: 'HS256' })
 //     .setIssuedAt()
-//     .setExpirationTime('30m')
-//     .sign(encodedKey)
+//     .setExpirationTime('5y')
+//     .sign(emailEncodedKey)
 //   }
 
 // async function decrypt(token: string): Promise<string | undefined> {
@@ -53,11 +54,11 @@ let mock_driver2_ID: string;
 
 // async function logEncrypted() {
 //   console.log(await encrypt("b20ec061-2957-4c3b-b193-c8b40138e8f1"));
-//   console.log(await encrypt("e314f688-d150-411e-aa4f-4b0e6e56319d"));
+//   console.log(await encrypt("39f48f9f-2693-446b-ad98-8e0db1ef14bd"));
 // }
 
-const invalidDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyMGVjMDYxLTI5NTctNGMzYi1iMTkzLWM4YjQwMTM4ZThmMSIsImlhdCI6MTc0NzAzMTc1OCwiZXhwIjoxNzQ3MDMzNTU4fQ.-pzb7zf-K4HGSliBzSSC76CaJPu_NO6HtNxCgbl25uI"
-const validDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImUzMTRmNjg4LWQxNTAtNDExZS1hYTRmLTRiMGU2ZTU2MzE5ZCIsImlhdCI6MTc0NzAzMjE0MSwiZXhwIjoxNzQ3MDMzOTQxfQ.aPTJ9DYW1eCjCDjrcgYrPgfB5It_s1sawbypgxSglFA"
+const invalidDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyMGVjMDYxLTI5NTctNGMzYi1iMTkzLWM4YjQwMTM4ZThmMSIsImlhdCI6MTc0NzA2NzM2NSwiZXhwIjoxOTA0ODU1MzY1fQ.pPIDRd0PtW97OkgD03LqeS9LI9TCRq7CwXpoDdM7K3k"
+const validDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjM5ZjQ4ZjlmLTI2OTMtNDQ2Yi1hZDk4LThlMGRiMWVmMTRiZCIsImlhdCI6MTc0NzA2NzM2NSwiZXhwIjoxOTA0ODU1MzY1fQ.U90qXFiG-nLiqqbL32KwhGaLdlZc0NyA6XDnetN1SRQ"
 // logEncrypted();
 
 beforeEach(async () => {

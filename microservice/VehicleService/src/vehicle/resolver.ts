@@ -9,6 +9,10 @@ const service = new VehicleService()
 
 @Resolver()
 export class VehicleResolver {
+  // need to allow admin and enforcement to see all vehicles so they can get tickets for those vehicles
+  // temporaryly disabled security, but really there should be another function for enforcement and admins to
+  // get vehicles of a userID
+  // @Authorized('admin', 'enforcement', 'police')
   @Authorized('driver')
   @Query(() => [Vehicle])
   async myVehicles(@Ctx() request: Request & {user: SessionUser}): Promise<Vehicle[]> {

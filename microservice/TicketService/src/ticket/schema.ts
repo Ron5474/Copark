@@ -52,6 +52,12 @@ export class TicketInput {
 }
 
 @InputType()
+export class EmailInput {
+  @Field(() => String)
+  email!: string;
+}
+
+@InputType()
 export class ModifyTicketInput {
   @Field(() => ID)
   id!: string;

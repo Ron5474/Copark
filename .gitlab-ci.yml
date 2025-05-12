@@ -326,6 +326,8 @@ conatainerize:setup:
 
 conatainerize:build-docker-image:
   stage: conatainerize
+  needs:
+    - conatainerize:setup
   image: node:20  # or your preferred Node version
   services:
     - docker:24-dind

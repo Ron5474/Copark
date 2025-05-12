@@ -66,21 +66,20 @@ export class VehicleService {
     }
   }
 
-  public async getVehicleByUserId(userID: string): Promise<VehicleID | null> {
+  public async getVehicleByUserId(userID: string): Promise<VehicleID[]> {
 
     const userDecrypted = await this.decrypt(userID)
 
     const result = await pool.query(
-      `SELECT id FROM vehicle WHERE userId = $1`,
+      `SELECT id FROM vehicle WHERE driver = $1`,
       [userDecrypted]
     )
 
-    if (result.rowCount === 0) return null
+    if (result.rowCount === 0) return []
 
-    const row = result.rows[0]
-    return {
+    return Promise.all(result.rows.map(async row => ({
       id: await this.encrypt(row.id),
-    }
+    })))
   }
 
   public async registerVehicle(userId: string, input: RegisterVehicleInput): Promise<Vehicle> {

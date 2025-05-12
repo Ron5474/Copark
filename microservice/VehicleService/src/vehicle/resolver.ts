@@ -60,7 +60,7 @@ export class VehicleResolver {
   @Query(() => VehicleID, { nullable: true })
   async getVehicleByUserId(
     @Arg('userID', () => String) userID: string
-  ): Promise<VehicleID | null> {
+  ): Promise<VehicleID[] | null> {
     return await service.getVehicleByUserId(userID);
   }
 }

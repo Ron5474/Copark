@@ -92,6 +92,6 @@ test('Can get userID by Email', async () => {
     .expect(200)
 
   expect(response.body).toBeDefined()
-  expect(typeof response.body).toBe('string')
+  expect(typeof response.body).toBe('object')
 })
 

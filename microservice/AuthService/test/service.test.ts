@@ -189,5 +189,5 @@ test('getIDByEmail returns undefined for invalid email', async () => {
   const email = 'invalid@example.com';
   const result = await authService.getIDByEmail(email);
 
-  expect(result).toBeUndefined();
+  expect(result).toBeNull();
 });

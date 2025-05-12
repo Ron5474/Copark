@@ -328,7 +328,7 @@ conatainerize:build-docker-image:
   stage: conatainerize
   needs:
     - conatainerize:setup
-  image: node:20  # or your preferred Node version
+  image: docker:24
   services:
     - name: docker:24-dind
       alias: docker
@@ -336,8 +336,9 @@ conatainerize:build-docker-image:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - apt-get update && apt-get install -y docker.io
+    - apk add --no-cache npm
   script:
+    - npm install
     - npm run package
   artifacts:
     paths:

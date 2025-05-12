@@ -209,7 +209,11 @@ export class TicketService {
     } as Ticket;
   }
 
-  public async getTicketsForEmail(vehicleIDs: string[]): Promise<Ticket[] | undefined> {
+  public async getTicketsForVehicleID(vehicleIDs: string[]): Promise<Ticket[] | undefined> {
+
+  const decryptedIDs = await Promise.all(vehicleIDs.map(async (vehicleID: string) => {
+    return await this.decrypt(vehicleID);
+  }));
 
   // get tickets for vehicles
   const query = `
@@ -224,7 +228,7 @@ export class TicketService {
     AND data->>'ticketStatus' NOT IN ('deleted', 'paid')
   `;
 
-  const result = await pool.query(query, [vehicleIDs]);
+  const result = await pool.query(query, [decryptedIDs]);
   
   //format
   interface TicketRow {

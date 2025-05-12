@@ -56,7 +56,7 @@ export class VehicleResolver {
     return await service.getVehicleById({ id: vehicleID })
   }
 
-  // need to add code for security in getTicketsForEmail
+  // need to add code for security in getTicketsForVehicleID
   // @Authorized('admin', 'enforcement')
   @Query(() => [VehicleID], { nullable: true })
   async getVehicleByUserId(

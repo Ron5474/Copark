@@ -217,3 +217,18 @@ test('deleteTicket should delete a ticket', async () => {
       .rejects
       .toThrow('No delete found.');
   });
+
+  test('getTicketsForVehicleID should return tickets for the provided vehicle IDs', async () => {
+
+    const vehicleid1 = await encrypt('f26adf21-f967-4283-8417-f72298bc7bbe');
+
+    // Call getTicketsForVehicleID with vehicle IDs
+    const tickets = await ticketService.getTicketsForVehicleID([vehicleid1]);
+  
+    // Assertions
+    expect(tickets).toBeDefined();
+    expect(tickets).toHaveLength(1);
+  
+    expect(tickets![0]).toHaveProperty('violation', 'parking');
+    expect(tickets![0]).toHaveProperty('ticketStatus', 'unpaid');
+  });

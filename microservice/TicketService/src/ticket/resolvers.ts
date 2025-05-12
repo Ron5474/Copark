@@ -97,7 +97,7 @@ export class TicketResolver {
 
   if (vehicleIDs.length === 0) return {hasTicket: false};
 
-    const tickets = await ticketService.getTicketsForEmail(vehicleIDs)
+    const tickets = await ticketService.getTicketsForVehicleID(vehicleIDs)
     if (!tickets) return {hasTicket: false}
     if (tickets?.length > 0) {
       return {hasTicket: true}

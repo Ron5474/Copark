@@ -1,4 +1,6 @@
 import { test, beforeAll, afterAll, expect } from 'vitest'
+// @ts-ignore
+
 import supertest from 'supertest'
 import * as http from 'http'
 
@@ -6,7 +8,6 @@ import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
 import { SignJWT } from 'jose'
-import { vehicle } from 'app/driver/tests/combined/mockService'
 
 let server: http.Server
 let authServer: http.Server
@@ -61,7 +62,7 @@ async function loginAsAdmin(): Promise<string> {
   return response.body.id
 }
 
-test('Admin can create a ticket with images (using variables)', async () => {
+test('Admin can create a ticket with images', async () => {
   const token = await loginAsAdmin()
 
   const vehicleid = await encrypt('00000000-0000-0000-0000-000000000000')

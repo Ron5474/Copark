@@ -6,7 +6,8 @@ import {
   Get,
   Security,
   Request,
-  Response
+  Response,
+  Query
 } from "tsoa";
 import * as express from "express";
 import { Credentials, Authenticated, OauthLoginData } from "./";
@@ -50,5 +51,10 @@ export class AuthController extends Controller {
     // console.log('eowefjioefjiowfejiowejiowefjioefwjioefjioef')
     // console.log("ROLE!S :" + request.headers.authorization, roles)
     return new AuthService().check(request.headers.authorization, roles);
+  }
+
+  @Get("id")
+  public async getIDByEmail(@Query() email: string): Promise<string | undefined> {
+    return new AuthService().getIDByEmail(email);
   }
 }

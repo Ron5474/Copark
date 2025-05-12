@@ -29,12 +29,13 @@ async function encrypt(userId: string): Promise<string> {
       .sign(encodedKey)
   }
 
-test('getTickets should return a list of enforcers', async () => {
+test('getTickets should return a list of tickets', async () => {
     const tickets = await ticketService.getTickets();
 
-    expect(tickets).toHaveLength(2);
+    expect(tickets).toHaveLength(3);
     expect(tickets[0].ticketStatus).toBe('unpaid');
     expect(tickets[1].ticketStatus).toBe('unpaid');
+    expect(tickets[2].ticketStatus).toBe('unpaid');
 });
 
 test('createTicket should return a newTicket', async () => {

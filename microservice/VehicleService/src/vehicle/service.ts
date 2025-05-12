@@ -66,10 +66,9 @@ export class VehicleService {
     }
   }
 
-  // don't wanna make a new type for this so userID uses VehicleID
-  public async getVehicleByUserId(userID: VehicleID): Promise<VehicleID | null> {
+  public async getVehicleByUserId(userID: string): Promise<VehicleID | null> {
 
-    const userDecrypted = await this.decrypt(userID.id)
+    const userDecrypted = await this.decrypt(userID)
 
     const result = await pool.query(
       `SELECT id FROM vehicle WHERE userId = $1`,

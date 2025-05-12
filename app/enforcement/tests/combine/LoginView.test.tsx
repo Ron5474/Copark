@@ -1,8 +1,9 @@
-import { vi, it, expect, afterEach, beforeAll, afterAll } from 'vitest'
+import { vi, it, expect, afterEach, beforeAll, afterAll, beforeEach } from 'vitest'
 import { render, screen, waitFor, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { setupServer } from 'msw/node'
 
+import { login } from '../../src/app/login/actions'
 import EnforcementLoginPage from '@/app/login/page'
 import { authHandlers } from './mockService'
 
@@ -29,6 +30,10 @@ vi.mock('next/headers', () => {
 })
 
 const push = vi.fn()
+global.fetch = vi.fn()
+beforeEach(() => {
+  vi.resetAllMocks()
+})
 
 beforeAll(() => {
   server.listen()
@@ -75,4 +80,32 @@ it('shows error when Auth microservice denies login', async () => {
 
   expect(await screen.findByText(/invalid credentials/i)).not.toBeNull()
   expect(push).not.toHaveBeenCalled()
+})
+
+it('returns undefined if authenticated user lacks an id', async () => {
+  ;(global.fetch as unknown) = vi.fn().mockResolvedValueOnce({
+    ok: true,
+    text: async () => JSON.stringify({ name: 'Officer Joe' }),
+  })
+
+  const result = await login({
+    email: 'officer1@outlook.com',
+    password: 'password1',
+  })
+
+  expect(result).toBeUndefined()
+})
+
+it('returns undefined if response text is empty (authenticated = null)', async () => {
+  ;(global.fetch as unknown) = vi.fn().mockResolvedValueOnce({
+    ok: true,
+    text: async () => '',
+  })
+
+  const result = await login({
+    email: 'officer1@outlook.com',
+    password: 'password1',
+  })
+
+  expect(result).toBeUndefined()
 })

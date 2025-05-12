@@ -22,7 +22,6 @@ import { useEffect } from 'react';
 import { getUser } from '../shared/actions';
 import { useRouter } from '@/i18n/navigation';
 import { useLocale } from 'next-intl';
-// import {login} from './actions'
 
 
 export default function LoginView() {
@@ -61,7 +60,6 @@ export default function LoginView() {
           fullWidth
           sx={{color: 'black', borderColor: 'black'}}
           onClick={() => {
-            console.log('Logging In')
             // login()
             handleClick('github')
           }}
@@ -74,7 +72,6 @@ export default function LoginView() {
           fullWidth
           sx={{color: 'black', borderColor: 'black'}}
           onClick={() => {
-            console.log('Logging In')
             // login()
             handleClick('google')
           }}
@@ -87,7 +84,6 @@ export default function LoginView() {
           fullWidth
           sx={{color: 'black', borderColor: 'black'}}
           onClick={() => {
-            console.log('Logging In')
             // login()
             handleClick('facebook')
           }}

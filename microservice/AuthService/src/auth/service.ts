@@ -97,8 +97,9 @@ export class AuthService {
   }
 
   public async getIDByEmail(email: string): Promise<string | null> {
+    // "SELECT id FROM account WHERE data->>'email' = $1 AND data->>'deleted' IS NULL"
     const query = {
-      text: "SELECT id FROM account WHERE data->>'email' = $1 AND data->>'deleted' IS NULL",
+      text: "SELECT id FROM account WHERE data->>'email' = $1",
       values: [email],
     };
 

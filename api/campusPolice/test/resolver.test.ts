@@ -41,3 +41,24 @@ test('Police can look-up cars using plate number', async () => {
     .expect(200)
   expect(response.body).toBe(true)
 })
+
+test('Police cannot look up plates W/O Authorization', async () => {
+  await supertest(server)
+    .get(`/api/v0/police/check?plate=${findByPlateInput.plate}`)
+    .expect(401)
+})
+
+test('Police cannot look up plates if /auth/check fails', async () => {
+  auth(mockServer, true) //fail auth/check endpoint
+  await supertest(server)
+    .get(`/api/v0/police/check?plate=${findByPlateInput.plate}`)
+    .set('Authorization', 'Bearer fake-token')
+    .expect(401)
+})
+
+
+test('GET /docs page swagger UI', async () => {
+  await supertest(server)
+    .get(`/api/v0/docs/`)
+    .expect(200)
+})

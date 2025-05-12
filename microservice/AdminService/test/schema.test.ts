@@ -2,7 +2,7 @@ import { test, beforeAll, afterAll, expect } from 'vitest';
 import * as http from 'http';
 import db from './db';
 import { app, bootstrap } from '../src/app';
-import { User, NewUser, UserInput } from '../src/admin/schema'; // Adjust to your schema import
+import { User, NewUser, UserInput, APIUser } from '../src/admin/schema'; // Adjust to your schema import
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>;
 
@@ -63,4 +63,10 @@ test('UserInput input type validation', () => {
 
   expect(UserInput.id).toBeDefined();
   expect(UserInput.id).toBe('1234');
+});
+
+test('APIUser Object Validation', () => {
+  const apiUser = new APIUser()
+  apiUser.id = '1234'
+  expect(apiUser.id).toBeDefined();
 });

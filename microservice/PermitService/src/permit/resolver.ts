@@ -1,6 +1,14 @@
 import { Resolver, Query,  Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { Request } from 'express'
-import { Confirmation, PurchaseZoneInput, IsValid, IsValidPermitInput, IsValidPolice, MyPermits } from './schema'
+import {
+  Confirmation,
+  PurchaseZoneInput,
+  IsValid,
+  IsValidPermitInput,
+  IsValidPolice,
+  MyPermits,
+  // ZoneDetails,
+} from './schema'
 import { PermitService } from './service'
 
 const service = new PermitService()
@@ -78,13 +86,11 @@ export class PermitResolver {
   @Authorized('police')
   @Query(() => IsValidPolice)
   async isValidPermitByPolice (
-    @Arg("input", () => String) input: string,
+    @Arg("plate", () => String) plate: string,
     @Ctx() request: Request
   ): Promise<IsValidPolice> {
     const userId = request.user?.id
     if (!userId) throw new Error('Unauthorized')
-    
-    const plate = input
 
     const vehicleQuery = `
       query FindVehicleByPlate($plate: String!) {
@@ -112,13 +118,13 @@ export class PermitResolver {
       return {isValid: false}
     }
 
-    return await service.isValidPermitPolice(input)
+    return await service.isValidPermitPolice(vehicleId)
   }
 
   @Authorized('driver')
   @Query(() => MyPermits)
   async myPermits(
-    @Arg("input", () => String) input: string,
+    @Arg("vehicleID", () => String) vehicleID: string,
     @Ctx() request: Request
   ): Promise<MyPermits> {
     const userId = request.user?.id
@@ -153,18 +159,18 @@ export class PermitResolver {
     //   return []
     // }
 
-    return await service.getMyPermits(input)
+    return await service.getMyPermits(vehicleID)
   }
 
   // @Authorized('driver')
-  // @Query(() => Number)
-  // async zoneQuote(
-  //   @Arg("input", () => PurchaseZoneInput) input: PurchaseZoneInput,
+  // @Query(() => ZoneDetails)
+  // async zoneDetails(
+  //   @Arg("zone", () => String) zone: string,
   //   @Ctx() request: Request
-  // ): Promise<number> {
+  // ): Promise<ZoneDetails> {
   //   const userId = request.user?.id
   //   if (!userId) throw new Error('Unauthorized')
 
-  //   return await service.getMyPermits(input)
+  //   return await service.getZoneDetails(zone)
   // }
 }

@@ -321,7 +321,9 @@ setup-env-variables:marketing-app:
 
 build-docker-image:
   stage: conatainerize
-  image: node:22-alpine
+  image: docker:24  # lightweight image with docker CLI
+  services:
+    - docker:24-dind
   script:
     - npm run installs
     - npm run package

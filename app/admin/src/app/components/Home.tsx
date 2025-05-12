@@ -2,18 +2,23 @@
 
 import { Box, Container, Button, Typography, Paper } from '@mui/material';
 import Layout from './Layout';
+import { useState } from 'react';
+import AddAPIUser from './AddAPIUser';
 
 interface HomeProps {
   onNavigate: (component: string) => void;
 }
 
 export default function Home({ onNavigate }: HomeProps) {
+  const [openAPIDialog, setOpenAPIDialog] = useState(false);
+
   const buttons = [
     { label: 'Manage Enforcement', component: 'enforcement' },
     { label: 'Manage Drivers', component: 'drivers' },
     { label: 'Override Tickets', component: 'tickets' },
     { label: 'View Statistics', component: 'statistics' },
     { label: 'Generate Reports', component: 'reports' },
+    { label: 'Manage API Users', onClick: () => setOpenAPIDialog(true) },
   ];
 
   return (
@@ -47,7 +52,7 @@ export default function Home({ onNavigate }: HomeProps) {
                 key={button.label}
                 variant="contained"
                 size="large"
-                onClick={() => onNavigate(button.component)}
+                onClick={button.onClick || (() => onNavigate(button.component))}
                 sx={{
                   minWidth: '200px',
                   height: '100px',
@@ -61,6 +66,11 @@ export default function Home({ onNavigate }: HomeProps) {
           </Box>
         </Paper>
       </Container>
+
+      <AddAPIUser 
+        open={openAPIDialog}
+        onClose={() => setOpenAPIDialog(false)}
+      />
     </Layout>
   );
-} 
+}

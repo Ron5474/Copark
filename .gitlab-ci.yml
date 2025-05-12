@@ -338,7 +338,8 @@ conatainerize:build-docker-image:
   before_script:
     - apk add --no-cache npm
   script:
-    - npm install
+    - docker version
+    - docker info
     - npm run package
   artifacts:
     paths:

@@ -319,17 +319,22 @@ setup-env-variables:marketing-app:
     paths:
       - app/marketing/.env
 
+setup:
+  stage: conatainerize
+  script:
+    - npm run installs
+
 build-docker-image:
   stage: conatainerize
-  image: node:18-alpine  # includes node + npm
+  image: node:20  # or your preferred Node version
   services:
     - docker:24-dind
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - apt-get update && apt-get install -y docker.io
   script:
-    - apk add --no-cache docker-cli
-    - npm run installs
     - npm run package
   artifacts:
     paths:

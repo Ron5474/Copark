@@ -274,6 +274,7 @@ test:driver:
       - .gitlab-ci.yml
 
 setup-env-variables:root:
+  stage: setup-env-variables
   script:
     - rm -f .env
     - echo "POSTGRES_HOST=${POSTGRES_HOST}" >> .env
@@ -287,9 +288,13 @@ setup-env-variables:root:
     - echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" >> .env
     - echo "JWT_SECRET=${JWT_SECRET}" >> .env
     - echo "MICROSERVICE_INTERNAL_SECRET=${MICROSERVICE_INTERNAL_SECRET}" >> .env
+  artifacts:
+    paths:
+      - .env
 
 
 setup-env-variables:driver-app:
+  stage: setup-env-variables
   script:
     - rm -f app/driver/.env
     - echo "NEXT_PUBLIC_GOOGLE_ID=${NEXT_PUBLIC_GOOGLE_ID}" >> app/driver/.env
@@ -301,14 +306,22 @@ setup-env-variables:driver-app:
     - echo "NEXTAUTH_SECRET=${NEXTAUTH_SECRET}" >> app/driver/.env
     - echo "NEXTAUTH_URL=${NEXTAUTH_URL}" >> app/driver/.env
     - echo "NEXT_PUBLIC_AUTH_COOKIE_NAME=${NEXT_PUBLIC_AUTH_COOKIE_NAME}" >> app/driver/.env
+  artifacts:
+    paths:
+      - app/driver/.env
 
 setup-env-variables:marketing-app:
+  stage: setup-env-variables
   script:
     - rm -f app/marketing/.env
     - echo "NEXT_PUBLIC_DRIVER_APP_URL=${NEXT_PUBLIC_DRIVER_APP_URL}" >> app/marketing/.env
+  artifacts:
+    paths:
+      - app/marketing/.env
 
 build-docker-image:
   stage: conatainerize
+  image: node:22-alpine
   script:
     - npm run installs
     - npm run package

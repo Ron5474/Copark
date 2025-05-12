@@ -3,14 +3,15 @@ import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
+const policeEncondedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class AdminService {
-  private async encrypt(userId: string, expr='30m'): Promise<string> {
+  private async encrypt(userId: string, expr='30m', key=encodedKey): Promise<string> {
     return new SignJWT({ id: userId })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime(expr)
-      .sign(encodedKey)
+      .sign(key)
   }
 
   private async decrypt(token: string): Promise<string | undefined> {
@@ -146,7 +147,7 @@ export class AdminService {
 
     if (rows.length > 0) {
       const userId = rows[0].id
-      const retid = await this.encrypt(userId, '5y')
+      const retid = await this.encrypt(userId, '5y', policeEncondedKey)
       return {id: retid}
     } else {
       return undefined

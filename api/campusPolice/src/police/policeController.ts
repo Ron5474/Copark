@@ -15,23 +15,21 @@ import { SessionUser } from '../'
 
 @Route('police')
 export class PoliceController extends Controller {
-  @Get('check/plate')
+  @Get('check')
   @Security('jwt', ['police'])
   public async checkPermitByPlate(
     @Query() plate: string,
     @Request() request: express.Request & {user: SessionUser}
   ): Promise<boolean> {
-    // const currentUser = request.user.id
-    // console.log('Current User: ', currentUser)
 
     const vehicleQuery = `
-      query FindVehicleByPlate($plate: String!) {
-        findVehicleByPlate(plate: $plate) {
-          id
+      query IsValidPermitByPolice($plate: String!) {
+        isValidPermitByPolice(input: $plate) {
+          isValid
         }
       }
     `
-    const vehicleRes = await fetch('http://localhost:4001/graphql', {
+    const validPermitRes = await fetch('http://localhost:4003/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,11 +40,8 @@ export class PoliceController extends Controller {
         variables: { plate: plate },
       }),
     })
-
-    const vehicleJson = await vehicleRes.json()
-    const found = vehicleJson?.data?.findVehicleByPlate?.id
-
-    console.log(found)
-    return true
+    const validPermit = await validPermitRes.json()
+    const found = validPermit?.data?.isValidPermitByPolice?.isValid
+    return found
   }
 }

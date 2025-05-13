@@ -10,16 +10,23 @@ import {
   DialogActions,
   TextField,
   useTheme,
-  Typography
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from '@mui/material'
 import { addAPIUser } from '../../api/actions'
+
+const API_ROLES = ['payroll', 'registrar', 'campusPolice'] as const
+type APIRole = typeof API_ROLES[number]
 
 export default function AddAPIUser({ open, onClose }: { open: boolean, onClose: () => void }) {
   const theme = useTheme()
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
-    role: 'api_user' // Default role
+    role: 'payroll' as APIRole // Default role
   })
 
   const handleSubmit = async () => {
@@ -27,7 +34,7 @@ export default function AddAPIUser({ open, onClose }: { open: boolean, onClose: 
     setNewUser({
       name: '',
       email: '',
-      role: 'api_user'
+      role: 'payroll'
     })
     onClose()
   }
@@ -69,7 +76,23 @@ export default function AddAPIUser({ open, onClose }: { open: boolean, onClose: 
             fullWidth
             value={newUser.email}
             onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+            sx={{ mb: 2 }}
           />
+          <FormControl fullWidth>
+            <InputLabel id="role-select-label">Role</InputLabel>
+            <Select
+              labelId="role-select-label"
+              value={newUser.role}
+              label="Role"
+              onChange={(e) => setNewUser({ ...newUser, role: e.target.value as APIRole })}
+            >
+              {API_ROLES.map((role) => (
+                <MenuItem key={role} value={role}>
+                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
       </DialogContent>
       <DialogActions>

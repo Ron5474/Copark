@@ -39,14 +39,14 @@ async function bootstrap() {
         });
 
         if (response.status !== 200) {
-          console.error('AuthChecker Error:', response);
+          // console.error('AuthChecker Error:', response);
           throw new Error('Unauthorized123');
         }
 
         const user = await response.json();
         return !!user; // Return true if the user is authorized
       } catch (error) {
-        console.error('AuthChecker Error:', error);
+        // console.error('AuthChecker Error:', error);
         void error;
         throw new Error('Unauthorized312');
       }

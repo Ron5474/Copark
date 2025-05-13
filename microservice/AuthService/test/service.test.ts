@@ -58,6 +58,7 @@ test('OAuth User can login successfully', async () => {
   expect(user).toBeDefined()
 })
 
+
 test('OAuth User login twice returns undefined', async () => {
   await new AuthService().driverSignup(driver)
   const user = await new AuthService().driverSignup(driver)
@@ -74,6 +75,20 @@ test('OAuth user with id throws error', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
   await expect(new AuthService().driverSignup(fake_driver)).rejects.toThrow('Unauthorized')
+})
+
+test('OAuth User unauthorized if pool.query fails', async () => {
+  const auth = new AuthService()
+  vi.spyOn(pool, 'query').mockRejectedValueOnce(new Error("Database failure"))
+
+  const data = {
+      name: "Alice",
+      email: "alice@example.com",
+      picture: "http://example.com/pic.jpg",
+      sub: "google-oauth2|abc123"
+    }
+
+    await expect(auth.driverSignup(data)).rejects.toThrow("Unauthorized")
 })
 
 test('getOauthUser() returns JWT for the current user', async () => {

@@ -184,10 +184,6 @@ export class TicketService {
   
     const result = await pool.query(query);
   
-    if (result.rows.length === 0) {
-      throw new Error("No update found.");
-    }
-  
     const row = result.rows[0];
   
     return {

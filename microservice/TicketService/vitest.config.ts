@@ -7,6 +7,7 @@ export default defineConfig({
       reporter: ['text', 'html'],
       exclude: [
         'build/**',
+        '**/index.d.ts',
         'eslint.config.mjs',
         'vitest.config.ts'
     ],

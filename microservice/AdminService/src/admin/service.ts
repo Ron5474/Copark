@@ -1,9 +1,9 @@
-import { User, UserInput, NewUser, APIUser, APICredential } from "./schema";
+import { User, UserInput, NewUser, APIUser, APICredential, APIUserID } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
-const policeEncondedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const policeEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class AdminService {
   private async encrypt(userId: string, expr='30m', key=encodedKey): Promise<string> {
@@ -121,7 +121,7 @@ export class AdminService {
     return enforcers;
   }
 
-  public async addAPIUser(credential: APICredential): Promise<APIUser | undefined> {
+  public async addAPIUser(credential: APICredential): Promise<APIUserID | undefined> {
     const insert = `
     INSERT INTO account (data)
       SELECT jsonb_build_object(
@@ -147,11 +147,39 @@ export class AdminService {
 
     if (rows.length > 0) {
       const userId = rows[0].id
-      const retid = await this.encrypt(userId, '5y', policeEncondedKey)
+      const retid = await this.encrypt(userId, '5y', policeEncodedKey)
       return {id: retid}
     } else {
       return undefined
     }
+  }
+
+  public async getAPIUsers(): Promise<APIUser[]> {
+    const apiUsersQuery = `
+      SELECT id,
+        data->>'name' AS name,
+        data->>'email' AS email,
+        data->'role'->>0 AS role
+      FROM account
+      WHERE data->'role' @> jsonb_build_array('payroll')
+        OR data->'role' @> jsonb_build_array('registrar')
+        OR data->'role' @> jsonb_build_array('campusPolice')
+      ORDER BY data->>'name';
+    `
+
+    const apiUsersResult = await pool.query(apiUsersQuery);
+    const apiUsers: APIUser[] = [];
+
+    for (const row of apiUsersResult.rows) {
+      apiUsers.push({
+        id: await this.encrypt(row.id, '5y', policeEncodedKey),
+        name: row.name,
+        email: row.email,
+        role: row.role
+      });
+    }
+
+    return apiUsers;
   }
 
   public async suspendUser(user: UserInput): Promise<User[]> {

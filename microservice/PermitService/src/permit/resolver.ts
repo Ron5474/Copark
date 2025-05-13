@@ -7,7 +7,7 @@ import {
   IsValidPermitInput,
   IsValidPolice,
   MyPermits,
-  // ZoneDetails,
+  ZoneDetails,
 } from './schema'
 import { PermitService } from './service'
 
@@ -31,17 +31,6 @@ export class PermitResolver {
     if (!userId) throw new Error('Unauthorized')
     return await service.purchaseMyZonePermit(input)
   }
-
-  // @Authorized('enforcement')
-  // @Mutation(() => IsValid)
-  // async isValidPermit(
-  //   @Arg("input", () => IsValidInput) input: IsValidInput,
-  //   @Ctx() request: Request
-  // ): Promise<IsValid> {
-  //   const userId = request.user?.id
-  //   if (!userId) throw new Error('Unauthorized')
-  //   return await service.isValidPermit(input)
-  // }
 
   @Authorized('enforcement')
   @Query(() => IsValid)
@@ -129,48 +118,19 @@ export class PermitResolver {
   ): Promise<MyPermits> {
     const userId = request.user?.id
     if (!userId) throw new Error('Unauthorized')
-    
-    // const vehicleQuery = `
-    //   query {
-    //     myVehicles {
-    //       id
-    //       plate
-    //       country
-    //       state
-    //     }
-    //   }
-    // `
-
-    // const vehicleRes = await fetch('http://localhost:4001/graphql', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     Authorization: `${request.headers.authorization}`,
-    //   },
-    //   body: JSON.stringify({
-    //     query: vehicleQuery,
-    //   }),
-    // })
-
-    // const vehicleJson = await vehicleRes.json()
-    // const vids = vehicleJson?.data?.myVehicles?.id
-
-    // if (vids.length == 0) {
-    //   return []
-    // }
 
     return await service.getMyPermits(vehicleID)
   }
 
-  // @Authorized('driver')
-  // @Query(() => ZoneDetails)
-  // async zoneDetails(
-  //   @Arg("zone", () => String) zone: string,
-  //   @Ctx() request: Request
-  // ): Promise<ZoneDetails> {
-  //   const userId = request.user?.id
-  //   if (!userId) throw new Error('Unauthorized')
+  @Authorized('driver')
+  @Query(() => ZoneDetails)
+  async zoneDetails(
+    @Arg("zone", () => String) zone: string,
+    @Ctx() request: Request
+  ): Promise<ZoneDetails> {
+    const userId = request.user?.id
+    if (!userId) throw new Error('Unauthorized')
 
-  //   return await service.getZoneDetails(zone)
-  // }
+    return await service.getZoneDetails(zone)
+  }
 }

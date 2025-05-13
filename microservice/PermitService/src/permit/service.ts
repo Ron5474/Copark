@@ -1,5 +1,14 @@
 import { pool } from './db'
-import { Confirmation, Receipt, PurchaseZoneInput, IsValid, IsValidPermitInput, IsValidPolice, MyPermits } from './schema'
+import {
+  Confirmation,
+  Receipt,
+  PurchaseZoneInput,
+  IsValid,
+  IsValidPermitInput,
+  IsValidPolice,
+  MyPermits,
+  ZoneDetails
+} from './schema'
 
 export class PermitService {
   public async purchaseMyZonePermit(input: PurchaseZoneInput): Promise<Confirmation> {
@@ -33,7 +42,6 @@ export class PermitService {
 
     const data = {
       type: 'zone',
-      zone: input.zone,
       purchaseDate,
       activeDate,
       expireDate,
@@ -42,16 +50,24 @@ export class PermitService {
     }
 
     const { rows } = await pool.query(`
-      INSERT INTO permit (vehicle, data)
-      VALUES ($1, $2)
-      RETURNING data`,
-      [input.vehicle, data]
-    )
+      WITH selected_zone AS (
+        SELECT id FROM zone
+        WHERE TRIM(LOWER(data->>'zone')) = TRIM(LOWER($2))
+        LIMIT 1
+      )
+      INSERT INTO permit (vehicle, zone, data)
+      SELECT $1, id, $3 FROM selected_zone
+      RETURNING zone, data
+    `, [input.vehicle, input.zone, data])
 
-    // if (rows.length == 0) throw new Error('Purchase unsuccessful')
+
+    if (!rows.length) {
+      throw new Error(`Zone ${input.zone} not found`)
+    }
+
     return {
       type: rows[0].data.type,
-      zone: rows[0].data.zone,
+      zone: rows[0].zone,
       purchaseDate: rows[0].data.purchaseDate,
       activeDate: rows[0].data.activeDate,
       expireDate: rows[0].data.expireDate,
@@ -60,36 +76,16 @@ export class PermitService {
     }
   }
 
-  // public async isValidPermit(vehicleId: IsValidInput): Promise<IsValid> {
-
-  //   const result = await pool.query(`
-  //     SELECT data
-  //     FROM permit
-  //     WHERE vehicle = $1
-  //     AND now() >= (data->>'activeDate')::timestamptz
-  //     AND now() <= (data->>'expireDate')::timestamptz`,
-  //     [vehicleId.vehicle]
-  //   )
-
-  //   if (result.rowCount === 0) return { isValid: false, type: 'N/A', zone: 'N/A' }
-
-  //   const row = result.rows[0]
-  //   return {
-  //     isValid: true,
-  //     type: row.data.type,
-  //     zone: row.data.type,
-  //   }
-  // }
-
   public async isValidZonePermit(input: IsValidPermitInput): Promise<IsValid> {
 
     const result = await pool.query(`
-      SELECT data
-      FROM permit
-      WHERE vehicle = $1
-      AND data->>'zone' = $2
-      AND now() >= (data->>'activeDate')::timestamptz
-      AND now() <= (data->>'expireDate')::timestamptz`,
+      SELECT p.data
+      FROM permit p
+      JOIN zone z ON z.id = p.zone
+      WHERE p.vehicle = $1
+        AND TRIM(LOWER(z.data->>'zone')) = TRIM(LOWER($2))
+        AND now() >= (p.data->>'activeDate')::timestamptz
+        AND now() <= (p.data->>'expireDate')::timestamptz`,
       [input.vehicle, input.zone]
     )
 
@@ -125,7 +121,7 @@ export class PermitService {
         WITH future AS (
           SELECT data->>'vehicle' AS vehicle,
             data->>'type' AS type,
-            data->>'zone' AS zone,
+            "zone",
             data->>'activeDate' AS activeDate,
             data->>'expireDate' AS expireDate
           FROM permit
@@ -135,7 +131,7 @@ export class PermitService {
         active AS (
           SELECT data->>'vehicle' AS vehicle,
             data->>'type' AS type,
-            data->>'zone' AS zone,
+            "zone",
             data->>'activeDate' AS activeDate,
             data->>'expireDate' AS expireDate
           FROM permit
@@ -146,7 +142,7 @@ export class PermitService {
         expired AS (
           SELECT data->>'vehicle' AS vehicle,
             data->>'type' AS type,
-            data->>'zone' AS zone,
+            "zone",
             data->>'activeDate' AS activeDate,
             data->>'expireDate' AS expireDate
           FROM permit
@@ -164,48 +160,17 @@ export class PermitService {
     return result.rows[0]
   }
 
-  // public async getQuote(zone: string): Promise<MyPermits> {
+  public async getZoneDetails(zone: string, currentDay=new Date().getDay()): Promise<ZoneDetails> {
+    const isWeekend = currentDay === 0 || currentDay === 6
 
-  //   const result = await pool.query(`
-  //       WITH future AS (
-  //         SELECT data->>'vehicle' AS vehicle,
-  //           data->>'type' AS type,
-  //           data->>'zone' AS zone,
-  //           data->>'activeDate' AS activeDate,
-  //           data->>'expireDate' AS expireDate
-  //         FROM permit
-  //         WHERE vehicle = $1
-  //         AND now() <= (data->>'activeDate')::timestamptz
-  //       ),
-  //       active AS (
-  //         SELECT data->>'vehicle' AS vehicle,
-  //           data->>'type' AS type,
-  //           data->>'zone' AS zone,
-  //           data->>'activeDate' AS activeDate,
-  //           data->>'expireDate' AS expireDate
-  //         FROM permit
-  //         WHERE vehicle = $1
-  //         AND now() >= (data->>'activeDate')::timestamptz
-  //         AND now() <= (data->>'expireDate')::timestamptz
-  //       ),
-  //       expired AS (
-  //         SELECT data->>'vehicle' AS vehicle,
-  //           data->>'type' AS type,
-  //           data->>'zone' AS zone,
-  //           data->>'activeDate' AS activeDate,
-  //           data->>'expireDate' AS expireDate
-  //         FROM permit
-  //         WHERE vehicle = $1
-  //         AND now() >= (data->>'expireDate')::timestamptz
-  //       )
-  //       SELECT
-  //         COALESCE((SELECT json_agg(future) FROM future), '[]') AS future,
-  //         COALESCE((SELECT json_agg(active) FROM active), '[]') AS active,
-  //         COALESCE((SELECT json_agg(expired) FROM expired), '[]') AS expired;
-  //     `,
-  //     [vid]
-  //   )
+    const result = await pool.query(`
+        SELECT data
+        FROM "zone"
+        WHERE data->>'zone' = $1
+      `,
+      [zone]
+    )
     
-  //   return result.rows[0]
-  // }
+    return isWeekend ? result.rows[0].data.weekend : result.rows[0].data.weekday
+  }
 }

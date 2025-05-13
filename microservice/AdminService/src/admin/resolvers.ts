@@ -5,7 +5,8 @@ import {
   NewUser,
   UserInput,
   APIUser,
-  APICredential
+  APICredential,
+  APIUserID
 } from "./schema";
 
 const adminService = new AdminService();
@@ -24,6 +25,12 @@ export class AdminResolver {
     return adminService.getDrivers();
   }
 
+  @Query(() => [APIUser])
+  @Authorized(["admin"])
+  async getAPIUsers(): Promise<APIUser[]> {
+    return adminService.getAPIUsers();
+  }
+
   @Mutation(() => [User])
   @Authorized(["admin"])
   async addEnforcer(
@@ -36,7 +43,7 @@ export class AdminResolver {
   @Authorized(["admin"])
   async addAPIUser(
     @Arg("organization", () => APICredential) organization: APICredential
-  ): Promise<APIUser | undefined> {
+  ): Promise<APIUserID | undefined> {
     return adminService.addAPIUser(organization)
   }
 

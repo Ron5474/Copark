@@ -19,13 +19,14 @@ vi.mock('server-only', () => ({}))
 
 const permitDetails = {
   vehicle: '12345678-1234-1234-1234-567890abcdef',
-  zone: '0',
+  zone: '27',
   duration: {'minutes': 30, 'hours': 0},
   paymentMethod: 'paypal'
 }
 
 const enforcementDetails = {
-  vehicle: '12345678-1234-1234-1234-567890abcdef',
+  vehicle: permitDetails.vehicle,
+  zone: permitDetails.zone,
 }
 
 const policeDetails = '12345678-1234-1234-1234-567890abcdef'
@@ -49,6 +50,13 @@ test('Purchasing different duration', async () => {
   expect(receipt.type).toBe('zone')
 })
 
+test('Purchasing different duration', async () => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(new PermitService().purchaseMyZonePermit({...permitDetails, zone: '13'}))
+      .rejects.toThrow('Zone 13 not found')
+})
+
 // test('Transaction failed', async () => {
 //   // eslint-disable-next-line @typescript-eslint/no-empty-function
 //   vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -56,33 +64,21 @@ test('Purchasing different duration', async () => {
 //       .rejects.toThrow('Purchase unsuccessful')
 // })
 
-// test('Vehicle has valid permit', async () => {
-//   await new PermitService().purchaseMyZonePermit(permitDetails)
-//   const { isValid } = await new PermitService().isValidPermit(enforcementDetails)
-//   expect(isValid).toBe(true)
-// })
-
-// test('Vehicle does not have valid permit', async () => {
-//   await new PermitService().purchaseMyZonePermit(permitDetails)
-//   const { isValid } = await new PermitService().isValidPermit({ vehicle: '11111111-1234-1234-1234-567890abcdef' })
-//   expect(isValid).toBe(false)
-// })
-
 test('Vehicle has valid permit', async () => {
   await new PermitService().purchaseMyZonePermit(permitDetails)
-  const { isValid } = await new PermitService().isValidZonePermit({...enforcementDetails, zone: '0'})
+  const { isValid } = await new PermitService().isValidZonePermit(enforcementDetails)
   expect(isValid).toBe(true)
 })
 
 test('Vehicle does not have valid permit', async () => {
   await new PermitService().purchaseMyZonePermit(permitDetails)
-  const { isValid } = await new PermitService().isValidZonePermit({ vehicle: '11111111-1234-1234-1234-567890abcdef', zone: '0' })
+  const { isValid } = await new PermitService().isValidZonePermit({ ...enforcementDetails, vehicle: '11111111-1234-1234-1234-567890abcdef' })
   expect(isValid).toBe(false)
 })
 
 test('Vehicle has permit, wrong zone', async () => {
   await new PermitService().purchaseMyZonePermit(permitDetails)
-  const { isValid } = await new PermitService().isValidZonePermit({...enforcementDetails, zone: '12' })
+  const { isValid } = await new PermitService().isValidZonePermit({...enforcementDetails, zone: '17' })
   expect(isValid).toBe(false)
 })
 
@@ -107,4 +103,14 @@ test('getMyPermits returns active permit', async () => {
   await new PermitService().purchaseMyZonePermit(permitDetails)
   const { active } = await new PermitService().getMyPermits(permitDetails.vehicle)
   expect(active.length).toBe(1)
+})
+
+test('zoneDetails gives correct hourly on weekday', async () => {
+  const { hourly } = await new PermitService().getZoneDetails('123', 3) // Wednesday
+  expect(hourly).toBe(2.45)
+})
+
+test('zoneDetails gives correct daily on weekend', async () => {
+  const { daily } = await new PermitService().getZoneDetails('123', 0) // Sunday
+  expect(daily).toBe(7.95)
 })

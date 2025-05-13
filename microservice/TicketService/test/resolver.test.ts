@@ -169,6 +169,7 @@ test('Admin can modify a ticket with images', async () => {
       modifyTicket(input: $input) {
         id
         vehicle
+        enforcer
         fine
         violation
         ticketStatus
@@ -184,7 +185,6 @@ test('Admin can modify a ticket with images', async () => {
       violation: "illegal parking",
       ticketStatus: "resolved",
       images: "photo2.jpg",
-      vehicle: vehicleid,
     },
   }  
 
@@ -194,6 +194,7 @@ test('Admin can modify a ticket with images', async () => {
     .send({ query: modifyQuery, variables: modifyVariables })
     .expect(200)
 
+  // console.log(modifyResponse.body.data.modifyTicket)
   expect(modifyResponse.body.errors).toBeUndefined()
   expect(modifyResponse.body.data.modifyTicket.id).toBe(ticketId)
   expect(modifyResponse.body.data.modifyTicket.fine).toBe(200)

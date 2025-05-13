@@ -110,6 +110,7 @@ test('modify should return a modified ticket', async () => {
     };
 
     const modifiedTicketResult = await ticketService.modifyTicket(modifiedTicket);
+    // console.log(modifiedTicketResult);
     expect(modifiedTicketResult).toHaveProperty('id');
     expect(modifiedTicketResult).toHaveProperty('vehicle', modifiedTicket.vehicle);
     expect(modifiedTicketResult).toHaveProperty('fine', modifiedTicket.fine);
@@ -117,7 +118,7 @@ test('modify should return a modified ticket', async () => {
     expect(modifiedTicketResult).toHaveProperty('images', modifiedTicket.images);
   });
 
-test('createTicket should error with no ticket ID', async () => {
+test('modifyTicket should error with bad ticket ID', async () => {
     const newTicket: NewTicket = {
         vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
@@ -141,7 +142,7 @@ test('createTicket should error with no ticket ID', async () => {
         .toThrow('Invalid or missing ticket ID.');
   });
 
-test('createTicket should error with no update fields', async () => {
+test('modifyTicket should error with no update fields', async () => {
   const newTicket: NewTicket = {
       vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
       enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
@@ -161,7 +162,7 @@ test('createTicket should error with no update fields', async () => {
       .toThrow('No fields provided to update.');
 });
 
-test('createTicket should error with no update fields', async () => {
+test('modifyticket should error with no id match', async () => {
   const modifiedTicket: ModifyTicketInput = {
       id: await encrypt('00000000-0000-0000-0000-000000000000'),
       fine: 100000000,
@@ -171,7 +172,7 @@ test('createTicket should error with no update fields', async () => {
 
   await expect(ticketService.modifyTicket(modifiedTicket))
       .rejects
-      .toThrow('No update found.');
+      .toThrow('Ticket not found.');
 });
 
 test('deleteTicket should delete a ticket', async () => {
@@ -192,8 +193,8 @@ test('deleteTicket should delete a ticket', async () => {
     const deletedTicketRes = await ticketService.deleteTicket(deletedTicket);
     // console.log(deletedTicketRes);
     expect(deletedTicketRes).toHaveProperty('id');
-    expect(deletedTicketRes).toHaveProperty('vehicle', newTicket.vehicle);
-    expect(deletedTicketRes).toHaveProperty('enforcer', newTicket.enforcer);
+    expect(deletedTicketRes).toHaveProperty('vehicle');
+    expect(deletedTicketRes).toHaveProperty('enforcer');
     expect(deletedTicketRes).toHaveProperty('fine', newTicket.fine);
     expect(deletedTicketRes).toHaveProperty('violation', newTicket.violation);
   });

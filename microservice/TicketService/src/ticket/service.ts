@@ -122,40 +122,64 @@ export class TicketService {
   }
 
   public async modifyTicket(input: ModifyTicketInput): Promise<Ticket | null> {
-    const { id, ...updates } = input;
+    const { id, vehicle, ...updates } = input;
   
     const decryptedID = await this.decrypt(id);
+    let decryptedVehicle = null;
+    if (vehicle) {
+      decryptedVehicle = await this.decrypt(vehicle);
+    }
   
     if (!decryptedID) {
       throw new Error("Invalid or missing ticket ID.");
     }
   
+    // If no fields to update, throw an error.
     const entries = Object.entries(updates).filter(
       ([, value]) => value !== undefined
     );
   
-    if (entries.length === 0) {
+    if (entries.length === 0 && !vehicle) {
       throw new Error("No fields provided to update.");
     }
   
-    const values: string[] = [decryptedID];
-    let paramIndex = 2;
+    const getDataQuery = {
+      text: `
+        SELECT vehicle, enforcer, data FROM ticket WHERE id = $1
+      `,
+      values: [decryptedID],
+    };
   
-    let setExpr = 'data';
-    for (const [key, value] of entries) {
-      values.push(JSON.stringify(value));
-      const param = `$${paramIndex++}`;
-      setExpr = `jsonb_set(${setExpr}, '{${key}}', ${param}::jsonb, true)`;
+    const currentResult = await pool.query(getDataQuery);
+  
+    if (currentResult.rows.length === 0) {
+      throw new Error("Ticket not found.");
     }
   
+    const { vehicle: currentVehicle, enforcer, data: currentData } = currentResult.rows[0];
+  
+    let updatedData = { ...currentData };
+  
+    // Apply the updates to the `data` field.
+    for (const [key, value] of entries) {
+      updatedData[key] = value;
+    }
+  
+    // Update `vehicle` if provided, otherwise keep the existing value.
+    const updatedVehicle = decryptedVehicle ?? currentVehicle;
+  
+    // Convert the updated data to a JSON string for the update.
+    const updatedDataJson = JSON.stringify(updatedData);
+  
+    // Update fields in the database.
     const query = {
       text: `
         UPDATE ticket
-        SET data = ${setExpr}
-        WHERE id = $1
-        RETURNING id, data
+        SET vehicle = $1, data = $2
+        WHERE id = $3
+        RETURNING id, vehicle, data
       `,
-      values
+      values: [updatedVehicle, updatedDataJson, decryptedID],
     };
   
     const result = await pool.query(query);
@@ -166,10 +190,10 @@ export class TicketService {
   
     const row = result.rows[0];
   
-    console.log(row);
-
     return {
-      id: row.id,
+      id: await this.encrypt(row.id),
+      vehicle: await this.encrypt(row.vehicle),
+      enforcer: await this.encrypt(enforcer),
       ...row.data,
     } as Ticket;
   }

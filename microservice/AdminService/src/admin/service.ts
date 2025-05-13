@@ -1,4 +1,4 @@
-import { User, UserInput, NewUser, APIUser, APICredential } from "./schema";
+import { User, UserInput, NewUser, APIUser, APICredential, APIUserID } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -121,7 +121,7 @@ export class AdminService {
     return enforcers;
   }
 
-  public async addAPIUser(credential: APICredential): Promise<APIUser | undefined> {
+  public async addAPIUser(credential: APICredential): Promise<APIUserID | undefined> {
     const insert = `
     INSERT INTO account (data)
       SELECT jsonb_build_object(

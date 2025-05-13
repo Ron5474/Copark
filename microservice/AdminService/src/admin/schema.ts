@@ -1,3 +1,4 @@
+import { IsEmail } from "class-validator";
 import { Field, ObjectType, InputType, ID } from "type-graphql";
 
 @ObjectType()
@@ -46,7 +47,23 @@ export class APICredential {
 }
 
 @ObjectType()
+export class APIUserID {
+  @Field(() => ID)
+  id!: string
+}
+
+@ObjectType()
 export class APIUser {
   @Field(() => ID)
   id!: string
+
+  @Field(() => String)
+  name!: string
+
+  @Field(() => String)
+  @IsEmail()
+  email!: string
+
+  @Field(() => String)
+  role!: string
 }

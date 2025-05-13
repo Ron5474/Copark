@@ -14,6 +14,8 @@ export default defineConfig({
       exclude: [
         'src/app/layout.tsx',
         'src/**/index.ts',
+        'src/**/layout.tsx',
+        'src/**/types.ts'
       ],
     },
   },

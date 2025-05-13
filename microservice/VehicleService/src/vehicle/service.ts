@@ -69,7 +69,9 @@ export class VehicleService {
 
   public async getVehicleByUserId(userID: string): Promise<VehicleID[]> {
 
-    const userDecrypted = await this.decrypt(userID, emailEncodedKey)
+    // const userDecrypted = await this.decrypt(userID, emailEncodedKey)
+    const userDecrypted = await this.decrypt(userID, encodedKey)
+
     const result = await pool.query(
       `SELECT id FROM vehicle WHERE driver = $1`,
       [userDecrypted]

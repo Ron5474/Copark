@@ -255,3 +255,15 @@ test('getTicketsForVehicleID should return tickets for the provided vehicle IDs'
     expect(tickets![0]).toHaveProperty('violation', 'parking');
     expect(tickets![0]).toHaveProperty('ticketStatus', 'unpaid');
 });
+
+// test('getTicketsForUserJWT should return tickets for the provided userJWT', async () => {
+//     const userID = '0f99f921-594e-4387-9d05-e6e80d8aa54a'
+
+//     const tickets = await ticketService.getTicketsForUserJWT(await encrypt(userID));
+
+//     console.log(tickets);
+//     expect(tickets).toBeDefined();
+
+//     expect(tickets![0]).toHaveProperty('violation', 'parking');
+//     expect(tickets![0]).toHaveProperty('ticketStatus', 'unpaid');
+// });

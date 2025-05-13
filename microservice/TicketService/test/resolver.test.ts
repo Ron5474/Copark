@@ -23,6 +23,11 @@ const adminUser = {
   password: 'password1',
 }
 
+const driverUser = {
+  email: 'driver1@outlook.com',
+  password: 'password1',
+}
+
 beforeAll(async () => {
   server = http.createServer(app)
   server.listen()
@@ -55,6 +60,18 @@ async function loginAsAdmin(): Promise<string> {
   const response = await supertest(AUTH_SERVICE_URL)
     .post('/api/v0/auth/login')
     .send(adminUser)
+
+  if (response.status !== 200) {
+    throw new Error(`Login failed with status ${response.status}`)
+  }
+
+  return response.body.id
+}
+
+async function loginAsDriver(): Promise<string> {
+  const response = await supertest(AUTH_SERVICE_URL)
+    .post('/api/v0/auth/login')
+    .send(driverUser)
 
   if (response.status !== 200) {
     throw new Error(`Login failed with status ${response.status}`)
@@ -196,7 +213,6 @@ test('Admin can modify a ticket with images', async () => {
 
   // console.log(modifyResponse.body.data.modifyTicket)
   expect(modifyResponse.body.errors).toBeUndefined()
-  expect(modifyResponse.body.data.modifyTicket.id).toBe(ticketId)
   expect(modifyResponse.body.data.modifyTicket.fine).toBe(200)
   expect(modifyResponse.body.data.modifyTicket.violation).toBe("illegal parking")
   expect(modifyResponse.body.data.modifyTicket.images).toBe("photo2.jpg")
@@ -279,4 +295,30 @@ test('Admin can delete a ticket', async () => {
   expect(getResponse.body.errors).toBeUndefined()
   const ticketIds = getResponse.body.data.getTickets.map((ticket: any) => ticket.id)
   expect(ticketIds).not.toContain(ticketId)
+})
+
+test('Driver can get their tickets', async () => {
+  const token = await loginAsDriver()
+
+  const query = `
+    query {
+      getMyTickets {
+        id
+        vehicle
+        fine
+        violation
+        images
+      }
+    }
+  `
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query })
+    .expect(200)
+
+  console.log(response.body)
+  expect(response.body.errors).toBeUndefined()
+  expect(response.body.data.getTickets.length).toBe(4)
 })

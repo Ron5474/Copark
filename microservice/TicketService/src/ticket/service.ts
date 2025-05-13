@@ -270,20 +270,20 @@ export class TicketService {
   })));
   }
 
-  public async getTicketsForUserJWT(userJWT: string): Promise<Ticket[] | undefined> {
+  // public async getTicketsForUserJWT(userJWT: string): Promise<Ticket[] | undefined> {
 
-    // get vehicles for user
-    const userDecrypted = await this.decrypt(userJWT)
-    const result = await pool.query(
-      `SELECT id FROM vehicle WHERE driver = $1`,
-      [userDecrypted]
-    )
+  //   // get vehicles for user
+  //   const userDecrypted = await this.decrypt(userJWT)
+  //   const result = await pool.query(
+  //     `SELECT id FROM vehicle WHERE driver = $1`,
+  //     [userDecrypted]
+  //   )
 
-    if (result.rowCount === 0) return []
+  //   if (result.rowCount === 0) return []
 
-    const vehicleIDs = await Promise.all(result.rows.map(async row => row.id));
+  //   const vehicleIDs = await Promise.all(result.rows.map(async row => row.id));
 
-    // get tickets for vehicles
-    return await this.getTicketsForVehicleID(vehicleIDs);
-  }
+  //   // get tickets for vehicles
+  //   return await this.getTicketsForVehicleID(vehicleIDs);
+  // }
 }

@@ -1,7 +1,6 @@
 import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
-import e from "express";
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
@@ -158,7 +157,7 @@ export class TicketService {
   
     const { vehicle: currentVehicle, enforcer, data: currentData } = currentResult.rows[0];
   
-    let updatedData = { ...currentData };
+    const updatedData = { ...currentData };
   
     // Apply the updates to the `data` field.
     for (const [key, value] of entries) {

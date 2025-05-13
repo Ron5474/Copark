@@ -201,3 +201,41 @@ test('Admin can modify a ticket with images', async () => {
   expect(modifyResponse.body.data.modifyTicket.violation).toBe("illegal parking")
   expect(modifyResponse.body.data.modifyTicket.images).toBe("photo2.jpg")
 })
+
+test('Admin can delete a ticket', async () => {
+  const token = await loginAsAdmin()
+
+  const vehicleid = await encrypt('00000000-0000-0000-0000-000000000000')
+  const enforcerid = await encrypt('00000000-0000-0000-0000-000000000000')
+
+  const query = `
+    mutation CreateTicket($input: NewTicket!) {
+      createTicket(newTicket: $input) {
+        id
+        vehicle
+        fine
+        violation
+        images
+      }
+    }
+  `
+
+  const variables = {
+    input: {
+      vehicle: vehicleid,
+      enforcer: enforcerid,
+      fine: 150,
+      violation: "speeding",
+      images: "photo1.jpg",
+    },
+  }
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query, variables })
+    .expect(200)
+
+  expect(response.body.errors).toBeUndefined()
+  expect(response.body.data.createTicket.images).toBe("photo1.jpg")
+})

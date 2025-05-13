@@ -8,13 +8,13 @@ INSERT INTO "zone" (id, data) VALUES
     jsonb_build_object(
       'zone', '123',
       'weekday', jsonb_build_object(
-        'hourly', '2.45',
+        'hourly', 2.45,
         'openTime', '07:00',
         'closeTime', '20:00',
         'maxDuration', '2:00'
       ),
       'weekend', jsonb_build_object(
-        'daily', '7.95',
+        'daily', 7.95,
         'openTime', '7:00',
         'closeTime', '20:00'
       )
@@ -27,7 +27,7 @@ INSERT INTO "zone" (id, data) VALUES
     jsonb_build_object(
       'zone', '111',
       'weekday', jsonb_build_object(
-        'hourly', '3.00',
+        'hourly', 3.00,
         'openTime', '07:00',
         'closeTime', '20:00',
         'maxDuration', '2:00'
@@ -42,7 +42,7 @@ INSERT INTO "zone" (id, data) VALUES
     jsonb_build_object(
       'zone', '27',
       'weekday', jsonb_build_object(
-        'hourly', '2.02',
+        'hourly', 2.02,
         'openTime', '07:00',
         'closeTime', '20:00'
       ),

@@ -50,6 +50,13 @@ test('Purchasing different duration', async () => {
   expect(receipt.type).toBe('zone')
 })
 
+test('Purchasing different duration', async () => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(new PermitService().purchaseMyZonePermit({...permitDetails, zone: '13'}))
+      .rejects.toThrow('Zone 13 not found')
+})
+
 // test('Transaction failed', async () => {
 //   // eslint-disable-next-line @typescript-eslint/no-empty-function
 //   vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -96,4 +103,14 @@ test('getMyPermits returns active permit', async () => {
   await new PermitService().purchaseMyZonePermit(permitDetails)
   const { active } = await new PermitService().getMyPermits(permitDetails.vehicle)
   expect(active.length).toBe(1)
+})
+
+test('zoneDetails gives correct hourly on weekday', async () => {
+  const { hourly } = await new PermitService().getZoneDetails('123', 3) // Wednesday
+  expect(hourly).toBe(2.45)
+})
+
+test('zoneDetails gives correct daily on weekend', async () => {
+  const { daily } = await new PermitService().getZoneDetails('123', 0) // Sunday
+  expect(daily).toBe(7.95)
 })

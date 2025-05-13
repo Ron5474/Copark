@@ -50,16 +50,13 @@ export class PermitService {
     }
 
     const { rows } = await pool.query(`
-      INSERT INTO permit (vehicle, zone, data)
-      VALUES (
-        $1,
-        (
-          SELECT id FROM zone
-          WHERE TRIM(LOWER(data->>'zone')) = TRIM(LOWER($2))
-          LIMIT 1
-        ),
-        $3
+      WITH selected_zone AS (
+        SELECT id FROM zone
+        WHERE TRIM(LOWER(data->>'zone')) = TRIM(LOWER($2))
+        LIMIT 1
       )
+      INSERT INTO permit (vehicle, zone, data)
+      SELECT $1, id, $3 FROM selected_zone
       RETURNING zone, data
     `, [input.vehicle, input.zone, data])
 
@@ -163,16 +160,13 @@ export class PermitService {
     return result.rows[0]
   }
 
-  public async getZoneDetails(zone: string): Promise<ZoneDetails> {
-    const currentDay = new Date().getDay()
+  public async getZoneDetails(zone: string, currentDay=new Date().getDay()): Promise<ZoneDetails> {
     const isWeekend = currentDay === 0 || currentDay === 6
 
     const result = await pool.query(`
         SELECT data
         FROM "zone"
         WHERE data->>'zone' = $1
-        AND now() >= (data->>'activeDate')::timestamptz
-        AND now() <= (data->>'expireDate')::timestamptz
       `,
       [zone]
     )

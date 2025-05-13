@@ -23,8 +23,6 @@ export default function Page() {
         return <ManageDrivers onNavigate={handleNavigate} />;
       case 'api_users':
         return <ManageAPIUsers onNavigate={handleNavigate} />;
-      case 'tickets':
-        return <div>Tickets Component</div>;
       case 'statistics':
         return <div>Statistics Component</div>;
       case 'reports':

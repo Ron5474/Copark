@@ -41,6 +41,14 @@ vi.mock('@mui/material', () => ({
       <input type="text" />
     </div>
   ),
+  FormControl: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  InputLabel: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Select: ({ children, value, onChange }: { children: React.ReactNode, value: string, onChange: (e: any) => void }) => (
+    <select value={value} onChange={onChange}>{children}</select>
+  ),
+  MenuItem: ({ children, value }: { children: React.ReactNode, value: string }) => (
+    <option value={value}>{children}</option>
+  ),
   useTheme: vi.fn(() => ({
     palette: {
       primary: { main: '#1976d2' },
@@ -178,17 +186,6 @@ it('navigates to Manage Drivers section', async () => {
 
   await waitFor(() => {
     expect(screen.getByText('Manage Drivers')).toBeDefined();
-  });
-});
-
-it('navigates to Tickets section', async () => {
-  render(<Page />);
-
-  const ticketsButton = screen.getByText('Override Tickets');
-  fireEvent.click(ticketsButton);
-
-  await waitFor(() => {
-    expect(screen.getByText('Tickets Component')).toBeDefined();
   });
 });
 

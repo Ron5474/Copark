@@ -134,11 +134,10 @@ test('Errors out with wrong permissions', async () => {
     expect(response.body.errors).toBeDefined()
 })
 
-
 test('GET /playground returns the GraphQL Playground HTML', async () => {
-const response = await supertest(server)
-    .get('/playground')
-    .expect(200);
+    const response = await supertest(server)
+        .get('/playground')
+        .expect(200);
 
-expect(response.text).toContain('<title>GraphQL Playground</title>');
+    expect(response.text).toContain('<title>GraphQL Playground</title>');
 });

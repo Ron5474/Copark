@@ -32,7 +32,6 @@ vi.mock('next-intl', () => ({
         return key;
     }
   }),
-  // Add other needed exports
   NextIntlClientProvider: ({ children }: {children: React.ReactNode}) => children,
   createSharedPathnamesNavigation: () => ({
     useRouter: () => ({

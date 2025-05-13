@@ -21,7 +21,13 @@ import { addAPIUser } from '../../api/actions'
 const API_ROLES = ['payroll', 'registrar', 'campusPolice'] as const
 type APIRole = typeof API_ROLES[number]
 
-export default function AddAPIUser({ open, onClose }: { open: boolean, onClose: () => void }) {
+interface AddAPIUserProps {
+  open: boolean;
+  onClose: () => void;
+  onUserAdded: () => void;  // Add this prop
+}
+
+export default function AddAPIUser({ open, onClose, onUserAdded }: AddAPIUserProps) {
   const theme = useTheme()
   const [newUser, setNewUser] = useState({
     name: '',
@@ -29,13 +35,15 @@ export default function AddAPIUser({ open, onClose }: { open: boolean, onClose: 
     role: 'payroll' as APIRole // Default role
   })
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
     await addAPIUser(newUser)
     setNewUser({
       name: '',
       email: '',
       role: 'payroll'
     })
+    onUserAdded()  // Call this after successful creation
     onClose()
   }
 
@@ -50,9 +58,9 @@ export default function AddAPIUser({ open, onClose }: { open: boolean, onClose: 
         }
       }}
     >
-      <DialogTitle sx={{ 
+      <DialogTitle sx={{
         color: theme.palette.primary.main,
-        fontWeight: 700 
+        fontWeight: 700
       }}>
         Add API User
       </DialogTitle>
@@ -96,13 +104,13 @@ export default function AddAPIUser({ open, onClose }: { open: boolean, onClose: 
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button 
+        <Button
           onClick={onClose}
           sx={{ color: theme.palette.secondary.main }}
         >
           Cancel
         </Button>
-        <Button 
+        <Button
           onClick={handleSubmit}
           sx={{
             bgcolor: theme.palette.primary.main,

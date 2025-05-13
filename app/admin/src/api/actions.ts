@@ -50,3 +50,29 @@ export const addAPIUser = async (organization: APICredential): Promise<APIUser |
   const result = await response.json()
   return result.data?.addAPIUser
 }
+
+export const getAPIUsers = async (): Promise<APIUser[]> => {
+  const token = await getAuthToken();
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query: `
+        query GetAPIUsers {
+          getAPIUsers {
+            id
+            name
+            email
+            role
+          }
+        }
+      `,
+    }),
+  });
+
+  const result = await response.json();
+  return result.data.getAPIUsers;
+};

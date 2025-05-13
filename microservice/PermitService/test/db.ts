@@ -67,7 +67,7 @@ const reset = async () => {
   await run(path + 'VehicleService/sql/schema.sql')
   await run(path + 'VehicleService/sql/data.sql')
   await run(path + 'PermitService/sql/schema.sql')
-  // await run(path + 'PermitService/sql/data.sql')
+  await run(path + 'PermitService/sql/data.sql')
 }
 
 const shutdown = () => {

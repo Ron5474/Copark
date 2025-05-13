@@ -90,7 +90,7 @@ test('createTicket should error with bad id', async () => {
         .toThrow('Invalid enforcer or vehicle ID.');
 });
 
-test('createTicket should return a newTicket', async () => {
+test('modify should return a modified ticket', async () => {
     const newTicket: NewTicket = {
         vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
@@ -220,7 +220,7 @@ test('deleteTicket should delete a ticket', async () => {
 
   test('getTicketsForVehicleID should return tickets for the provided vehicle IDs', async () => {
 
-    const vehicleid1 = await encrypt('f26adf21-f967-4283-8417-f72298bc7bbe');
+    const vehicleid1 = 'f26adf21-f967-4283-8417-f72298bc7bbe';
 
     // Call getTicketsForVehicleID with vehicle IDs
     const tickets = await ticketService.getTicketsForVehicleID([vehicleid1]);

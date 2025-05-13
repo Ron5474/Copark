@@ -1,6 +1,7 @@
 import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
+import e from "express";
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
@@ -122,33 +123,31 @@ export class TicketService {
 
   public async modifyTicket(input: ModifyTicketInput): Promise<Ticket | null> {
     const { id, ...updates } = input;
-
+  
     const decryptedID = await this.decrypt(id);
-
+  
     if (!decryptedID) {
       throw new Error("Invalid or missing ticket ID.");
     }
-
-    // Filter out undefined fields
+  
     const entries = Object.entries(updates).filter(
       ([, value]) => value !== undefined
     );
-
+  
     if (entries.length === 0) {
       throw new Error("No fields provided to update.");
     }
-
-    // Apply each field using jsonb_set sequentially
-    let setExpr = 'data';
+  
     const values: string[] = [decryptedID];
-    let valueIndex = 2;
-
+    let paramIndex = 2;
+  
+    let setExpr = 'data';
     for (const [key, value] of entries) {
-      setExpr = `jsonb_set(${setExpr}, '{${key}}', $${valueIndex}::jsonb, true)`;
       values.push(JSON.stringify(value));
-      valueIndex++;
+      const param = `$${paramIndex++}`;
+      setExpr = `jsonb_set(${setExpr}, '{${key}}', ${param}::jsonb, true)`;
     }
-
+  
     const query = {
       text: `
         UPDATE ticket
@@ -158,21 +157,23 @@ export class TicketService {
       `,
       values
     };
-
+  
     const result = await pool.query(query);
-
+  
     if (result.rows.length === 0) {
       throw new Error("No update found.");
     }
-
+  
     const row = result.rows[0];
+  
+    console.log(row);
 
     return {
       id: row.id,
-      ...row.data
+      ...row.data,
     } as Ticket;
   }
-
+  
   public async deleteTicket(id: TicketInput): Promise<Ticket | null> {
 
     const decryptedID = await this.decrypt(id.id);
@@ -211,9 +212,6 @@ export class TicketService {
 
   public async getTicketsForVehicleID(vehicleIDs: string[]): Promise<Ticket[] | undefined> {
 
-  const decryptedIDs = await Promise.all(vehicleIDs.map(async (vehicleID: string) => {
-    return await this.decrypt(vehicleID);
-  }));
 
   // get tickets for vehicles
   const query = `
@@ -228,9 +226,8 @@ export class TicketService {
     AND data->>'ticketStatus' NOT IN ('deleted', 'paid')
   `;
 
-  const result = await pool.query(query, [decryptedIDs]);
+  const result = await pool.query(query, [vehicleIDs]);
   
-  //format
   interface TicketRow {
     id: string;
     vehicle: string;

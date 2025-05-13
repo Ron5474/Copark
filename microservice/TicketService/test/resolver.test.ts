@@ -8,6 +8,7 @@ import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
 import { SignJWT } from 'jose'
+import { vehicle } from 'api/campusPolice/test/mockService'
 
 let server: http.Server
 let authServer: http.Server
@@ -98,4 +99,104 @@ test('Admin can create a ticket with images', async () => {
 
   expect(response.body.errors).toBeUndefined()
   expect(response.body.data.createTicket.images).toBe("photo1.jpg")
+})
+
+test('Admin can get all tickets', async () => {
+  const token = await loginAsAdmin()
+
+  const query = `
+    query {
+      getTickets {
+        id
+        vehicle
+        enforcer
+        fine
+        violation
+        images
+      }
+    }
+  `
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query })
+    .expect(200)
+
+  expect(response.body.errors).toBeUndefined()
+  expect(response.body.data.getTickets.length).toBe(4)
+})
+
+test('Admin can modify a ticket with images', async () => {
+  const token = await loginAsAdmin()
+
+  const vehicleid = await encrypt('00000000-0000-0000-0000-000000000001')
+  const enforcerid = await encrypt('00000000-0000-0000-0000-000000000002')
+
+  const createQuery = `
+    mutation CreateTicket($input: NewTicket!) {
+      createTicket(newTicket: $input) {
+        id
+        vehicle
+        fine
+        violation
+        images
+      }
+    }
+  `
+
+  const createVariables = {
+    input: {
+      vehicle: vehicleid,
+      enforcer: enforcerid,
+      fine: 150,
+      violation: "speeding",
+      images: "photo1.jpg",
+    },
+  }
+
+  const createResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: createQuery, variables: createVariables })
+    .expect(200)
+
+  expect(createResponse.body.errors).toBeUndefined()
+  const ticketId = createResponse.body.data.createTicket.id
+
+  const modifyQuery = `
+    mutation ModifyTicket($input: ModifyTicketInput!) {
+      modifyTicket(input: $input) {
+        id
+        vehicle
+        fine
+        violation
+        ticketStatus
+        images
+      }
+    }
+  `
+
+  const modifyVariables = {
+    input: {
+      id: ticketId,
+      fine: 200,
+      violation: "illegal parking",
+      ticketStatus: "resolved",
+      images: "photo2.jpg",
+      vehicle: vehicleid,
+    },
+  }  
+
+  const modifyResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: modifyQuery, variables: modifyVariables })
+    .expect(200)
+
+  expect(modifyResponse.body.errors).toBeUndefined()
+  expect(modifyResponse.body.data.modifyTicket.id).toBe(ticketId)
+  expect(modifyResponse.body.data.modifyTicket.fine).toBe(200)
+  expect(modifyResponse.body.data.modifyTicket.violation).toBe("illegal parking")
+  expect(modifyResponse.body.data.modifyTicket.images).toBe("photo2.jpg")
 })

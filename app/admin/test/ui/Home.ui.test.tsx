@@ -49,6 +49,12 @@ vi.mock('@mui/material', () => ({
   MenuItem: ({ children, value }: { children: React.ReactNode, value: string }) => (
     <option value={value}>{children}</option>
   ),
+  TableContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Table: ({ children }: { children: React.ReactNode }) => <table>{children}</table>,
+  TableHead: ({ children }: { children: React.ReactNode }) => <thead>{children}</thead>,
+  TableBody: ({ children }: { children: React.ReactNode }) => <tbody>{children}</tbody>,
+  TableRow: ({ children }: { children: React.ReactNode }) => <tr>{children}</tr>,
+  TableCell: ({ children }: { children: React.ReactNode }) => <td>{children}</td>,
   useTheme: vi.fn(() => ({
     palette: {
       primary: { main: '#1976d2' },

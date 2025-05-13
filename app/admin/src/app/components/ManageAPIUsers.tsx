@@ -93,7 +93,7 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
           <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>
             Loading...
           </Typography>
-        ) : apiUsers.length === 0 ? (
+        ) : apiUsers?.length === 0 ? (
           <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>
             No API users found
           </Typography>
@@ -109,7 +109,7 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
                 </TableRow>
               </TableHead>
               <TableBody>
-                {apiUsers.map((user) => (
+                {apiUsers?.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>

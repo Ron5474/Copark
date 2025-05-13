@@ -74,5 +74,5 @@ export const getAPIUsers = async (): Promise<APIUser[]> => {
   });
 
   const result = await response.json();
-  return result.data.getAPIUsers;
+  return result.data?.getAPIUsers;
 };

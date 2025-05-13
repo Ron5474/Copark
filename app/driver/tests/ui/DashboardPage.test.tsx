@@ -1,11 +1,11 @@
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi, it, expect, afterEach, beforeEach } from 'vitest'
 
 import Page from '@/app/[locale]/dashboard/page'
 import { getVehicles } from '../../src/app/[locale]/vehicle/actions'
 import { userLoginSignUpAttempt } from '@/app/[locale]/dashboard/actions'
-// import { getUser } from '@/app/[locale]/shared/actions'
+import { getUser } from '@/app/[locale]/shared/actions'
 
 
 vi.mock('next-auth/react', () => ({
@@ -77,13 +77,7 @@ vi.mock('../../src/app/[locale]/dashboard/actions', () => ({
 }))
 
 vi.mock('../../src/app/[locale]/shared/actions', () => ({
-  getUser: vi.fn().mockResolvedValue({
-    user: {
-      name: "Test User",
-      email: "test@example.com"
-    },
-    expires: "2025-01-01T00:00:00.000Z"
-  }),
+  getUser: vi.fn(),
 }))
 
 afterEach(() => {
@@ -111,12 +105,19 @@ beforeEach(() => {
       state: 'California',
     },
   ])
+  vi.mocked(getUser).mockResolvedValue({
+    user: {
+      name: "Test User",
+      email: "test@example.com"
+    },
+    expires: "2025-01-01T00:00:00.000Z"
+  })
 })
 
 it('calls setCurrentPage with "buy-permit" when Buy Permit is clicked', async () => {
   const user = userEvent.setup()
-  vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful');
-  // const signOutMock = vi.mocked(signOut)
+  vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful')
+
   render(<Page />)
 
   await user.click(screen.getByText('Buy Permit'))
@@ -125,8 +126,8 @@ it('calls setCurrentPage with "buy-permit" when Buy Permit is clicked', async ()
 
 it('Garage Displayed when Garage is clicked', async () => {
   const user = userEvent.setup()
-  vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful');
-  // const signOutMock = vi.mocked(signOut)
+  vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful')
+
   render(<Page />)
 
   await user.click(screen.getByText('Garage'))
@@ -135,10 +136,29 @@ it('Garage Displayed when Garage is clicked', async () => {
 
 it('Add Vehicle Displayed when Add Vehicle is clicked', async () => {
   const user = userEvent.setup()
-  vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful');
-  // const signOutMock = vi.mocked(signOut)
+  vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful')
   render(<Page />)
 
   await user.click(screen.getByText('Add Vehicle'))
   expect(await screen.findByText('License Plate Number'))
 })
+
+it('Redirects to /login', async () => {
+  vi.mocked(getUser).mockResolvedValue(undefined)
+  vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful')
+  render(<Page />)
+
+  await waitFor(() => {
+    expect(pushMock).toHaveBeenCalledWith('/login')
+  })
+})
+
+it('Redirects to Dashboard', async () => {
+  const user = userEvent.setup()
+  vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful')
+  render(<Page />)
+
+  await user.click(screen.getByText('Add Vehicle'))
+  await user.click(await screen.getByLabelText('back to dashboard'))
+  expect(await screen.queryByLabelText('back to dashboard')).toBeNull()
+});

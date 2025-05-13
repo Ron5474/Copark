@@ -171,6 +171,7 @@ export class PermitService {
       [zone]
     )
     
+    if (result.rowCount == 0) throw new Error(`Zone does not exist: ${zone}`)
     return isWeekend ? result.rows[0].data.weekend : result.rows[0].data.weekday
   }
 }

@@ -40,6 +40,7 @@ it('handles form submission', async () => {
     </ThemeProvider>
   )
 
+  // Fill in the form fields
   fireEvent.change(screen.getByLabelText('Organization Name'), {
     target: { value: 'Test Organization' }
   })
@@ -47,17 +48,53 @@ it('handles form submission', async () => {
     target: { value: 'test@organization.com' }
   })
 
+  // Click submit button
   fireEvent.click(screen.getByText('Add'))
 
+  // Update expectation to match new role implementation
   await waitFor(() => {
     expect(addAPIUser).toHaveBeenCalledWith({
       name: 'Test Organization',
       email: 'test@organization.com',
-      role: 'api_user'
+      role: 'payroll' // Changed from 'api_user' to match default role
     })
     expect(mockOnClose).toHaveBeenCalled()
   })
 })
+
+it('handles role selection change', async () => {
+  cleanup();
+  render(
+    <ThemeProvider theme={theme}>
+      <AddAPIUser open={true} onClose={mockOnClose} />
+    </ThemeProvider>
+  );
+
+  // Fill in form fields
+  fireEvent.change(screen.getByLabelText('Organization Name'), {
+    target: { value: 'Test Organization' }
+  });
+  fireEvent.change(screen.getByLabelText('Organization Email'), {
+    target: { value: 'test@organization.com' }
+  });
+
+  // Open role dropdown and select 'registrar'
+  fireEvent.mouseDown(screen.getByLabelText('Role'));
+  fireEvent.click(screen.getByText('Registrar'));
+
+  // Submit form
+  fireEvent.click(screen.getByText('Add'));
+
+  // Verify form submission with changed role
+  await waitFor(() => {
+    expect(addAPIUser).toHaveBeenCalledWith({
+      name: 'Test Organization',
+      email: 'test@organization.com',
+      role: 'registrar'
+    });
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+});
 
 it('closes dialog when cancel is clicked', () => {
   cleanup(); 

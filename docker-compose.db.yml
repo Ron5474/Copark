@@ -27,6 +27,8 @@ services:
       - ./microservice/TicketService/sql/data.sql:/docker-entrypoint-initdb.d/12.data.sql
       - ./microservice/PermitService/sql/databases.sql:/docker-entrypoint-initdb.d/13.databases.sql
       - ./microservice/PermitService/sql/schema.sql:/docker-entrypoint-initdb.d/14.schema.sql
+    networks:
+      - external-network
 
   test_postgres:
     container_name: test
@@ -55,3 +57,8 @@ services:
       - ./microservice/TicketService/sql/data.sql:/docker-entrypoint-initdb.d/12.data.sql
       - ./microservice/PermitService/sql/databases.sql:/docker-entrypoint-initdb.d/13.databases.sql
       - ./microservice/PermitService/sql/schema.sql:/docker-entrypoint-initdb.d/14.schema.sql
+
+networks:
+  external-network:
+    name: external-network
+    external: true

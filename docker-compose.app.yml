@@ -5,8 +5,6 @@ services:
       - prod
     env_file: .env
     build: .
-    depends_on:
-      - postgres
     ports:
       - "3000:3000"
       - "3001:3001"
@@ -16,3 +14,10 @@ services:
       - "3012:3012"
       - "3013:3013"
       - "8080:8080"
+    networks:
+      - external-network
+
+networks:
+  external-network:
+    external: true
+    name: external-network

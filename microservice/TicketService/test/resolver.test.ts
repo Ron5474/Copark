@@ -345,7 +345,7 @@ async function loginAs(who: string): Promise<string> {
       throw new Error(`Enforcement login failed with status ${response.status}`)
     }
 
-    console.log(response.body)
+    // console.log(response.body)
     return response.body.id
   }
 
@@ -386,9 +386,10 @@ test('Enforcer can create a ticket', async () => {
       }
     })
 
-  console.log(JSON.stringify(response.body, null, 2))
+  // console.log(JSON.stringify(response.body, null, 2))
 
   expect(response.status).toBe(200)
+  // console.log(response.body.data)
   const ticket = response.body.data.createNewTicket
 
   expect(ticket).toBeDefined()

@@ -94,11 +94,11 @@ export class TicketResolver {
     ): Promise<Ticket> {
       // const enforcerId = request.user?.id
       // console.log(enforcerId)
-      console.log("enforcerrrrr")
+      // console.log("enforcerrrrr")
       // if (!enforcerId) throw new Error('Unauthorized')
       
       const plate = input.plate
-      console.log("plate", plate)
+      // console.log("plate", plate)
       const vehicleQuery = `
         mutation FindOrCreateVehicleByPlate($plate: String!) {
           findOrCreateVehicleByPlate(plate: $plate) {
@@ -106,7 +106,7 @@ export class TicketResolver {
           }
         }
       `;
-      console.log("before vehicle re")
+      // console.log("before vehicle re")
       console.log(request.headers.authorization)
       const vehicleRes = await fetch("http://localhost:4001/graphql", {
         method: "POST",
@@ -119,9 +119,9 @@ export class TicketResolver {
           variables: { plate: plate },
         }),
       });
-      console.log("after vehicle re")
+      // console.log("after vehicle re")
       const vehicleJson = await vehicleRes.json();
-      console.log("vec jason", vehicleJson)
+      // console.log("vec jason", vehicleJson)
       const vehicleId = vehicleJson?.data?.findOrCreateVehicleByPlate?.id;
 
       if (!vehicleId) {

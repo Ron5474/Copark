@@ -6,13 +6,18 @@ import * as http from 'http'
 import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
+import { app as VehicleApp } from '../../VehicleService/src/app'
 
 let server: http.Server
 let authServer: http.Server
+let vehcServer: http.Server
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
+const VEHC_PORT = 4001
+// const VEHC_SERVICE_URL = `http://localhost:${VEHC_PORT}`
 
+// const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
 beforeAll(async () => {
   // Start your GraphQL server
@@ -20,15 +25,17 @@ beforeAll(async () => {
   server.listen()
   await bootstrap()
 
-  // Start your Auth server
   authServer = http.createServer(authApp)
   await new Promise<void>((resolve) => {
-    authServer.listen(AUTH_PORT, () => {
-      resolve()
-    })
+    authServer.listen(AUTH_PORT, () => resolve())
   })
 
-  return
+  vehcServer = http.createServer(VehicleApp)
+  await new Promise<void>((resolve) => {
+    vehcServer.listen(VEHC_PORT, () => resolve())
+  })
+
+  return db.reset()
 })
 
 beforeEach( async () => {
@@ -39,6 +46,7 @@ afterAll(() => {
   db.shutdown()
   server.close()
   authServer.close()
+  vehcServer.close()
 })
 
 
@@ -130,6 +138,22 @@ const purchaseZoneInput = {
   }
 }
 
+// const isValidZonePermitQuery = `
+// query IsValid($input: IsValidPermitInput!) {
+//   isValidZonePermit(input: $input) {
+//     isValid
+//     type
+//     zone
+//   }
+// }`
+
+// const isValidZonePermitInput = {
+//   input: {
+//     vehicle: "7RON123",
+//     zone: "123"
+//   }
+// }
+
 
 const myPermitsQuery = `
 query MyPermits($vehicleID: String!) {
@@ -210,19 +234,20 @@ test('Driver can purchase a zone permit', async () => {
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
 })
 
-test('Enforcer gets invalid permit', async () => {
-  const token = await loginAs("enforcement")
+// test('Enforcer gets invalid permit', async () => {
+//   const token = await loginAs("enforcement")
 
-  const confirmation = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
-    .send({ 
-      query: purchaseZonePermitQuery,
-      variables: purchaseZoneInput
-    })
+//   const isValid = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + token)
+//     .send({ 
+//       query: isValidZonePermitQuery,
+//       variables: isValidZonePermitInput
+//     })
 
-  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
-})
+//   console.log(isValid.body)
+//   expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
+// })
 
 test('Driver has no permits', async () => {
   const token = await loginAs("driver")

@@ -29,11 +29,57 @@ interface Server {
   use: (...handlers: import('msw').RequestHandler[]) => void
 }
 
-const auth = (server: Server): void => {
+const auth = (server: Server, failLogin=false): void => {
   server.use(
     http.get(authURL + '/driver/id', async (): Promise<HttpResponse<string>> => {
       return HttpResponse.json("auth-token")
     }),
+
+    http.post(authURL + '/driver/login', async (): Promise<HttpResponse<string>> => {
+      if (failLogin) {
+        return new HttpResponse(null, {status: 401})
+      } else {
+        return HttpResponse.json("auth-token")
+      }
+    }),
+
+    http.get('/driver/api/auth/session', async (): Promise<HttpResponse<object>> => {
+      if (failLogin) {
+        return HttpResponse.json({ expires: null, user: null })
+      } else {
+        return HttpResponse.json({
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          user: {
+            name: 'Test User',
+            email: 'test@example.com',
+          }
+        })
+      }
+    }),
+
+    http.get('/driver/api/auth/csrf', async (): Promise<HttpResponse<object>> => {
+      return HttpResponse.json({
+        csrfToken: 'mock-csrf-token-123',
+      })
+    }),
+
+    http.get('/driver/api/auth/signout', async (): Promise<HttpResponse<string>> => {
+      if (failLogin) {
+        return HttpResponse.json("Login Again")
+      } else {
+        return HttpResponse.json("Redirecting You to home")
+      }
+    }),
+
+    http.all('http://localhost:3000/*', async () => {
+      return HttpResponse.json({ message: "Mocked response" });
+    }),
+
+    http.all('*', async () => {
+      // console.log(`Caught unhandled request to: ${request.url}`);
+      return HttpResponse.json({ message: "Mocked response" }, { status: 200 });
+    }),
+
   )
 }
 

@@ -71,6 +71,10 @@ const auth = (server: Server, failLogin=false): void => {
       }
     }),
 
+    http.post('http://localhost:3000/driver/api/auth/signout', async () => {
+      return HttpResponse.json("Signed out successfully");
+    }),
+
     http.all('http://localhost:3000/*', async () => {
       return HttpResponse.json({ message: "Mocked response" });
     }),

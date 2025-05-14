@@ -53,6 +53,8 @@ afterAll(() => {
 
 const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
 
+const policeJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFiZTQwNWM2LTc0MDAtNGQyMy05Zjg2LTAwZWFkMTU3MjlmNSIsImlhdCI6MTc0NzI2MzIyMSwiZXhwIjoxOTA1MDUxMjIxfQ.UVVWAjg2-asw8gfqoxljHZSVX4Mn_1FzOV85CagVbUQ"
+
 const adminUser = {
   email: 'jxiong0822@outlook.com',
   password: 'password1',
@@ -90,7 +92,9 @@ async function loginAs(who: string): Promise<string | undefined> {
 
     return response.body.id
 
-  } else {
+  } 
+  
+  else {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
       .send(adminUser)
@@ -147,6 +151,17 @@ const isValidZonePermitInput = {
   }
 }
 
+const isValidPermitByPoliceQuery = `
+query IsValidPolice($plate: String!) {
+  isValidPermitByPolice(plate: $plate) {
+    isValid
+  }
+}`
+
+const isValidPermitByPoliceInput = {
+  plate: "7RON123",
+}
+
 
 const myPermitsQuery = `
 query MyPermits($vehicleID: String!) {
@@ -201,6 +216,7 @@ const zoneDetailsInput = {
 //   vehicle: "12345678-1234-1234-1234-567890abcdef"
 // }
 
+
 test('Permit service is running', async () => {
   const status = await supertest(server)
     .post('/graphql')
@@ -238,8 +254,20 @@ test('Enforcer gets invalid permit', async () => {
       variables: isValidZonePermitInput
     })
 
-  console.log(isValid.body)
   expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
+})
+
+test('Police gets invalid permit', async () => {
+  const isValid = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + policeJWT)
+    .send({ 
+      query: isValidPermitByPoliceQuery,
+      variables: isValidPermitByPoliceInput
+    })
+
+    console.log(isValid.body)
+  expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
 })
 
 test('Driver has no permits', async () => {

@@ -25,6 +25,17 @@ VALUES (
   )
 );
 
+
+INSERT INTO account(id, data)
+VALUES (
+  'abe405c6-7400-4d23-9f86-00ead15729f5',
+  jsonb_build_object(
+    'name', 'Antioch PD',
+    'email', 'apd@pd.com',
+    'role', '["police"]'
+  )
+);
+
 -- For OAuth Testing
 INSERT INTO account(id, data)
 VALUES (

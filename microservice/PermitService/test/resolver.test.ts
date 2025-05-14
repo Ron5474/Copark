@@ -115,36 +115,36 @@ const purchaseZoneInput = {
 }
 
 
-// const myPermitsQuery = `
-// query MyPermits($vehicleID: String!) {
-//   myPermits(vehicleID: $vehicleID) {
-//     future {
-//       vehicle
-//       type
-//       zone
-//       activeDate
-//       expireDate
-//     }
-//     active {
-//       vehicle
-//       type
-//       zone
-//       activeDate
-//       expireDate
-//     }
-//     expired {
-//       vehicle
-//       type
-//       zone
-//       activeDate
-//       expireDate
-//     }
-//   }
-// }`
+const myPermitsQuery = `
+query MyPermits($vehicleID: String!) {
+  myPermits(vehicleID: $vehicleID) {
+    future {
+      vehicle
+      type
+      zone
+      activeDate
+      expireDate
+    }
+    active {
+      vehicle
+      type
+      zone
+      activeDate
+      expireDate
+    }
+    expired {
+      vehicle
+      type
+      zone
+      activeDate
+      expireDate
+    }
+  }
+}`
 
-// const myPermitsInput = {
-//   vehicleID: "12345678-1234-1234-1234-567890abcdef"
-// }
+const myPermitsInput = {
+  vehicleID: "12345678-1234-1234-1234-567890abcdef"
+}
 
 // const isValidPermitInput = {
 //   vehicle: "12345678-1234-1234-1234-567890abcdef"
@@ -176,17 +176,30 @@ test('Driver can purchase a zone permit', async () => {
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
 })
 
+test('Driver has no permits', async () => {
+  const token = await loginAs("driver")
+
+  const permits = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: myPermitsQuery,
+      variables: myPermitsInput
+    })
+
+  expect(permits.body.data.myPermits.active.length).toBe(0)
+})
+
 // test('Driver has no permits', async () => {
 //   const token = await loginAs("driver")
 
-//   const permits = await supertest(server)
+//   const details = await supertest(server)
 //     .post('/graphql')
 //     .set('Authorization', 'Bearer ' + token)
 //     .send({ 
-//       query: myPermitsQuery,
-//       variables: myPermitsInput
+//       query: zoneDetailsQuery,
+//       variables: zoneDetailsInput
 //     })
 
-//   console.log(permits.body)
-//   expect(permits.body.data.myPermits.active.length).toBe(0)
+//   expect(details.body.data.myPermits.active.length).toBe(0)
 // })

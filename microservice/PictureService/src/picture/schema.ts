@@ -2,15 +2,15 @@ import { Field, InputType, ObjectType } from 'type-graphql'
 
 @InputType()
 export class RecognizePlateInput {
-  @Field()
+  @Field(() => String)
   image!: string
 }
 
 @ObjectType()
 export class RecognizePlateResult {
-  @Field()
+  @Field(() => String)
   plate!: string
 
-  @Field()
+  @Field(() => Number)
   confidence!: number
 }

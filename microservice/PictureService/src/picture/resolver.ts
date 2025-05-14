@@ -1,4 +1,4 @@
-import { Arg, Mutation, Resolver, Authorized } from 'type-graphql'
+import { Arg, Mutation, Resolver, Authorized, Query } from 'type-graphql'
 import { RecognizePlateInput, RecognizePlateResult } from './schema'
 import { PictureService } from './service'
 
@@ -12,5 +12,13 @@ export class PictureResolver {
     @Arg('input', () => RecognizePlateInput) input: RecognizePlateInput
   ): Promise<RecognizePlateResult> {
     return this.service.recognizePlate(input)
+  }
+}
+
+@Resolver()
+export class DummyQueryResolver {
+  @Query(() => String)
+  ping(): string {
+    return 'pong'
   }
 }

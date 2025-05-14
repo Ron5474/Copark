@@ -13,7 +13,9 @@ export class PictureService {
     const buffer = Buffer.from(base64Data, 'base64')
 
     const result = await Tesseract.recognize(buffer, 'eng', {
-      logger: false,
+      logger: () => {
+        // nothing typescript, leave me alone
+      },
     })
 
     const plate = result.data.text.replace(/\s/g, '').toUpperCase()

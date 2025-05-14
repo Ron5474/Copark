@@ -114,9 +114,53 @@ const purchaseZoneInput = {
   }
 }
 
+
+// const myPermitsQuery = `
+// query MyPermits($vehicleID: String!) {
+//   myPermits(vehicleID: $vehicleID) {
+//     future {
+//       vehicle
+//       type
+//       zone
+//       activeDate
+//       expireDate
+//     }
+//     active {
+//       vehicle
+//       type
+//       zone
+//       activeDate
+//       expireDate
+//     }
+//     expired {
+//       vehicle
+//       type
+//       zone
+//       activeDate
+//       expireDate
+//     }
+//   }
+// }`
+
+// const myPermitsInput = {
+//   vehicleID: "12345678-1234-1234-1234-567890abcdef"
+// }
+
 // const isValidPermitInput = {
 //   vehicle: "12345678-1234-1234-1234-567890abcdef"
 // }
+
+test('Permit service is running', async () => {
+  const status = await supertest(server)
+    .post('/graphql')
+    .send({ 
+      query: `
+        query { permitServiceStatus }
+      `,
+    })
+
+  expect(status.body.data.permitServiceStatus).toBe("Permit service is running")
+})
 
 test('Driver can purchase a zone permit', async () => {
   const token = await loginAs("driver")
@@ -128,6 +172,21 @@ test('Driver can purchase a zone permit', async () => {
       query: purchaseZonePermitQuery,
       variables: purchaseZoneInput
     })
-  console.log(confirmation.body)
+
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
 })
+
+// test('Driver has no permits', async () => {
+//   const token = await loginAs("driver")
+
+//   const permits = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + token)
+//     .send({ 
+//       query: myPermitsQuery,
+//       variables: myPermitsInput
+//     })
+
+//   console.log(permits.body)
+//   expect(permits.body.data.myPermits.active.length).toBe(0)
+// })

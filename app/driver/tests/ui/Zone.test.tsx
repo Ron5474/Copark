@@ -16,12 +16,7 @@ import { ZoneProvider } from '../../src/app/[locale]/zone/Context'
 
 
 vi.mock('../../src/app/[locale]/zone/actions', () => ({
-  getZoneDetails: vi.fn() //.mockResolvedValue({
-  //   daily: 2.50,
-  //   maxDuration: { hours: 2, minutes: 0 },
-  //   openTime: '07:00',
-  //   closeTime: '20:00',
-  // }),
+  getZoneDetails: vi.fn()
 }))
 
 vi.mock('next/navigation', () => ({

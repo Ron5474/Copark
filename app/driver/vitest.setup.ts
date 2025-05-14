@@ -1,0 +1,6 @@
+process.env.NEXT_PUBLIC_GOOGLE_ID = 'mock-google-id'
+process.env.NEXT_PUBLIC_GOOGLE_SECRET = 'mock-google-secret'
+process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID = 'mock-facebook-id'
+process.env.NEXT_PUBLIC_FACEBOOK_SECRET = 'mock-facebook-secret'
+process.env.NEXT_PUBLIC_GITHUB_ID = 'mock-github-id'
+process.env.NEXT_PUBLIC_GITHUB_SECRET = 'mock-github-secret'

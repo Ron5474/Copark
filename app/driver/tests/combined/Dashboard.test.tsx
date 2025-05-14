@@ -13,7 +13,7 @@ Object.defineProperty(window, 'location', {
   value: {
     ...window.location,
     href: 'http://localhost:3000/driver/en/dashboard',
-    origin: 'http://localhost:3000', // this is key
+    origin: 'http://localhost:3000',
     assign: vi.fn(),
     replace: vi.fn(),
   },
@@ -23,8 +23,8 @@ vi.mock('next-auth/next', () => ({
   getServerSession: vi.fn().mockImplementation(() => {
     return Promise.resolve({
       user: {
-        name: 'Test User',
-        email: 'test@example.com',
+        name: 'Bryant Oliver',
+        email: 'bryant@oliver.com',
       },
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
     })

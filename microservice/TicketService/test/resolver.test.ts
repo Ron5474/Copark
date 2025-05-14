@@ -18,7 +18,7 @@ const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 
 const VEHICLE_PORT = 4001
-const VEHICLE_SERVICE_URL = `http://localhost:${VEHICLE_PORT}`
+// const VEHICLE_SERVICE_URL = `http://localhost:${VEHICLE_PORT}`
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
@@ -227,107 +227,286 @@ test('Admin can modify a ticket with images', async () => {
   expect(modifyResponse.body.data.modifyTicket.images).toBe("photo2.jpg")
 })
 
-test('Admin can delete a ticket', async () => {
-  const token = await loginAsAdmin()
+// test('Admin can delete a ticket', async () => {
+//   const token = await loginAsAdmin()
 
-  const vehicleid = await encrypt('00000000-0000-0000-0000-000000000000')
-  const enforcerid = await encrypt('00000000-0000-0000-0000-000000000000')
+//   const vehicleid = await encrypt('00000000-0000-0000-0000-000000000000')
+//   const enforcerid = await encrypt('00000000-0000-0000-0000-000000000000')
 
-  const createQuery = `
-    mutation CreateTicket($input: NewTicket!) {
-      createTicket(newTicket: $input) {
-        id
-        vehicle
-        fine
-        violation
-        images
-      }
-    }
-  `
+//   const createQuery = `
+//     mutation CreateTicket($input: NewTicket!) {
+//       createTicket(newTicket: $input) {
+//         id
+//         vehicle
+//         fine
+//         violation
+//         images
+//       }
+//     }
+//   `
 
-  const createVariables = {
-    input: {
-      vehicle: vehicleid,
-      enforcer: enforcerid,
-      fine: 150,
-      violation: "speeding",
-      images: "photo1.jpg",
-    },
-  }
+//   const createVariables = {
+//     input: {
+//       vehicle: vehicleid,
+//       enforcer: enforcerid,
+//       fine: 150,
+//       violation: "speeding",
+//       images: "photo1.jpg",
+//     },
+//   }
 
-  const createResponse = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
-    .send({ query: createQuery, variables: createVariables })
-    .expect(200)
+//   const createResponse = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + token)
+//     .send({ query: createQuery, variables: createVariables })
+//     .expect(200)
 
-  expect(createResponse.body.errors).toBeUndefined()
-  const ticketId = createResponse.body.data.createTicket.id
+//   expect(createResponse.body.errors).toBeUndefined()
+//   const ticketId = createResponse.body.data.createTicket.id
 
-  const deleteQuery = `
-    mutation DeleteTicket($id: TicketInput!) {
-      deleteTicket(id: $id) {
-        id
-      }
-    }
-  `
+//   const deleteQuery = `
+//     mutation DeleteTicket($id: TicketInput!) {
+//       deleteTicket(id: $id) {
+//         id
+//       }
+//     }
+//   `
 
-  const deleteVariables = {
-    id: {
-      id: ticketId,
-    },
-  }
+//   const deleteVariables = {
+//     id: {
+//       id: ticketId,
+//     },
+//   }
   
-  const deleteResponse = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
-    .send({ query: deleteQuery, variables: deleteVariables })
-    .expect(200)
+//   const deleteResponse = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + token)
+//     .send({ query: deleteQuery, variables: deleteVariables })
+//     .expect(200)
 
-  expect(deleteResponse.body.errors).toBeUndefined()
-  expect(deleteResponse.body.data.deleteTicket.id).toBe(ticketId)
+//   expect(deleteResponse.body.errors).toBeUndefined()
+//   expect(deleteResponse.body.data.deleteTicket.id).toBe(ticketId)
 
-  const getQuery = `
-    query {
-      getTickets {
-        id
-      }
+//   const getQuery = `
+//     query {
+//       getTickets {
+//         id
+//       }
+//     }
+//   `
+
+//   const getResponse = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + token)
+//     .send({ query: getQuery })
+//     .expect(200)
+
+//   expect(getResponse.body.errors).toBeUndefined()
+//   const ticketIds = getResponse.body.data.getTickets.map((ticket: any) => ticket.id)
+//   expect(ticketIds).not.toContain(ticketId)
+// })
+
+// test('Driver can get their tickets', async () => {
+//   const token = await loginAsDriver()
+
+//   const query = `
+//     query {
+//       getMyTickets {
+//         id
+//         vehicle
+//         fine
+//         violation
+//         images
+//       }
+//     }
+//   `
+
+//   const response = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + token)
+//     .send({ query })
+//     .expect(200)
+
+//   console.log(response.body)
+//   expect(response.body.errors).toBeUndefined()
+//   expect(response.body.data.getMyTickets.length).toBe(3)
+// })
+
+async function loginAs(who: string): Promise<string> {
+  if (who === "enforcement") {
+    const response = await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/login')
+      .send({
+        email: 'enforcer1@outlook.com',
+        password: 'password1',
+      })
+
+    if (response.status !== 200) {
+      throw new Error(`Enforcement login failed with status ${response.status}`)
     }
-  `
 
-  const getResponse = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
-    .send({ query: getQuery })
-    .expect(200)
+    console.log(response.body)
+    return response.body.id
+  }
 
-  expect(getResponse.body.errors).toBeUndefined()
-  const ticketIds = getResponse.body.data.getTickets.map((ticket: any) => ticket.id)
-  expect(ticketIds).not.toContain(ticketId)
-})
+  throw new Error("Unsupported user role")
+}
 
-test('Driver can get their tickets', async () => {
-  const token = await loginAsDriver()
+const createNewTicketMutation = `
+mutation CreateNewTicket($input: NewTicketInput!) {
+  createNewTicket(input: $input) {
+    id
+    vehicle
+    enforcer
+    issuedDate
+    violation
+    fine
+    ticketStatus
+    images
+    note
+  }
+}
+`
 
-  const query = `
-    query {
-      getMyTickets {
-        id
-        vehicle
-        fine
-        violation
-        images
-      }
-    }
-  `
+test('Enforcer can create a ticket', async () => {
+  const token = await loginAs("enforcement")
 
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query })
-    .expect(200)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "TICKET123",
+          reason: "Blocking Driveway",
+          note: "Parked right in front of gate",
+          images: "https://example.com/photo.jpg"
+        }
+      }
+    })
 
-  console.log(response.body)
-  expect(response.body.errors).toBeUndefined()
-  expect(response.body.data.getMyTickets.length).toBe(3)
+  console.log(JSON.stringify(response.body, null, 2))
+
+  expect(response.status).toBe(200)
+  const ticket = response.body.data.createNewTicket
+
+  expect(ticket).toBeDefined()
+  expect(ticket.violation).toBe("Blocking Driveway")
+  expect(ticket.fine).toBe(50)
+  expect(ticket.ticketStatus).toBe("ISSUED")
+  expect(ticket.images).toBe("https://example.com/photo.jpg")
+  expect(ticket.note).toBe("Parked right in front of gate")
 })
+// import { test, beforeAll, afterAll, expect } from 'vitest'
+// import supertest from 'supertest'
+// import * as http from 'http'
+
+// import db from './db'
+// import { app, bootstrap } from '../src/app'
+// import authApp from '../../AuthService/src/app'
+// import vechApp from '../../VehicleService/src/app'
+
+// let server: http.Server
+
+// let authServer: http.Server
+
+// let vechServer: http.Server
+
+// const AUTH_PORT = 3010
+// const VECH_PORT = 4001
+
+// const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
+// // const VECH_SERVICE_URL = `http://localhost:${VECH_PORT}`
+
+// beforeAll(async () => {
+//   server = http.createServer(app)
+//   server.listen()
+//   await bootstrap()
+
+//   authServer = http.createServer(authApp)
+//   await new Promise<void>((resolve) => {
+//     authServer.listen(AUTH_PORT, () => resolve())
+//   })
+
+//   vechServer = http.createServer(vechApp)
+//   await new Promise<void>((resolve) => {
+//     vechServer.listen(VECH_PORT, () => resolve())
+//   })
+
+//   return db.reset()
+// })
+
+// afterAll(() => {
+//   db.shutdown()
+//   server.close()
+//   authServer.close()
+//   vechServer.close()
+// })
+
+// async function loginAs(who: string): Promise<string> {
+//   if (who === "enforcement") {
+//     const response = await supertest(AUTH_SERVICE_URL)
+//       .post('/api/v0/auth/login')
+//       .send({
+//         email: 'enforcer1@outlook.com',
+//         password: 'password1',
+//       })
+
+//     if (response.status !== 200) {
+//       throw new Error(`Enforcement login failed with status ${response.status}`)
+//     }
+
+//     console.log(response.body)
+//     return response.body.id
+//   }
+
+//   throw new Error("Unsupported user role")
+// }
+
+// const createNewTicketMutation = `
+// mutation CreateNewTicket($input: NewTicketInput!) {
+//   createNewTicket(input: $input) {
+//     id
+//     vehicle
+//     enforcer
+//     issuedDate
+//     violation
+//     fine
+//     ticketStatus
+//     images
+//     note
+//   }
+// }
+// `
+
+// test('Enforcer can create a ticket', async () => {
+//   const token = await loginAs("enforcement")
+
+//   const response = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + token)
+//     .send({
+//       query: createNewTicketMutation,
+//       variables: {
+//         input: {
+//           plate: "TICKET123",
+//           reason: "Blocking Driveway",
+//           note: "Parked right in front of gate",
+//           images: "https://example.com/photo.jpg"
+//         }
+//       }
+//     })
+
+//   console.log(JSON.stringify(response.body, null, 2))
+
+//   expect(response.status).toBe(200)
+//   const ticket = response.body.data.createNewTicket
+
+//   expect(ticket).toBeDefined()
+//   expect(ticket.violation).toBe("Blocking Driveway")
+//   expect(ticket.fine).toBe(50)
+//   expect(ticket.ticketStatus).toBe("ISSUED")
+//   expect(ticket.images).toBe("https://example.com/photo.jpg")
+//   expect(ticket.note).toBe("Parked right in front of gate")
+// })

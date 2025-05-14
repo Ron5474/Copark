@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Arg, Authorized, Ctx } from "type-graphql";
-
+import { Request } from 'express'
 import { TicketService } from "./service";
 import { 
   Ticket,
@@ -7,7 +7,8 @@ import {
   ModifyTicketInput,
   TicketInput,
   hasTicket,
-  EmailInput
+  EmailInput,
+  NewTicketInput
 } from "./schema";
 
 import { SessionUser } from "src";
@@ -68,21 +69,73 @@ export class TicketResolver {
   }
 
   @Mutation(() => Ticket)
-  @Authorized(["enforcer", "admin"])
+  @Authorized(["enforcement", "admin"])
   async createTicket(@Arg("newTicket", () => NewTicket) newTicket: NewTicket): Promise<Ticket> {
     return ticketService.createTicket(newTicket);
   }
 
   @Mutation(() => Ticket, { nullable: true })
-  @Authorized(["enforcer", "admin"])
+  @Authorized(["enforcement", "admin"])
   async modifyTicket(@Arg("input", () => ModifyTicketInput) input: ModifyTicketInput): Promise<Ticket | null> {
     return ticketService.modifyTicket(input);
   }
 
   @Mutation(() => Ticket, { nullable: true })
-  @Authorized(["enforcer", "admin"])
+  @Authorized(["enforcement", "admin"])
   async deleteTicket(@Arg("id", () => TicketInput) id: TicketInput): Promise<Ticket | null> {
     return ticketService.deleteTicket(id);
+  }
+
+  @Mutation(() => Ticket)
+  @Authorized(["enforcement", "admin"])
+    async createNewTicket(
+      @Arg("input", () => NewTicketInput) input: NewTicketInput,
+      @Ctx() request: Request
+    ): Promise<Ticket> {
+      // const enforcerId = request.user?.id
+      // console.log(enforcerId)
+      console.log("enforcerrrrr")
+      // if (!enforcerId) throw new Error('Unauthorized')
+      
+      const plate = input.plate
+      console.log("plate", plate)
+      const vehicleQuery = `
+        mutation FindOrCreateVehicleByPlate($plate: String!) {
+          findOrCreateVehicleByPlate(plate: $plate) {
+            id
+          }
+        }
+      `;
+      console.log("before vehicle re")
+      console.log(request.headers.authorization)
+      const vehicleRes = await fetch("http://localhost:4001/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${request.headers.authorization}`,
+        },
+        body: JSON.stringify({
+          query: vehicleQuery,
+          variables: { plate: plate },
+        }),
+      });
+      console.log("after vehicle re")
+      const vehicleJson = await vehicleRes.json();
+      console.log("vec jason", vehicleJson)
+      const vehicleId = vehicleJson?.data?.findOrCreateVehicleByPlate?.id;
+
+      if (!vehicleId) {
+        throw new Error("Unable to resolve vehicle ID");
+      }
+
+      return ticketService.createTicket({
+      enforcer: (request.headers.authorization as string).split(' ')[1],
+      vehicle: vehicleId,
+      violation: input.reason,
+      fine: 50,
+      note: input.note,
+      images: input.images,
+    })
   }
 
   //need to add getTicketByEmail

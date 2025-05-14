@@ -73,8 +73,8 @@ export async function issueTicket({ plate, reason, note, images }: TicketInput) 
   }
 
   const mutation = `
-    mutation CreateTicket($input: TicketInput!) {
-      createTicket(input: $input) {
+    mutation CreateNewTicket($input: NewTicketInput!) {
+      createNewTicket(input: $input) {
         id
         issuedDate
         violation
@@ -111,5 +111,5 @@ export async function issueTicket({ plate, reason, note, images }: TicketInput) 
     throw new Error(result.errors[0].message)
   }
 
-  return result.data.createTicket
+  return result.data.createNewTicket
 }

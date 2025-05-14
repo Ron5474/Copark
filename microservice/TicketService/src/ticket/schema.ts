@@ -25,6 +25,9 @@ export class Ticket {
 
   @Field(() => String, { nullable: true })  
   images?: string;
+
+  @Field(() => String, { nullable: true })
+  note?: string;
 }
 
 @InputType()
@@ -43,6 +46,9 @@ export class NewTicket {
 
   @Field(() => String, { nullable: true })  
   images?: string;
+
+  @Field(() => String, { nullable: true })
+  note?: string;
 }
 
 @InputType()
@@ -83,4 +89,19 @@ export class hasTicket {
 
   @Field(() => Boolean)
   hasTicket!: boolean
+}
+
+@InputType()
+export class NewTicketInput {
+  @Field(() => String)
+  plate!: string;
+
+  @Field(() => String)
+  reason!: string;
+
+  @Field(() => String, { nullable: true })
+  note?: string;
+
+  @Field(() => String, { nullable: true })
+  images?: string;
 }

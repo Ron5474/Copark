@@ -203,6 +203,7 @@ export default function ManageEnforcement({ onNavigate }) {
           <TextField
             autoFocus
             margin="dense"
+            aria-label='Input Name'
             label="Name"
             fullWidth
             value={newEnforcer.name}
@@ -211,6 +212,7 @@ export default function ManageEnforcement({ onNavigate }) {
           />
           <TextField
             margin="dense"
+            aria-label='Input Email'
             label="Email"
             fullWidth
             value={newEnforcer.email}

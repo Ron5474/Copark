@@ -74,6 +74,7 @@ export default function Home({ onNavigate, children }: HomeProps) {
           {buttons.map((button) => (
             <ListItem key={button.label} disablePadding>
               <ListItemButton
+                aria-label={button.label}
                 onClick={() => onNavigate(button.component)}
                 sx={{
                   '&:hover': {

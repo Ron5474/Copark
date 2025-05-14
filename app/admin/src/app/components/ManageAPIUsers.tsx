@@ -15,10 +15,10 @@ import {
   TableRow
 } from '@mui/material'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
-import HomeIcon from '@mui/icons-material/Home'
 import AddAPIUser from './AddAPIUser'
 import { getAPIUsers, APIUser } from '@/api/actions'
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: string) => void }) {
   const theme = useTheme()
   const [openAddDialog, setOpenAddDialog] = useState(false)

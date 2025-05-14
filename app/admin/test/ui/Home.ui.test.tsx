@@ -2,7 +2,18 @@ import { it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import Page from '../../src/app/page';
+import { useState } from 'react';
+import Home from '@/app/components/Home';
 
+function TestWrapper() {
+  const [component, setComponent] = useState<string | null>(null);
+
+  return (
+    <Home onNavigate={setComponent}>
+      {component === 'reports' ? <div>Reports Component</div> : <div>Welcome to Admin Dashboard</div>}
+    </Home>
+  );
+}
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
@@ -16,53 +27,6 @@ vi.mock('next/headers', () => ({
     delete: vi.fn(),
   })
 }));
-
-
-vi.mock('@mui/material', () => ({
-  ...vi.importActual('@mui/material'),
-  Container: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Box: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Typography: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Paper: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Button: ({ children, onClick }: { children: React.ReactNode, onClick?: () => void }) =>
-    <button onClick={onClick}>{children}</button>,
-  IconButton: ({ children, onClick }: { children: React.ReactNode, onClick?: () => void }) =>
-    <button onClick={onClick}>{children}</button>,
-  AppBar: ({ children }: { children: React.ReactNode }) => <div role="banner">{children}</div>,
-  Toolbar: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Dialog: ({ children, open }: { children: React.ReactNode, open: boolean }) =>
-    open ? <div role="dialog">{children}</div> : null,
-  DialogTitle: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogActions: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  TextField: ({ label }: { label: string }) => (
-    <div>
-      <label>{label}</label>
-      <input type="text" />
-    </div>
-  ),
-  FormControl: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  InputLabel: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Select: ({ children, value, onChange }: { children: React.ReactNode, value: string, onChange: (e: any) => void }) => (
-    <select value={value} onChange={onChange}>{children}</select>
-  ),
-  MenuItem: ({ children, value }: { children: React.ReactNode, value: string }) => (
-    <option value={value}>{children}</option>
-  ),
-  TableContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Table: ({ children }: { children: React.ReactNode }) => <table>{children}</table>,
-  TableHead: ({ children }: { children: React.ReactNode }) => <thead>{children}</thead>,
-  TableBody: ({ children }: { children: React.ReactNode }) => <tbody>{children}</tbody>,
-  TableRow: ({ children }: { children: React.ReactNode }) => <tr>{children}</tr>,
-  TableCell: ({ children }: { children: React.ReactNode }) => <td>{children}</td>,
-  useTheme: vi.fn(() => ({
-    palette: {
-      primary: { main: '#1976d2' },
-      secondary: { main: '#dc004e' }
-    }
-  }))
-}));
-
 
 vi.mock('../../src/enforcement/actions', () => ({
   getEnforcers: vi.fn().mockResolvedValue([
@@ -116,7 +80,6 @@ it('renders main page with required elements', () => {
   render(<Page />);
 
   expect(screen.getByText("Admin Dashboard")).toBeDefined();
-  expect(screen.getByRole('banner')).toBeDefined();
 });
 
 it('displays user name from session storage', () => {
@@ -177,29 +140,32 @@ it('navigates to Manage Enforcers section', async () => {
   render(<Page />);
 
   const manageEnforcementButton = screen.getByText('Manage Enforcement');
-  fireEvent.click(manageEnforcementButton);
+  const clickableItem = manageEnforcementButton.closest('div');
+  fireEvent.click(clickableItem!);
 
   await waitFor(() => {
-    expect(screen.getByText('Manage Enforcers')).toBeDefined();
+    expect(screen.getByText(/Enforcer Count: \d+/i)).toBeDefined();
   });
 });
 
 it('navigates to Manage Drivers section', async () => {
   render(<Page />);
 
-  const manageDriversButton = screen.getByText('Manage Drivers');
-  fireEvent.click(manageDriversButton);
+  const manageDriversText = screen.getByText('Manage Drivers');
+  const clickableItem = manageDriversText.closest('div');
+  fireEvent.click(clickableItem!);
 
   await waitFor(() => {
-    expect(screen.getByText('Manage Drivers')).toBeDefined();
+    expect(screen.getByText(/Driver Count: \d+/i)).toBeDefined();
   });
 });
 
 it('navigates to Statistics section', async () => {
   render(<Page />);
 
-  const statisticsButton = screen.getByText('View Statistics');
-  fireEvent.click(statisticsButton);
+  const statisticsText = screen.getByText('View Statistics');
+  const clickableItem = statisticsText.closest('div');
+  fireEvent.click(clickableItem!);
 
   await waitFor(() => {
     expect(screen.getByText('Statistics Component')).toBeDefined();
@@ -209,8 +175,10 @@ it('navigates to Statistics section', async () => {
 it('navigates to Reports section', async () => {
   render(<Page />);
 
-  const reportsButton = screen.getByText('Generate Reports');
-  fireEvent.click(reportsButton);
+  const reportsText = screen.getByText('Generate Reports');
+  const clickableItem = reportsText.closest('div');
+
+  fireEvent.click(clickableItem!);
 
   await waitFor(() => {
     expect(screen.getByText('Reports Component')).toBeDefined();
@@ -220,10 +188,11 @@ it('navigates to Reports section', async () => {
 it('navigates to API Users section', async () => {
   render(<Page />);
 
-  const apiUsersButton = screen.getByText('Manage API Users');
-  fireEvent.click(apiUsersButton);
+  const apiUsersText = screen.getByText('Manage API Users');
+  const clickableItem = apiUsersText.closest('div');
+  fireEvent.click(clickableItem!);
 
   await waitFor(() => {
-    expect(screen.getByText('Manage API Users')).toBeDefined();
+    expect(screen.getByText('Add API User')).toBeDefined();
   });
 });

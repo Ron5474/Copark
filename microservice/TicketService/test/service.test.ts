@@ -11,7 +11,7 @@ import { ModifyTicketInput, NewTicket, TicketInput } from '../src/ticket/schema'
 
 const ticketService = new TicketService();
 
-const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 beforeAll(async () => {
   await db.reset();
@@ -40,7 +40,7 @@ test('getTickets should return all unpaid tickets', async () => {
 
 test('createTicket should successfully create a ticket with all fields', async () => {
     const newTicket: NewTicket = {
-        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        vehicle: '00000000-0000-0000-0000-000000000000',
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
         fine: 100,
         violation: 'speeding',
@@ -59,7 +59,7 @@ test('createTicket should successfully create a ticket with all fields', async (
 
 test('createTicket should successfully create a ticket without images', async () => {
     const newTicket: NewTicket = {
-        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        vehicle: '00000000-0000-0000-0000-000000000000',
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
         fine: 100,
         violation: 'speeding',
@@ -77,7 +77,7 @@ test('createTicket should successfully create a ticket without images', async ()
 
 test('createTicket should throw an error for invalid enforcer ID', async () => {
     const newTicket: NewTicket = {
-        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        vehicle: '00000000-0000-0000-0000-000000000000',
         enforcer: 'not a uuid',
         fine: 100,
         violation: 'speeding',
@@ -90,7 +90,7 @@ test('createTicket should throw an error for invalid enforcer ID', async () => {
 
 test('modifyTicket should successfully update a ticket', async () => {
     const newTicket: NewTicket = {
-        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        vehicle: '00000000-0000-0000-0000-000000000000',
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
         fine: 100000000,
         violation: 'blowing up a red light',
@@ -101,7 +101,7 @@ test('modifyTicket should successfully update a ticket', async () => {
 
     const modifiedTicket: ModifyTicketInput = {
         id: ticket.id,
-        vehicle: await encrypt('12341234-0000-0000-0000-000000000000'),
+        vehicle: '12341234-0000-0000-0000-000000000000',
         fine: 9,
         violation: 'vaporizing a small child',
         images: 'image213.jpg',
@@ -118,7 +118,7 @@ test('modifyTicket should successfully update a ticket', async () => {
 
 test('modifyTicket should successfully update a ticket without new vehicleID', async () => {
     const newTicket: NewTicket = {
-        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        vehicle: '00000000-0000-0000-0000-000000000000',
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
         fine: 100000000,
         violation: 'blowing up a red light',
@@ -145,7 +145,7 @@ test('modifyTicket should successfully update a ticket without new vehicleID', a
 
 test('modifyTicket should throw an error for invalid ticket ID', async () => {
     const newTicket: NewTicket = {
-        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        vehicle: '00000000-0000-0000-0000-000000000000',
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
         fine: 100000000,
         violation: 'blowing up a red light',
@@ -156,7 +156,7 @@ test('modifyTicket should throw an error for invalid ticket ID', async () => {
 
     const modifiedTicket: ModifyTicketInput = {
         id: ticket.id + 'extra',
-        vehicle: await encrypt('12341234-0000-0000-0000-000000000000'),
+        vehicle: '12341234-0000-0000-0000-000000000000',
         fine: 9,
         violation: 'vaporizing a small child',
         images: 'image213.jpg',
@@ -169,7 +169,7 @@ test('modifyTicket should throw an error for invalid ticket ID', async () => {
 
 test('modifyTicket should throw an error when no fields are provided to update', async () => {
     const newTicket: NewTicket = {
-        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        vehicle: '00000000-0000-0000-0000-000000000000',
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
         fine: 100000000,
         violation: 'blowing up a red light',
@@ -202,7 +202,7 @@ test('modifyTicket should throw an error when ticket ID does not match any recor
 
 test('deleteTicket should successfully delete a ticket', async () => {
     const newTicket: NewTicket = {
-        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        vehicle: '00000000-0000-0000-0000-000000000000',
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
         fine: 12344321,
         violation: 'blowing up a red light',
@@ -226,7 +226,7 @@ test('deleteTicket should successfully delete a ticket', async () => {
 
 test('deleteTicket should throw an error for invalid ticket ID', async () => {
     const newTicket: NewTicket = {
-        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        vehicle: '00000000-0000-0000-0000-000000000000',
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
         fine: 12344321,
         violation: 'blowing up a red light',

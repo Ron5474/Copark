@@ -49,7 +49,7 @@ export class TicketService {
     for (const row of ticketResults.rows) {
       tickets.push({
         id: await this.encrypt(row.id),
-        vehicle: await this.encrypt(row.vehicle),
+        vehicle: row.vehicle,
         enforcer: await this.encrypt(row.enforcer),
         issuedDate: new Date(row.issueddate),
         violation: row.violation,
@@ -112,7 +112,7 @@ export class TicketService {
 
     const ticket: Ticket = {
         id: await this.encrypt(row.id),
-        vehicle: await this.encrypt(row.vehicle),
+        vehicle: row.vehicle,
         enforcer: await this.encrypt(row.enforcer),
         issuedDate: new Date(row.issueddate),
         violation: row.violation,
@@ -132,7 +132,7 @@ export class TicketService {
     const decryptedID = await this.decrypt(id);
     let decryptedVehicle = null;
     if (vehicle) {
-      decryptedVehicle = await this.decrypt(vehicle);
+      decryptedVehicle = vehicle
     }
   
     if (!decryptedID) {
@@ -193,7 +193,7 @@ export class TicketService {
   
     return {
       id: await this.encrypt(row.id),
-      vehicle: await this.encrypt(row.vehicle),
+      vehicle: row.vehicle,
       enforcer: await this.encrypt(enforcer),
       ...row.data,
     } as Ticket;
@@ -225,7 +225,7 @@ export class TicketService {
 
     return {
       id: await this.encrypt(row.id),
-      vehicle: await this.encrypt(row.vehicle),
+      vehicle: row.vehicle,
       enforcer: await this.encrypt(row.enforcer),
       issuedDate: new Date(row.issueddate),
       violation: row.violation,
@@ -266,7 +266,7 @@ export class TicketService {
 
   return await Promise.all(result.rows.map(async (row: TicketRow): Promise<Ticket> => ({
     id: await this.encrypt(row.id),
-    vehicle: await this.encrypt(row.vehicle),
+    vehicle: row.vehicle,
     enforcer: await this.encrypt(row.enforcer),
     issuedDate: new Date(row.issueddate),
     violation: row.violation,

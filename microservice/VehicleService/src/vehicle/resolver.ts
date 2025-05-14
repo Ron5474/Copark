@@ -78,9 +78,7 @@ export class VehicleResolver {
   async findOrCreateVehicleByPlate(
     @Arg('plate', () => String) plate: string
   ): Promise<CreatedVehicle> {
-    console.log("before find")
     const vehicle = await service.findVehicleByPlate(plate)
-    console.log("vehicle called")
     if (vehicle) {
       return {
         id: vehicle.id,

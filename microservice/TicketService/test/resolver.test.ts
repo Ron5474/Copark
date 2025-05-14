@@ -228,84 +228,84 @@ test('Admin can modify a ticket with images', async () => {
   expect(modifyResponse.body.data.modifyTicket.images).toBe("photo2.jpg")
 })
 
-// test('Admin can delete a ticket', async () => {
-//   const token = await loginAsAdmin()
+test('Admin can delete a ticket', async () => {
+  const token = await loginAsAdmin()
 
-//   const vehicleid = await encrypt('00000000-0000-0000-0000-000000000000')
-//   const enforcerid = await encrypt('00000000-0000-0000-0000-000000000000')
+  const vehicleid = '00000000-0000-0000-0000-000000000000'
+  const enforcerid = await encrypt('00000000-0000-0000-0000-000000000000')
 
-//   const createQuery = `
-//     mutation CreateTicket($input: NewTicket!) {
-//       createTicket(newTicket: $input) {
-//         id
-//         vehicle
-//         fine
-//         violation
-//         images
-//       }
-//     }
-//   `
+  const createQuery = `
+    mutation CreateTicket($input: NewTicket!) {
+      createTicket(newTicket: $input) {
+        id
+        vehicle
+        fine
+        violation
+        images
+      }
+    }
+  `
 
-//   const createVariables = {
-//     input: {
-//       vehicle: vehicleid,
-//       enforcer: enforcerid,
-//       fine: 150,
-//       violation: "speeding",
-//       images: "photo1.jpg",
-//     },
-//   }
+  const createVariables = {
+    input: {
+      vehicle: vehicleid,
+      enforcer: enforcerid,
+      fine: 150,
+      violation: "speeding",
+      images: "photo1.jpg",
+    },
+  }
 
-//   const createResponse = await supertest(server)
-//     .post('/graphql')
-//     .set('Authorization', 'Bearer ' + token)
-//     .send({ query: createQuery, variables: createVariables })
-//     .expect(200)
+  const createResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: createQuery, variables: createVariables })
+    .expect(200)
 
-//   expect(createResponse.body.errors).toBeUndefined()
-//   const ticketId = createResponse.body.data.createTicket.id
+  expect(createResponse.body.errors).toBeUndefined()
+  const ticketId = createResponse.body.data.createTicket.id
 
-//   const deleteQuery = `
-//     mutation DeleteTicket($id: TicketInput!) {
-//       deleteTicket(id: $id) {
-//         id
-//       }
-//     }
-//   `
+  const deleteQuery = `
+    mutation DeleteTicket($id: TicketInput!) {
+      deleteTicket(id: $id) {
+        id
+      }
+    }
+  `
 
-//   const deleteVariables = {
-//     id: {
-//       id: ticketId,
-//     },
-//   }
+  const deleteVariables = {
+    id: {
+      id: ticketId,
+    },
+  }
   
-//   const deleteResponse = await supertest(server)
-//     .post('/graphql')
-//     .set('Authorization', 'Bearer ' + token)
-//     .send({ query: deleteQuery, variables: deleteVariables })
-//     .expect(200)
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: deleteQuery, variables: deleteVariables })
+    .expect(200)
 
-//   expect(deleteResponse.body.errors).toBeUndefined()
-//   expect(deleteResponse.body.data.deleteTicket.id).toBe(ticketId)
+  expect(deleteResponse.body.errors).toBeUndefined()
+  expect(deleteResponse.body.data.deleteTicket.id).toBe(ticketId)
 
-//   const getQuery = `
-//     query {
-//       getTickets {
-//         id
-//       }
-//     }
-//   `
+  const getQuery = `
+    query {
+      getTickets {
+        id
+      }
+    }
+  `
 
-//   const getResponse = await supertest(server)
-//     .post('/graphql')
-//     .set('Authorization', 'Bearer ' + token)
-//     .send({ query: getQuery })
-//     .expect(200)
+  const getResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: getQuery })
+    .expect(200)
 
-//   expect(getResponse.body.errors).toBeUndefined()
-//   const ticketIds = getResponse.body.data.getTickets.map((ticket: any) => ticket.id)
-//   expect(ticketIds).not.toContain(ticketId)
-// })
+  expect(getResponse.body.errors).toBeUndefined()
+  const ticketIds = getResponse.body.data.getTickets.map((ticket: any) => ticket.id)
+  expect(ticketIds).not.toContain(ticketId)
+})
 
 // test('Driver can get their tickets', async () => {
 //   const token = await loginAsDriver()

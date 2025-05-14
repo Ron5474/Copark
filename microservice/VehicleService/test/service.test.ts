@@ -165,6 +165,6 @@ test('getVehicleByUserId - Returns Array of length 1', async () => {
   const resolvedValidDriverJWT = await validDriverJWT;
   const vehicles = await vehicleService.getVehicleByUserId(resolvedValidDriverJWT);
 
-  console.log('body !!!!' + vehicles)
+  // console.log('body !!!!' + vehicles)
   expect(vehicles.length).toBe(1);
 });

@@ -2,6 +2,7 @@
 
 ----- Your insert statements go below here -----
 \connect auth;
+
 INSERT INTO account(id, data)
 VALUES (
   '3662998e-a053-4789-b34a-4491468f56d6',
@@ -27,7 +28,6 @@ VALUES (
   )
 );
 
--- Adding Test Data for OAuth
 INSERT INTO account(id, data)
 VALUES (
   '39f48f9f-2693-446b-ad98-8e0db1ef14bd',

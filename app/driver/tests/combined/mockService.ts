@@ -2,6 +2,7 @@ import {http, HttpResponse} from 'msw'
 
 const authURL = 'http://localhost:3010/api/v0/auth'
 const vehicleURL = 'http://localhost:4001/graphql'
+const permitURL = 'http://localhost:4003/graphql'
 
 export interface Vehicle {
   plate: string
@@ -10,7 +11,18 @@ export interface Vehicle {
   nickname?: string
 }
 
-const vehicles: Vehicle[] = []
+interface Duration{
+  hours: number
+  minutes: number
+}
+
+export interface ZoneDetails {
+  daily?: number
+  hourly?: number
+  maxDuration?: Duration
+  openTime?: string
+  closeTime?: string
+}
 
 
 interface Server {
@@ -24,6 +36,9 @@ const auth = (server: Server): void => {
     }),
   )
 }
+
+
+const vehicles: Vehicle[] = []
 
 const vehicle = (server: Server, failGet=false, failAdd=false): void => {
   server.use(
@@ -89,4 +104,48 @@ const vehicle = (server: Server, failGet=false, failAdd=false): void => {
   )
 }
 
-export {auth, vehicle, vehicles}
+
+const zoneDetails: ZoneDetails = {
+  hourly: 2.50,
+  maxDuration: {hours: 2, minutes: 0},
+  openTime: '07:00',
+  closeTime: '20:00'
+}
+
+const permit = (server: Server, failGet=false): void => {
+  server.use(
+    http.post(permitURL, async ({ request }) => {
+      const body = await request.json()
+
+      if (body && typeof body === 'object' && typeof body.query === 'string') {
+        if (body.query.includes('query GetZoneDetails')) {
+          if (!failGet) {
+            return HttpResponse.json({
+              data: {
+                zoneDetails,
+              },
+            })
+          } else {
+            return HttpResponse.json({
+              errors: [{ message: 'Failed to connect' }],
+            }, { status: 200 })
+          }
+        }
+      }
+
+      return HttpResponse.json(
+        {
+          errors: [{ message: 'Unknown query' }],
+        },
+        { status: 400 }
+      )
+    })
+  )
+}
+
+export {
+  auth,
+  vehicle,
+  permit,
+  vehicles
+}

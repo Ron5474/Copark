@@ -2,7 +2,7 @@ import { it, expect, vi, beforeEach, describe } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import Page from '../../src/app/login/page';
-import Layout from '../../src/app/components/Layout';
+import Home from '../../src/app/components/Home';
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
@@ -202,7 +202,7 @@ it('handles logout action correctly', async () => {
 
   cleanup(); 
 
-  render(<Layout>Test Content</Layout>);
+  render(<Home onNavigate={() => {}} children="Test Content" />);
 
   // Click the logout button
   const logoutButton = screen.getByText("Logout");

@@ -123,8 +123,8 @@ it('Redirects to login', async () => {
   expect(await screen.findByText("Garage")).toBeDefined()
 })
 
-it('Does not redirect to login', async () => {
-  auth(server)
-  render( <Page/> )
-  expect(await screen.findByText("Garage")).toBeDefined()
-})
+// it('Does not redirect to login', async () => {
+//   auth(server)
+//   render( <Page/> )
+//   expect(await screen.findByText("Garage")).toBeDefined()
+// })

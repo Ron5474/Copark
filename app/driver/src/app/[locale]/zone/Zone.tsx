@@ -14,7 +14,7 @@ import theme from '../theme'
 
 
 export default function Zone() {
-  const { zoneNumber, setZoneNumber, next } = useContext(ZoneContext)
+  const { zoneNumber, setZoneNumber, setZoneDetails, next } = useContext(ZoneContext)
   const [zoneExists, setZoneExists] = useState<boolean>(true)
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
 
@@ -22,7 +22,8 @@ export default function Zone() {
     setIsValidEntry(zoneNumber.length > 0)
     if (zoneNumber.length > 0) {
       try {
-        await getZoneDetails(zoneNumber)
+        const zoneDetails = await getZoneDetails(zoneNumber)
+        setZoneDetails(zoneDetails)
         setZoneExists(true)
         next()
       } catch {

@@ -35,10 +35,10 @@ export class MyPermits {
 @ObjectType()
 export class Duration {
   @Field(() => Number)
-  minutes?: number
+  minutes!: number
 
   @Field(() => Number)
-  hours?: number
+  hours!: number
 }
 
 @ObjectType()

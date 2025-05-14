@@ -93,6 +93,17 @@ export default function Zone() {
           Please select a parking rate
         </Typography>
       )}
+
+      {
+        durationOption == 'max' ?
+      
+        <MaxDuration/>
+
+        :
+
+        null
+      }
+
       <Button
         onClick={submitDuration}
         aria-label="Confirm duration"
@@ -108,6 +119,89 @@ export default function Zone() {
       >
         Continue
       </Button>
+    </Box>
+  )
+}
+
+function MaxDuration() {
+  // const { zoneDetails } = useContext(ZoneContext)
+
+  const maxDuration = {hours: 2, minutes: 0}// zoneDetails?.maxDuration
+  const openTime = "7:00"
+  const closeTime = "20:00"// zoneDetails?.closeTime
+
+  const now = new Date()
+  let untilCloseMs = Infinity
+  let untilOpenMs = Infinity
+  let overnight = false
+
+  if (closeTime) {
+    const [hours, minutes] = closeTime.split(':').map(Number)
+    const close = new Date()
+    close.setHours(hours, minutes, 0, 0)
+    if (close < now) {
+      overnight = true
+      const [openHours, openMinutes] = openTime.split(':').map(Number)
+      const open = new Date()
+      open.setHours(openHours, openMinutes, 0 ,0)
+      open.setDate(open.getDate() + 1)
+      untilOpenMs = open.getTime() - now.getTime() // overnight case
+    }
+    untilCloseMs = close.getTime() - now.getTime()
+  }
+
+  let maxDurationMs = Infinity
+  if (maxDuration) {
+    const { hours = 0, minutes = 0 } = maxDuration
+    maxDurationMs = (hours * 60 + minutes) * 60 * 1000
+  }
+
+  const finalDurationMs = !overnight ? Math.min(untilCloseMs, maxDurationMs) : untilOpenMs
+
+  const totalMinutes = Math.floor(finalDurationMs / (1000 * 60))
+  const finalHours = Math.floor(totalMinutes / 60)
+  const finalMinutes = totalMinutes % 60
+
+  const durationParts: string[] = []
+  if (finalHours) durationParts.push(`${finalHours} ${finalHours === 1 ? 'hour' : 'hours'}`)
+  if (finalMinutes) durationParts.push(`${finalMinutes} ${finalMinutes === 1 ? 'minute' : 'minutes'}`)
+  const durationString = durationParts.join(' ')
+
+  const endTime = new Date(now.getTime() + finalDurationMs)
+  const endTimeString = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(endTime)
+
+  const estimatedPriceString = `$${
+    !overnight ?
+    (totalMinutes * (2.50/*zoneDetails?.hourly ?? 0*/)).toFixed(2) :
+    0.00
+  }`
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        margin: 'auto',
+      }}
+    >
+      <Typography variant="h5" gutterBottom sx={{ mt: '1vh' }}>
+        Review your duration
+      </Typography>
+
+      <Typography variant="body1" sx={{ marginTop: '1vh', color: '#4b4b4b' }}>
+        {`This rate (Maximum Parking Time) allows you to park here for ${durationString} until ${endTimeString}.`}
+      </Typography>
+
+      <Typography variant="h5" gutterBottom sx={{ mt: '1vh' }}>
+        {`Estimated Price: ${estimatedPriceString}`}
+      </Typography>
+
+      <Typography variant="subtitle2" sx={{ marginTop: '1vh', color: '#4b4b4b' }}>
+        Transaction fees and taxes may apply in later steps.
+      </Typography>
     </Box>
   )
 }

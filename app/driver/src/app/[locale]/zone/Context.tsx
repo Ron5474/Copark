@@ -2,7 +2,7 @@
 
 import {useState, createContext} from 'react'
 
-import { Vehicle } from '../types'
+import { Vehicle, ZoneDetails } from '../types'
 
 
 const steps = ['Zone', 'Duration', 'Vehicle', 'Payment', 'Review']
@@ -13,6 +13,8 @@ const ZoneContext = createContext<{
   setCurrentStep: React.Dispatch<React.SetStateAction<string>>
   zoneNumber: string
   setZoneNumber: React.Dispatch<React.SetStateAction<string>>
+  zoneDetails: ZoneDetails | undefined
+  setZoneDetails: React.Dispatch<React.SetStateAction<ZoneDetails | undefined>>
   vehicle: Vehicle | undefined
   setVehicle: React.Dispatch<React.SetStateAction<Vehicle | undefined>>
   next: () => void
@@ -21,6 +23,8 @@ const ZoneContext = createContext<{
   setCurrentStep: () => {},
   zoneNumber: '',
   setZoneNumber: () => {},
+  zoneDetails: undefined,
+  setZoneDetails: () => {},
   vehicle: undefined,
   setVehicle: () => {},
   next: () => {},
@@ -35,6 +39,7 @@ interface ZoneProviderProps {
 function ZoneProvider(props: ZoneProviderProps) {
   const [currentStep, setCurrentStep] = useState<string>('Zone')
   const [zoneNumber, setZoneNumber] = useState<string>('')
+  const [zoneDetails, setZoneDetails] = useState<ZoneDetails|undefined>(undefined)
   const [vehicle, setVehicle] = useState<Vehicle|undefined>(undefined)
 
   const next = () => {
@@ -48,6 +53,7 @@ function ZoneProvider(props: ZoneProviderProps) {
   const value = {
     currentStep, setCurrentStep,
     zoneNumber, setZoneNumber,
+    zoneDetails, setZoneDetails,
     vehicle, setVehicle,
     next,
   }

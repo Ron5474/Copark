@@ -14,11 +14,11 @@ import {test, afterAll, expect, vi, beforeEach} from 'vitest'
 import db from './db'
 import { VehicleService } from '../src/vehicle/service'
 import { Vehicle } from '../src/vehicle/schema'
-// import { SignJWT, jwtVerify } from 'jose'
+import { SignJWT } from 'jose'
 
 vi.mock('server-only', () => ({}))
 
-// const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 // const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 beforeEach(() => {
@@ -29,13 +29,13 @@ afterAll(() => {
   db.shutdown()
 })
 
-// async function encrypt(userId: string): Promise<string> {
-//   return new SignJWT({ id: userId })
-//     .setProtectedHeader({ alg: 'HS256' })
-//     .setIssuedAt()
-//     .setExpirationTime('5y')
-//     .sign(emailEncodedKey)
-//   }
+async function encrypt(userId: string): Promise<string> {
+  return new SignJWT({ id: userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('5y')
+    .sign(encodedKey)
+  }
 
 // async function decrypt(token: string): Promise<string | undefined> {
 //   try {
@@ -58,8 +58,8 @@ let mock_driver2_ID: string;
 // }
 
 const invalidDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyMGVjMDYxLTI5NTctNGMzYi1iMTkzLWM4YjQwMTM4ZThmMSIsImlhdCI6MTc0NzA2NzM2NSwiZXhwIjoxOTA0ODU1MzY1fQ.pPIDRd0PtW97OkgD03LqeS9LI9TCRq7CwXpoDdM7K3k"
-const validDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjM5ZjQ4ZjlmLTI2OTMtNDQ2Yi1hZDk4LThlMGRiMWVmMTRiZCIsImlhdCI6MTc0NzA2NzM2NSwiZXhwIjoxOTA0ODU1MzY1fQ.U90qXFiG-nLiqqbL32KwhGaLdlZc0NyA6XDnetN1SRQ"
-// logEncrypted();
+// const validDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjM5ZjQ4ZjlmLTI2OTMtNDQ2Yi1hZDk4LThlMGRiMWVmMTRiZCIsImlhdCI6MTc0NzA2NzM2NSwiZXhwIjoxOTA0ODU1MzY1fQ.U90qXFiG-nLiqqbL32KwhGaLdlZc0NyA6XDnetN1SRQ"
+const validDriverJWT = encrypt('b1eab387-1000-4ee3-a746-d59366e44f06');
 
 beforeEach(async () => {
   mock_driver1_ID = "b20ec061-2957-4c3b-b193-c8b40138e8f1"
@@ -162,6 +162,9 @@ test('getVehicleByUserId - Returns Empty Array if no vehicle not found', async (
 
 test('getVehicleByUserId - Returns Array of length 1', async () => {
   const vehicleService = new VehicleService();
-  const vehicles = await vehicleService.getVehicleByUserId(validDriverJWT);
+  const resolvedValidDriverJWT = await validDriverJWT;
+  const vehicles = await vehicleService.getVehicleByUserId(resolvedValidDriverJWT);
+
+  console.log('body !!!!' + vehicles)
   expect(vehicles.length).toBe(1);
 });

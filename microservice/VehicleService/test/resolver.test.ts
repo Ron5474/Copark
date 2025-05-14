@@ -380,5 +380,7 @@ test('Driver can get a list of their vehicles', async () => {
       .send({ query: getVehicleByUserIdQuery,
         variables: {userID: validDriverJWT}
        })
+
+    // console.log('body !!!!' + listResponse)
     expect(listResponse.body.data.getVehicleByUserId.length).toBe(1)
   })

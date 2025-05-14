@@ -7,14 +7,18 @@ import * as http from 'http'
 import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
+import { app as VehicleApp } from '../../VehicleService/src/app'
 import { SignJWT } from 'jose'
-import { vehicle } from 'api/campusPolice/test/mockService'
 
 let server: http.Server
 let authServer: http.Server
+let vehicleServer: http.Server
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
+
+const VEHICLE_PORT = 4001
+const VEHICLE_SERVICE_URL = `http://localhost:${VEHICLE_PORT}`
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
@@ -24,7 +28,7 @@ const adminUser = {
 }
 
 const driverUser = {
-  email: 'driver1@outlook.com',
+  email: 'staticdriver1@outlook.com',
   password: 'password1',
 }
 
@@ -36,6 +40,11 @@ beforeAll(async () => {
   authServer = http.createServer(authApp)
   await new Promise<void>((resolve) => {
     authServer.listen(AUTH_PORT, () => resolve())
+  })
+
+  vehicleServer = http.createServer(VehicleApp)
+  await new Promise<void>((resolve) => {
+    vehicleServer.listen(VEHICLE_PORT, () => resolve())
   })
 
   return db.reset()
@@ -320,5 +329,5 @@ test('Driver can get their tickets', async () => {
 
   console.log(response.body)
   expect(response.body.errors).toBeUndefined()
-  expect(response.body.data.getTickets.length).toBe(4)
+  expect(response.body.data.getMyTickets.length).toBe(3)
 })

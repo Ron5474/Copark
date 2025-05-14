@@ -26,6 +26,7 @@ export class TicketResolver {
   @Authorized(["driver"])
   async getMyTickets(@Ctx() request: Request & {user: SessionUser}): Promise<Ticket[] | undefined> {
     // eslint-disable-next-line
+    // @ts-ignore
     const userJWT = request.headers.authorization?.split(' ')[1];
     // console.log(userJWT)
 
@@ -33,7 +34,7 @@ export class TicketResolver {
       query: `
       query {
         getVehicleByUserId(userID: "${userJWT}") {
-        id
+          id
         }
       }
       `
@@ -53,7 +54,7 @@ export class TicketResolver {
 
       if (response.status !== 200) {
         console.error('Vehicle Fetching Error', response);
-        throw new Error('Failed to fetch vehicles for user');
+        throw new Error('Failed to fetch vehicles for user111');
       }
 
       result = await response.json();
@@ -63,15 +64,8 @@ export class TicketResolver {
     }
 
     console.log(result)
-    return await ticketService.getTicketsForVehicleID(result.data.getUserByUserId)
+    return await ticketService.getTicketsForVehicleID(result.data.getVehicleByUserId)
   }
-
-  // @Authorized('driver')
-  // @Query(() => [Vehicle])
-  // async myVehicles(@Ctx() request: Request & {user: SessionUser}): Promise<Vehicle[]> {
-  //   const userId = request.user.id
-  //   return await service.getMyVehicles(userId)
-  // }
 
   @Mutation(() => Ticket)
   @Authorized(["enforcer", "admin"])

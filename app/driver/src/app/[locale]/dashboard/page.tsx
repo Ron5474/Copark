@@ -31,7 +31,8 @@ function Dashboard() {
       if (!await getUser()) {
         router.push(`/login`);
       } else if (!await userLoginSignUpAttempt()) {
-        signOut({ callbackUrl: `/driver/${locale}/login` });
+        signOut({ callbackUrl: new URL(`/driver/${locale}/login`, window.location.origin).toString() });
+
       }   
     }
     loggedIn();

@@ -3,10 +3,9 @@ import { render, screen, cleanup, /*waitFor*/ } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 
-import { auth, vehicle } from './mockService'
-import { getVehicles, addVehicle } from '../../src/app/[locale]/vehicle/actions'
-import VehicleList from '../../src/app/[locale]/vehicle/member/Vehicle'
-// import AddForm from '../../src/app/[locale]/vehicle/AddForm'
+import { auth, permit } from './mockService'
+import { getZoneDetails } from '../../src/app/[locale]/zone/actions'
+import MemberView from '../../src/app/[locale]/zone/View'
 
 
 const server = setupServer()
@@ -39,6 +38,20 @@ vi.mock('next/headers', () => {
   }
 })
 
+vi.mock('next-auth/next', () => ({
+  getServerSession: vi.fn().mockImplementation(() => {
+    return Promise.resolve({
+      user: {
+        name: 'Derik Driver',
+        email: 'derik@copark.space',
+      },
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    })
+  }),
+  signOut: vi.fn(() => Promise.resolve()),
+  SessionProvider: ({ children }: { children: React.ReactNode }) => children
+}))
+
 vi.mock('next-intl', () => ({
   useTranslations: () => (
     vi.fn((x: string) => {
@@ -70,7 +83,7 @@ afterAll(() => server.close())
 beforeEach(() => {
   vi.resetModules()
   auth(server)
-  vehicle(server)
+  permit(server)
 })
 
 afterEach(() => {
@@ -81,35 +94,19 @@ afterEach(() => {
 
 
 
-it('Garage empty', async () => {
-  render( <VehicleList/> )
-  expect(await screen.findByText("No vehicles yet")).toBeDefined()
-})
 
-it('Vehicle fetch fail', async () => {
+it('Zone Details fetch failed', async () => {
   vi.spyOn(console, 'error').mockImplementation(() => {})
-  vehicle(server, true) // force failure
-  await expect(getVehicles()).rejects.toThrow('Failed to fetch vehicles')
+  permit(server, true) // force failure
+  await expect(getZoneDetails('187')).rejects.toThrow('Failed to connect')
 })
 
-it('Add vehicle', async () => {
-  render(<VehicleList />)
+it('Fetch Zone Details', async () => {
+  render(<MemberView />)
   const user = userEvent.setup()
-  await user.click((await screen.findAllByLabelText("Add a vehicle"))[0])
-  const input = screen.getByLabelText('Enter license plate number')
-  await user.type(input, 'TEST123')
-  await user.click(await screen.findByText('Save'))
+  const input = screen.getByLabelText('Enter parking zone number')
+  await user.type(input, '123')
+  await user.click(screen.getByText('Confirm Zone'))
 
-  expect(await screen.findByText('TEST123')).toBeDefined()
-})
-
-it('Vehicle add failed', async () => {
-  vi.spyOn(console, 'error').mockImplementation(() => {})
-  vehicle(server, false, true) // fail add
-  const newVehicle = {
-    plate: '1ABC123',
-    country: 'United States',
-    state: 'California',
-  }
-  await expect(addVehicle(newVehicle)).rejects.toThrow('Failed to register vehicle')
+  expect(await screen.findByText('What parking rate works for you?')).toBeDefined()
 })

@@ -430,9 +430,8 @@ test('Driver can get a list of their vehicles', async () => {
       .post('/graphql')
       // .set('Authorization', 'Bearer ' + token)
       .send({ query: getVehicleByUserIdQuery,
-        variables: {userID: validDriverJWT}
+        variables: {userID: await validDriverJWT}
        })
 
-    console.log('body !!!!' + listResponse.body.data)
     expect(listResponse.body.data.getVehicleByUserId.length).toBe(1)
   })

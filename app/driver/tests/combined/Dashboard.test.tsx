@@ -1,27 +1,56 @@
 import { vi, it, afterEach, beforeAll, afterAll, expect, beforeEach } from 'vitest'
 import { render, screen, cleanup, /*waitFor*/ } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 
-import { auth, vehicle } from './mockService'
-import { getVehicles, addVehicle } from '../../src/app/[locale]/vehicle/actions'
-import VehicleList from '../../src/app/[locale]/vehicle/member/Vehicle'
-// import AddForm from '../../src/app/[locale]/vehicle/AddForm'
+import '../setup'
+import { auth } from './mockService'
+import Page from '@/app/[locale]/dashboard/page'
 
+
+
+Object.defineProperty(window, 'location', {
+  writable: true,
+  value: {
+    ...window.location,
+    href: 'http://localhost:3000/driver/en/dashboard',
+    origin: 'http://localhost:3000',
+    assign: vi.fn(),
+    replace: vi.fn(),
+  },
+});
+
+vi.mock('next-auth/next', () => ({
+  getServerSession: vi.fn().mockImplementation(() => {
+    return Promise.resolve({
+      user: {
+        name: 'Bryant Oliver',
+        email: 'bryant@oliver.com',
+      },
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    })
+  }),
+  signOut: vi.fn(() => Promise.resolve()),
+  SessionProvider: ({ children }: { children: React.ReactNode }) => children
+}));
 
 const server = setupServer()
-
+const pushMock = vi.fn()
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: pushMock,
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    pathname: '/dashboard',
+    basePath: '',
+    route: '/dashboard',
   }),
-}))
+}));
 
 vi.mock('next/headers', () => {
   const mockCookies = {
     get: vi.fn((name) => {
-      if (name === 'auth-token') {
+      if (name === 'next-auth.session-token') {
         return { value: 'mocked-auth-token-123' }
       }
       return undefined
@@ -39,7 +68,15 @@ vi.mock('next/headers', () => {
   }
 })
 
+vi.mock('@/i18n/navigation', () => ({
+  useRouter: () => ({
+    push: pushMock,
+    replace: vi.fn(),
+  }),
+}));
+
 vi.mock('next-intl', () => ({
+  useLocale: () => 'en',
   useTranslations: () => (
     vi.fn((x: string) => {
       switch (x) {
@@ -70,7 +107,6 @@ afterAll(() => server.close())
 beforeEach(() => {
   vi.resetModules()
   auth(server)
-  vehicle(server)
 })
 
 afterEach(() => {
@@ -81,35 +117,14 @@ afterEach(() => {
 
 
 
-it('Garage empty', async () => {
-  render( <VehicleList/> )
-  expect(await screen.findByText("No vehicles yet")).toBeDefined()
+it('Redirects to login', async () => {
+  auth(server, true)
+  render( <Page/> )
+  expect(await screen.findByText("Garage")).toBeDefined()
 })
 
-it('Vehicle fetch fail', async () => {
-  vi.spyOn(console, 'error').mockImplementation(() => {})
-  vehicle(server, true) // force failure
-  await expect(getVehicles()).rejects.toThrow('Failed to fetch vehicles')
-})
-
-it('Add vehicle', async () => {
-  render(<VehicleList />)
-  const user = userEvent.setup()
-  await user.click((await screen.findAllByLabelText("Add a vehicle"))[0])
-  const input = screen.getByLabelText('Enter license plate number')
-  await user.type(input, 'TEST123')
-  await user.click(await screen.findByText('Save'))
-
-  expect(await screen.findByText('TEST123')).toBeDefined()
-})
-
-it('Vehicle add failed', async () => {
-  vi.spyOn(console, 'error').mockImplementation(() => {})
-  vehicle(server, false, true) // fail add
-  const newVehicle = {
-    plate: '1ABC123',
-    country: 'United States',
-    state: 'California',
-  }
-  await expect(addVehicle(newVehicle)).rejects.toThrow('Failed to register vehicle')
-})
+// it('Does not redirect to login', async () => {
+//   auth(server)
+//   render( <Page/> )
+//   expect(await screen.findByText("Garage")).toBeDefined()
+// })

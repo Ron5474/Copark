@@ -59,18 +59,19 @@ vi.mock('next-intl', () => ({
   ),
 }))
 
-vi.mock('next-auth/next', () => {
-  return {
-    getServerSession: vi.fn(() => Promise.resolve({
+vi.mock('next-auth/next', () => ({
+  getServerSession: vi.fn().mockImplementation(() => {
+    return Promise.resolve({
       user: {
-        name: 'Test User',
-        email: 'test@example.com',
-        image: 'https://example.com/avatar.png',
+        name: 'Derik Driver',
+        email: 'derik@copark.space',
       },
-      expires: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour later
-    })),
-  }
-})
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    })
+  }),
+  signOut: vi.fn(() => Promise.resolve()),
+  SessionProvider: ({ children }: { children: React.ReactNode }) => children
+}))
 
 
 
@@ -87,7 +88,7 @@ afterEach(() => {
 
 it('returns session when user is authenticated', async () => {
   const session = await getUser()
-  expect(session?.user?.email).toBe('test@example.com')
+  expect(session?.user?.email).toBe('derik@copark.space')
 })
 
 it('returns undefined when user is unauthenticated', async () => {

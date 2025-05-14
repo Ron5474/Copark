@@ -1,7 +1,7 @@
 {
-    "name": "campus-police-api",
+    "name": "registrar-api",
     "version": "1.0.0",
-    "description": "Campus Police API",
+    "description": "Registrar API",
     "author": "Copark Inc.",
     "license": "UNLICENSED",
     "repository": "none",

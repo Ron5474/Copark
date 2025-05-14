@@ -59,7 +59,7 @@ it('Redirects to /driver/en/login signOut when userLoginSignUpAttempt fails', as
 
   await waitFor(() => {
     expect(signOut).toHaveBeenCalledWith({
-      callbackUrl: '/driver/en/login',
+      callbackUrl: `${window.location.origin}/driver/en/login`,
     })
   })
 })

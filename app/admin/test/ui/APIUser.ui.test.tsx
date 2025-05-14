@@ -4,21 +4,12 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import theme from '../../src/app/theme'
 import AddAPIUser from '../../src/app/components/AddAPIUser'
 import ManageAPIUsers from '../../src/app/components/ManageAPIUsers'
-import { addAPIUser } from '../../src/api/actions'
+import { addAPIUser, getAPIUsers } from '../../src/api/actions'
 
 // Mock the API actions with more detailed implementation
 vi.mock('../../src/api/actions', () => ({
   addAPIUser: vi.fn(),
-  getAPIUsers: vi.fn().mockImplementation(() => 
-    Promise.resolve([
-      { 
-        id: '1', 
-        name: 'Test Org', 
-        email: 'test@org.com', 
-        role: 'api_user' 
-      }
-    ])
-  )
+  getAPIUsers: vi.fn()
 }))
 
 const mockOnClose = vi.fn()
@@ -131,6 +122,15 @@ const mockNavigate = vi.fn()
 
 beforeEach(() => {
   vi.clearAllMocks()
+  // Set up default mock implementation for other tests
+  vi.mocked(getAPIUsers).mockResolvedValue([
+    { 
+      id: '1', 
+      name: 'Test Org', 
+      email: 'test@org.com', 
+      role: 'api_user' 
+    }
+  ])
 })
 
 it('renders correctly', async () => {
@@ -187,4 +187,20 @@ it('navigates home when home button is clicked', () => {
 
   fireEvent.click(screen.getByTestId('HomeIcon').parentElement!)
   expect(mockNavigate).toHaveBeenCalledWith('home')
+})
+
+it('shows no users message when api returns empty array', async () => {
+  // Setup mock to return empty array
+  vi.mocked(getAPIUsers).mockResolvedValueOnce([])
+  
+  render(
+    <ThemeProvider theme={theme}>
+      <ManageAPIUsers onNavigate={mockNavigate} />
+    </ThemeProvider>
+  )
+
+  // Wait for and verify the "no users" message
+  await waitFor(() => {
+    expect(screen.getByText('No API users found')).toBeDefined()
+  })
 })

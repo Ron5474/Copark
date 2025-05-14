@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { 
-  Box, 
-  Button, 
-  Paper, 
-  Typography, 
-  IconButton, 
+import {
+  Box,
+  Button,
+  Paper,
+  Typography,
+  IconButton,
   useTheme,
   Table,
   TableBody,
@@ -27,14 +27,9 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
   const [loading, setLoading] = useState(true)
 
   const fetchUsers = async () => {
-    try {
-      const users = await getAPIUsers()
-      setApiUsers(users)
-    } catch (error) {
-      console.error('Failed to fetch API users:', error)
-    } finally {
-      setLoading(false)
-    }
+    const users = await getAPIUsers()
+    setApiUsers(users)
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -42,21 +37,21 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
   }, [])
 
   return (
-    <Box sx={{ 
+    <Box sx={{
       p: 4,
       bgcolor: '#ffffff'
     }}>
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
         mb: 4,
         borderBottom: `2px solid ${theme.palette.primary.main}`,
         pb: 2
       }}>
         <img src="/admin/assets/logo-notitle.png" alt="CoPark Admin" style={{ height: 60, marginRight: 16 }} />
-        <Typography 
-          variant="h4" 
-          sx={{ 
+        <Typography
+          variant="h4"
+          sx={{
             color: theme.palette.primary.main,
             fontWeight: 700,
             fontSize: "32px"
@@ -148,7 +143,7 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
         <HomeIcon />
       </IconButton>
 
-      <AddAPIUser 
+      <AddAPIUser
         open={openAddDialog}
         onClose={() => setOpenAddDialog(false)}
         onUserAdded={fetchUsers}  // Add this prop

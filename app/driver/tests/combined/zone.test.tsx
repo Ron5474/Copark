@@ -38,6 +38,20 @@ vi.mock('next/headers', () => {
   }
 })
 
+vi.mock('next-auth/next', () => ({
+  getServerSession: vi.fn().mockImplementation(() => {
+    return Promise.resolve({
+      user: {
+        name: 'Derik Driver',
+        email: 'derik@copark.space',
+      },
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    })
+  }),
+  signOut: vi.fn(() => Promise.resolve()),
+  SessionProvider: ({ children }: { children: React.ReactNode }) => children
+}))
+
 vi.mock('next-intl', () => ({
   useTranslations: () => (
     vi.fn((x: string) => {

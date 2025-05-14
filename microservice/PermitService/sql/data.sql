@@ -12,7 +12,8 @@ INSERT INTO "zone" (id, data) VALUES
         'openTime', '07:00',
         'closeTime', '20:00',
         'maxDuration', jsonb_build_object(
-          'hours', 2
+          'hours', 2,
+          'minutes', 0
         )
       ),
       'weekend', jsonb_build_object(

@@ -146,6 +146,24 @@ const myPermitsInput = {
   vehicleID: "12345678-1234-1234-1234-567890abcdef"
 }
 
+const zoneDetailsQuery = `
+query ZoneDetails($zone: String!) {
+  zoneDetails(zone: $zone) {
+    daily
+    hourly
+    maxDuration {
+      minutes
+      hours
+    }
+    openTime
+    closeTime
+  }
+}`
+
+const zoneDetailsInput = {
+  zone: "123"
+}
+
 // const isValidPermitInput = {
 //   vehicle: "12345678-1234-1234-1234-567890abcdef"
 // }
@@ -190,16 +208,16 @@ test('Driver has no permits', async () => {
   expect(permits.body.data.myPermits.active.length).toBe(0)
 })
 
-// test('Driver has no permits', async () => {
-//   const token = await loginAs("driver")
+test('Driver has no permits', async () => {
+  const token = await loginAs("driver")
 
-//   const details = await supertest(server)
-//     .post('/graphql')
-//     .set('Authorization', 'Bearer ' + token)
-//     .send({ 
-//       query: zoneDetailsQuery,
-//       variables: zoneDetailsInput
-//     })
+  const details = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: zoneDetailsQuery,
+      variables: zoneDetailsInput
+    })
 
-//   expect(details.body.data.myPermits.active.length).toBe(0)
-// })
+  expect(details.body.data.zoneDetails.hourly).toBe(2.45)
+})

@@ -81,7 +81,7 @@ test('reinstateUser should reinstate a suspended user', async () => {
 test('getDrivers should return a list of drivers', async () => {
     const enforcers = await adminService.getDrivers();
 
-    expect(enforcers).toHaveLength(2);
+    expect(enforcers).toHaveLength(3);
     expect(enforcers[0].name).toBe('Driver 1');
     expect(enforcers[0].accountStatus).toBe('active');
 
@@ -108,4 +108,49 @@ test('AddAPIUser returns undefined for repeated addition', async () => {
     const enforcers = await adminService.addAPIUser(apiUser);
 
     expect(enforcers).toBeUndefined()
+});
+
+test('getAPIUsers should return all API users with different roles', async () => {
+  // Add test API users with different roles
+  const payrollUser: APICredential = { 
+    name: 'UCSC Payroll', 
+    email: 'payroll@ucsc.edu', 
+    role: 'payroll' 
+  };
+  const registrarUser: APICredential = { 
+    name: 'UCSC Registrar', 
+    email: 'registrar@ucsc.edu', 
+    role: 'registrar' 
+  };
+  const policeUser: APICredential = { 
+    name: 'Campus Police', 
+    email: 'police@ucsc.edu', 
+    role: 'campusPolice' 
+  };
+
+  await adminService.addAPIUser(payrollUser);
+  await adminService.addAPIUser(registrarUser);
+  await adminService.addAPIUser(policeUser);
+
+  const apiUsers = await adminService.getAPIUsers();
+
+  // Verify we get all API users
+  expect(apiUsers).toHaveLength(3);
+
+  // Verify each role type is present
+  const roles = apiUsers.map(user => user.role);
+  expect(roles).toContain('payroll');
+  expect(roles).toContain('registrar');
+  expect(roles).toContain('campusPolice');
+
+  // Verify user properties
+  const payrollUserResult = apiUsers.find(u => u.email === 'payroll@ucsc.edu');
+  expect(payrollUserResult).toBeDefined();
+  expect(payrollUserResult?.name).toBe('UCSC Payroll');
+  expect(payrollUserResult?.role).toBe('payroll');
+
+  // Verify users are sorted by name
+  const names = apiUsers.map(user => user.name);
+  const sortedNames = [...names].sort();
+  expect(names).toEqual(sortedNames);
 });

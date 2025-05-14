@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Authorized, Ctx } from "type-graphql";
 
 import { TicketService } from "./service";
 import { 
@@ -10,6 +10,8 @@ import {
   EmailInput
 } from "./schema";
 
+import { SessionUser } from "src";
+
 const ticketService = new TicketService();
 
 @Resolver()
@@ -19,6 +21,57 @@ export class TicketResolver {
   async getTickets(): Promise<Ticket[]> {
     return ticketService.getTickets();
   }
+
+  @Query(() => [Ticket])
+  @Authorized(["driver"])
+  async getMyTickets(@Ctx() request: Request & {user: SessionUser}): Promise<Ticket[] | undefined> {
+    // eslint-disable-next-line
+    const userJWT = request.headers.authorization?.split(' ')[1];
+    // console.log(userJWT)
+
+    const vehicleQuery = {
+      query: `
+      query {
+        getVehicleByUserId(userID: "${userJWT}") {
+        id
+        }
+      }
+      `
+    };
+
+    let result;
+
+    try {
+      const response = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // 'Authorization': `${userJWT}`
+      },
+      body: JSON.stringify(vehicleQuery)
+      });
+
+      if (response.status !== 200) {
+        console.error('Vehicle Fetching Error', response);
+        throw new Error('Failed to fetch vehicles for user');
+      }
+
+      result = await response.json();
+    } catch (error) {
+      console.error('Error fetching vehicles:', error);
+      throw new Error('Failed to fetch vehicles for user');
+    }
+
+    console.log(result)
+    return await ticketService.getTicketsForVehicleID(result.data.getUserByUserId)
+  }
+
+  // @Authorized('driver')
+  // @Query(() => [Vehicle])
+  // async myVehicles(@Ctx() request: Request & {user: SessionUser}): Promise<Vehicle[]> {
+  //   const userId = request.user.id
+  //   return await service.getMyVehicles(userId)
+  // }
 
   @Mutation(() => Ticket)
   @Authorized(["enforcer", "admin"])
@@ -97,7 +150,7 @@ export class TicketResolver {
 
   if (vehicleIDs.length === 0) return {hasTicket: false};
 
-    const tickets = await ticketService.getTicketsForEmail(vehicleIDs)
+    const tickets = await ticketService.getTicketsForVehicleID(vehicleIDs)
     if (!tickets) return {hasTicket: false}
     if (tickets?.length > 0) {
       return {hasTicket: true}

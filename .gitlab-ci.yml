@@ -206,6 +206,28 @@ build:adminService:
       - package.json
       - .gitlab-ci.yml
 
+build:vehicleService:
+  stage: build
+  script:
+    - npm run install-vehicleService
+    - npm run build-vehicleService
+  rules:
+    - changes: 
+      - microservices/VehicleService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+# build:ticketService:
+#   stage: build
+#   script:
+#     - npm run install-ticketService
+#     - npm run build-ticketService
+#   rules:
+#     - changes:
+#       - microservices/TicketService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
+
 # build:
 #   stage: build
 #   script:
@@ -324,27 +346,27 @@ conatainerize:setup:
   script:
     - npm run installs
 
-conatainerize:build-docker-image:
-  stage: conatainerize
-  needs:
-    - conatainerize:setup
-  image: docker:24
-  services:
-    - name: docker:24-dind
-      alias: docker
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-  before_script:
-    - apk add --no-cache npm
-  script:
-    - docker version
-    - docker info
-    - npm run package
-  artifacts:
-    paths:
-      - cte-linux-amd64.tar
-      - docker-compose.yml
+# conatainerize:build-docker-image:
+#   stage: conatainerize
+#   needs:
+#     - conatainerize:setup
+#   image: docker:24
+#   services:
+#     - name: docker:24-dind
+#       alias: docker
+#   variables:
+#     DOCKER_HOST: tcp://docker:2375
+#     DOCKER_TLS_CERTDIR: ""
+#   before_script:
+#     - apk add --no-cache npm
+#   script:
+#     - docker version
+#     - docker info
+#     - npm run package
+#   artifacts:
+#     paths:
+#       - cte-linux-amd64.tar
+#       - docker-compose.yml
 
 deploy:predeploy:
   stage: deploy

@@ -44,17 +44,20 @@ export class Duration {
 @ObjectType()
 export class ZoneDetails {
 
-  @Field(() => Number)
-  hourly!: number
+  @Field(() => Number, { nullable: true })
+  daily?: number
 
-  @Field(() => Duration)
-  maxDuration!: Duration
+  @Field(() => Number, { nullable: true })
+  hourly?: number
 
-  @Field(() => String)
-  openTime!: string
+  @Field(() => Duration, { nullable: true })
+  maxDuration?: Duration
 
-  @Field(() => String)
-  closeTime!: string
+  @Field(() => String, { nullable: true })
+  openTime?: string
+
+  @Field(() => String, { nullable: true })
+  closeTime?: string
 }
 
 @ObjectType()

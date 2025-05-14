@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Home from './components/Home';
 import ManageEnforcement from './components/ManageEnforcement';
 import ManageDrivers from './components/ManageDrivers';
+import ManageAPIUsers from './components/ManageAPIUsers';
 
 export default function Page() {
   const [currentComponent, setCurrentComponent] = useState<string>('home');
@@ -20,8 +21,8 @@ export default function Page() {
         return <ManageEnforcement onNavigate={handleNavigate} />;
       case 'drivers':
         return <ManageDrivers onNavigate={handleNavigate} />;
-      case 'tickets':
-        return <div>Tickets Component</div>;
+      case 'api_users':
+        return <ManageAPIUsers onNavigate={handleNavigate} />;
       case 'statistics':
         return <div>Statistics Component</div>;
       case 'reports':

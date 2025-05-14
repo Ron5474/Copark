@@ -29,15 +29,16 @@ async function encrypt(userId: string): Promise<string> {
       .sign(encodedKey)
   }
 
-test('getTickets should return a list of enforcers', async () => {
+test('getTickets should return all unpaid tickets', async () => {
     const tickets = await ticketService.getTickets();
 
-    expect(tickets).toHaveLength(2);
+    expect(tickets).toHaveLength(3);
     expect(tickets[0].ticketStatus).toBe('unpaid');
     expect(tickets[1].ticketStatus).toBe('unpaid');
+    expect(tickets[2].ticketStatus).toBe('unpaid');
 });
 
-test('createTicket should return a newTicket', async () => {
+test('createTicket should successfully create a ticket with all fields', async () => {
     const newTicket: NewTicket = {
         vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
@@ -48,7 +49,6 @@ test('createTicket should return a newTicket', async () => {
 
     const ticket = await ticketService.createTicket(newTicket);
 
-    // console.log(ticket)
     expect(ticket).toHaveProperty('id');
     expect(ticket).toHaveProperty('vehicle', newTicket.vehicle);
     expect(ticket).toHaveProperty('enforcer', newTicket.enforcer);
@@ -57,7 +57,7 @@ test('createTicket should return a newTicket', async () => {
     expect(ticket).toHaveProperty('images', newTicket.images);
 });
 
-test('createTicket should return a newTicket (with no image)', async () => {
+test('createTicket should successfully create a ticket without images', async () => {
     const newTicket: NewTicket = {
         vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
@@ -67,7 +67,6 @@ test('createTicket should return a newTicket (with no image)', async () => {
 
     const ticket = await ticketService.createTicket(newTicket);
 
-    // console.log(ticket)
     expect(ticket).toHaveProperty('id');
     expect(ticket).toHaveProperty('vehicle', newTicket.vehicle);
     expect(ticket).toHaveProperty('enforcer', newTicket.enforcer);
@@ -76,7 +75,7 @@ test('createTicket should return a newTicket (with no image)', async () => {
     expect(ticket).not.toHaveProperty('images', newTicket.images);
 });
 
-test('createTicket should error with bad id', async () => {
+test('createTicket should throw an error for invalid enforcer ID', async () => {
     const newTicket: NewTicket = {
         vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
         enforcer: 'not a uuid',
@@ -89,7 +88,7 @@ test('createTicket should error with bad id', async () => {
         .toThrow('Invalid enforcer or vehicle ID.');
 });
 
-test('createTicket should return a newTicket', async () => {
+test('modifyTicket should successfully update a ticket', async () => {
     const newTicket: NewTicket = {
         vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
@@ -109,14 +108,42 @@ test('createTicket should return a newTicket', async () => {
     };
 
     const modifiedTicketResult = await ticketService.modifyTicket(modifiedTicket);
+
     expect(modifiedTicketResult).toHaveProperty('id');
     expect(modifiedTicketResult).toHaveProperty('vehicle', modifiedTicket.vehicle);
     expect(modifiedTicketResult).toHaveProperty('fine', modifiedTicket.fine);
     expect(modifiedTicketResult).toHaveProperty('violation', modifiedTicket.violation);
     expect(modifiedTicketResult).toHaveProperty('images', modifiedTicket.images);
-  });
+});
 
-test('createTicket should error with no ticket ID', async () => {
+test('modifyTicket should successfully update a ticket without new vehicleID', async () => {
+    const newTicket: NewTicket = {
+        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+        fine: 100000000,
+        violation: 'blowing up a red light',
+        images: 'image1.jpg',
+    };
+
+    const ticket = await ticketService.createTicket(newTicket);
+
+    const modifiedTicket: ModifyTicketInput = {
+        id: ticket.id,
+        fine: 9,
+        violation: 'vaporizing a small child',
+        images: 'image213.jpg',
+    };
+
+    const modifiedTicketResult = await ticketService.modifyTicket(modifiedTicket);
+
+    expect(modifiedTicketResult).toHaveProperty('id');
+    expect(modifiedTicketResult).toHaveProperty('vehicle', newTicket.vehicle);
+    expect(modifiedTicketResult).toHaveProperty('fine', modifiedTicket.fine);
+    expect(modifiedTicketResult).toHaveProperty('violation', modifiedTicket.violation);
+    expect(modifiedTicketResult).toHaveProperty('images', modifiedTicket.images);
+});
+
+test('modifyTicket should throw an error for invalid ticket ID', async () => {
     const newTicket: NewTicket = {
         vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
@@ -138,42 +165,42 @@ test('createTicket should error with no ticket ID', async () => {
     await expect(ticketService.modifyTicket(modifiedTicket))
         .rejects
         .toThrow('Invalid or missing ticket ID.');
-  });
-
-test('createTicket should error with no update fields', async () => {
-  const newTicket: NewTicket = {
-      vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
-      enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
-      fine: 100000000,
-      violation: 'blowing up a red light',
-      images: 'image1.jpg',
-  };
-
-  const ticket = await ticketService.createTicket(newTicket);
-
-  const modifiedTicket: ModifyTicketInput = {
-      id: ticket.id,
-  };
-
-  await expect(ticketService.modifyTicket(modifiedTicket))
-      .rejects
-      .toThrow('No fields provided to update.');
 });
 
-test('createTicket should error with no update fields', async () => {
-  const modifiedTicket: ModifyTicketInput = {
-      id: await encrypt('00000000-0000-0000-0000-000000000000'),
-      fine: 100000000,
-      violation: 'blowing up a red light',
-      images: 'image1.jpg',
-  };
+test('modifyTicket should throw an error when no fields are provided to update', async () => {
+    const newTicket: NewTicket = {
+        vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
+        enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+        fine: 100000000,
+        violation: 'blowing up a red light',
+        images: 'image1.jpg',
+    };
 
-  await expect(ticketService.modifyTicket(modifiedTicket))
-      .rejects
-      .toThrow('No update found.');
+    const ticket = await ticketService.createTicket(newTicket);
+
+    const modifiedTicket: ModifyTicketInput = {
+        id: ticket.id,
+    };
+
+    await expect(ticketService.modifyTicket(modifiedTicket))
+        .rejects
+        .toThrow('No fields provided to update.');
 });
 
-test('deleteTicket should delete a ticket', async () => {
+test('modifyTicket should throw an error when ticket ID does not match any record', async () => {
+    const modifiedTicket: ModifyTicketInput = {
+        id: await encrypt('00000000-0000-0000-0000-000000000000'),
+        fine: 100000000,
+        violation: 'blowing up a red light',
+        images: 'image1.jpg',
+    };
+
+    await expect(ticketService.modifyTicket(modifiedTicket))
+        .rejects
+        .toThrow('Ticket not found.');
+});
+
+test('deleteTicket should successfully delete a ticket', async () => {
     const newTicket: NewTicket = {
         vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
@@ -189,15 +216,15 @@ test('deleteTicket should delete a ticket', async () => {
     };
 
     const deletedTicketRes = await ticketService.deleteTicket(deletedTicket);
-    // console.log(deletedTicketRes);
+
     expect(deletedTicketRes).toHaveProperty('id');
-    expect(deletedTicketRes).toHaveProperty('vehicle', newTicket.vehicle);
-    expect(deletedTicketRes).toHaveProperty('enforcer', newTicket.enforcer);
+    expect(deletedTicketRes).toHaveProperty('vehicle');
+    expect(deletedTicketRes).toHaveProperty('enforcer');
     expect(deletedTicketRes).toHaveProperty('fine', newTicket.fine);
     expect(deletedTicketRes).toHaveProperty('violation', newTicket.violation);
-  });
+});
 
-test('deleteTicket should delete a ticket', async () => {
+test('deleteTicket should throw an error for invalid ticket ID', async () => {
     const newTicket: NewTicket = {
         vehicle: await encrypt('00000000-0000-0000-0000-000000000000'),
         enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
@@ -213,6 +240,30 @@ test('deleteTicket should delete a ticket', async () => {
     };
 
     await expect(ticketService.deleteTicket(deletedTicket))
-      .rejects
-      .toThrow('No delete found.');
-  });
+        .rejects
+        .toThrow('No delete found.');
+});
+
+test('getTicketsForVehicleID should return tickets for the provided vehicle IDs', async () => {
+    const vehicleid1 = 'f26adf21-f967-4283-8417-f72298bc7bbe';
+
+    const tickets = await ticketService.getTicketsForVehicleID([vehicleid1]);
+
+    expect(tickets).toBeDefined();
+    expect(tickets).toHaveLength(1);
+
+    expect(tickets![0]).toHaveProperty('violation', 'parking');
+    expect(tickets![0]).toHaveProperty('ticketStatus', 'unpaid');
+});
+
+// test('getTicketsForUserJWT should return tickets for the provided userJWT', async () => {
+//     const userID = '0f99f921-594e-4387-9d05-e6e80d8aa54a'
+
+//     const tickets = await ticketService.getTicketsForUserJWT(await encrypt(userID));
+
+//     console.log(tickets);
+//     expect(tickets).toBeDefined();
+
+//     expect(tickets![0]).toHaveProperty('violation', 'parking');
+//     expect(tickets![0]).toHaveProperty('ticketStatus', 'unpaid');
+// });

@@ -6,7 +6,7 @@
     "license": "UNLICENSED",
     "repository": "none",
     "scripts": {
-      "package": "docker build . -t cte-linux-amd64 --platform linux/amd64 && docker save -o cte-linux-amd64.tar cte-linux-amd64",
+      "package": "docker build . -t cte-linux-amd64 --platform linux/amd64 --no-cache && docker save -o cte-linux-amd64.tar cte-linux-amd64",
       "containerised": "npm run build && npm run compose",
       "compose": "docker compose --profile prod up --build",
       "installs": "npm install && npm run install-auth && npm run install-admin && npm run install-enforcement && npm run install-driver && npm run install-adminService && npm run install-marketing && npm run install-vehicleService && npm run install-ticketService && npm run install-permitService && npm run install-helloworld && npm run install-campusPolice && npm run install-payroll && npm run install-registrar",

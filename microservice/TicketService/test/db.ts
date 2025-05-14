@@ -114,7 +114,7 @@ const reset = async () => {
   await run(path + 'VehicleService/sql/data.sql')
   await run(path + 'TicketService/sql/schema.sql')
   await run(path + 'TicketService/sql/data.sql')
-  console.log('Database reset complete')
+  // console.log('Database reset complete')
 }
 
 const shutdown = () => {

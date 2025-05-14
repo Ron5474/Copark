@@ -1,5 +1,5 @@
 FROM node:23-alpine
-EXPOSE 8080 3000 3001 3002 3009
+EXPOSE 8080 3000 3001 3002 3009 3011 3012 3013
 
 WORKDIR /home/copark
 
@@ -75,6 +75,19 @@ COPY microservice/VehicleService/sql/ /home/copark/microservice/VehicleService/s
 COPY microservice/VehicleService/build/ /home/copark/microservice/VehicleService/build/
 COPY microservice/VehicleService/package.json /home/copark/microservice/VehicleService/package.json
 COPY microservice/VehicleService/package-lock.json /home/copark/microservice/VehicleService/package-lock.json
+
+# Copy the APIs
+COPY api/campusPolice/build/ /home/copark/api/campusPolice/build/
+COPY api/campusPolice/package.json /home/copark/api/campusPolice/package.json
+COPY api/campusPolice/package-lock.json /home/copark/api/campusPolice/package-lock.json
+
+COPY api/payroll/build/ /home/copark/api/payroll/build/
+COPY api/payroll/package.json /home/copark/api/payroll/package.json
+COPY api/payroll/package-lock.json /home/copark/api/payroll/package-lock.json
+
+COPY api/registrar/build/ /home/copark/api/registrar/build/
+COPY api/registrar/package.json /home/copark/api/registrar/package.json
+COPY api/registrar/package-lock.json /home/copark/api/registrar/package-lock.json
 
 RUN npm run cis
 CMD [ "npm", "start" ]

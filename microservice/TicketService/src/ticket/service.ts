@@ -121,58 +121,78 @@ export class TicketService {
   }
 
   public async modifyTicket(input: ModifyTicketInput): Promise<Ticket | null> {
-    const { id, ...updates } = input;
-
+    const { id, vehicle, ...updates } = input;
+  
     const decryptedID = await this.decrypt(id);
-
+    let decryptedVehicle = null;
+    if (vehicle) {
+      decryptedVehicle = await this.decrypt(vehicle);
+    }
+  
     if (!decryptedID) {
       throw new Error("Invalid or missing ticket ID.");
     }
-
-    // Filter out undefined fields
+  
+    // If no fields to update, throw an error.
     const entries = Object.entries(updates).filter(
       ([, value]) => value !== undefined
     );
-
-    if (entries.length === 0) {
+  
+    if (entries.length === 0 && !vehicle) {
       throw new Error("No fields provided to update.");
     }
-
-    // Apply each field using jsonb_set sequentially
-    let setExpr = 'data';
-    const values: string[] = [decryptedID];
-    let valueIndex = 2;
-
-    for (const [key, value] of entries) {
-      setExpr = `jsonb_set(${setExpr}, '{${key}}', $${valueIndex}::jsonb, true)`;
-      values.push(JSON.stringify(value));
-      valueIndex++;
+  
+    const getDataQuery = {
+      text: `
+        SELECT vehicle, enforcer, data FROM ticket WHERE id = $1
+      `,
+      values: [decryptedID],
+    };
+  
+    const currentResult = await pool.query(getDataQuery);
+  
+    if (currentResult.rows.length === 0) {
+      throw new Error("Ticket not found.");
     }
-
+  
+    const { vehicle: currentVehicle, enforcer, data: currentData } = currentResult.rows[0];
+  
+    const updatedData = { ...currentData };
+  
+    // Apply the updates to the `data` field.
+    for (const [key, value] of entries) {
+      updatedData[key] = value;
+    }
+  
+    // Update `vehicle` if provided, otherwise keep the existing value.
+    const updatedVehicle = decryptedVehicle ?? currentVehicle;
+  
+    // Convert the updated data to a JSON string for the update.
+    const updatedDataJson = JSON.stringify(updatedData);
+  
+    // Update fields in the database.
     const query = {
       text: `
         UPDATE ticket
-        SET data = ${setExpr}
-        WHERE id = $1
-        RETURNING id, data
+        SET vehicle = $1, data = $2
+        WHERE id = $3
+        RETURNING id, vehicle, data
       `,
-      values
+      values: [updatedVehicle, updatedDataJson, decryptedID],
     };
-
+  
     const result = await pool.query(query);
-
-    if (result.rows.length === 0) {
-      throw new Error("No update found.");
-    }
-
+  
     const row = result.rows[0];
-
+  
     return {
-      id: row.id,
-      ...row.data
+      id: await this.encrypt(row.id),
+      vehicle: await this.encrypt(row.vehicle),
+      enforcer: await this.encrypt(enforcer),
+      ...row.data,
     } as Ticket;
   }
-
+  
   public async deleteTicket(id: TicketInput): Promise<Ticket | null> {
 
     const decryptedID = await this.decrypt(id.id);
@@ -209,7 +229,8 @@ export class TicketService {
     } as Ticket;
   }
 
-  public async getTicketsForEmail(vehicleIDs: string[]): Promise<Ticket[] | undefined> {
+  public async getTicketsForVehicleID(vehicleIDs: string[]): Promise<Ticket[] | undefined> {
+
 
   // get tickets for vehicles
   const query = `
@@ -226,7 +247,6 @@ export class TicketService {
 
   const result = await pool.query(query, [vehicleIDs]);
   
-  //format
   interface TicketRow {
     id: string;
     vehicle: string;
@@ -249,4 +269,21 @@ export class TicketService {
     images: row.images,
   })));
   }
+
+  // public async getTicketsForUserJWT(userJWT: string): Promise<Ticket[] | undefined> {
+
+  //   // get vehicles for user
+  //   const userDecrypted = await this.decrypt(userJWT)
+  //   const result = await pool.query(
+  //     `SELECT id FROM vehicle WHERE driver = $1`,
+  //     [userDecrypted]
+  //   )
+
+  //   if (result.rowCount === 0) return []
+
+  //   const vehicleIDs = await Promise.all(result.rows.map(async row => row.id));
+
+  //   // get tickets for vehicles
+  //   return await this.getTicketsForVehicleID(vehicleIDs);
+  // }
 }

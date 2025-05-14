@@ -15,6 +15,7 @@ export default defineConfig({
         'test/**',
       ],
       exclude: [
+        'test/mockService.ts',
         'src/server.ts',
         '**/index.ts',
         '**/index.d.ts',

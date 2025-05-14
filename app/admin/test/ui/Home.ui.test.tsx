@@ -41,6 +41,20 @@ vi.mock('@mui/material', () => ({
       <input type="text" />
     </div>
   ),
+  FormControl: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  InputLabel: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Select: ({ children, value, onChange }: { children: React.ReactNode, value: string, onChange: (e: any) => void }) => (
+    <select value={value} onChange={onChange}>{children}</select>
+  ),
+  MenuItem: ({ children, value }: { children: React.ReactNode, value: string }) => (
+    <option value={value}>{children}</option>
+  ),
+  TableContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Table: ({ children }: { children: React.ReactNode }) => <table>{children}</table>,
+  TableHead: ({ children }: { children: React.ReactNode }) => <thead>{children}</thead>,
+  TableBody: ({ children }: { children: React.ReactNode }) => <tbody>{children}</tbody>,
+  TableRow: ({ children }: { children: React.ReactNode }) => <tr>{children}</tr>,
+  TableCell: ({ children }: { children: React.ReactNode }) => <td>{children}</td>,
   useTheme: vi.fn(() => ({
     palette: {
       primary: { main: '#1976d2' },
@@ -181,17 +195,6 @@ it('navigates to Manage Drivers section', async () => {
   });
 });
 
-it('navigates to Tickets section', async () => {
-  render(<Page />);
-
-  const ticketsButton = screen.getByText('Override Tickets');
-  fireEvent.click(ticketsButton);
-
-  await waitFor(() => {
-    expect(screen.getByText('Tickets Component')).toBeDefined();
-  });
-});
-
 it('navigates to Statistics section', async () => {
   render(<Page />);
 
@@ -211,5 +214,16 @@ it('navigates to Reports section', async () => {
 
   await waitFor(() => {
     expect(screen.getByText('Reports Component')).toBeDefined();
+  });
+});
+
+it('navigates to API Users section', async () => {
+  render(<Page />);
+
+  const apiUsersButton = screen.getByText('Manage API Users');
+  fireEvent.click(apiUsersButton);
+
+  await waitFor(() => {
+    expect(screen.getByText('Manage API Users')).toBeDefined();
   });
 });

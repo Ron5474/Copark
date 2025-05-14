@@ -11,9 +11,9 @@ export default function Home({ onNavigate }: HomeProps) {
   const buttons = [
     { label: 'Manage Enforcement', component: 'enforcement' },
     { label: 'Manage Drivers', component: 'drivers' },
-    { label: 'Override Tickets', component: 'tickets' },
     { label: 'View Statistics', component: 'statistics' },
     { label: 'Generate Reports', component: 'reports' },
+    { label: 'Manage API Users', component: 'api_users' }, 
   ];
 
   return (
@@ -63,4 +63,4 @@ export default function Home({ onNavigate }: HomeProps) {
       </Container>
     </Layout>
   );
-} 
+}

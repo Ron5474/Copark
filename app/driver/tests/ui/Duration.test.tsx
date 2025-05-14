@@ -14,6 +14,15 @@ import Duration from '../../src/app/[locale]/zone/Duration'
 // import { ZoneContext } from '../../src/app/[locale]/zone/Context'
 
 
+vi.mock('@/app/[locale]/zone/actions', () => ({
+  getZoneDetails: vi.fn().mockResolvedValue({
+    daily: 2.50,
+    maxDuration: {hours: 2, minutes: 0},
+    openTime: '07:00',
+    closeTime: '20:00',
+  }),
+}))
+
 vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
   getVehicles: vi.fn().mockResolvedValue([{
     plate: 'C0P4RK',

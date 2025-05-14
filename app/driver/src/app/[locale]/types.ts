@@ -17,3 +17,16 @@ export interface Vehicle {
   state: string
   nickname?: string
 }
+
+interface Duration{
+  hours: number
+  minutes: number
+}
+
+export interface ZoneDetails {
+  daily?: number
+  hourly?: number
+  maxDuration?: Duration
+  openTime?: string
+  closeTime?: string
+}

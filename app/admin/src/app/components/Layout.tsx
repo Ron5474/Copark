@@ -32,7 +32,7 @@ export default function Layout({ children }: LayoutProps) {
         <Toolbar sx={{ justifyContent: 'space-between' }}>
           <Box>
             <Image
-              src="/assets/admin_logo.png"
+              src="/admin/assets/logo-notitle.png"
               alt="CoPark Logo"
               width={150}
               height={0}

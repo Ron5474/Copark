@@ -308,9 +308,9 @@ test('Admin can add a payroll organization', async () => {
 
   const mutation = `
     mutation {addAPIUser(organization: {
-      name: "Santa Cruz PD"
-      email: "scpd@gmail.com"
-      role: "police"
+      name: "Santa Cruz Payroll"
+      email: "scpy@gmail.com"
+      role: "payroll"
       }){
       id
       }
@@ -325,4 +325,57 @@ test('Admin can add a payroll organization', async () => {
 
   expect(response.body.errors).toBeUndefined()
   expect(response.body.data.addAPIUser.id).toBeDefined()
+})
+
+test('Admin can get a list of API users', async () => {
+  const token = await loginAsAdmin()
+
+  // First add a police organization to ensure there's data to retrieve
+  const addOrgMutation = `
+    mutation {addAPIUser(organization: {
+      name: "Santa Cruz PD"
+      email: "scpd@gmail.com"
+      role: "campusPolice"
+      }){
+      id
+      }
+    }
+  `
+
+  const addResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: addOrgMutation })
+    .expect(200)
+
+  expect(addResponse.body.errors).toBeUndefined()
+  expect(addResponse.body.data.addAPIUser.id).toBeDefined()
+
+  // Then query for API users
+  const query = `
+    query {
+      getAPIUsers {
+        id
+        name
+        email
+        role
+      }
+    }
+  `
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query })
+    .expect(200)
+
+  expect(response.body.errors).toBeUndefined()
+  expect(response.body.data.getAPIUsers).toBeInstanceOf(Array)
+  expect(response.body.data.getAPIUsers.length).toBeGreaterThan(0)
+  
+  const apiUsers = response.body.data.getAPIUsers
+  expect(apiUsers[0]).toHaveProperty('id')
+  expect(apiUsers[0]).toHaveProperty('name')
+  expect(apiUsers[0]).toHaveProperty('email')
+  expect(apiUsers[0]).toHaveProperty('role')
 })

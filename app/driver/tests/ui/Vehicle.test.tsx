@@ -22,6 +22,15 @@ vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
     Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174000', ...vehicle }))
 }))
 
+vi.mock('@/app/[locale]/zone/actions', () => ({
+  getZoneDetails: vi.fn().mockResolvedValue({
+    daily: 2.50,
+    maxDuration: {hours: 2, minutes: 0},
+    openTime: '07:00',
+    closeTime: '20:00',
+  }),
+}))
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),

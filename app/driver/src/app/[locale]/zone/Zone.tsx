@@ -8,17 +8,27 @@ import {
   TextField,
 } from '@mui/material'
 
+import { getZoneDetails } from './actions'
 import ZoneContext from './Context'
 import theme from '../theme'
 
 
 export default function Zone() {
   const { zoneNumber, setZoneNumber, next } = useContext(ZoneContext)
+  const [zoneExists, setZoneExists] = useState<boolean>(true)
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
 
   const submitZone = async () => {
     setIsValidEntry(zoneNumber.length > 0)
-    if (zoneNumber.length > 0) next()
+    if (zoneNumber.length > 0) {
+      try {
+        await getZoneDetails(zoneNumber)
+        setZoneExists(true)
+        next()
+      } catch {
+        setZoneExists(false)
+      }
+    }
   }
 
   const textFieldStyle = {
@@ -74,11 +84,21 @@ export default function Zone() {
           }}
           onChange={(event) => setZoneNumber(event.target.value)}
         />
-        {!isValidEntry && (
-          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-            Zone number is required
-          </Typography>
-        )}
+        {
+          !isValidEntry && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Zone number is required
+            </Typography>
+          )
+
+          ||
+
+          !zoneExists && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              Entered zone does not exists
+            </Typography>
+          )
+        }
       </Box>
       <Button
         onClick={submitZone}

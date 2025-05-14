@@ -4,7 +4,7 @@ import * as http from 'http'
 import supertest from 'supertest'
 
 import { app, bootstrap } from '../src/app'
-import { Ticket, NewTicket, TicketInput, ModifyTicketInput } from '../src/ticket/schema'
+import { Ticket, NewTicket, TicketInput, ModifyTicketInput, hasTicket } from '../src/ticket/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
@@ -77,6 +77,14 @@ test('TicketInput schema loads correctly', () => {
 
   expect(testTicketInput).toBeDefined();
   expect(testTicketInput.id).toBe('1234');
+});
+
+test('hasTicket schema loads correctly', () => {
+  const testTicketInput = new hasTicket();
+  testTicketInput.hasTicket = true;
+
+  expect(testTicketInput).toBeDefined();
+  expect(testTicketInput.hasTicket).toBe(true);
 });
 
 test('ModifyTicketInput schema loads correctly', () => {

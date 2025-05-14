@@ -175,8 +175,8 @@ function MaxDuration() {
 
   const estimatedPriceString = `$${
     !overnight ?
-    (totalMinutes * (2.50/*zoneDetails?.hourly ?? 0*/)).toFixed(2) :
-    0.00
+    (totalMinutes * (2.50/*zoneDetails?.hourly ?? 0*/) / 60).toFixed(2) :
+    0.00.toFixed(2)
   }`
 
   return (

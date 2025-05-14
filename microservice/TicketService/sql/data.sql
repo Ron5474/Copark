@@ -40,3 +40,44 @@ VALUES (
     'images', '[]'
   )
 );
+
+-- below are three tickets for bad driver
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '8dc65233-c590-45b7-9b10-a5b049600901',
+  jsonb_build_object(
+    'issuedDate', NOW(),
+    'violation', 'hitting a pedestrian',
+    'fine', 9999,
+    'ticketStatus', 'unpaid',
+    'images', '[]'
+  )
+);
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '8dc65233-c590-45b7-9b10-a5b049600901',
+  jsonb_build_object(
+    'issuedDate', NOW(),
+    'violation', 'arson',
+    'fine', 1234,
+    'ticketStatus', 'unpaid',
+    'images', '[]'
+  )
+);
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '8dc65233-c590-45b7-9b10-a5b049600901',
+  jsonb_build_object(
+    'issuedDate', NOW(),
+    'violation', 'drag racing',
+    'fine', 891237,
+    'ticketStatus', 'unpaid',
+    'images', '[]'
+  )
+);

@@ -25,7 +25,7 @@ export class TicketResolver {
   @Query(() => [Ticket])
   @Authorized(["driver"])
   async getMyTickets(@Ctx() request: Request & {user: SessionUser}): Promise<Ticket[] | undefined> {
-    /* eslint-disable */
+    // eslint-disable-next-line
     const userJWT = request.headers.authorization?.split(' ')[1];
     // console.log(userJWT)
 

@@ -141,7 +141,7 @@ test('Admin can get all tickets', async () => {
     .expect(200)
 
   expect(response.body.errors).toBeUndefined()
-  expect(response.body.data.getTickets.length).toBe(4)
+  expect(response.body.data.getTickets.length).toBe(7)
 })
 
 test('Admin can modify a ticket with images', async () => {

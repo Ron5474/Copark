@@ -80,7 +80,6 @@ export class VehicleService {
 
     if (result.rowCount === 0) return []
 
-    console.log(result.rows)
     return Promise.all(result.rows.map(async row => ({
       // id: await this.encrypt(row.id),
       id: row.id

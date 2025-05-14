@@ -62,7 +62,6 @@ export class VehicleResolver {
   async getVehicleByUserId(
     @Arg('userID', () => String) userID: string
   ): Promise<VehicleID[] | null> {
-    console.log(userID)
     return await service.getVehicleByUserId(userID);
   }
 

@@ -61,4 +61,4 @@ services:
 networks:
   external-network:
     name: external-network
-    external: true
+      # external: true

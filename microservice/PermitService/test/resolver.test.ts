@@ -32,7 +32,7 @@ beforeAll(async () => {
 })
 
 beforeEach( async () => {
-    return db.reset()
+  return db.reset()
 })
 
 afterAll(() => {
@@ -90,9 +90,17 @@ async function loginAs(who: string): Promise<string | undefined> {
 const purchaseZonePermitQuery = `
 mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
   purchaseZonePermit(input: $input) {
-    vehicle
+    type
     zone
-    duration
+    purchaseDate
+    activeDate
+    expireDate
+    receipt {
+      tax
+      service
+      subTotal
+      total
+    }
     paymentMethod
   }
 }`
@@ -100,7 +108,7 @@ mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
 const purchaseZoneInput = {
   input: {
     vehicle: "12345678-1234-1234-1234-567890abcdef",
-    zone: "0",
+    zone: "123",
     duration: {'minutes': 30, 'hours': 0},
     paymentMethod: "paypal"
   }
@@ -113,13 +121,13 @@ const purchaseZoneInput = {
 test('Driver can purchase a zone permit', async () => {
   const token = await loginAs("driver")
 
-  const receipt = await supertest(server)
+  const confirmation = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
     .send({ 
       query: purchaseZonePermitQuery,
       variables: purchaseZoneInput
     })
-
-  expect(receipt.body.data.receipt.type).toBe("zone")
+  console.log(confirmation.body)
+  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
 })

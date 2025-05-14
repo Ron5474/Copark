@@ -71,7 +71,7 @@ export class PermitService {
       purchaseDate: rows[0].data.purchaseDate,
       activeDate: rows[0].data.activeDate,
       expireDate: rows[0].data.expireDate,
-      receipt: rows[0].data.price,
+      receipt: rows[0].data.receipt,
       paymentMethod: rows[0].data.paymentMethod,
     }
   }

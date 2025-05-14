@@ -65,6 +65,22 @@ async function loginAs(who: string): Promise<string | undefined> {
     }
 
     return response.body
+  }
+
+  else if (who === "enforcement") {
+    const response = await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/login')
+      .send({
+        email: 'enforcer1@outlook.com',
+        password: 'password1',
+      })
+
+    if (response.status !== 200) {
+      throw new Error(`Enforcement login failed with status ${response.status}`)
+    }
+
+    return response.body.id
+
   } else {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
@@ -182,6 +198,20 @@ test('Permit service is running', async () => {
 
 test('Driver can purchase a zone permit', async () => {
   const token = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: purchaseZoneInput
+    })
+
+  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+})
+
+test('Enforcer gets invalid permit', async () => {
+  const token = await loginAs("enforcement")
 
   const confirmation = await supertest(server)
     .post('/graphql')

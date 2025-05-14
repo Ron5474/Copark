@@ -56,7 +56,7 @@ export const getZoneDetails = async (zone: string): Promise<ZoneDetails> => {
       throw new Error(result.errors[0].message)
     }
 
-    return result.data.myVehicles
+    return result.data.zoneDetails
   } catch (error) {
     console.error('Error fetching vehicles:', error)
     throw error

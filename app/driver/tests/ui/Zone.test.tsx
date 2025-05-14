@@ -4,14 +4,25 @@
  * @author Bryant Oliver
  */
 
-import { vi, it, afterEach, expect } from 'vitest'
+import { vi, it, beforeEach, afterEach, expect } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '../setup'
 
 import MemberView from '../../src/app/[locale]/zone/View'
 import Zone from '../../src/app/[locale]/zone/Zone'
+import { getZoneDetails } from '../../src/app/[locale]/zone/actions'
+import { ZoneProvider } from '../../src/app/[locale]/zone/Context'
 
+
+vi.mock('../../src/app/[locale]/zone/actions', () => ({
+  getZoneDetails: vi.fn() //.mockResolvedValue({
+  //   daily: 2.50,
+  //   maxDuration: { hours: 2, minutes: 0 },
+  //   openTime: '07:00',
+  //   closeTime: '20:00',
+  // }),
+}))
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -56,15 +67,6 @@ vi.mock('@/app/[locale]/shared/actions', () => ({
   }),
 }))
 
-vi.mock('@/app/[locale]/zone/actions', () => ({
-  getZoneDetails: vi.fn().mockResolvedValue({
-    daily: 2.50,
-    maxDuration: {hours: 2, minutes: 0},
-    openTime: '07:00',
-    closeTime: '20:00',
-  }),
-}))
-
 vi.mock('next/headers', () => {
   const mockCookies = {
     get: vi.fn((name) => {
@@ -86,6 +88,15 @@ vi.mock('next/headers', () => {
   }
 })
 
+
+beforeEach(() => {
+  vi.mocked(getZoneDetails).mockResolvedValue({
+    daily: 2.50,
+    maxDuration: { hours: 2, minutes: 0 },
+    openTime: '07:00',
+    closeTime: '20:00',
+  })
+})
 
 afterEach(() => {
   cleanup()
@@ -110,6 +121,21 @@ it('Error if zone # is empty', async () => {
   await user.click(screen.getByText('Confirm Zone'))
 
   expect(await screen.findByText('Zone number is required')).toBeDefined()
+})
+
+it('Error if zone # does not exist', async () => {
+  render(
+    <ZoneProvider>
+      <Zone />
+    </ZoneProvider>
+  )
+  const user = userEvent.setup()
+  const input = screen.getByLabelText('Enter parking zone number')
+  await user.type(input, '000')
+  vi.mocked(getZoneDetails).mockRejectedValue(new Error('Zone does not exist'))
+  await user.click(screen.getByText('Confirm Zone'))
+
+  expect(await screen.findByText('Zone does not exist')).toBeDefined()
 })
 
 it('Confirm Zone takes you to duration step', async () => {

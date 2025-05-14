@@ -95,7 +95,7 @@ export default function Zone() {
 
           !zoneExists && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Entered zone does not exists
+              Zone does not exist
             </Typography>
           )
         }

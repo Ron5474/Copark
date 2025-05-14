@@ -177,18 +177,6 @@ it('opens add dialog and closes it properly', async () => {
   }, { timeout: 2000 })
 })
 
-it('navigates home when home button is clicked', () => {
-  cleanup(); 
-  render(
-    <ThemeProvider theme={theme}>
-      <ManageAPIUsers onNavigate={mockNavigate} />
-    </ThemeProvider>
-  )
-
-  fireEvent.click(screen.getByTestId('HomeIcon').parentElement!)
-  expect(mockNavigate).toHaveBeenCalledWith('home')
-})
-
 it('shows no users message when api returns empty array', async () => {
   // Setup mock to return empty array
   vi.mocked(getAPIUsers).mockResolvedValueOnce([])

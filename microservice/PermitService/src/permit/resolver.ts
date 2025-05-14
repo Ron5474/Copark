@@ -42,7 +42,6 @@ export class PermitResolver {
     if (!userId) throw new Error('Unauthorized')
     
     const plate = input.vehicle
-    console.log("Plate: ", plate)
 
     const vehicleQuery = `
       query FindVehicleByPlate($plate: String!) {
@@ -63,9 +62,7 @@ export class PermitResolver {
       }),
     })
 
-    console.log("VEHICLERES: ", vehicleRes)
     const vehicleJson = await vehicleRes.json()
-    console.log("VEHICLEJSON", vehicleJson)
     const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 
     if (vehicleId) {
@@ -81,9 +78,10 @@ export class PermitResolver {
     @Arg("plate", () => String) plate: string,
     @Ctx() request: Request
   ): Promise<IsValidPolice> {
+    console.log('HELOOOOOOOOOO')
     const userId = request.user?.id
     if (!userId) throw new Error('Unauthorized')
-
+    console.log('HELOOOOOOOOOO 2')
     const vehicleQuery = `
       query FindVehicleByPlate($plate: String!) {
         findVehicleByPlate(plate: $plate) {

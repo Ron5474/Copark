@@ -30,6 +30,16 @@ VALUES (
 
 INSERT INTO account(id, data)
 VALUES (
+  'abe405c6-7400-4d23-9f86-00ead15729f5',
+  jsonb_build_object(
+    'name', 'Antioch PD',
+    'email', 'apd@pd.com',
+    'role', '["police"]'
+  )
+);
+
+INSERT INTO account(id, data)
+VALUES (
   '39f48f9f-2693-446b-ad98-8e0db1ef14bd',
   jsonb_build_object(
     'name', 'Ronak Patel',

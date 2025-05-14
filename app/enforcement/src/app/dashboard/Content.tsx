@@ -3,7 +3,7 @@
 import { Container, Box, Typography } from '@mui/material'
 import ManualEntryCard from './plate/ManualEntry'
 import PermitCard from './permit/Card'
-import IssueViolationForm from './permit/IssueViolationForm'
+import IssueViolationForm from './violation/IssueViolationForm'
 import { useEnforcement } from './context/Context'
 
 export default function EnforcementDashboardView() {

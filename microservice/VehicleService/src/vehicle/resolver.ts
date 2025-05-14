@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { Request } from 'express'
-import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID } from './schema'
+import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVehicleInput, CreatedVehicle } from './schema'
 import { VehicleService } from './service'
 import { SessionUser } from '../types/express'
 
@@ -43,7 +43,7 @@ export class VehicleResolver {
   @Authorized('admin', 'enforcement', 'police')
   @Query(() => Vehicle, { nullable: true })
   async findVehicleByPlate(
-    @Arg('plate', () => String) plate: string
+     @Arg('plate', () => String) plate: string
   ): Promise<Vehicle | null> {
     return await service.findVehicleByPlate(plate)
   }
@@ -63,5 +63,13 @@ export class VehicleResolver {
     @Arg('userID', () => String) userID: string
   ): Promise<VehicleID[] | null> {
     return await service.getVehicleByUserId(userID);
+  }
+
+  @Authorized('admin', 'enforcement')
+  @Mutation(() => CreatedVehicle)
+  async createUnregisteredVehicle(
+    @Arg('input', () => createdVehicleInput) input: createdVehicleInput
+  ): Promise<CreatedVehicle> {
+    return await service.createUnregisteredVehicle(input);
   }
 }

@@ -70,6 +70,22 @@ async function loginAs(who: string): Promise<string | undefined> {
     }
 
     return response.body
+  }
+
+  else if (who === "enforcement") {
+    const response = await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/login')
+      .send({
+        email: 'enforcer1@outlook.com',
+        password: 'password1',
+      })
+
+    if (response.status !== 200) {
+      throw new Error(`Enforcement login failed with status ${response.status}`)
+    }
+
+    return response.body.id
+
   } else {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
@@ -160,6 +176,30 @@ const vehicleInput = {
 const findByPlateInput = {
   plate: "TEST123"
 }
+
+const findOrCreateVehicleByPlateMutation = `
+mutation FindOrCreateVehicleByPlate($plate: String!) {
+  findOrCreateVehicleByPlate(plate: $plate) {
+    id
+    plate
+    country
+    state
+  }
+}`
+
+test('Enforcer can find or create vehicle by plate', async () => {
+  const token = await loginAs("enforcement")
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: findOrCreateVehicleByPlateMutation,
+      variables: { plate: "ENF456" }
+    })
+
+  expect(response.body.data.findOrCreateVehicleByPlate.plate).toBe("ENF456")
+})
 
 test('Non-Driver cannot get a list of their vehicles', async () => {
   const token = await loginAs("admin")

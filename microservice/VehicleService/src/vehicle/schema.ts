@@ -54,3 +54,30 @@ export class VehicleID {
   id!: string
 }
 
+@ObjectType()
+export class CreatedVehicle {
+  @Field(() => ID)
+  id!: string
+
+  @Field(() => String)
+  plate!: string
+
+  @Field(() => String, { nullable: true })
+  country?: string
+
+  @Field(() => String, { nullable: true })
+  state?: string
+}
+
+
+@InputType()
+export class createdVehicleInput {
+  @Field(() => String)
+  plate!: string;
+
+  @Field(() => String, { nullable: true })
+  country?: string;
+
+  @Field(() => String, { nullable: true })
+  state?: string;
+}

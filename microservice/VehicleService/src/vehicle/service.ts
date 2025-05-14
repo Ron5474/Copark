@@ -1,5 +1,5 @@
 import { pool } from './db'
-import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID } from './schema'
+import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVehicleInput, CreatedVehicle } from './schema'
 import { SignJWT, jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
@@ -140,4 +140,17 @@ export class VehicleService {
       nickname: row.data.nickname
     }
   }
+
+  public async createUnregisteredVehicle(input: createdVehicleInput): Promise<CreatedVehicle> {
+    const result = await pool.query(
+      `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
+      [null, JSON.stringify(input)]
+    );
+
+    return {
+      id: result.rows[0].id,
+      ...input,
+    };
+  }
+
 }

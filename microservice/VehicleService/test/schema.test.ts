@@ -3,7 +3,7 @@ import * as http from 'http'
 import supertest from 'supertest'
 
 import { app, bootstrap } from '../src/app'
-import { Vehicle, VehicleID } from '../src/vehicle/schema'
+import { Vehicle, VehicleID, CreatedVehicle } from '../src/vehicle/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
@@ -51,4 +51,16 @@ test('GET playground', async () => {
     await supertest(server)
       .get('/playground')
       .expect(200)
+})
+
+test('CreatedVehicle schema loads correctly', () => {
+  const created = new CreatedVehicle()
+  created.id = VehicleData.id
+  created.plate = VehicleData.plate
+  created.country = VehicleData.country
+  created.state = VehicleData.state
+
+  expect(created).toBeDefined()
+  expect(created.plate).toBe('TEST123')
+  expect(created.country).toBe('The Greatest Country')
 })

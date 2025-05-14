@@ -2,7 +2,7 @@ import { render, screen,  cleanup, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi, it, expect, afterEach} from 'vitest'
 
-import IssueViolationForm from '@/app/dashboard/permit/IssueViolationForm'
+import IssueViolationForm from '@/app/dashboard/violation/IssueViolationForm'
 import PermitCard from '@/app/dashboard/permit/Card'
 import { EnforcementProvider } from '@/app/dashboard/context/Context'
 

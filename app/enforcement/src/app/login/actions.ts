@@ -14,7 +14,6 @@ export async function login({ email, password }: { email: string; password: stri
     return undefined;
   }
 
-  // Ensure the response body is valid before parsing
   const text = await response.text();
   const authenticated = text ? JSON.parse(text) : null;
 

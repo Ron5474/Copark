@@ -38,7 +38,7 @@ export class AuthService {
     }
   }
 
-  public async getOauthUser(data: OauthLoginData|SessionUser|undefined): Promise<string| undefined> {
+  public async getOauthUser(data: OauthLoginData|SessionUser|undefined): Promise<User| undefined> {
     if (data === undefined) {
       throw new Error("Unauthorized");
     }
@@ -55,7 +55,11 @@ export class AuthService {
       return undefined;
     } else {
       const user = res.rows[0];
-      return this.encrypt(user.id)
+      return {
+        id: user.id,
+        name: user.data.name,
+        role: user.data.role,
+      }
     }
   }
 

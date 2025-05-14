@@ -64,7 +64,6 @@ export class TicketResolver {
       throw new Error('Failed to fetch vehicles for user');
     }
 
-    console.log(result)
     return await ticketService.getTicketsForVehicleID(result.data.getVehicleByUserId)
   }
 
@@ -92,13 +91,7 @@ export class TicketResolver {
       @Arg("input", () => NewTicketInput) input: NewTicketInput,
       @Ctx() request: Request
     ): Promise<Ticket> {
-      // const enforcerId = request.user?.id
-      // console.log(enforcerId)
-      // console.log("enforcerrrrr")
-      // if (!enforcerId) throw new Error('Unauthorized')
-      
       const plate = input.plate
-      // console.log("plate", plate)
       const vehicleQuery = `
         mutation FindOrCreateVehicleByPlate($plate: String!) {
           findOrCreateVehicleByPlate(plate: $plate) {
@@ -106,8 +99,6 @@ export class TicketResolver {
           }
         }
       `;
-      // console.log("before vehicle re")
-      console.log(request.headers.authorization)
       const vehicleRes = await fetch("http://localhost:4001/graphql", {
         method: "POST",
         headers: {
@@ -119,9 +110,7 @@ export class TicketResolver {
           variables: { plate: plate },
         }),
       });
-      // console.log("after vehicle re")
       const vehicleJson = await vehicleRes.json();
-      // console.log("vec jason", vehicleJson)
       const vehicleId = vehicleJson?.data?.findOrCreateVehicleByPlate?.id;
 
       if (!vehicleId) {

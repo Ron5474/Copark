@@ -2,7 +2,7 @@ import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
-const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class TicketService {
   private async encrypt(userId: string): Promise<string> {
@@ -35,7 +35,8 @@ export class TicketService {
         data->>'violation' AS violation,
         data->>'fine' AS fine,
         data->>'ticketStatus' AS ticketstatus,
-        data->>'images' AS images
+        data->>'images' AS images,
+        data->>'note' AS note
         FROM ticket
         WHERE data->>'ticketStatus' != 'deleted'
         ORDER BY data->>'issuedDate';
@@ -55,6 +56,7 @@ export class TicketService {
         fine: parseFloat(row.fine),
         ticketStatus: row.ticketstatus,
         images: row.images,
+        note: row.note
       });
 
     }
@@ -67,8 +69,8 @@ export class TicketService {
 
     // console.log(newTicket);
     const enforcerId = await this.decrypt(newTicket.enforcer);
-    const vehicleId = await this.decrypt(newTicket.vehicle);
-    if (!enforcerId || !vehicleId) {
+    // const vehicleId = await this.decrypt(newTicket.vehicle);
+    if (!enforcerId) {
       throw new Error("Invalid enforcer or vehicle ID.");
     }
     //TODO: Check if the enforcerId and vehicleId are valid, will need services in enforcer and vehicle microservices
@@ -80,27 +82,30 @@ export class TicketService {
             'violation', $4::TEXT,
             'fine', $5::NUMERIC,
             'ticketStatus', $6::TEXT,
-            'images', $7::TEXT
+            'images', $7::TEXT,
+            'note', $8::TEXT
         ))
         RETURNING id, vehicle, enforcer, 
                   data->>'issuedDate' AS issueddate,
                   data->>'violation' AS violation,
                   data->>'fine' AS fine,
                   data->>'ticketStatus' AS ticketstatus,
-                  data->>'images' AS images;
+                  data->>'images' AS images,
+                  data->>'note' AS note;
     `;
 
     const issuedDate = new Date().toISOString();
     const ticketStatus = 'active';
 
     const result = await pool.query(insertQuery, [
-        vehicleId,
+        newTicket.vehicle,
         enforcerId,
         issuedDate,
         newTicket.violation,
         newTicket.fine,
         ticketStatus,
         newTicket.images || null,
+        newTicket.note
     ]);
 
     const row = result.rows[0];
@@ -114,6 +119,7 @@ export class TicketService {
         fine: parseFloat(row.fine),
         ticketStatus: row.ticketstatus,
         images: row.images,
+        note: row.note,
     };
 
     // console.log(ticket.id);

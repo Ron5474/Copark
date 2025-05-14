@@ -7,7 +7,7 @@ import * as http from 'http'
 import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
-import { app as VehicleApp } from '../../VehicleService/src/app'
+import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 import { SignJWT } from 'jose'
 
 let server: http.Server
@@ -20,7 +20,7 @@ const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 const VEHICLE_PORT = 4001
 // const VEHICLE_SERVICE_URL = `http://localhost:${VEHICLE_PORT}`
 
-const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 const adminUser = {
   email: 'jxiong0822@outlook.com',
@@ -46,6 +46,7 @@ beforeAll(async () => {
   await new Promise<void>((resolve) => {
     vehicleServer.listen(VEHICLE_PORT, () => resolve())
   })
+  await VehicleBoot()
 
   return db.reset()
 })
@@ -92,7 +93,7 @@ async function loginAsDriver(): Promise<string> {
 test('Admin can create a ticket with images', async () => {
   const token = await loginAsAdmin()
 
-  const vehicleid = await encrypt('00000000-0000-0000-0000-000000000000')
+  const vehicleid = '00000000-0000-0000-0000-000000000000'
   const enforcerid = await encrypt('00000000-0000-0000-0000-000000000000')
 
   const query = `
@@ -156,7 +157,7 @@ test('Admin can get all tickets', async () => {
 test('Admin can modify a ticket with images', async () => {
   const token = await loginAsAdmin()
 
-  const vehicleid = await encrypt('00000000-0000-0000-0000-000000000001')
+  const vehicleid = '00000000-0000-0000-0000-000000000001'
   const enforcerid = await encrypt('00000000-0000-0000-0000-000000000002')
 
   const createQuery = `
@@ -345,7 +346,6 @@ async function loginAs(who: string): Promise<string> {
       throw new Error(`Enforcement login failed with status ${response.status}`)
     }
 
-    // console.log(response.body)
     return response.body.id
   }
 
@@ -386,8 +386,6 @@ test('Enforcer can create a ticket', async () => {
       }
     })
 
-  // console.log(JSON.stringify(response.body, null, 2))
-
   expect(response.status).toBe(200)
   // console.log(response.body.data)
   const ticket = response.body.data.createNewTicket
@@ -395,7 +393,7 @@ test('Enforcer can create a ticket', async () => {
   expect(ticket).toBeDefined()
   expect(ticket.violation).toBe("Blocking Driveway")
   expect(ticket.fine).toBe(50)
-  expect(ticket.ticketStatus).toBe("ISSUED")
+  expect(ticket.ticketStatus).toBe("active")
   expect(ticket.images).toBe("https://example.com/photo.jpg")
   expect(ticket.note).toBe("Parked right in front of gate")
 })

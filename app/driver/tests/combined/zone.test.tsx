@@ -1,11 +1,11 @@
 import { vi, it, afterEach, beforeAll, afterAll, expect, beforeEach } from 'vitest'
-import { /*render, screen, */cleanup, /*waitFor*/ } from '@testing-library/react'
-// import userEvent from '@testing-library/user-event'
+import { render, screen, cleanup, /*waitFor*/ } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 
 import { auth, permit } from './mockService'
 import { getZoneDetails } from '../../src/app/[locale]/zone/actions'
-// import Zone from '../../src/app/[locale]/zone/Zone'
+import MemberView from '../../src/app/[locale]/zone/View'
 
 
 const server = setupServer()
@@ -20,7 +20,7 @@ vi.mock('next/navigation', () => ({
 vi.mock('next/headers', () => {
   const mockCookies = {
     get: vi.fn((name) => {
-      if (name === 'next-auth.session-token') {
+      if (name === 'auth-token') {
         return { value: 'mocked-auth-token-123' }
       }
       return undefined
@@ -81,31 +81,18 @@ afterEach(() => {
 
 
 
-it('Vehicle fetch fail', async () => {
+it('Zone Details fetch failed', async () => {
   vi.spyOn(console, 'error').mockImplementation(() => {})
   permit(server, true) // force failure
   await expect(getZoneDetails('187')).rejects.toThrow('Failed to connect')
 })
 
+it('Fetch Zone Details', async () => {
+  render(<MemberView />)
+  const user = userEvent.setup()
+  const input = screen.getByLabelText('Enter parking zone number')
+  await user.type(input, '123')
+  await user.click(screen.getByText('Confirm Zone'))
 
-// it('Add vehicle', async () => {
-//   render(<VehicleList />)
-//   const user = userEvent.setup()
-//   await user.click((await screen.findAllByLabelText("Add a vehicle"))[0])
-//   const input = screen.getByLabelText('Enter license plate number')
-//   await user.type(input, 'TEST123')
-//   await user.click(await screen.findByText('Save'))
-
-//   expect(await screen.findByText('TEST123')).toBeDefined()
-// })
-
-// it('Vehicle add failed', async () => {
-//   vi.spyOn(console, 'error').mockImplementation(() => {})
-//   vehicle(server, false, true) // fail add
-//   const newVehicle = {
-//     plate: '1ABC123',
-//     country: 'United States',
-//     state: 'California',
-//   }
-//   await expect(addVehicle(newVehicle)).rejects.toThrow('Failed to register vehicle')
-// })
+  expect(await screen.findByText('What parking rate works for you?')).toBeDefined()
+})

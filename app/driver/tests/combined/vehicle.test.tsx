@@ -21,7 +21,7 @@ vi.mock('next/navigation', () => ({
 vi.mock('next/headers', () => {
   const mockCookies = {
     get: vi.fn((name) => {
-      if (name === 'next-auth.session-token') {
+      if (name === 'auth-token') {
         return { value: 'mocked-auth-token-123' }
       }
       return undefined
@@ -91,7 +91,6 @@ it('Vehicle fetch fail', async () => {
   vehicle(server, true) // force failure
   await expect(getVehicles()).rejects.toThrow('Failed to fetch vehicles')
 })
-
 
 it('Add vehicle', async () => {
   render(<VehicleList />)

@@ -127,22 +127,6 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
         )}
       </Paper>
 
-      <IconButton
-        onClick={() => onNavigate('home')}
-        sx={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-          bgcolor: theme.palette.primary.main,
-          color: '#ffffff',
-          '&:hover': {
-            bgcolor: theme.palette.primary.dark
-          }
-        }}
-      >
-        <HomeIcon />
-      </IconButton>
-
       <AddAPIUser
         open={openAddDialog}
         onClose={() => setOpenAddDialog(false)}

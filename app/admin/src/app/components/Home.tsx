@@ -1,13 +1,13 @@
 'use client';
 
-import { Box, Container, Button, Typography, Paper } from '@mui/material';
-import Layout from './Layout';
+import { Box, Drawer, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 
 interface HomeProps {
   onNavigate: (component: string) => void;
+  children: React.ReactNode;
 }
 
-export default function Home({ onNavigate }: HomeProps) {
+export default function Home({ onNavigate, children }: HomeProps) {
   const buttons = [
     { label: 'Manage Enforcement', component: 'enforcement' },
     { label: 'Manage Drivers', component: 'drivers' },
@@ -16,51 +16,56 @@ export default function Home({ onNavigate }: HomeProps) {
     { label: 'Manage API Users', component: 'api_users' }, 
   ];
 
+  const drawerWidth = 240;
+
   return (
-    <Layout>
-      <Container maxWidth="lg" sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', py: 4 }}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 3,
-            width: '100%',
-            maxWidth: '800px',
-          }}
-        >
-          <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
+    <Box sx={{ display: 'flex' }}>
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            backgroundColor: (theme) => theme.palette.primary.main,
+            color: 'white',
+          },
+        }}
+      >
+        <Box sx={{ p: 2, borderBottom: '1px solid rgba(255, 255, 255, 0.12)' }}>
+          <Typography variant="h6" component="div" sx={{ color: 'white' }}>
             Admin Dashboard
           </Typography>
-          
-          <Box sx={{ 
-            display: 'flex', 
-            flexWrap: 'wrap', 
-            gap: 2, 
-            justifyContent: 'center',
-            width: '100%'
-          }}>
-            {buttons.map((button) => (
-              <Button
-                key={button.label}
-                variant="contained"
-                size="large"
+        </Box>
+        <List>
+          {buttons.map((button) => (
+            <ListItem key={button.label} disablePadding>
+              <ListItemButton
                 onClick={() => onNavigate(button.component)}
                 sx={{
-                  minWidth: '200px',
-                  height: '100px',
-                  fontSize: '1.1rem',
-                  flex: '1 1 200px',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  },
                 }}
               >
-                {button.label}
-              </Button>
-            ))}
-          </Box>
-        </Paper>
-      </Container>
-    </Layout>
+                <ListItemText primary={button.label} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          minHeight: '100vh',
+          backgroundColor: (theme) => theme.palette.background.default,
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
   );
 }

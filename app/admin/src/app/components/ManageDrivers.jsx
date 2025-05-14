@@ -146,23 +146,6 @@ export default function ManageDrivers({ onNavigate }) {
           </Box>
         ))}
       </Paper>
-
-      <Box sx={{ position: 'fixed', bottom: 24, right: 24 }}>
-        <IconButton
-          sx={{
-            bgcolor: theme.palette.primary.main,
-            color: '#ffffff',
-            '&:hover': {
-              bgcolor: theme.palette.primary.dark
-            }
-          }}
-          size="large"
-          onClick={() => onNavigate('home')}
-          aria-label="Go to Home"
-        >
-          <HomeIcon sx={{ fontSize: 32 }} />
-        </IconButton>
-      </Box>
     </Box>
   );
 }

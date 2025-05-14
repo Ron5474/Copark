@@ -1,5 +1,6 @@
 'use client';
 
+import { Box } from '@mui/material';
 import { useState } from 'react';
 import Home from './components/Home';
 import ManageEnforcement from './components/ManageEnforcement';
@@ -15,8 +16,6 @@ export default function Page() {
 
   const renderComponent = () => {
     switch (currentComponent) {
-      case 'home':
-        return <Home onNavigate={handleNavigate} />;
       case 'enforcement':
         return <ManageEnforcement onNavigate={handleNavigate} />;
       case 'drivers':
@@ -24,12 +23,18 @@ export default function Page() {
       case 'api_users':
         return <ManageAPIUsers onNavigate={handleNavigate} />;
       case 'statistics':
-        return <div>Statistics Component</div>;
+        return <Box>Statistics Component</Box>;
       case 'reports':
-        return <div>Reports Component</div>;
+        return <Box>Reports Component</Box>;
+      default:
+        return <Box>Welcome to Admin Dashboard</Box>;
     }
   };
 
-  return renderComponent();
+  return (
+    <Home onNavigate={handleNavigate}>
+      {renderComponent()}
+    </Home>
+  );
 }
 

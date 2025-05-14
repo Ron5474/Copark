@@ -241,6 +241,47 @@ test('Fails when plate input is missing', async () => {
   expect(response.body.errors).toBeDefined()
 })
 
+test('Unregistered vehicle has null fields by default', async () => {
+  const token = await loginAs("enforcement")
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: findOrCreateVehicleByPlateMutation,
+      variables: { plate: "NULLCHECK456" }
+    })
+
+  const vehicle = response.body.data.findOrCreateVehicleByPlate
+  expect(vehicle.country).toBeNull()
+  expect(vehicle.state).toBeNull()
+})
+
+test('Enforcer can directly create an unregistered vehicle', async () => {
+  const token = await loginAs("enforcement")
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      query: `
+        mutation CreateUnregisteredVehicle($input: createdVehicleInput!) {
+          createUnregisteredVehicle(input: $input) {
+            id
+            plate
+          }
+        }
+      `,
+      variables: {
+        input: {
+          plate: "COVERAGE999"
+        }
+      }
+    })
+
+  expect(response.body.data.createUnregisteredVehicle.plate).toBe("COVERAGE999")
+})
+
 test('Non-Driver cannot get a list of their vehicles', async () => {
   const token = await loginAs("admin")
   const response = await supertest(server)

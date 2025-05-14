@@ -113,9 +113,9 @@ export class TicketResolver {
       const vehicleJson = await vehicleRes.json();
       const vehicleId = vehicleJson?.data?.findOrCreateVehicleByPlate?.id;
 
-      if (!vehicleId) {
-        throw new Error("Unable to resolve vehicle ID");
-      }
+      // if (!vehicleId) {
+      //   throw new Error("Unable to resolve vehicle ID");
+      // }
 
       return ticketService.createTicket({
       enforcer: (request.headers.authorization as string).split(' ')[1],

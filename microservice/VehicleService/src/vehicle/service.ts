@@ -3,7 +3,7 @@ import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVe
 import { SignJWT, jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
-const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+// const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class VehicleService {
 

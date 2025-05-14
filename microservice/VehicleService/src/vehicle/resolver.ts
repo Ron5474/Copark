@@ -72,4 +72,23 @@ export class VehicleResolver {
   ): Promise<CreatedVehicle> {
     return await service.createUnregisteredVehicle(input);
   }
+
+  @Authorized('enforcement')
+  @Mutation(() => CreatedVehicle)
+  async findOrCreateVehicleByPlate(
+    @Arg('plate', () => String) plate: string
+  ): Promise<CreatedVehicle> {
+    const vehicle = await service.findVehicleByPlate(plate)
+
+    if (vehicle) {
+      return {
+        id: vehicle.id,
+        plate: vehicle.plate,
+        country: vehicle.country ?? null,
+        state: vehicle.state ?? null,
+      }
+    }
+
+    return await service.createUnregisteredVehicle({ plate })
+  }
 }

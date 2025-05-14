@@ -63,9 +63,7 @@ export class PermitResolver {
       }),
     })
 
-    console.log("VEHICLERES: ", vehicleRes)
     const vehicleJson = await vehicleRes.json()
-    console.log("VEHICLEJSON", vehicleJson)
     const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 
     if (vehicleId) {

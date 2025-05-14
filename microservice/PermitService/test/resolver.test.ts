@@ -6,7 +6,7 @@ import * as http from 'http'
 import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
-import { app as VehicleApp } from '../../VehicleService/src/app'
+import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 
 let server: http.Server
 let authServer: http.Server
@@ -34,6 +34,7 @@ beforeAll(async () => {
   await new Promise<void>((resolve) => {
     vehcServer.listen(VEHC_PORT, () => resolve())
   })
+  await VehicleBoot()
 
   return db.reset()
 })
@@ -102,14 +103,6 @@ async function loginAs(who: string): Promise<string | undefined> {
   }
 }
 
-// const isValidQuery = `
-//       query {
-//         isValidZonePermit {
-//           vehicle
-//           zone
-//         }
-//       }
-//     `
 
 const purchaseZonePermitQuery = `
 mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
@@ -138,21 +131,21 @@ const purchaseZoneInput = {
   }
 }
 
-// const isValidZonePermitQuery = `
-// query IsValid($input: IsValidPermitInput!) {
-//   isValidZonePermit(input: $input) {
-//     isValid
-//     type
-//     zone
-//   }
-// }`
+const isValidZonePermitQuery = `
+query IsValid($input: IsValidPermitInput!) {
+  isValidZonePermit(input: $input) {
+    isValid
+    type
+    zone
+  }
+}`
 
-// const isValidZonePermitInput = {
-//   input: {
-//     vehicle: "7RON123",
-//     zone: "123"
-//   }
-// }
+const isValidZonePermitInput = {
+  input: {
+    vehicle: "7RON123",
+    zone: "123"
+  }
+}
 
 
 const myPermitsQuery = `
@@ -234,20 +227,20 @@ test('Driver can purchase a zone permit', async () => {
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
 })
 
-// test('Enforcer gets invalid permit', async () => {
-//   const token = await loginAs("enforcement")
+test('Enforcer gets invalid permit', async () => {
+  const token = await loginAs("enforcement")
 
-//   const isValid = await supertest(server)
-//     .post('/graphql')
-//     .set('Authorization', 'Bearer ' + token)
-//     .send({ 
-//       query: isValidZonePermitQuery,
-//       variables: isValidZonePermitInput
-//     })
+  const isValid = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: isValidZonePermitQuery,
+      variables: isValidZonePermitInput
+    })
 
-//   console.log(isValid.body)
-//   expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
-// })
+  console.log(isValid.body)
+  expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
+})
 
 test('Driver has no permits', async () => {
   const token = await loginAs("driver")

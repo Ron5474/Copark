@@ -72,6 +72,7 @@ export class VehicleService {
     // const userDecrypted = await this.decrypt(userID, emailEncodedKey)
     const userDecrypted = await this.decrypt(userID, encodedKey)
 
+    console.log(userDecrypted)
     const result = await pool.query(
       `SELECT id FROM vehicle WHERE driver = $1`,
       [userDecrypted]
@@ -79,6 +80,7 @@ export class VehicleService {
 
     if (result.rowCount === 0) return []
 
+    console.log(result.rows)
     return Promise.all(result.rows.map(async row => ({
       // id: await this.encrypt(row.id),
       id: row.id

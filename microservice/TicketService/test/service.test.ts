@@ -32,7 +32,7 @@ async function encrypt(userId: string): Promise<string> {
 test('getTickets should return all unpaid tickets', async () => {
     const tickets = await ticketService.getTickets();
 
-    expect(tickets).toHaveLength(3);
+    expect(tickets).toHaveLength(6);
     expect(tickets[0].ticketStatus).toBe('unpaid');
     expect(tickets[1].ticketStatus).toBe('unpaid');
     expect(tickets[2].ticketStatus).toBe('unpaid');

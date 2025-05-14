@@ -5,12 +5,15 @@ import * as http from 'http'
 import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
+import { SignJWT } from 'jose'
+
 
 let server: http.Server
 let authServer: http.Server
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
 
 beforeAll(async () => {
   // Start your GraphQL server
@@ -48,7 +51,15 @@ const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSl
 //     "sub": "1234567890",
 //   }
 
-const validDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjM5ZjQ4ZjlmLTI2OTMtNDQ2Yi1hZDk4LThlMGRiMWVmMTRiZCIsImlhdCI6MTc0NzA2NzM2NSwiZXhwIjoxOTA0ODU1MzY1fQ.U90qXFiG-nLiqqbL32KwhGaLdlZc0NyA6XDnetN1SRQ"
+async function encrypt(userId: string): Promise<string> {
+  return new SignJWT({ id: userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('5y')
+    .sign(encodedKey)
+  }
+
+const validDriverJWT = encrypt('b1eab387-1000-4ee3-a746-d59366e44f06');
 
 const adminUser = {
   email: 'jxiong0822@outlook.com',
@@ -381,6 +392,6 @@ test('Driver can get a list of their vehicles', async () => {
         variables: {userID: validDriverJWT}
        })
 
-    // console.log('body !!!!' + listResponse)
+    console.log('body !!!!' + listResponse.body.data)
     expect(listResponse.body.data.getVehicleByUserId.length).toBe(1)
   })

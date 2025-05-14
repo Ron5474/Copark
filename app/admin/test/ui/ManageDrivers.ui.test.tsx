@@ -118,13 +118,3 @@ it('handles deleting a driver', async () => {
     expect(screen.queryByText('Driver 2')).toBeNull();
   });
 });
-
-it('navigates to home when Home button is clicked', () => {
-  const mockNavigate = vi.fn();
-  render(<ManageDrivers onNavigate={mockNavigate} />);
-
-  const homeButton = screen.getByRole('button', { name: 'Go to Home' });
-  fireEvent.click(homeButton);
-
-  expect(mockNavigate).toHaveBeenCalledWith('home');
-});

@@ -201,6 +201,46 @@ test('Enforcer can find or create vehicle by plate', async () => {
   expect(response.body.data.findOrCreateVehicleByPlate.plate).toBe("ENF456")
 })
 
+test('Enforcer does not create duplicate vehicle if plate exists', async () => {
+  const token = await loginAs("enforcement")
+
+  const first = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: findOrCreateVehicleByPlateMutation,
+      variables: { plate: "DUPLICATE123" }
+    })
+
+  const vehicleId1 = first.body.data.findOrCreateVehicleByPlate.id
+
+  const second = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: findOrCreateVehicleByPlateMutation,
+      variables: { plate: "DUPLICATE123" }
+    })
+
+  const vehicleId2 = second.body.data.findOrCreateVehicleByPlate.id
+
+  expect(vehicleId1).toBe(vehicleId2)
+})
+
+test('Fails when plate input is missing', async () => {
+  const token = await loginAs("enforcement")
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: findOrCreateVehicleByPlateMutation,
+      variables: {}
+    })
+
+  expect(response.body.errors).toBeDefined()
+})
+
 test('Non-Driver cannot get a list of their vehicles', async () => {
   const token = await loginAs("admin")
   const response = await supertest(server)

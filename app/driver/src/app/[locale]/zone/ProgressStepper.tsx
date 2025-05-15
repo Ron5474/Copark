@@ -24,7 +24,7 @@ export default function CustomStepper({ steps, activeStep }: CustomStepperProps)
         alignItems: 'center',
         padding: theme.spacing(2),
         flexWrap: 'nowrap',
-        overflowX: 'auto',
+        // overflowX: 'auto',
         gap: theme.spacing(1),
       }}
     >

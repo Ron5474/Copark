@@ -14,7 +14,7 @@ import Topbar from "../shared/Topbar";
 import { getUser } from "../shared/actions";
 import { useRouter } from "@/i18n/navigation";
 import ViewVehicles from "../vehicle/member/Vehicle"
-import AddVehicle from "../vehicle/AddForm";
+// import AddVehicle from "../vehicle/AddForm";
 import { userLoginSignUpAttempt } from "./actions";
 // import BuyPermit from "../permit/View";
 import BuyPermit from "../zone/View";
@@ -55,9 +55,9 @@ function Dashboard() {
             {currentPage === "garage" && (
               <ViewVehicles />
             )}
-            {currentPage === "add-vehicle" && (
+            {/* {currentPage === "add-vehicle" && (
               <AddVehicle />
-            )}
+            )} */}
             {currentPage === 'buy-permit' && (
               <BuyPermit />
             )}

@@ -174,7 +174,7 @@ function MaxDuration() {
   }).format(endTime)
 
   setPrice(!overnight ? (totalMinutes * (zoneDetails?.hourly ?? 0) / 60) : 0)
-  const estimatedPriceString = `$${price.toFixed(2)}`
+  const estimatedPriceString = `$${(price ? price + 0.50 : 0).toFixed(2)}`
 
   return (
     <Box

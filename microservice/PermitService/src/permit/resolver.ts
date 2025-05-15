@@ -78,10 +78,10 @@ export class PermitResolver {
     @Arg("plate", () => String) plate: string,
     @Ctx() request: Request
   ): Promise<IsValidPolice> {
-    console.log('HELOOOOOOOOOO')
+    // console.log('HELOOOOOOOOOO')
     const userId = request.user?.id
     if (!userId) throw new Error('Unauthorized')
-    console.log('HELOOOOOOOOOO 2')
+    // console.log('HELOOOOOOOOOO 2')
     const vehicleQuery = `
       query FindVehicleByPlate($plate: String!) {
         findVehicleByPlate(plate: $plate) {

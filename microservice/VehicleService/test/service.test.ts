@@ -18,7 +18,7 @@ import { SignJWT } from 'jose'
 
 vi.mock('server-only', () => ({}))
 
-const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 // const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 beforeEach(() => {
@@ -156,6 +156,7 @@ test('getVehicleById - Returns null if Vehicle not found', async () => {
 
 test('getVehicleByUserId - Returns Empty Array if no vehicle not found', async () => {
   const vehicleService = new VehicleService();
+  // console.log('invalidDriverJWT', invalidDriverJWT)
   const vehicles = await vehicleService.getVehicleByUserId(invalidDriverJWT);
   expect(vehicles.length).toBe(0);
 });
@@ -163,6 +164,7 @@ test('getVehicleByUserId - Returns Empty Array if no vehicle not found', async (
 test('getVehicleByUserId - Returns Array of length 1', async () => {
   const vehicleService = new VehicleService();
   const resolvedValidDriverJWT = await validDriverJWT;
+  // console.log('resolvedValidDriverJWT', resolvedValidDriverJWT)
   const vehicles = await vehicleService.getVehicleByUserId(resolvedValidDriverJWT);
 
   // console.log('body !!!!' + vehicles)

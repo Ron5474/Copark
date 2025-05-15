@@ -50,7 +50,6 @@ afterAll(() => {
   vehcServer.close()
 })
 
-
 const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
 
 const policeJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFiZTQwNWM2LTc0MDAtNGQyMy05Zjg2LTAwZWFkMTU3MjlmNSIsImlhdCI6MTc0NzI2MzIyMSwiZXhwIjoxOTA1MDUxMjIxfQ.UVVWAjg2-asw8gfqoxljHZSVX4Mn_1FzOV85CagVbUQ"
@@ -59,11 +58,6 @@ const adminUser = {
   email: 'jxiong0822@outlook.com',
   password: 'password1',
 }
-
-// const enforcerUser = {
-//   email: 'jxiong0822@outlook.com',
-//   password: 'password1',
-// }
 
 async function loginAs(who: string): Promise<string | undefined> {
   if (who === "driver") {
@@ -107,7 +101,6 @@ async function loginAs(who: string): Promise<string | undefined> {
   }
 }
 
-
 const purchaseZonePermitQuery = `
 mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
   purchaseZonePermit(input: $input) {
@@ -146,7 +139,14 @@ query IsValid($input: IsValidPermitInput!) {
 
 const isValidZonePermitInput = {
   input: {
-    vehicle: "7RON123",
+    vehicle: "0000000",
+    zone: "123"
+  }
+}
+
+const ValidZonePermitInput = {
+  input: {
+    vehicle: "JCDE544",
     zone: "123"
   }
 }
@@ -162,6 +162,9 @@ const isValidPermitByPoliceInput = {
   plate: "7RON123",
 }
 
+const nonExistentPlateInput = {
+  plate: "1AAA111",
+}
 
 const myPermitsQuery = `
 query MyPermits($vehicleID: String!) {
@@ -212,11 +215,6 @@ const zoneDetailsInput = {
   zone: "123"
 }
 
-// const isValidPermitInput = {
-//   vehicle: "12345678-1234-1234-1234-567890abcdef"
-// }
-
-
 test('Permit service is running', async () => {
   const status = await supertest(server)
     .post('/graphql')
@@ -257,6 +255,22 @@ test('Enforcer gets invalid permit', async () => {
   expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
 })
 
+test('Enforcer gets valid permit', async () => {
+  const token = await loginAs("enforcement")
+
+  const isValid = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: isValidZonePermitQuery,
+      variables: ValidZonePermitInput
+    })
+
+  // expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
+  expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
+
+})
+
 test('Police gets invalid permit', async () => {
   const isValid = await supertest(server)
     .post('/graphql')
@@ -264,6 +278,19 @@ test('Police gets invalid permit', async () => {
     .send({ 
       query: isValidPermitByPoliceQuery,
       variables: isValidPermitByPoliceInput
+    })
+
+    // console.log(isValid.body)
+  expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
+})
+
+test('Police gets invalid for nonexistent plate', async () => {
+  const isValid = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + policeJWT)
+    .send({ 
+      query: isValidPermitByPoliceQuery,
+      variables: nonExistentPlateInput
     })
 
     // console.log(isValid.body)

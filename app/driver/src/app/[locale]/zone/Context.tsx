@@ -15,6 +15,10 @@ const ZoneContext = createContext<{
   setZoneNumber: React.Dispatch<React.SetStateAction<string>>
   zoneDetails: ZoneDetails | undefined
   setZoneDetails: React.Dispatch<React.SetStateAction<ZoneDetails | undefined>>
+  durationString: string
+  setDurationString: React.Dispatch<React.SetStateAction<string>>
+  price: number
+  setPrice: React.Dispatch<React.SetStateAction<number>>
   vehicle: Vehicle | undefined
   setVehicle: React.Dispatch<React.SetStateAction<Vehicle | undefined>>
   next: () => void
@@ -25,6 +29,10 @@ const ZoneContext = createContext<{
   setZoneNumber: () => {},
   zoneDetails: undefined,
   setZoneDetails: () => {},
+  durationString: '',
+  setDurationString: () => {},
+  price: 0.0,
+  setPrice: () => {},
   vehicle: undefined,
   setVehicle: () => {},
   next: () => {},
@@ -40,6 +48,8 @@ function ZoneProvider(props: ZoneProviderProps) {
   const [currentStep, setCurrentStep] = useState<string>('Zone')
   const [zoneNumber, setZoneNumber] = useState<string>('')
   const [zoneDetails, setZoneDetails] = useState<ZoneDetails|undefined>(undefined)
+  const [durationString, setDurationString] = useState<string>('')
+  const [price, setPrice] = useState<number>(0)
   const [vehicle, setVehicle] = useState<Vehicle|undefined>(undefined)
 
   const next = () => {
@@ -54,6 +64,8 @@ function ZoneProvider(props: ZoneProviderProps) {
     currentStep, setCurrentStep,
     zoneNumber, setZoneNumber,
     zoneDetails, setZoneDetails,
+    durationString, setDurationString,
+    price, setPrice,
     vehicle, setVehicle,
     next,
   }

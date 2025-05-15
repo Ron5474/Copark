@@ -21,8 +21,6 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
 
   const fetchUsers = async () => {
     const users = await getAPIUsers();
-
-    console.log(users);
     setApiUsers(users);
     setLoading(false);
   };
@@ -90,7 +88,7 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
           </Typography>
         ) : (
           <Box>
-            {apiUsers.map((user) => (
+            {apiUsers?.map((user) => (
               <Box
                 key={user.id}
                 sx={{

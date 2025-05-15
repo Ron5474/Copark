@@ -47,9 +47,6 @@ export const addAPIUser = async (organization: APICredential): Promise<APIUser |
   })
 
   const result = await response.json()
-
-  console.log('Add API User Result:', result) 
-
   return result.data?.addAPIUser
 }
 
@@ -77,9 +74,6 @@ export const getAPIUsers = async (): Promise<APIUser[]> => {
   });
 
   const result = await response.json();
-
-  console.log('Get API Users Result:', result) 
-
   return result.data?.getAPIUsers;
 };
 

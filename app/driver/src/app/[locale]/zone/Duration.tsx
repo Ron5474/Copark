@@ -195,10 +195,6 @@ function MaxDuration() {
       <Typography variant="h5" gutterBottom sx={{ mt: '1vh' }}>
         {`Estimated Price: ${estimatedPriceString}`}
       </Typography>
-
-      <Typography variant="subtitle2" sx={{ marginTop: '1vh', color: '#4b4b4b' }}>
-        Transaction fees and taxes may apply in later steps.
-      </Typography>
     </Box>
   )
 }

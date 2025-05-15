@@ -9,6 +9,7 @@
 import { Fragment, /*useEffect, useState,*/ useContext } from 'react'
 import {
   Box,
+  Divider,
   // Button,
   // Dialog,
   // DialogContent,
@@ -38,8 +39,8 @@ export default function Review() {
       <Box sx={{
           maxWidth: '92%',
           display: 'flex',
+          flexDirection: 'column',
           justifyContent: 'space-between',
-          alignItems: 'center',
           margin: 'auto',
           marginTop: '1vh',
         }}
@@ -47,14 +48,18 @@ export default function Review() {
         <Typography
           variant="h5"
           gutterBottom
+          fontWeight={600}
         >
           Review Order
         </Typography>
 
-        <Box>
+        <Divider sx={{ my: 2 }}/>
+
+        <Box >
           <Typography
             variant="body1"
             gutterBottom
+            fontWeight={600}
           >
             Zone
           </Typography>
@@ -72,10 +77,13 @@ export default function Review() {
           </Typography>
         </Box>
 
+        <Divider sx={{ my: 2 }}/>
+
         <Box>
           <Typography
             variant="body1"
             gutterBottom
+            fontWeight={600}
           >
             Duration
           </Typography>
@@ -87,10 +95,13 @@ export default function Review() {
           </Typography>
         </Box>
 
+        <Divider sx={{ my: 2 }}/>
+
         <Box>
           <Typography
             variant="body1"
             gutterBottom
+            fontWeight={600}
           >
             Vehicle
           </Typography>
@@ -102,7 +113,9 @@ export default function Review() {
           </Typography>
         </Box>
 
-        <Box>
+        <Divider sx={{ my: 2 }}/>
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography
             variant="body1"
             gutterBottom
@@ -117,7 +130,7 @@ export default function Review() {
           </Typography>
         </Box>
 
-        <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography
             variant="body1"
             gutterBottom
@@ -132,16 +145,19 @@ export default function Review() {
           </Typography>
         </Box>
 
-        <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography
-            variant="body1"
+            variant="h6"
             gutterBottom
+            fontWeight={600}
           >
             Order Total
           </Typography>
           <Typography
-            variant="body1"
+            variant="h6"
             gutterBottom
+            color="primary"
+            fontWeight={600}
           >
             {`$${(price + 0.5).toFixed(2)}`}
           </Typography>
@@ -149,7 +165,7 @@ export default function Review() {
 
         <Box>
           <Typography
-            variant="subtitle1"
+            variant="subtitle2"
             gutterBottom
             color="gray"
           >

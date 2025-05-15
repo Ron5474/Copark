@@ -10,7 +10,7 @@ import { render, screen, cleanup } from '@testing-library/react'
 import '../setup'
 
 // import MemberView from '../../src/app/[locale]/zone/View'
-import Payment from '../../src/app/[locale]/zone/Payment'
+import Review from '../../src/app/[locale]/zone/Review'
 // import { ZoneContext } from '../../src/app/[locale]/zone/Context'
 
 
@@ -144,6 +144,6 @@ afterEach(() => {
 
 
 it('Renders Payment', async () => {
-  render(<Payment />)
-  expect(await screen.findByText('Which Payment Method?')).toBeDefined()
+  render(<Review />)
+  expect(await screen.findByText('Review Order')).toBeDefined()
 })

@@ -8,7 +8,8 @@ dotenv.config({ path: resolve(__dirname, '../../../../../.env') });
 export class PaymentService {
   async payment(
     item: string,
-    id?: string
+    locale: string,
+    id?: string,
   ): Promise<string|null> {
     if (!id) {
       throw new Error("User ID is required");
@@ -24,8 +25,8 @@ export class PaymentService {
         }
       ],
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL}/driver`,
-      cancel_url: `${process.env.FRONTEND_URL}/driver`,
+      success_url: `${process.env.FRONTEND_URL}/${locale}/payment-confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}/${locale}`,
     });
     // console.log("session", session);
     return session.url;

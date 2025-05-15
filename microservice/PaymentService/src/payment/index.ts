@@ -5,7 +5,8 @@ export interface SessionUser {
 }
 
 export interface Checkout {
-  item: string
+  item: string,
+  locale: string
 }
 
 export interface User {

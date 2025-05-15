@@ -1,5 +1,6 @@
 'use server';
 
+import { getLocale } from "next-intl/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -33,6 +34,7 @@ export async function testPay() {
       Authorization: `Bearer ${authCookie?.value}`,
     },body: JSON.stringify({
       item: "dailyPass",
+      locale: await getLocale()
     }),
   })
   

@@ -5,7 +5,6 @@ import Page from '../../src/app/page';
 import ManageEnforcement from '../../src/app/components/ManageEnforcement';
 import { getEnforcers, addEnforcer, suspendUser, reinstateUser, deleteUser } from '../../src/enforcement/actions';
 
-
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
   redirect: vi.fn(),
@@ -126,7 +125,6 @@ it('handles adding a new enforcer', async () => {
 
   render(<ManageEnforcement onNavigate={() => { }} />);
 
-  
   fireEvent.click(screen.getByText('Add Enforcer'));
 
   await waitFor(() => {
@@ -139,7 +137,7 @@ it('handles adding a new enforcer', async () => {
     fireEvent.change(nameInput!, { target: { value: 'New Enforcer' } });
     fireEvent.change(emailInput!, { target: { value: 'new@example.com' } });
   });
-  
+
   fireEvent.click(screen.getByText('Add'));
 
   await waitFor(() => {
@@ -147,7 +145,7 @@ it('handles adding a new enforcer', async () => {
       name: 'New Enforcer',
       email: 'new@example.com'
     });
-    expect(getEnforcers).toHaveBeenCalledTimes(2); 
+    expect(getEnforcers).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -167,7 +165,7 @@ it('handles suspending an enforcer', async () => {
 
   await waitFor(() => {
     expect(suspendUser).toHaveBeenCalledWith('1');
-    expect(getEnforcers).toHaveBeenCalledTimes(2); 
+    expect(getEnforcers).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -186,65 +184,34 @@ it('displays correct icon based on enforcer status', async () => {
 it('closes add enforcer dialog when clicking cancel', async () => {
   render(<ManageEnforcement onNavigate={() => { }} />);
 
-  
   const addButton = screen.getByText('Add Enforcer');
   fireEvent.click(addButton);
 
-  
   expect(screen.getByRole('dialog')).toBeDefined();
 
-  
   const cancelButton = screen.getByText('Cancel');
   fireEvent.click(cancelButton);
 
-  
   await waitFor(() => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 it('handles reinstating a suspended enforcer', async () => {
-  
   (reinstateUser as Mock).mockResolvedValue(mockEnforcers.map(e =>
     e.id === '2' ? { ...e, accountStatus: 'active' } : e
   ));
 
   render(<ManageEnforcement onNavigate={() => { }} />);
 
-  
   await waitFor(() => {
     expect(screen.getByText('Test Enforcer 2')).toBeDefined();
   });
 
-  
   const restoreButton = screen.getByRole('button', { name: 'Restore user' });
 
-  
   fireEvent.click(restoreButton);
 
-  
   await waitFor(() => {
     expect(reinstateUser).toHaveBeenCalledWith('2');
     expect(getEnforcers).toHaveBeenCalledTimes(2);
@@ -252,24 +219,41 @@ it('handles reinstating a suspended enforcer', async () => {
 });
 
 it('deletes an enforcer and removes them from display', async () => {
-  
+
   (getEnforcers as Mock).mockResolvedValueOnce(mockEnforcers)
     .mockResolvedValueOnce(mockEnforcers.filter(e => e.id !== '1'));
 
   render(<ManageEnforcement onNavigate={() => { }} />);
 
-  
+
   await waitFor(() => {
     expect(screen.getByText('Test Enforcer')).toBeDefined();
   });
 
-  
   const deleteButtons = screen.getAllByLabelText('Delete user');
   fireEvent.click(deleteButtons[0]);
 
-  
   await waitFor(() => {
     expect(deleteUser).toHaveBeenCalledWith('1');
     expect(screen.queryByText('Test Enforcer')).toBeNull();
   });
 });
+
+it('closes the dialog when clicking the backdrop', async () => {
+  render(<ManageEnforcement onNavigate={() => { }} />);
+
+  fireEvent.click(screen.getByText('Add Enforcer'));
+
+  expect(screen.getByRole('dialog')).toBeDefined();
+
+  const backdrop = document.querySelector('[class*="MuiBackdrop-root"]');
+  expect(backdrop).toBeDefined();
+
+  fireEvent.mouseDown(backdrop!); 
+  fireEvent.click(backdrop!);     
+
+  await waitFor(() => {
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+});
+

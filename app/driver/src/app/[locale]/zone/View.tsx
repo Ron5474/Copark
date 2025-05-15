@@ -18,7 +18,7 @@ import Zone from './Zone'
 import Duration from './Duration'
 import MemberVehicles from '../vehicle/member/Vehicle'
 import Payment from './Payment'
-import Footer from '../shared/Footer'
+// import Footer from '../shared/Footer'
 import theme from '../theme'
 
 
@@ -26,17 +26,23 @@ const View: NextPage = () => {
   return (
     <Fragment>
       <CssBaseline />
-      <TopBar />
-      <Box sx={{ /*width: '92%',*/ margin: 'auto' }}>
-        <ThemeProvider theme={theme}>
-          <ZoneProvider>
-            <ZoneView />
-          </ZoneProvider>
-        </ThemeProvider>
-      </Box>
-      <Box sx={{ position: 'fixed', bottom: 0, width: '100%' }}>
-        <Footer />
-      </Box>
+      {/* <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          // minHeight: '100vh',
+        }}
+      > */}
+        <TopBar />
+        <Box sx={{ /*width: '92%',*/ margin: 'auto', top: 0 }}>
+          <ThemeProvider theme={theme}>
+            <ZoneProvider>
+              <ZoneView />
+            </ZoneProvider>
+          </ThemeProvider>
+        </Box>
+        {/* <Footer /> */}
+      {/* </Box> */}
     </Fragment>
   )
 }

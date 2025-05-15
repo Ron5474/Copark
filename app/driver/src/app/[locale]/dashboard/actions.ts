@@ -38,6 +38,7 @@ export async function testPay() {
   
   const data = await res.json();
   if (data.url) {
+    console.log(data.url);
     redirect(data.url);
   }
   

@@ -15,6 +15,4 @@ export function expressAuthentication(
   // console.log("reqheader auth:" + request.headers.authorization); 
   // console.log("scopes:" + scopes);
   return new AuthService().check(request.headers.authorization, scopes)
-      console.log("Creating payment session for item:");
-
 }

@@ -58,6 +58,6 @@
       "src"
     ],
     "ext": "ts",
-    "exec": "ts-node ./server/server.ts"
+    "exec": "ts-node ./src/server.ts"
   }
 }

@@ -19,7 +19,7 @@ export class PaymentService {
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
-          price: "price_1ROYFeLROD4QlApS03E7vgcT",
+          price: "price_1ROseAPvo0ngnUaGKlARst9I",
           quantity: 1,
         }
       ],
@@ -27,7 +27,7 @@ export class PaymentService {
       success_url: `${process.env.FRONTEND_URL}/driver`,
       cancel_url: `${process.env.FRONTEND_URL}/driver`,
     });
-    console.log("session", session);
+    // console.log("session", session);
     return session.url;
   } 
 

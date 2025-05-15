@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Paper, Typography, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, useTheme } from '@mui/material';
+import {
+  Box,
+  Button,
+  Typography,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  useTheme
+} from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GavelIcon from '@mui/icons-material/Gavel';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
-import HomeIcon from '@mui/icons-material/Home';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { getEnforcers, addEnforcer, suspendUser, reinstateUser, deleteUser } from '../../enforcement/actions';
 
@@ -32,43 +42,43 @@ export default function ManageEnforcement({ onNavigate }) {
     } else {
       await suspendUser(enforcerId);
     }
-    fetchEnforcers(); // Refresh the list after status change
+    fetchEnforcers();
   };
 
   const handleDeleteUser = async (enforcerId) => {
     await deleteUser(enforcerId);
-    fetchEnforcers(); // Refresh the list after deletion
+    fetchEnforcers();
   };
 
   const handleAddEnforcer = async () => {
     await addEnforcer(newEnforcer);
     setOpenAddDialog(false);
-    setNewEnforcer({
-      name: '',
-      email: ''
-    });
+    setNewEnforcer({ name: '', email: '' });
     fetchEnforcers();
   };
 
   return (
-    <Box sx={{ 
-      p: 4,
-      bgcolor: '#ffffff'
-    }}>
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        mb: 4,
-        borderBottom: `2px solid ${theme.palette.primary.main}`,
-        pb: 2
-      }}>
-        <img src="/admin/assets/logo-notitle.png" alt="CoPark Admin" style={{ height: 60, marginRight: 16 }} />
-        <Typography 
-          variant="h4" 
-          sx={{ 
+    <Box sx={{ p: 4, bgcolor: '#ffffff' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mb: 4,
+          borderBottom: `2px solid ${theme.palette.primary.main}`,
+          pb: 2
+        }}
+      >
+        <img
+          src="/admin/assets/logo-notitle.png"
+          alt="CoPark Admin"
+          style={{ height: 60, marginRight: 16 }}
+        />
+        <Typography
+          variant="h4"
+          sx={{
             color: theme.palette.primary.main,
             fontWeight: 700,
-            fontSize: "32px"
+            fontSize: '32px'
           }}
         >
           Manage Enforcers
@@ -90,18 +100,19 @@ export default function ManageEnforcement({ onNavigate }) {
         </Button>
       </Box>
 
-      <Box 
+      <Box
         data-testid="enforcers-list"
-        sx={{ 
-          p: 3, 
-          background: '#ffffff', 
-          maxWidth: 900, 
+        sx={{
+          p: 3,
+          background: '#ffffff',
+          maxWidth: 900,
           mx: 'auto',
           boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
           borderRadius: '15px'
         }}
       >
-        {<p>Enforcer Count: {enforcers.length}</p>}
+        <Typography sx={{ mb: 2 }}>Enforcer Count: {enforcers.length}</Typography>
+
         {enforcers.map((enforcer) => (
           <Box
             key={enforcer.id}
@@ -123,18 +134,23 @@ export default function ManageEnforcement({ onNavigate }) {
             }}
           >
             <Box>
-              <Typography sx={{ 
-                fontSize: "20px",
-                fontWeight: 500,
-                color: theme.palette.primary.dark
-              }}>
+              <Typography
+                sx={{
+                  fontSize: '20px',
+                  fontWeight: 500,
+                  color: theme.palette.primary.dark
+                }}
+              >
                 {enforcer.name}
               </Typography>
               <Typography
                 sx={{
-                  fontSize: "14px",
+                  fontSize: '14px',
                   fontWeight: 500,
-                  color: enforcer.accountStatus === 'suspended' ? theme.palette.secondary.main : theme.palette.primary.main,
+                  color:
+                    enforcer.accountStatus === 'suspended'
+                      ? theme.palette.secondary.main
+                      : theme.palette.primary.main,
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}
@@ -142,49 +158,60 @@ export default function ManageEnforcement({ onNavigate }) {
                 {enforcer.accountStatus}
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <IconButton
-                onClick={() => handleUserStatus(enforcer.id, enforcer.accountStatus)}
-                sx={{
-                  // Same light background for both states
-                  bgcolor: `${theme.palette.primary.main} + 20`,
-                  color: theme.palette.primary.main,
-                  '&:hover': {
-                    bgcolor: theme.palette.primary.main,
-                    color: '#ffffff'
+
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              {/* Suspend / Restore */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography variant="caption" sx={{ fontWeight: 500, mb: 0.5 }}>
+                  {enforcer.accountStatus === 'suspended' ? 'Restore' : 'Suspend'}
+                </Typography>
+                <IconButton
+                  onClick={() => handleUserStatus(enforcer.id, enforcer.accountStatus)}
+                  sx={{
+                    bgcolor: `${theme.palette.primary.main}20`,
+                    color: theme.palette.primary.main,
+                    '&:hover': {
+                      bgcolor: theme.palette.primary.main,
+                      color: '#ffffff'
+                    }
+                  }}
+                  aria-label={
+                    enforcer.accountStatus === 'suspended' ? 'Restore user' : 'Suspend user'
                   }
-                }}
-                aria-label={enforcer.accountStatus === 'suspended' ? 'Restore user' : 'Suspend user'}
-              >
-                {enforcer.accountStatus === 'suspended' ? (
-                  <RestoreIcon />
-                ) : (
-                  <GavelIcon />
-                )}
-              </IconButton>
-              <IconButton
-                onClick={() => handleDeleteUser(enforcer.id)}
-                sx={{
-                  bgcolor: theme.palette.secondary.main + '20',
-                  color: theme.palette.secondary.main,
-                  '&:hover': {
-                    bgcolor: theme.palette.secondary.main,
-                    color: '#ffffff'
-                  }
-                }}
-                aria-label="Delete user"
-                disabled={enforcer.accountStatus === 'deleted'}
-              >
-                <PersonOffIcon />
-              </IconButton>
+                >
+                  {enforcer.accountStatus === 'suspended' ? <RestoreIcon /> : <GavelIcon />}
+                </IconButton>
+              </Box>
+
+              {/* Delete */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography variant="caption" sx={{ fontWeight: 500, mb: 0.5 }}>
+                  Delete
+                </Typography>
+                <IconButton
+                  onClick={() => handleDeleteUser(enforcer.id)}
+                  sx={{
+                    bgcolor: `${theme.palette.secondary.main}20`,
+                    color: theme.palette.secondary.main,
+                    '&:hover': {
+                      bgcolor: theme.palette.secondary.main,
+                      color: '#ffffff'
+                    }
+                  }}
+                  aria-label="Delete user"
+                  disabled={enforcer.accountStatus === 'deleted'}
+                >
+                  <PersonOffIcon />
+                </IconButton>
+              </Box>
             </Box>
           </Box>
         ))}
       </Box>
 
-      {/* Add Enforcer Dialog - Updated styles */}
-      <Dialog 
-        open={openAddDialog} 
+      {/* Add Enforcer Dialog */}
+      <Dialog
+        open={openAddDialog}
         onClose={() => setOpenAddDialog(false)}
         PaperProps={{
           sx: {
@@ -193,10 +220,7 @@ export default function ManageEnforcement({ onNavigate }) {
           }
         }}
       >
-        <DialogTitle sx={{ 
-          color: theme.palette.primary.main,
-          fontWeight: 700 
-        }}>
+        <DialogTitle sx={{ color: theme.palette.primary.main, fontWeight: 700 }}>
           Add New Enforcer
         </DialogTitle>
         <DialogContent>
@@ -221,13 +245,10 @@ export default function ManageEnforcement({ onNavigate }) {
           />
         </DialogContent>
         <DialogActions>
-          <Button 
-            onClick={() => setOpenAddDialog(false)}
-            sx={{ color: theme.palette.secondary.main }}
-          >
+          <Button onClick={() => setOpenAddDialog(false)} sx={{ color: theme.palette.secondary.main }}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleAddEnforcer}
             sx={{
               bgcolor: theme.palette.primary.main,

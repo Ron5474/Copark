@@ -498,7 +498,7 @@ const getMyTicketquery = `
   `
 
 
-test('Registrar check student with no ticket successful', async () => {
+test('Student can check their tickets successful', async () => {
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + ronakDriverToken)

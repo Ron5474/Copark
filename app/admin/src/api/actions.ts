@@ -1,4 +1,5 @@
 'use server'
+import { User } from '@/types'
 import { cookies } from 'next/headers'
 
 export interface APICredential {
@@ -12,6 +13,7 @@ export interface APIUser {
   name: string
   email: string
   role: string
+  accountStatus: string
 }
 
 const API_URL = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:4000/graphql'
@@ -35,9 +37,6 @@ export const addAPIUser = async (organization: APICredential): Promise<APIUser |
         mutation AddAPIUser($organization: APICredential!) {
           addAPIUser(organization: $organization) {
             id
-            name
-            email
-            role
           }
         }
       `,
@@ -48,6 +47,9 @@ export const addAPIUser = async (organization: APICredential): Promise<APIUser |
   })
 
   const result = await response.json()
+
+  console.log('Add API User Result:', result) 
+
   return result.data?.addAPIUser
 }
 
@@ -67,6 +69,7 @@ export const getAPIUsers = async (): Promise<APIUser[]> => {
             name
             email
             role
+            accountStatus
           }
         }
       `,
@@ -74,5 +77,39 @@ export const getAPIUsers = async (): Promise<APIUser[]> => {
   });
 
   const result = await response.json();
+
+  console.log('Get API Users Result:', result) 
+
   return result.data?.getAPIUsers;
+};
+
+export const suspendAPIUser = async (id: string): Promise<User[]> => {
+  const token = await getAuthToken();
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query: `
+          mutation SuspendUser($user: UserInput!) {
+            suspendUser(user: $user) {
+              id
+              name
+              email
+              accountStatus
+            }
+          }
+        `,
+      variables: {
+        user: {
+          id
+        },
+      },
+    }),
+  });
+
+  const result = await response.json();
+  return result.data.suspendUser;
 };

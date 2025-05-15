@@ -1,59 +1,53 @@
-'use client'
-
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
   Paper,
   Typography,
+  IconButton,
   useTheme,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow
-} from '@mui/material'
-import PersonAddIcon from '@mui/icons-material/PersonAdd'
-import AddAPIUser from './AddAPIUser'
-import { getAPIUsers, APIUser } from '@/api/actions'
+} from '@mui/material';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import GavelIcon from '@mui/icons-material/Gavel';
+import AddAPIUser from './AddAPIUser'; // Assuming this component exists in the same directory
+import { getAPIUsers, suspendAPIUser, APIUser } from '@/api/actions'; // Using existing actions
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: string) => void }) {
-  const theme = useTheme()
-  const [openAddDialog, setOpenAddDialog] = useState(false)
-  const [apiUsers, setApiUsers] = useState<APIUser[]>([])
-  const [loading, setLoading] = useState(true)
+  const theme = useTheme();
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [apiUsers, setApiUsers] = useState<APIUser[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchUsers = async () => {
-    const users = await getAPIUsers()
-    setApiUsers(users)
-    setLoading(false)
-  }
+    const users = await getAPIUsers();
+
+    console.log(users);
+    setApiUsers(users);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    fetchUsers()
-  }, [])
+    fetchUsers();
+  }, []);
 
   return (
-    <Box sx={{
-      p: 4,
-      bgcolor: '#ffffff'
-    }}>
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        mb: 4,
-        borderBottom: `2px solid ${theme.palette.primary.main}`,
-        pb: 2
-      }}>
+    <Box sx={{ p: 4, bgcolor: '#ffffff' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mb: 4,
+          borderBottom: `2px solid ${theme.palette.primary.main}`,
+          pb: 2,
+        }}
+      >
         <img src="/admin/assets/logo-notitle.png" alt="CoPark Admin" style={{ height: 60, marginRight: 16 }} />
         <Typography
           variant="h4"
           sx={{
             color: theme.palette.primary.main,
             fontWeight: 700,
-            fontSize: "32px"
+            fontSize: '32px',
           }}
         >
           Manage API Users
@@ -67,22 +61,24 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
             bgcolor: theme.palette.primary.main,
             color: '#ffffff',
             '&:hover': {
-              bgcolor: theme.palette.primary.dark
-            }
+              bgcolor: theme.palette.primary.dark,
+            },
           }}
         >
           Add API User
         </Button>
       </Box>
 
-      <Paper sx={{
-        p: 3,
-        background: '#ffffff',
-        maxWidth: 900,
-        mx: 'auto',
-        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
-        borderRadius: '15px'
-      }}>
+      <Paper
+        sx={{
+          p: 3,
+          background: '#ffffff',
+          maxWidth: 900,
+          mx: 'auto',
+          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
+          borderRadius: '15px',
+        }}
+      >
         {loading ? (
           <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>
             Loading...
@@ -92,45 +88,83 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
             No API users found
           </Typography>
         ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Role</TableCell>
-                  {/* <TableCell>API Key</TableCell> */}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {apiUsers?.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    {/* <TableCell>
-                      <Typography 
-                        sx={{ 
-                          fontFamily: 'monospace',
-                          fontSize: '0.875rem'
-                        }}
-                      >
-                        {user.id}
-                      </Typography>
-                    </TableCell> */}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <Box>
+            {apiUsers.map((user) => (
+              <Box
+                key={user.id}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  bgcolor: '#D9F1E4',
+                  border: `1px solid ${theme.palette.primary.light}20`,
+                  p: 3,
+                  mb: 2,
+                  borderRadius: '15px',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                  },
+                }}
+              >
+                <Box>
+                  <Typography sx={{ fontSize: '20px', fontWeight: 500 }}>
+                    {user.name}
+                  </Typography>
+                  <Typography sx={{ fontSize: '14px', fontWeight: 500, color: theme.palette.text.secondary }}>
+                    {user.email} – {user.role}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: user.accountStatus === 'suspended' ? theme.palette.secondary.main : theme.palette.primary.main,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}
+                  >
+                    {user.accountStatus}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {/* Suspend User */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 500, mb: 0.5 }}>
+                      Suspend
+                    </Typography>
+                    <IconButton
+                      onClick={async () => {
+                        await suspendAPIUser(user.id);
+                        fetchUsers();
+                      }}
+                      sx={{
+                        bgcolor: `${theme.palette.primary.main}20`,
+                        color: theme.palette.primary.main,
+                        '&:hover': {
+                          bgcolor: theme.palette.primary.main,
+                          color: '#ffffff',
+                        },
+                      }}
+                      aria-label="Suspend user"
+                    >
+                      <GavelIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+              </Box>
+            ))}
+          </Box>
         )}
       </Paper>
 
+      {/* Add API User Dialog */}
       <AddAPIUser
         open={openAddDialog}
         onClose={() => setOpenAddDialog(false)}
-        onUserAdded={fetchUsers}  // Add this prop
+        onUserAdded={fetchUsers}  // After adding a new user, refresh the user list
       />
     </Box>
-  )
+  );
 }

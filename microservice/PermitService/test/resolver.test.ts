@@ -266,7 +266,7 @@ test('Police gets invalid permit', async () => {
       variables: isValidPermitByPoliceInput
     })
 
-    console.log(isValid.body)
+    // console.log(isValid.body)
   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
 })
 

@@ -8,7 +8,8 @@ export default defineConfig({
       exclude: [
         'build/**',
         'eslint.config.mjs',
-        'vitest.config.ts'
+        'vitest.config.ts',
+        '**/index.d.ts'
     ],
     },
   },

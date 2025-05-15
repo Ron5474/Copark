@@ -179,7 +179,7 @@ export class AdminService {
         name: row.name,
         email: row.email,
         role: row.role,
-        accountStatus: row.accountStatus
+        accountStatus: row.accountstatus
       });
     }
 

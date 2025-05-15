@@ -40,6 +40,7 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
           pb: 2,
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */ }
         <img src="/admin/assets/logo-notitle.png" alt="CoPark Admin" style={{ height: 60, marginRight: 16 }} />
         <Typography
           variant="h4"

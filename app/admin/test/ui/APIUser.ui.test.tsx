@@ -128,7 +128,8 @@ beforeEach(() => {
       id: '1', 
       name: 'Test Org', 
       email: 'test@org.com', 
-      role: 'api_user' 
+      role: 'registrar', 
+      accountStatus: 'active', 
     }
   ])
 })

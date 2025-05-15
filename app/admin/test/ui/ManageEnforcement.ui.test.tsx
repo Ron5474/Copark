@@ -5,7 +5,7 @@ import Page from '../../src/app/page';
 import ManageEnforcement from '../../src/app/components/ManageEnforcement';
 import { getEnforcers, addEnforcer, suspendUser, reinstateUser, deleteUser } from '../../src/enforcement/actions';
 
-// Mock Next.js navigation and cookies
+
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
   redirect: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock('next/headers', () => ({
   })
 }));
 
-// Mock enforcement actions
+
 vi.mock('../../src/enforcement/actions', () => ({
   getEnforcers: vi.fn(),
   addEnforcer: vi.fn(),
@@ -126,19 +126,20 @@ it('handles adding a new enforcer', async () => {
 
   render(<ManageEnforcement onNavigate={() => { }} />);
 
-  // Open dialog
+  
   fireEvent.click(screen.getByText('Add Enforcer'));
 
-  const nameWrapper = screen.getByLabelText('Input Name');
-  const nameInput = nameWrapper.querySelector('input');
+  await waitFor(() => {
+    const nameWrapper = screen.getByLabelText('Input Name');
+    const nameInput = nameWrapper.querySelector('input');
 
-  const emailWrapper = screen.getByLabelText('Input Email');
-  const emailInput = emailWrapper.querySelector('input');
+    const emailWrapper = screen.getByLabelText('Input Email');
+    const emailInput = emailWrapper.querySelector('input');
 
-  fireEvent.change(nameInput!, { target: { value: 'New Enforcer' } });
-  fireEvent.change(emailInput!, { target: { value: 'new@example.com' } });
-
-  // Submit form
+    fireEvent.change(nameInput!, { target: { value: 'New Enforcer' } });
+    fireEvent.change(emailInput!, { target: { value: 'new@example.com' } });
+  });
+  
   fireEvent.click(screen.getByText('Add'));
 
   await waitFor(() => {
@@ -146,7 +147,7 @@ it('handles adding a new enforcer', async () => {
       name: 'New Enforcer',
       email: 'new@example.com'
     });
-    expect(getEnforcers).toHaveBeenCalledTimes(2); // Initial + after add
+    expect(getEnforcers).toHaveBeenCalledTimes(2); 
   });
 });
 
@@ -166,7 +167,7 @@ it('handles suspending an enforcer', async () => {
 
   await waitFor(() => {
     expect(suspendUser).toHaveBeenCalledWith('1');
-    expect(getEnforcers).toHaveBeenCalledTimes(2); // Initial + after suspend
+    expect(getEnforcers).toHaveBeenCalledTimes(2); 
   });
 });
 
@@ -185,65 +186,65 @@ it('displays correct icon based on enforcer status', async () => {
 it('closes add enforcer dialog when clicking cancel', async () => {
   render(<ManageEnforcement onNavigate={() => { }} />);
 
-  // Open dialog
+  
   const addButton = screen.getByText('Add Enforcer');
   fireEvent.click(addButton);
 
-  // Verify dialog is open
+  
   expect(screen.getByRole('dialog')).toBeDefined();
 
-  // Click cancel button
+  
   const cancelButton = screen.getByText('Cancel');
   fireEvent.click(cancelButton);
 
-  // Verify dialog is closed
+  
   await waitFor(() => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 });
 
-// it('closes add enforcer dialog when clicking outside', async () => {
-//   render(<ManageEnforcement onNavigate={() => {}} />);
 
-//   // Open dialog
-//   const addButton = screen.getByText('Add Enforcer');
-//   fireEvent.click(addButton);
 
-//   // Verify dialog is open
-//   expect(screen.getByRole('dialog')).toBeDefined();
 
-//   // Click the backdrop to simulate clicking outside
-//   await waitFor(() => {
-//     const backdrop = screen.getByTestId('dialog-backdrop');
-//     fireEvent.click(backdrop);
-//   })
 
-//   // Verify dialog is closed
-//   await waitFor(() => {
-//     expect(screen.queryByRole('dialog')).toBeNull();
-//   });
-// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 it('handles reinstating a suspended enforcer', async () => {
-  // Mock the reinstate response
+  
   (reinstateUser as Mock).mockResolvedValue(mockEnforcers.map(e =>
     e.id === '2' ? { ...e, accountStatus: 'active' } : e
   ));
 
   render(<ManageEnforcement onNavigate={() => { }} />);
 
-  // Wait for component to load
+  
   await waitFor(() => {
     expect(screen.getByText('Test Enforcer 2')).toBeDefined();
   });
 
-  // Find the restore button using aria-label
+  
   const restoreButton = screen.getByRole('button', { name: 'Restore user' });
 
-  // Click the restore button
+  
   fireEvent.click(restoreButton);
 
-  // Verify the reinstate action was called with correct ID
+  
   await waitFor(() => {
     expect(reinstateUser).toHaveBeenCalledWith('2');
     expect(getEnforcers).toHaveBeenCalledTimes(2);
@@ -251,22 +252,22 @@ it('handles reinstating a suspended enforcer', async () => {
 });
 
 it('deletes an enforcer and removes them from display', async () => {
-  // Mock initial state and after deletion state
+  
   (getEnforcers as Mock).mockResolvedValueOnce(mockEnforcers)
     .mockResolvedValueOnce(mockEnforcers.filter(e => e.id !== '1'));
 
   render(<ManageEnforcement onNavigate={() => { }} />);
 
-  // Wait for initial load and verify Test Enforcer exists
+  
   await waitFor(() => {
     expect(screen.getByText('Test Enforcer')).toBeDefined();
   });
 
-  // Get all delete buttons and click the first one
+  
   const deleteButtons = screen.getAllByLabelText('Delete user');
   fireEvent.click(deleteButtons[0]);
 
-  // Verify deletion and UI update
+  
   await waitFor(() => {
     expect(deleteUser).toHaveBeenCalledWith('1');
     expect(screen.queryByText('Test Enforcer')).toBeNull();

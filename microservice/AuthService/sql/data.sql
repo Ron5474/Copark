@@ -28,6 +28,17 @@ VALUES (
   )
 );
 
+
+INSERT INTO account(id, data)
+VALUES (
+  'e5c592ed-2a4a-45b9-9802-c70c6914c6fd',
+  jsonb_build_object(
+    'name', 'UCSD Registrar',
+    'email', 'registrar@ucsc.edu',
+    'role', '["registrar"]'
+  )
+);
+
 INSERT INTO account(id, data)
 VALUES (
   'abe405c6-7400-4d23-9f86-00ead15729f5',
@@ -46,6 +57,19 @@ VALUES (
     'email', 'roapatel@ucsc.edu',
     'picture' , 'https://www.google.com/img',
     'sub', '12345678',
+    'role', '["driver"]',
+    'accountStatus', 'active'
+  )
+);
+
+INSERT INTO account(id, data)
+VALUES (
+  '4c0d7053-7bab-4494-8d42-d7384d983809',
+  jsonb_build_object(
+    'name', 'Bryant Oliver',
+    'email', 'bcoliver@ucsc.edu',
+    'picture' , 'https://www.google.com/img',
+    'sub', '12345679',
     'role', '["driver"]',
     'accountStatus', 'active'
   )

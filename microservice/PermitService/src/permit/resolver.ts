@@ -25,7 +25,7 @@ export class PermitResolver {
   @Mutation(() => Confirmation)
   async purchaseZonePermit(
     @Arg("input", () => PurchaseZoneInput) input: PurchaseZoneInput,
-    @Ctx() request: Request
+    // @Ctx() request: Request
   ): Promise<Confirmation> {
     // const userId = request.user?.id
     // if (!userId) throw new Error('Unauthorized')
@@ -117,7 +117,7 @@ export class PermitResolver {
   @Query(() => MyPermits)
   async myPermits(
     @Arg("vehicleID", () => String) vehicleID: string,
-    @Ctx() request: Request
+    // @Ctx() request: Request
   ): Promise<MyPermits> {
     // const userId = request.user?.id
     // if (!userId) throw new Error('Unauthorized')
@@ -129,7 +129,7 @@ export class PermitResolver {
   @Query(() => ZoneDetails)
   async zoneDetails(
     @Arg("zone", () => String) zone: string,
-    @Ctx() request: Request
+    // @Ctx() request: Request
   ): Promise<ZoneDetails> {
     // const userId = request.user?.id
     // if (!userId) throw new Error('Unauthorized')

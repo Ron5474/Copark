@@ -54,7 +54,7 @@
       "build-campusPolice": "cd api/campusPolice && npm run build",
       "build-payroll": "cd api/payroll && npm run build",
       "build-registrar": "cd api/registrar && npm run build",
-      "start": "concurrently --kill-others \"npm run start-auth\" \"npm run start-adminService\" \"npm run start-vehicleService\" \"npm run start-ticketService\" \"npm run start-permitService\" \"npm run start-permitService\" \"npm run start-campusPolice\" \"npm run start-payroll\" \"npm run start-registrar\" \"npm run start-admin\" \"npm run start-enforcement\" \"npm run start-driver\" \"npm run start-marketing\" \"npm run start-helloworld\"",
+      "start": "concurrently --kill-others \"npm run start-auth\" \"npm run start-adminService\" \"npm run start-vehicleService\" \"npm run start-ticketService\" \"npm run start-paymentService\" \"npm run start-permitService\" \"npm run start-campusPolice\" \"npm run start-payroll\" \"npm run start-registrar\" \"npm run start-admin\" \"npm run start-enforcement\" \"npm run start-driver\" \"npm run start-marketing\" \"npm run start-helloworld\"",
       "start-auth": "cd microservice/AuthService && npm start",
       "start-adminService": "cd microservice/AdminService && npm start",
       "start-vehicleService": "cd microservice/VehicleService && npm start",

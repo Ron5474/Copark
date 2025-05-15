@@ -1,5 +1,10 @@
-import Stripe from "stripe";
 
+// import * as db from "./db";
+import Stripe from "stripe";
+import dotenv from 'dotenv'
+import { resolve } from 'path'
+
+dotenv.config({ path: resolve(__dirname, '../../../../../.env') });
 export class PaymentService {
   async payment(
     item: string,
@@ -8,10 +13,10 @@ export class PaymentService {
     if (!id) {
       throw new Error("User ID is required");
     }
+    console.log(process.env.FRONTEND_URL);
     const stripe = new Stripe(process.env.STRIPE_SECRET as string);
     if (item == "dailyPass") {
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card", "paypal", "amazon_pay"],
       line_items: [
         {
           price: "price_1ROYFeLROD4QlApS03E7vgcT",
@@ -19,9 +24,10 @@ export class PaymentService {
         }
       ],
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL}/success`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+      success_url: `${process.env.FRONTEND_URL}/driver`,
+      cancel_url: `${process.env.FRONTEND_URL}/driver`,
     });
+    console.log("session", session);
     return session.url;
   } 
 

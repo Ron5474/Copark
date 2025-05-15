@@ -15,7 +15,6 @@ export class AuthService {
     }
 
     try {
-      console.log("Creating payment session for item:");
       const user = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
         method: 'GET',
         headers: {
@@ -23,10 +22,16 @@ export class AuthService {
           'Content-Type': 'application/json',
         }
       })
+      const userData = await user.json();
+      if (!userData) {
+        throw new Error("Unauthorized");
+      }
 
-      console.log("User data:", await user.json());
-      console.log(scopes);
-      return {id: 'aaaaaa'}
+      if (scopes && !scopes.includes(userData.role[0])) {
+        throw new Error("Unauthorized");
+      }
+  
+      return {id: userData.id};
     } catch {
       throw new Error("Unauthorized");
     }

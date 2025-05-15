@@ -8,7 +8,7 @@ import {
   Response,
 } from "tsoa";
 import * as express from "express";
-
+import { Checkout } from "./index";
 import { PaymentService } from "./service";
 
 @Route("pay")
@@ -21,21 +21,23 @@ export class PaymentController extends Controller {
   @Response('400', 'Bad Request')
   public async createPayment(
     @Request() request: express.Request,
-    @Body() item: string
-  ): Promise<void> {
-    const session = await new PaymentService().payment(item, request.user?.id);
+    @Body() item: Checkout
+  ): Promise<{url: string}> {
+    const session = await new PaymentService().payment(item.item, request.user?.id);
     if (!session) {
       this.setStatus(500);
       throw new Error("Failed to create payment session");
     }
-    try {
-      this.setStatus(302); // Set the status code to 302 for redirection
-    this.setHeader('Location', session); // This will perform a redirect
-    return;
-    } catch{
-      this.setStatus(400);
-      throw new Error("Bad Request");
-    }
+    // try {
+    console.log("session", session);
+    this.setStatus(302); // Set the status code to 302 for redirection
+    return { url: session }; // Return the URL for redirection
+    // } catch (err) {
+    //   console.log(request.user?.id);
+    //   console.log(err);
+    //   this.setStatus(400);
+    //   throw new Error("Bad Request");
+    // }
   }
 }
 

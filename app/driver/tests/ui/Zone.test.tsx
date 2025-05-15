@@ -101,7 +101,7 @@ afterEach(() => {
 
 it('Renders guest', async () => {
   render(<MemberView />)
-  expect(await screen.findByText('Copark™')).toBeDefined()
+  expect(await screen.findByText('Where are you parking?')).toBeDefined()
 })
 
 it('Renders zone entry', async () => {

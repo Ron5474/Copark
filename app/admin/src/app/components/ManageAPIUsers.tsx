@@ -12,6 +12,7 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import AddAPIUser from './AddAPIUser'; // Assuming this component exists in the same directory
 import { getAPIUsers, suspendAPIUser, APIUser } from '@/api/actions'; // Using existing actions
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: string) => void }) {
   const theme = useTheme();
   const [openAddDialog, setOpenAddDialog] = useState(false);

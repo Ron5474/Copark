@@ -3,7 +3,7 @@ import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVe
 import { SignJWT, jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
-// const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class VehicleService {
 
@@ -22,7 +22,7 @@ export class VehicleService {
       return payload.id as string; // Extract the `id` from the payload
     } catch (error) {
       void error;
-      // console.error('Failed to decrypt token:', error);
+      console.error('Failed to decrypt token:', error);
       return undefined; // Return undefined if the token is invalid or expired
     }
   }
@@ -69,18 +69,22 @@ export class VehicleService {
 
   public async getVehicleByUserId(userID: string): Promise<VehicleID[]> {
 
-    // const userDecrypted = await this.decrypt(userID, emailEncodedKey)
-    const userDecrypted = await this.decrypt(userID, encodedKey)
+    const userDecrypted = await this.decrypt(userID, emailEncodedKey)
 
-    console.log(userDecrypted)
+    // console.log('userDecrypted', userDecrypted)
+    // const userDecrypted = await this.decrypt(userID, encodedKey)
     const result = await pool.query(
       `SELECT id FROM vehicle WHERE driver = $1`,
       [userDecrypted]
     )
 
+    // console.log('result', result)
+
     if (result.rowCount === 0) return []
 
-    return Promise.all(result.rows.map(async row => ({
+    // console.log('result.rows', result.rows)
+
+    return (result.rows.map(row => ({
       // id: await this.encrypt(row.id),
       id: row.id
     })))

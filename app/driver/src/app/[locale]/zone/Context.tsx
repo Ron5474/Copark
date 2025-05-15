@@ -5,7 +5,7 @@ import {useState, createContext} from 'react'
 import { Vehicle, ZoneDetails } from '../types'
 
 
-const steps = ['Zone', 'Duration', 'Vehicle', 'Payment', 'Review']
+const steps = ['Zone', 'Duration', 'Vehicle', 'Review', 'Payment']
 
 
 const ZoneContext = createContext<{

@@ -10,7 +10,7 @@ import authApp from '../../AuthService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 import { SignJWT } from 'jose'
 
-let server: http.Server
+let server: http.Server // Ticket
 let authServer: http.Server
 let vehicleServer: http.Server
 
@@ -21,6 +21,7 @@ const VEHICLE_PORT = 4001
 // const VEHICLE_SERVICE_URL = `http://localhost:${VEHICLE_PORT}`
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const registrarToken = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImU1YzU5MmVkLTJhNGEtNDViOS05ODAyLWM3MGM2OTE0YzZmZCIsImlhdCI6MTc0NzI2ODk2NCwiZXhwIjoxOTA1MDU2OTY0fQ.aJnD-aYMd53RNCKmBOHBHFOxmFRzGYEqBFScmzMNpeE"
 
 const adminUser = {
   email: 'jxiong0822@outlook.com',
@@ -151,7 +152,7 @@ test('Admin can get all tickets', async () => {
     .expect(200)
 
   expect(response.body.errors).toBeUndefined()
-  expect(response.body.data.getTickets.length).toBe(7)
+  expect(response.body.data.getTickets.length).toBe(8)
 })
 
 test('Admin can modify a ticket with images', async () => {
@@ -397,6 +398,75 @@ test('Enforcer can create a ticket', async () => {
   expect(ticket.images).toBe("https://example.com/photo.jpg")
   expect(ticket.note).toBe("Parked right in front of gate")
 })
+
+const registrarQuery = `
+query CheckPendingTicket($email: EmailInput!) {
+  hasPendingTicket(email: $email) {
+    hasTicket
+  }
+}`
+
+test('Registrar check if non-existent student has ticket', async () => {
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + registrarToken)
+    .send({
+      query: registrarQuery,
+      variables: {
+        email: {
+          email: "fake@user.com"
+        }
+      }
+    })
+
+  expect(response.status).toBe(200)
+  // console.log(response.body.data)
+  const ticket = response.body.data.hasPendingTicket
+
+  expect(ticket).toBeDefined()
+})
+
+test('Registrar check student with ticket successful', async () => {
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + registrarToken)
+    .send({
+      query: registrarQuery,
+      variables: {
+        email: {
+          email: "roapatel@ucsc.edu"
+        }
+      }
+    })
+
+  expect(response.status).toBe(200)
+  // console.log(response.body.data)
+  const ticket = response.body.data.hasPendingTicket
+
+  expect(ticket.hasTicket).toBe(true)
+})
+
+test('Registrar check student with no ticket successful', async () => {
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + registrarToken)
+    .send({
+      query: registrarQuery,
+      variables: {
+        email: {
+          email: "bcoliver@ucsc.edu"
+        }
+      }
+    })
+
+  expect(response.status).toBe(200)
+  // console.log(response.body.data)
+  const ticket = response.body.data.hasPendingTicket
+
+  expect(ticket.hasTicket).toBe(false)
+})
+
+
 // import { test, beforeAll, afterAll, expect } from 'vitest'
 // import supertest from 'supertest'
 // import * as http from 'http'

@@ -27,6 +27,17 @@ INSERT INTO vehicle (id, driver, data) VALUES
 
 INSERT INTO vehicle (driver, data) VALUES
   (
+    '4c0d7053-7bab-4494-8d42-d7384d983809',
+    jsonb_build_object(
+      'plate', '4BRY123',
+      'country', 'US',
+      'state', 'CA',
+      'nickname', 'Motorbike'
+    )
+  );
+
+INSERT INTO vehicle (driver, data) VALUES
+  (
     'f26adf21-f967-4283-8417-f72298bc7bbe',
     jsonb_build_object(
       'plate', '8ABC456',

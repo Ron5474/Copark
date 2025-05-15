@@ -235,7 +235,7 @@ export class TicketService {
     } as Ticket;
   }
 
-  public async getTicketsForVehicleID(vehicleIDs: string[]): Promise<Ticket[] | undefined> {
+  public async getTicketsForVehicleID(vehicleIDs: string[]): Promise<Ticket[]> {
 
 
   // get tickets for vehicles
@@ -251,7 +251,7 @@ export class TicketService {
     AND data->>'ticketStatus' NOT IN ('deleted', 'paid')
   `;
 
-  const result = await pool.query(query, [vehicleIDs]);
+  const {rows} = await pool.query(query, [vehicleIDs]);
   
   interface TicketRow {
     id: string;
@@ -264,7 +264,7 @@ export class TicketService {
     images: string | undefined;
   }
 
-  return await Promise.all(result.rows.map(async (row: TicketRow): Promise<Ticket> => ({
+  return await Promise.all(rows.map(async (row: TicketRow): Promise<Ticket> => ({
     id: await this.encrypt(row.id),
     vehicle: row.vehicle,
     enforcer: await this.encrypt(row.enforcer),

@@ -41,28 +41,16 @@ export class TicketResolver {
       `
     };
 
-    let result;
+    const response = await fetch('http://localhost:4001/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'Authorization': `${userJWT}`
+    },
+    body: JSON.stringify(vehicleQuery)
+    });
 
-    try {
-      const response = await fetch('http://localhost:4001/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Authorization': `${userJWT}`
-      },
-      body: JSON.stringify(vehicleQuery)
-      });
-
-      if (response.status !== 200) {
-        console.error('Vehicle Fetching Error', response);
-        throw new Error('Failed to fetch vehicles for user111');
-      }
-
-      result = await response.json();
-    } catch (error) {
-      console.error('Error fetching vehicles:', error);
-      throw new Error('Failed to fetch vehicles for user');
-    }
+    const result = await response.json();
 
     return await ticketService.getTicketsForVehicleID(result.data.getVehicleByUserId)
   }

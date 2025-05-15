@@ -27,8 +27,8 @@ export class PermitResolver {
     @Arg("input", () => PurchaseZoneInput) input: PurchaseZoneInput,
     @Ctx() request: Request
   ): Promise<Confirmation> {
-    const userId = request.user?.id
-    if (!userId) throw new Error('Unauthorized')
+    // const userId = request.user?.id
+    // if (!userId) throw new Error('Unauthorized')
     return await service.purchaseMyZonePermit(input)
   }
 
@@ -38,8 +38,8 @@ export class PermitResolver {
     @Arg("input", () => IsValidPermitInput) input: IsValidPermitInput,
     @Ctx() request: Request
   ): Promise<IsValid> {
-    const userId = request.user?.id
-    if (!userId) throw new Error('Unauthorized')
+    // const userId = request.user?.id
+    // if (!userId) throw new Error('Unauthorized')
     
     const plate = input.vehicle
 
@@ -63,9 +63,11 @@ export class PermitResolver {
     })
 
     const vehicleJson = await vehicleRes.json()
+    // console.log('vehicleJson', vehicleJson)
+
     const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 
-    if (vehicleId) {
+    if (!vehicleId) {
       return {isValid: false, type: 'Vehicle Not Found', zone: input.zone}
     }
 
@@ -79,8 +81,8 @@ export class PermitResolver {
     @Ctx() request: Request
   ): Promise<IsValidPolice> {
     // console.log('HELOOOOOOOOOO')
-    const userId = request.user?.id
-    if (!userId) throw new Error('Unauthorized')
+    // const userId = request.user?.id
+    // if (!userId) throw new Error('Unauthorized')
     // console.log('HELOOOOOOOOOO 2')
     const vehicleQuery = `
       query FindVehicleByPlate($plate: String!) {
@@ -117,8 +119,8 @@ export class PermitResolver {
     @Arg("vehicleID", () => String) vehicleID: string,
     @Ctx() request: Request
   ): Promise<MyPermits> {
-    const userId = request.user?.id
-    if (!userId) throw new Error('Unauthorized')
+    // const userId = request.user?.id
+    // if (!userId) throw new Error('Unauthorized')
 
     return await service.getMyPermits(vehicleID)
   }
@@ -129,8 +131,8 @@ export class PermitResolver {
     @Arg("zone", () => String) zone: string,
     @Ctx() request: Request
   ): Promise<ZoneDetails> {
-    const userId = request.user?.id
-    if (!userId) throw new Error('Unauthorized')
+    // const userId = request.user?.id
+    // if (!userId) throw new Error('Unauthorized')
 
     return await service.getZoneDetails(zone)
   }

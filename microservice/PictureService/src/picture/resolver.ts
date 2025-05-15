@@ -1,4 +1,4 @@
-import { Arg, Mutation, Resolver, Authorized } from 'type-graphql'
+import { Arg, Mutation, Resolver, Authorized, Query } from 'type-graphql'
 import { RecognizePlateInput, RecognizePlateResult } from './schema'
 import { PictureService } from './service'
 
@@ -11,6 +11,21 @@ export class PictureResolver {
   async recognizePlate(
     @Arg('input', () => RecognizePlateInput) input: RecognizePlateInput
   ): Promise<RecognizePlateResult> {
+    if (!input.image || !input.image.startsWith('data:image')) {
+      throw new Error('Invalid image input')
+    }
+    console.log("Base64 length:", input.image.length)
+    console.log("Image prefix:", input.image.substring(0, 30))
+
+
     return this.service.recognizePlate(input)
+  }
+}
+
+@Resolver()
+export class DummyQueryResolver {
+  @Query(() => String)
+  ping(): string {
+    return 'pong'
   }
 }

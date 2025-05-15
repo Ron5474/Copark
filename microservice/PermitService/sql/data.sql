@@ -54,3 +54,15 @@ INSERT INTO "zone" (id, data) VALUES
       'weekend', jsonb_build_object()
     )
   );
+
+INSERT INTO permit (vehicle, zone, data) VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  'e314f688-d150-411e-aa4f-38e679112e0e',
+  jsonb_build_object(
+    'permitType', 'day',
+    'purchaseDate', to_char((now() - interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expiresDate', to_char((now() + interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'price', 2.45,
+    'paymentMethod', 'credit'
+  )
+);

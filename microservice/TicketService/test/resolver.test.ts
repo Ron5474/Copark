@@ -8,7 +8,7 @@ import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
-import { SignJWT } from 'jose'
+import { SignJWT, JWTPayload } from 'jose'
 
 let server: http.Server // Ticket
 let authServer: http.Server
@@ -22,6 +22,7 @@ const VEHICLE_PORT = 4001
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 const registrarToken = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImU1YzU5MmVkLTJhNGEtNDViOS05ODAyLWM3MGM2OTE0YzZmZCIsImlhdCI6MTc0NzI2ODk2NCwiZXhwIjoxOTA1MDU2OTY0fQ.aJnD-aYMd53RNCKmBOHBHFOxmFRzGYEqBFScmzMNpeE"
+const ronakDriverToken = "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiUm9uYWsgUGF0ZWwiLCJlbWFpbCI6InJvYXBhdGVsQHVjc2MuZWR1IiwicGljdHVyZSI6Imh0dHBzOi8vd3d3Lmdvb2dsZS5jb20vaW1nIiwic3ViIjoiMTIzNDU2NzgiLCJpYXQiOjE3NDcyNzI2NjksImV4cCI6MTkwNTA2MDY2OX0.Mlas0IqbxpF893s6A8JycOIYX1tG3bNbC72PhghEZ_0"
 
 const adminUser = {
   email: 'jxiong0822@outlook.com',
@@ -65,6 +66,15 @@ async function encrypt(userId: string): Promise<string> {
       .setExpirationTime('30m')
       .sign(encodedKey)
   }
+
+
+// async function encryptObj(user: JWTPayload): Promise<string> {
+//   return new SignJWT(user)
+//     .setProtectedHeader({ alg: 'HS256' })
+//     .setIssuedAt()
+//     .setExpirationTime('5y')
+//     .sign(encodedKey)
+// }
 
 
 async function loginAsAdmin(): Promise<string> {
@@ -129,7 +139,15 @@ test('Admin can create a ticket with images', async () => {
   expect(response.body.data.createTicket.images).toBe("photo1.jpg")
 })
 
+// const driver = {
+//   'name': 'Ronak Patel',
+//   'email': 'roapatel@ucsc.edu',
+//   'picture': 'https://www.google.com/img',
+//   'sub': '12345678',
+// }
+
 test('Admin can get all tickets', async () => {
+  // console.log('jwt: ', await encryptObj(driver))
   const token = await loginAsAdmin()
 
   const query = `
@@ -465,6 +483,37 @@ test('Registrar check student with no ticket successful', async () => {
 
   expect(ticket.hasTicket).toBe(false)
 })
+
+const getMyTicketquery = `
+    query {
+      getMyTickets {
+        id
+        vehicle
+        enforcer
+        fine
+        violation
+        images
+      }
+    }
+  `
+
+
+test('Student can check their tickets successful', async () => {
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + ronakDriverToken)
+    .send({
+      query: getMyTicketquery,
+    })
+
+  expect(response.status).toBe(200)
+  console.log(response.body.data)
+  const ticket = response.body.data.getMyTickets
+
+  expect(ticket).toBeDefined()
+})
+
+
 
 
 // import { test, beforeAll, afterAll, expect } from 'vitest'

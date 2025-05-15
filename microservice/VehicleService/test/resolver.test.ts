@@ -13,7 +13,7 @@ let authServer: http.Server
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
-const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 beforeAll(async () => {
   // Start your GraphQL server

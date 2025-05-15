@@ -61,10 +61,10 @@ const ZoneView = () => {
             return <Duration />
           case 'Vehicle':
             return <MemberVehicles isCheckout={true} />
-          case 'Payment':
-            return <Payment />
           case 'Review':
             return <div>Case Y</div>
+          case 'Payment':
+            return <Payment />
           default:
             return <div>404 Unknown step</div>
         }

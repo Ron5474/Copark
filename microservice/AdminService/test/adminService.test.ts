@@ -81,11 +81,11 @@ test('reinstateUser should reinstate a suspended user', async () => {
 test('getDrivers should return a list of drivers', async () => {
     const enforcers = await adminService.getDrivers();
 
-    expect(enforcers).toHaveLength(3);
-    expect(enforcers[0].name).toBe('Driver 1');
+    expect(enforcers).toHaveLength(4);
+    expect(enforcers[0].name).toBe('Bryant Oliver');
     expect(enforcers[0].accountStatus).toBe('active');
 
-    expect(enforcers[1].name).toBe('Driver 2');
+    expect(enforcers[1].name).toBe('Driver 1');
     expect(enforcers[1].accountStatus).toBe('active');
 });
 

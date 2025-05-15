@@ -18,7 +18,6 @@ export class VehicleService {
   private async decrypt(token: string, key=encodedKey): Promise<string | undefined> {
     try {
       const { payload } = await jwtVerify(token, key)
-      console.log('payload: ', payload)
 
       return payload.id as string; // Extract the `id` from the payload
     } catch (error) {

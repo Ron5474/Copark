@@ -36,6 +36,16 @@ VALUES (
   )
 );
 
+INSERT INTO account(id, data)
+VALUES (
+  'e5c592ed-2a4a-45b9-9802-c70c6914c6fd',
+  jsonb_build_object(
+    'name', 'UCSD Registrar',
+    'email', 'registrar@ucsc.edu',
+    'role', '["registrar"]'
+  )
+);
+
 -- For OAuth Testing
 INSERT INTO account(id, data)
 VALUES (

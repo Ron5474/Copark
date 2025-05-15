@@ -21,6 +21,7 @@ const VEHICLE_PORT = 4001
 // const VEHICLE_SERVICE_URL = `http://localhost:${VEHICLE_PORT}`
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const registrarToken = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImU1YzU5MmVkLTJhNGEtNDViOS05ODAyLWM3MGM2OTE0YzZmZCIsImlhdCI6MTc0NzI2ODk2NCwiZXhwIjoxOTA1MDU2OTY0fQ.aJnD-aYMd53RNCKmBOHBHFOxmFRzGYEqBFScmzMNpeE"
 
 const adminUser = {
   email: 'jxiong0822@outlook.com',
@@ -91,6 +92,7 @@ async function loginAsDriver(): Promise<string> {
 }
 
 test('Admin can create a ticket with images', async () => {
+  console.log(await encrypt('e5c592ed-2a4a-45b9-9802-c70c6914c6fd'))
   const token = await loginAsAdmin()
 
   const vehicleid = '00000000-0000-0000-0000-000000000000'
@@ -397,6 +399,35 @@ test('Enforcer can create a ticket', async () => {
   expect(ticket.images).toBe("https://example.com/photo.jpg")
   expect(ticket.note).toBe("Parked right in front of gate")
 })
+
+const registrarQuery = `
+query CheckPendingTicket($email: EmailInput!) {
+  hasPendingTicket(email: $email) {
+    hasTicket
+  }
+}`
+
+test('Registrar check if student has ticket', async () => {
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + registrarToken)
+    .send({
+      query: registrarQuery,
+      variables: {
+        email: {
+          email: "fake@user.com"
+        }
+      }
+    })
+
+  expect(response.status).toBe(200)
+  // console.log(response.body.data)
+  const ticket = response.body.data.hasPendingTicket
+
+  expect(ticket).toBeDefined()
+})
+
+
 // import { test, beforeAll, afterAll, expect } from 'vitest'
 // import supertest from 'supertest'
 // import * as http from 'http'

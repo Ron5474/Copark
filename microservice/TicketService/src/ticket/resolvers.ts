@@ -25,7 +25,7 @@ export class TicketResolver {
 
   @Query(() => [Ticket])
   @Authorized(["driver"])
-  async getMyTickets(@Ctx() request: Request & {user: SessionUser}): Promise<Ticket[] | undefined> {
+  async getMyTickets(@Ctx() request: Request & {user: SessionUser}): Promise<Ticket[]> {
     // eslint-disable-next-line
     // @ts-ignore
     const userJWT = request.headers.authorization?.split(' ')[1];
@@ -134,29 +134,18 @@ export class TicketResolver {
     @Arg("email", () => EmailInput) email: EmailInput,
   ): Promise<hasTicket> {
     
-    let userID;
-    try {
-      const response = await fetch(
-        `http://localhost:3010/api/v0/auth/id?email=${encodeURIComponent(email.email)}`, 
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `${request.headers.authorization}`
-          },
-        }
-      );
-
-      if (response.status !== 200) {
-        console.error('Email Fetching Error', response);
-        throw new Error('Fetched to get user ID');
+    const response = await fetch(
+      `http://localhost:3010/api/v0/auth/id?email=${encodeURIComponent(email.email)}`, 
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': `${request.headers.authorization}`
+        },
       }
+    );
 
-      userID = await response.json();
-    } catch (error) {
-      void error;
-      throw new Error('Fetched to get user ID, check auth service');
-    }
+    const userID = await response.json();
 
     // get vehicles for userID
 
@@ -182,12 +171,12 @@ export class TicketResolver {
   const vehicleResult = await vehicleResponse.json();
 
   const vehicleIDs: string[] =
-    vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id) ?? [];
+    vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id);
 
   if (vehicleIDs.length === 0) return {hasTicket: false};
 
     const tickets = await ticketService.getTicketsForVehicleID(vehicleIDs)
-    if (!tickets) return {hasTicket: false}
+
     if (tickets?.length > 0) {
       return {hasTicket: true}
     }

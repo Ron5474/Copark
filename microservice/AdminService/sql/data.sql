@@ -62,6 +62,19 @@ VALUES (
 
 INSERT INTO account(id, data)
 VALUES (
+  '4c0d7053-7bab-4494-8d42-d7384d983809',
+  jsonb_build_object(
+    'name', 'Bryant Oliver',
+    'email', 'bcoliver@ucsc.edu',
+    'picture' , 'https://www.google.com/img',
+    'sub', '12345679',
+    'role', '["driver"]',
+    'accountStatus', 'active'
+  )
+);
+
+INSERT INTO account(id, data)
+VALUES (
   '8dc65233-c590-45b7-9b10-a5b049600901',
   jsonb_build_object(
     'name', 'Enforcer 1',

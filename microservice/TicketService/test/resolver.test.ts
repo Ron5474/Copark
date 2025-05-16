@@ -507,7 +507,7 @@ test('Student can check their tickets successful', async () => {
     })
 
   expect(response.status).toBe(200)
-  console.log(response.body.data)
+  // console.log(response.body.data.getMyTickets)
   const ticket = response.body.data.getMyTickets
 
   expect(ticket).toBeDefined()

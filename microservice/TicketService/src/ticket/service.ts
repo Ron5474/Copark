@@ -1,6 +1,7 @@
 import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
+import { Vehicle } from "../types/express";
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
@@ -235,8 +236,7 @@ export class TicketService {
     } as Ticket;
   }
 
-  public async getTicketsForVehicleID(vehicleIDs: string[]): Promise<Ticket[]> {
-
+  public async getTicketsForVehicleID(vehicleIDs: Vehicle[]): Promise<Ticket[]> {
 
   // get tickets for vehicles
   const query = `

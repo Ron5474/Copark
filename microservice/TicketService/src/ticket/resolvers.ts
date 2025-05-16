@@ -1,5 +1,6 @@
 import { Resolver, Query, Mutation, Arg, Authorized, Ctx } from "type-graphql";
 import { Request } from 'express'
+import { SignJWT } from 'jose'
 import { TicketService } from "./service";
 import { 
   Ticket,
@@ -12,8 +13,18 @@ import {
 } from "./schema";
 
 import { SessionUser } from "src";
+import { Vehicle } from "src/types/express";
 
 const ticketService = new TicketService();
+const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+
+async function encrypt(userId: string, key=emailEncodedKey): Promise<string> {
+  return new SignJWT({ id: userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('30m')
+    .sign(key)
+}
 
 @Resolver()
 export class TicketResolver {
@@ -28,13 +39,25 @@ export class TicketResolver {
   async getMyTickets(@Ctx() request: Request & {user: SessionUser}): Promise<Ticket[]> {
     // eslint-disable-next-line
     // @ts-ignore
-    const userJWT = request.headers.authorization?.split(' ')[1];
-    // console.log(userJWT)
+    // const userJWT = request.headers.authorization?.split(' ')[1];
+    // console.log('User: ', userJWT)
+    const authRes = await fetch(
+      `http://localhost:3010/api/v0/auth/driver/id`, 
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${request.headers.authorization}`
+        },
+      }
+    );
 
+    const userID = await authRes.json();
+    const userEncrypted = await encrypt(userID.id, emailEncodedKey)
     const vehicleQuery = {
       query: `
       query {
-        getVehicleByUserId(userID: "${userJWT}") {
+        getVehicleByUserId(userID: "${userEncrypted}") {
           id
         }
       }
@@ -50,9 +73,11 @@ export class TicketResolver {
     body: JSON.stringify(vehicleQuery)
     });
 
-    const result = await response.json();
+    const vehicleResult = await response.json();
+    const vehicleIDs: Vehicle[] =
+    vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id);
 
-    return await ticketService.getTicketsForVehicleID(result.data.getVehicleByUserId)
+    return await ticketService.getTicketsForVehicleID(vehicleIDs)
   }
 
   @Mutation(() => Ticket)
@@ -121,7 +146,7 @@ export class TicketResolver {
   async hasPendingTicket (
     @Arg("email", () => EmailInput) email: EmailInput,
   ): Promise<hasTicket> {
-    
+
     const response = await fetch(
       `http://localhost:3010/api/v0/auth/id?email=${encodeURIComponent(email.email)}`, 
       {
@@ -134,6 +159,9 @@ export class TicketResolver {
     );
 
     const userID = await response.json();
+    if (!userID.id) {
+      return {hasTicket: false}
+    }
 
     // get vehicles for userID
 
@@ -157,11 +185,8 @@ export class TicketResolver {
   });
 
   const vehicleResult = await vehicleResponse.json();
-
-  const vehicleIDs: string[] =
+  const vehicleIDs: Vehicle[] =
     vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id);
-
-  if (vehicleIDs.length === 0) return {hasTicket: false};
 
     const tickets = await ticketService.getTicketsForVehicleID(vehicleIDs)
 

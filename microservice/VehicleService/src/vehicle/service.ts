@@ -8,12 +8,12 @@ const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERN
 export class VehicleService {
 
   private async encrypt(userId: string, key=encodedKey): Promise<string> {
-      return new SignJWT({ id: userId })
-        .setProtectedHeader({ alg: 'HS256' })
-        .setIssuedAt()
-        .setExpirationTime('30m')
-        .sign(key)
-    }
+    return new SignJWT({ id: userId })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(key)
+  }
 
   private async decrypt(token: string, key=encodedKey): Promise<string | undefined> {
     try {
@@ -71,7 +71,6 @@ export class VehicleService {
 
     const userDecrypted = await this.decrypt(userID, emailEncodedKey)
 
-    // console.log('userDecrypted', userDecrypted)
     // const userDecrypted = await this.decrypt(userID, encodedKey)
     const result = await pool.query(
       `SELECT id FROM vehicle WHERE driver = $1`,

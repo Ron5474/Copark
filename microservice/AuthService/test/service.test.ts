@@ -22,7 +22,7 @@ const driver = {
   "name": "Derik Driver",
   "email": "derik@copark.space",
   "picture": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWRzMmJldTdzMWtncDBweGtvM21kYnRyeDk1cHpvNnU5MWVycXEybiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/keyufLabLaJKh3xnVy/giphy.gif",
-  "sub": "1234567890",
+  "sub": "1091642409960125156",
 }
 const fake_driver = {
   "name": "Fake Driver",
@@ -94,7 +94,7 @@ test('OAuth User unauthorized if pool.query fails', async () => {
 test('getOauthUser() returns JWT for the current user', async () => {
   await new AuthService().driverSignup(driver)
   const user = await new AuthService().getOauthUser(driver)
-  expect(user).toMatch(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/) // JWT Regex Comparison
+  expect(user.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/) // JWT Regex Comparison
 })
 
 test('getOauthUser() Undefined user throws error', async () => {

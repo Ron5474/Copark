@@ -85,3 +85,12 @@ it('Renders', async () => {
   await screen.findByText('Terms of Service')
 })
 
+it('Accept TOS and Click Continue', async () => {
+    render(<View />)
+    const TOSButton = screen.getByLabelText('I have read and agree to the Terms of Service')
+    TOSButton.click()
+    const next = screen.getByText('Continue')
+    next.click()
+    expect(push).toHaveBeenCalledWith('/dashboard')
+  })
+  

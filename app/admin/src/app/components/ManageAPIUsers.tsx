@@ -10,40 +10,22 @@ import {
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GavelIcon from '@mui/icons-material/Gavel';
 import RestoreIcon from '@mui/icons-material/Restore';
-import AddAPIUser from './AddAPIUser'; 
-import { getAPIUsers, APIUser, suspendAPIUser, reinstateAPIUser } from '@/api/actions'; 
-import { getAPIUsers, suspendAPIUser, reinstateAPIUser, APIUser } from '@/api/actions'; 
+import AddAPIUser from './AddAPIUser';
+import { getAPIUsers, suspendAPIUser, reinstateAPIUser, APIUser } from '@/api/actions';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: string) => void }) {
   const theme = useTheme();
   const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [apiUsers, setApiUsers] = useState<APIUser[]>([]);
+  const [APIUsers, setAPIUsers] = useState<APIUser[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchUsers = async () => {
-    try {
-      const users = await getAPIUsers();
-      setApiUsers(users);
-      setLoading(false);
-      return users;
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      setLoading(false);
-    }
-  };
-
-  const handleUserStatus = async (userId: string, currentStatus: string) => {
-    try {
-      if (currentStatus === 'suspended') {
-        await reinstateAPIUser(userId);
-      } else {
-        await suspendAPIUser(userId);
-      }
-      fetchUsers();
-    } catch (error) {
-      console.error('Error updating user status:', error);
-    }
+    const users = await getAPIUsers();
+    setAPIUsers(users);
+    setLoading(false);
+    setLoading(false);
+    return users;
   };
 
   useEffect(() => {
@@ -61,7 +43,7 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
           pb: 2,
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */ }
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/admin/assets/logo-notitle.png" alt="CoPark Admin" style={{ height: 60, marginRight: 16 }} />
         <Typography
           variant="h4"
@@ -104,13 +86,13 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
           <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>
             Loading...
           </Typography>
-        ) : apiUsers?.length === 0 ? (
+        ) : APIUsers?.length === 0 ? (
           <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>
             No API users found
           </Typography>
         ) : (
           <Box>
-            {apiUsers?.map((user) => (
+            {APIUsers?.map((user) => (
               <Box
                 key={user.id}
                 sx={{
@@ -150,25 +132,6 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
                 </Box>
 
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <Typography variant="caption" sx={{ fontWeight: 500, mb: 0.5 }}>
-                      {user.accountStatus === 'suspended' ? 'Restore' : 'Suspend'}
-                    </Typography>
-                    <IconButton
-                      onClick={() => handleUserStatus(user.id, user.accountStatus)}
-                      sx={{
-                        bgcolor: `${theme.palette.primary.main}20`,
-                        color: theme.palette.primary.main,
-                        '&:hover': {
-                          bgcolor: theme.palette.primary.main,
-                          color: '#ffffff',
-                        },
-                      }}
-                      aria-label={user.accountStatus === 'suspended' ? 'Restore user' : 'Suspend user'}
-                    >
-                      {user.accountStatus === 'suspended' ? <RestoreIcon /> : <GavelIcon />}
-                    </IconButton>
-                  </Box>
                   {user.accountStatus !== 'suspended' ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <Typography variant="caption" sx={{ fontWeight: 500, mb: 0.5 }}>
@@ -226,7 +189,7 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
       <AddAPIUser
         open={openAddDialog}
         onClose={() => setOpenAddDialog(false)}
-        onUserAdded={fetchUsers}  
+        onUserAdded={fetchUsers}
       />
     </Box>
   );

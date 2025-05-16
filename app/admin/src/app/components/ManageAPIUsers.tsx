@@ -9,8 +9,10 @@ import {
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GavelIcon from '@mui/icons-material/Gavel';
+import RestoreIcon from '@mui/icons-material/Restore';
 import AddAPIUser from './AddAPIUser'; 
-import { getAPIUsers, suspendAPIUser, APIUser } from '@/api/actions'; 
+import { getAPIUsers, APIUser } from '@/api/actions'; 
+import { suspendUser } from '@/api/actions'; 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: string) => void }) {
@@ -20,9 +22,28 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
   const [loading, setLoading] = useState(true);
 
   const fetchUsers = async () => {
-    const users = await getAPIUsers();
-    setApiUsers(users);
-    setLoading(false);
+    try {
+      const users = await getAPIUsers();
+      setApiUsers(users);
+      setLoading(false);
+      return users;
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleUserStatus = async (userId: string, currentStatus: string) => {
+    try {
+      if (currentStatus === 'suspended') {
+        // await reinstateUser(userId);
+      } else {
+        await suspendUser(userId);
+      }
+      fetchUsers();
+    } catch (error) {
+      console.error('Error updating user status:', error);
+    }
   };
 
   useEffect(() => {
@@ -129,16 +150,12 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
                 </Box>
 
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  {/* Suspend User */}
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <Typography variant="caption" sx={{ fontWeight: 500, mb: 0.5 }}>
-                      Suspend
+                      {user.accountStatus === 'suspended' ? 'Restore' : 'Suspend'}
                     </Typography>
                     <IconButton
-                      onClick={async () => {
-                        await suspendAPIUser(user.id);
-                        fetchUsers();
-                      }}
+                      onClick={() => handleUserStatus(user.id, user.accountStatus)}
                       sx={{
                         bgcolor: `${theme.palette.primary.main}20`,
                         color: theme.palette.primary.main,
@@ -147,9 +164,9 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
                           color: '#ffffff',
                         },
                       }}
-                      aria-label="Suspend user"
+                      aria-label={user.accountStatus === 'suspended' ? 'Restore user' : 'Suspend user'}
                     >
-                      <GavelIcon />
+                      {user.accountStatus === 'suspended' ? <RestoreIcon /> : <GavelIcon />}
                     </IconButton>
                   </Box>
                 </Box>
@@ -159,11 +176,10 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
         )}
       </Paper>
 
-      {/* Add API User Dialog */}
       <AddAPIUser
         open={openAddDialog}
         onClose={() => setOpenAddDialog(false)}
-        onUserAdded={fetchUsers}  // After adding a new user, refresh the user list
+        onUserAdded={fetchUsers}  
       />
     </Box>
   );

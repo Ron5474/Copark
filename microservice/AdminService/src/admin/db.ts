@@ -1,9 +1,6 @@
 import { Pool } from 'pg';
 
-import * as dotenv from 'dotenv'
-import { resolve } from 'path'
 
-dotenv.config({ path: resolve(__dirname, '../../../../.env') })
 
 
 // console.log('PORT: ', process.env.POSTGRES_PORT)

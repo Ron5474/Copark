@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv'
-dotenv.config()
+import { resolve } from 'path'
+
+dotenv.config({ path: resolve(__dirname, '../../../.env') });
+
 
 import app from './app'
 

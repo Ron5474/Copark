@@ -97,5 +97,30 @@ it('Click Github', async () => {
   })
 })
 
+it('Click Google', async () => {
+  render(<View />)
+  const githubButton = screen.getByText('Sign Up With Google')
+  githubButton.click()
+  const signInMock = vi.mocked(signIn)
+  expect(signInMock).toHaveBeenCalledWith('google', {
+    callbackUrl: '/driver/en/onboard',
+    basePath: '/driver'
+  })
+})
 
+it('Click Facebook', async () => {
+  render(<View />)
+  const githubButton = screen.getByText('Sign Up With Facebook')
+  githubButton.click()
+  const signInMock = vi.mocked(signIn)
+  expect(signInMock).toHaveBeenCalledWith('facebook', {
+    callbackUrl: '/driver/en/onboard',
+    basePath: '/driver'
+  })
+})
+
+it('Renders Page', async () => {
+  render(<Page />)
+  await screen.findByText('Sign Up!')
+})
 

@@ -77,7 +77,7 @@ export const getAPIUsers = async (): Promise<APIUser[]> => {
   return result.data?.getAPIUsers;
 };
 
-export const suspendUser = async (id: string): Promise<User[]> => {
+export const suspendAPIUser = async (id: string): Promise<User[]> => {
   const token = await getAuthToken();
 
   const response = await fetch(API_URL, {
@@ -109,33 +109,33 @@ export const suspendUser = async (id: string): Promise<User[]> => {
   return result.data.suspendUser;
 };
 
-// export const reinstateAPIUser = async (id: string): Promise<User[]> => {
-//   const token = await getAuthToken();
-//   const response = await fetch(API_URL, {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Authorization': `Bearer ${token}`,
-//     },
-//     body: JSON.stringify({
-//       query: `
-//           mutation ReinstateUser($user: UserInput!) {
-//             reinstateUser(user: $user) {
-//               id
-//               name
-//               email
-//               accountStatus
-//             }
-//           }
-//         `,
-//       variables: {
-//         user: {
-//           id
-//         },
-//       },
-//     }),
-//   });
+export const reinstateAPIUser = async (id: string): Promise<User[]> => {
+  const token = await getAuthToken();
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query: `
+          mutation ReinstateUser($user: UserInput!) {
+            reinstateUser(user: $user) {
+              id
+              name
+              email
+              accountStatus
+            }
+          }
+        `,
+      variables: {
+        user: {
+          id
+        },
+      },
+    }),
+  });
 
-//   const result = await response.json();
-//   return result.data.reinstateUser;
-// };
+  const result = await response.json();
+  return result.data.reinstateUser;
+};

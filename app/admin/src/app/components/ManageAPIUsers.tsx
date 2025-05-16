@@ -11,8 +11,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GavelIcon from '@mui/icons-material/Gavel';
 import RestoreIcon from '@mui/icons-material/Restore';
 import AddAPIUser from './AddAPIUser'; 
-import { getAPIUsers, APIUser } from '@/api/actions'; 
-import { suspendUser } from '@/api/actions'; 
+import { getAPIUsers, APIUser, suspendAPIUser, reinstateAPIUser } from '@/api/actions'; 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: string) => void }) {
@@ -36,9 +35,9 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
   const handleUserStatus = async (userId: string, currentStatus: string) => {
     try {
       if (currentStatus === 'suspended') {
-        // await reinstateUser(userId);
+        await reinstateAPIUser(userId);
       } else {
-        await suspendUser(userId);
+        await suspendAPIUser(userId);
       }
       fetchUsers();
     } catch (error) {

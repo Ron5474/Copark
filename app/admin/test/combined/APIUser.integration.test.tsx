@@ -64,6 +64,17 @@ beforeAll(() => {
           json: () => Promise.resolve({ data: { suspendAPIUser: true } })
         });
       }
+
+      if (body.query.includes('reinstateUser')) {
+        const userId = body.variables.user.id;
+        apiUsersData = apiUsersData.map(user =>
+          user.id === userId ? { ...user, accountStatus: 'active' } : user
+        );
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: { reinstateAPIUser: true } })
+        });
+      }
     }
 
     return Promise.reject(new Error(`Unhandled fetch to ${url}`));
@@ -169,5 +180,37 @@ it('should suspend an API user when the suspend button is clicked', async () => 
   await waitFor(() => {
     const statusText = screen.getByText(/suspended/i);
     expect(statusText).toBeDefined();
+  });
+});
+
+it('should suspend and reinstate an API user', async () => {
+  render(
+    <ThemeProvider theme={theme}>
+      <ManageAPIUsers onNavigate={() => {}} />
+    </ThemeProvider>
+  );
+
+  // Wait for initial render with user
+  await waitFor(() => {
+    expect(screen.getByText('Test Organization')).toBeDefined();
+  });
+
+  // Find and click suspend button 
+  const suspendButton = screen.getByLabelText('Suspend user');
+  fireEvent.click(suspendButton);
+
+  // Verify suspended state
+  await waitFor(() => {
+    expect(screen.getByText(/suspended/i)).toBeDefined();
+    expect(screen.getByLabelText('Reinstate user')).toBeDefined();
+  });
+
+  // Find and click reinstate button
+  const reinstateButton = screen.getByLabelText('Reinstate user');
+  fireEvent.click(reinstateButton);
+
+  // Verify reinstated state
+  await waitFor(() => {
+    expect(screen.getByText(/active/i)).toBeDefined();
   });
 });

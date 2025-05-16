@@ -12,7 +12,7 @@ import {
 import * as express from "express";
 import { Credentials, Authenticated, OauthLoginData } from "./";
 import { AuthService } from "./service";
-import { SessionUser } from "./index";
+import { SessionUser, User } from "./index";
 
 @Route("auth")
 export class AuthController extends Controller {
@@ -38,7 +38,7 @@ export class AuthController extends Controller {
 
   @Get("driver/id")
   @Security("jwt", ["driver"])
-  public async getDriverId(@Request() request: express.Request): Promise<string | undefined> {
+  public async getDriverId(@Request() request: express.Request): Promise<User | undefined> {
     // console.log("authenticating user with credentials:", credentials);
     return new AuthService().getOauthUser(request.user);
   }

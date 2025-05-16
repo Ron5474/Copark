@@ -17,7 +17,7 @@ import TopBar from '../shared/Topbar'
 import Zone from './Zone'
 import Duration from './Duration'
 import MemberVehicles from '../vehicle/member/Vehicle'
-import Payment from './Payment'
+import Review from './Review'
 // import Footer from '../shared/Footer'
 import theme from '../theme'
 
@@ -62,9 +62,9 @@ const ZoneView = () => {
           case 'Vehicle':
             return <MemberVehicles isCheckout={true} />
           case 'Review':
-            return <div>Case Y</div>
+            return <Review/>
           case 'Payment':
-            return <Payment />
+            return <div>Stripe payment page</div>
           default:
             return <div>404 Unknown step</div>
         }

@@ -3,7 +3,7 @@ import Tesseract from 'tesseract.js'
 
 export class PictureService {
   async recognizePlate(input: RecognizePlateInput): Promise<RecognizePlateResult> {
-    const { image } = input
+    const { image } = input;
 
     if (!image.startsWith('data:image')) {
       throw new Error('Invalid image format')
@@ -18,7 +18,8 @@ export class PictureService {
       },
     })
 
-    const plate = result.data.text.replace(/\s/g, '').toUpperCase()
+    // const plate = result.data.text.replace(/\s/g, '').toUpperCase()
+    const plate = result.data.text?.replace(/\W/g, '').toUpperCase() || '';
     const confidence = result.data.confidence ?? 0
 
     return { plate, confidence }

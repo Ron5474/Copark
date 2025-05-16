@@ -5,16 +5,6 @@ import Page from '../../src/app/page';
 import { useState } from 'react';
 import Home from '@/app/components/Home';
 
-function TestWrapper() {
-  const [component, setComponent] = useState<string | null>(null);
-
-  return (
-    <Home onNavigate={setComponent}>
-      {component === 'reports' ? <div>Reports Component</div> : <div>Welcome to Admin Dashboard</div>}
-    </Home>
-  );
-}
-
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
   redirect: vi.fn(),
@@ -47,7 +37,6 @@ vi.mock('../../src/enforcement/actions', () => ({
   suspendUser: vi.fn()
 }));
 
-
 vi.mock('../../src/driver/actions', () => ({
   getDrivers: vi.fn().mockResolvedValue([
     {
@@ -68,6 +57,25 @@ vi.mock('../../src/driver/actions', () => ({
   deleteUser: vi.fn().mockResolvedValue({}),
 }));
 
+vi.mock('../../src/api/actions', () => ({
+  getAPIUsers: vi.fn().mockResolvedValue([
+    {
+      id: '1',
+      name: 'API User One',
+      email: 'apiuser1@example.com',
+      role: 'payroll',
+      accountStatus: 'active',
+    },
+    {
+      id: '2',
+      name: 'API User Two',
+      email: 'apiuser2@example.com',
+      role: 'registrar',
+      accountStatus: 'suspended',
+    },
+  ]),
+}));
+
 const mockRouter = {
   push: vi.fn(),
 };
@@ -78,23 +86,19 @@ beforeEach(() => {
 
 it('renders main page with required elements', () => {
   render(<Page />);
-
   expect(screen.getByText("Admin Dashboard")).toBeDefined();
 });
 
 it('displays user name from session storage', () => {
   window.sessionStorage.setItem('name', 'Jason Xiong');
   render(<Page />);
-
   expect(screen.getByText("Logged in as: Jason Xiong")).toBeDefined();
 });
 
 it('handles logout action', async () => {
   render(<Page />);
-
   const logoutButton = screen.getByText('Logout');
   fireEvent.click(logoutButton);
-
   await waitFor(() => {
     expect(window.sessionStorage.getItem('name')).toBeNull();
   });
@@ -107,10 +111,8 @@ it('renders without user name when session is empty', () => {
 
 it('displays enforcers list when navigating to manage enforcement', async () => {
   render(<Page />);
-
   const manageEnforcementButton = screen.getByText('Manage Enforcement');
   fireEvent.click(manageEnforcementButton);
-
   await waitFor(() => {
     expect(screen.getByText('Test Enforcer')).toBeDefined();
     expect(screen.getByText('Test Enforcer 2')).toBeDefined();
@@ -121,16 +123,12 @@ it('displays enforcers list when navigating to manage enforcement', async () => 
 
 it('handles enforcer suspension', async () => {
   render(<Page />);
-
   const manageEnforcementButton = screen.getByText('Manage Enforcement');
   fireEvent.click(manageEnforcementButton);
-
   await waitFor(() => {
     const suspendButton = screen.getAllByRole('button')[0];
     fireEvent.click(suspendButton);
   });
-
-
   await waitFor(() => {
     expect(screen.getByText('active')).toBeDefined();
   });
@@ -138,11 +136,9 @@ it('handles enforcer suspension', async () => {
 
 it('navigates to Manage Enforcers section', async () => {
   render(<Page />);
-
   const manageEnforcementButton = screen.getByText('Manage Enforcement');
   const clickableItem = manageEnforcementButton.closest('div');
   fireEvent.click(clickableItem!);
-
   await waitFor(() => {
     expect(screen.getByText(/Enforcer Count: \d+/i)).toBeDefined();
   });
@@ -150,11 +146,9 @@ it('navigates to Manage Enforcers section', async () => {
 
 it('navigates to Manage Drivers section', async () => {
   render(<Page />);
-
   const manageDriversText = screen.getByText('Manage Drivers');
   const clickableItem = manageDriversText.closest('div');
   fireEvent.click(clickableItem!);
-
   await waitFor(() => {
     expect(screen.getByText(/Driver Count: \d+/i)).toBeDefined();
   });
@@ -162,11 +156,9 @@ it('navigates to Manage Drivers section', async () => {
 
 it('navigates to Statistics section', async () => {
   render(<Page />);
-
   const statisticsText = screen.getByText('View Statistics');
   const clickableItem = statisticsText.closest('div');
   fireEvent.click(clickableItem!);
-
   await waitFor(() => {
     expect(screen.getByText('Statistics Component')).toBeDefined();
   });
@@ -174,12 +166,9 @@ it('navigates to Statistics section', async () => {
 
 it('navigates to Reports section', async () => {
   render(<Page />);
-
   const reportsText = screen.getByText('Generate Reports');
   const clickableItem = reportsText.closest('div');
-
   fireEvent.click(clickableItem!);
-
   await waitFor(() => {
     expect(screen.getByText('Reports Component')).toBeDefined();
   });
@@ -187,11 +176,9 @@ it('navigates to Reports section', async () => {
 
 it('navigates to API Users section', async () => {
   render(<Page />);
-
   const apiUsersText = screen.getByText('Manage API Users');
   const clickableItem = apiUsersText.closest('div');
   fireEvent.click(clickableItem!);
-
   await waitFor(() => {
     expect(screen.getByText('Add API User')).toBeDefined();
   });

@@ -6,7 +6,7 @@ const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SE
 const policeEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class AdminService {
-  private async encrypt(userId: string, expr='30m', key=encodedKey): Promise<string> {
+  private async encrypt(userId: string, expr = '30m', key = encodedKey): Promise<string> {
     return new SignJWT({ id: userId })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
@@ -55,7 +55,7 @@ export class AdminService {
   }
 
   public async getDrivers(): Promise<User[]> {
-      const driverQuery = `
+    const driverQuery = `
           SELECT id,
           data->>'name' AS name,
           data->>'email' AS email,
@@ -66,20 +66,20 @@ export class AdminService {
           ORDER BY data->>'name';
       `
 
-      const driverResult = await pool.query(driverQuery);
+    const driverResult = await pool.query(driverQuery);
 
-      const drivers: User[] = [];
+    const drivers: User[] = [];
 
-      for (const row of driverResult.rows) {
-        drivers.push({
-          id: await this.encrypt(row.id),
-          name: row.name,
-          accountStatus: row.accountstatus,
-          email: row.email
-        });
-      }
+    for (const row of driverResult.rows) {
+      drivers.push({
+        id: await this.encrypt(row.id),
+        name: row.name,
+        accountStatus: row.accountstatus,
+        email: row.email
+      });
+    }
 
-      return drivers;
+    return drivers;
   }
 
   public async addEnforcer(enforcer: NewUser): Promise<User[]> {
@@ -123,21 +123,23 @@ export class AdminService {
 
   public async addAPIUser(credential: APICredential): Promise<APIUserID | undefined> {
     const insert = `
-    INSERT INTO account (data)
-      SELECT jsonb_build_object(
-        'name', $1::text,
-        'email', $2::text,
-        'role', jsonb_build_array($3::text)
-      )
-      WHERE NOT EXISTS (
-        SELECT 1
-        FROM account
-        WHERE (data->>'email' = $2::text
-              AND data->'role' @> jsonb_build_array($3::text)
-             )
-      )
-      RETURNING id`
-    
+      INSERT INTO account (data)
+        SELECT jsonb_build_object(
+          'name', $1::text,
+          'email', $2::text,
+          'role', jsonb_build_array($3::text),
+          'accountStatus', 'active'::text 
+        )
+        WHERE NOT EXISTS (
+          SELECT 1
+          FROM account
+          WHERE (data->>'email' = $2::text
+                AND data->'role' @> jsonb_build_array($3::text)
+              )
+        )
+        RETURNING id
+    `
+
     const query = {
       text: insert,
       values: [credential.name, credential.email, credential.role]
@@ -148,7 +150,7 @@ export class AdminService {
     if (rows.length > 0) {
       const userId = rows[0].id
       const retid = await this.encrypt(userId, '5y', policeEncodedKey)
-      return {id: retid}
+      return { id: retid }
     } else {
       return undefined
     }
@@ -159,6 +161,7 @@ export class AdminService {
       SELECT id,
         data->>'name' AS name,
         data->>'email' AS email,
+        data->>'accountStatus' AS accountStatus,
         data->'role'->>0 AS role
       FROM account
       WHERE data->'role' @> jsonb_build_array('payroll')
@@ -175,7 +178,8 @@ export class AdminService {
         id: await this.encrypt(row.id, '5y', policeEncodedKey),
         name: row.name,
         email: row.email,
-        role: row.role
+        role: row.role,
+        accountStatus: row.accountstatus
       });
     }
 
@@ -189,11 +193,11 @@ export class AdminService {
       WHERE id = $1
       RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
     `;
-  
+
     const result = await pool.query(updateQuery, [await this.decrypt(user.id)]);
-  
+
     const Users: User[] = [];
-  
+
     for (const row of result.rows) {
       Users.push({
         id: await this.encrypt(row.id),
@@ -202,7 +206,7 @@ export class AdminService {
         email: row.email,
       });
     }
-  
+
     return Users;
   }
 
@@ -214,11 +218,11 @@ export class AdminService {
       AND data->>'accountStatus' = 'suspended'
       RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
     `;
-  
+
     const result = await pool.query(updateQuery, [await this.decrypt(user.id)]);
-  
+
     const Users: User[] = [];
-  
+
     for (const row of result.rows) {
       Users.push({
         id: await this.encrypt(row.id),
@@ -227,7 +231,7 @@ export class AdminService {
         email: row.email,
       });
     }
-  
+
     return Users;
   }
 
@@ -238,11 +242,11 @@ export class AdminService {
       WHERE id = $1
       RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
     `;
-  
+
     const result = await pool.query(updateQuery, [await this.decrypt(user.id)]);
-  
+
     const Users: User[] = [];
-  
+
     for (const row of result.rows) {
       Users.push({
         id: await this.encrypt(row.id),
@@ -251,7 +255,7 @@ export class AdminService {
         email: row.email,
       });
     }
-  
+
     return Users;
   }
 }

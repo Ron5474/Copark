@@ -124,11 +124,11 @@ export default function Zone() {
 }
 
 function MaxDuration() {
-  // const { zoneDetails } = useContext(ZoneContext)
+  const { zoneDetails, durationString, setDurationString, price, setPrice } = useContext(ZoneContext)
 
-  const maxDuration = {hours: 2, minutes: 0}// zoneDetails?.maxDuration
-  const openTime = "7:00"
-  const closeTime = "20:00"// zoneDetails?.closeTime
+  const maxDuration = zoneDetails?.maxDuration
+  const openTime = zoneDetails?.openTime || '0:00'
+  const closeTime = zoneDetails?.closeTime
 
   const now = new Date()
   let untilCloseMs = Infinity
@@ -165,7 +165,7 @@ function MaxDuration() {
   const durationParts: string[] = []
   if (finalHours) durationParts.push(`${finalHours} ${finalHours === 1 ? 'hour' : 'hours'}`)
   if (finalMinutes) durationParts.push(`${finalMinutes} ${finalMinutes === 1 ? 'minute' : 'minutes'}`)
-  const durationString = durationParts.join(' ')
+  setDurationString(durationParts.join(' '))
 
   const endTime = new Date(now.getTime() + finalDurationMs)
   const endTimeString = new Intl.DateTimeFormat('en-US', {
@@ -173,11 +173,8 @@ function MaxDuration() {
     minute: '2-digit',
   }).format(endTime)
 
-  const estimatedPriceString = `$${
-    !overnight ?
-    (totalMinutes * (2.50/*zoneDetails?.hourly ?? 0*/) / 60).toFixed(2) :
-    0.00.toFixed(2)
-  }`
+  setPrice(!overnight ? (totalMinutes * (zoneDetails?.hourly ?? 0) / 60) : 0)
+  const estimatedPriceString = `$${(price ? price + 0.50 : 0).toFixed(2)}`
 
   return (
     <Box
@@ -197,10 +194,6 @@ function MaxDuration() {
 
       <Typography variant="h5" gutterBottom sx={{ mt: '1vh' }}>
         {`Estimated Price: ${estimatedPriceString}`}
-      </Typography>
-
-      <Typography variant="subtitle2" sx={{ marginTop: '1vh', color: '#4b4b4b' }}>
-        Transaction fees and taxes may apply in later steps.
       </Typography>
     </Box>
   )

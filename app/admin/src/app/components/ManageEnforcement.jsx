@@ -11,7 +11,6 @@ import {
   TextField,
   useTheme
 } from '@mui/material';
-import GroupIcon from '@mui/icons-material/Group';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GavelIcon from '@mui/icons-material/Gavel';
 import PersonOffIcon from '@mui/icons-material/PersonOff';

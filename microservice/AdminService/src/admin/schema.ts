@@ -66,4 +66,7 @@ export class APIUser {
 
   @Field(() => String)
   role!: string
+
+  @Field(() => String)
+  accountStatus!: string
 }

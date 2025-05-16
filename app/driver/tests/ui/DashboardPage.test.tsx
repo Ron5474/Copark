@@ -134,15 +134,6 @@ it('Garage Displayed when Garage is clicked', async () => {
   expect(await screen.findByText('+ Add Vehicle'))
 })
 
-it('Add Vehicle Displayed when Add Vehicle is clicked', async () => {
-  const user = userEvent.setup()
-  vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful')
-  render(<Page />)
-
-  await user.click(screen.getByText('Add Vehicle'))
-  expect(await screen.findByText('License Plate Number'))
-})
-
 it('Redirects to /login', async () => {
   vi.mocked(getUser).mockResolvedValue(undefined)
   vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful')
@@ -158,7 +149,7 @@ it('Redirects to Dashboard', async () => {
   vi.mocked(userLoginSignUpAttempt).mockResolvedValue('Login/SignUp attempt successful')
   render(<Page />)
 
-  await user.click(screen.getByText('Add Vehicle'))
+  await user.click(screen.getByText('Garage'))
   await user.click(await screen.getByLabelText('back to dashboard'))
   expect(await screen.queryByLabelText('back to dashboard')).toBeNull()
 });

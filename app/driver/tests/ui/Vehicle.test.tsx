@@ -276,7 +276,7 @@ it('Continues to next page', async () => {
   await user.click(await screen.findByText("C0P4RK"))
   await user.click(await screen.findByText('Continue'))
 
-  expect(await screen.findByText('Which Payment Method?')).toBeDefined()
+  expect(await screen.findByText('Review Order')).toBeDefined()
 })
 
 // it('Adding vehicle displays new vehicle (rerenders)', async () => {

@@ -25,15 +25,6 @@ it('renders all CardButtons with correct text', () => {
       <DashboardView />
     </DashboardContext.Provider>
   )
-  expect(screen.getByText('Add Vehicle')).toBeDefined()
-})
-
-it('renders all CardButtons with correct text', () => {
-  render(
-    <DashboardContext.Provider value={{ currentPage: 'dashboard', setCurrentPage }}>
-      <DashboardView />
-    </DashboardContext.Provider>
-  )
   expect(screen.getByText('Buy Permit')).toBeDefined()
 })
 
@@ -47,18 +38,6 @@ it('calls setCurrentPage with garage when Garage is clicked', async () => {
 
   await user.click(screen.getByText('Garage'))
   expect(setCurrentPage).toHaveBeenCalledWith('garage')
-})
-
-it('calls setCurrentPage with add vehicle when Add Vehicle is clicked', async () => {
-  const user = userEvent.setup()
-  render(
-    <DashboardContext.Provider value={{ currentPage: 'dashboard', setCurrentPage }}>
-      <DashboardView />
-    </DashboardContext.Provider>
-  )
-
-  await user.click(screen.getByText('Add Vehicle'))
-  expect(setCurrentPage).toHaveBeenCalledWith('add-vehicle')
 })
 
 it('calls setCurrentPage with "buy-permit" when Buy Permit is clicked', async () => {

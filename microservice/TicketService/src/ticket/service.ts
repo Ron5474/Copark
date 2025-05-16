@@ -1,6 +1,7 @@
 import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
+import { Vehicle } from "../types/express";
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
@@ -235,8 +236,7 @@ export class TicketService {
     } as Ticket;
   }
 
-  public async getTicketsForVehicleID(vehicleIDs: string[]): Promise<Ticket[]> {
-
+  public async getTicketsForVehicleID(vehicleIDs: Vehicle[]): Promise<Ticket[]> {
 
   // get tickets for vehicles
   const query = `
@@ -292,4 +292,48 @@ export class TicketService {
   //   // get tickets for vehicles
   //   return await this.getTicketsForVehicleID(vehicleIDs);
   // }
+
+  public async getTicketsStatsByDay(): Promise<Record<string, Ticket[]>> {
+    const ticketQuery = `
+        SELECT 
+        id,
+        vehicle,
+        enforcer,
+        data->>'issuedDate' AS issueddate,
+        data->>'violation' AS violation,
+        data->>'fine' AS fine,
+        data->>'ticketStatus' AS ticketstatus,
+        data->>'images' AS images,
+        data->>'note' AS note
+        FROM ticket
+        WHERE data->>'ticketStatus' != 'deleted'
+        ORDER BY data->>'issuedDate';
+    `;
+
+    const ticketResults = await pool.query(ticketQuery);
+
+    const ticketsByDay: Record<string, Ticket[]> = {};
+
+    for (const row of ticketResults.rows) {
+      const date = new Date(row.issueddate).toISOString().split('T')[0]; // YYYY-MM-DD
+      const ticket: Ticket = {
+        id: await this.encrypt(row.id),
+        vehicle: row.vehicle,
+        enforcer: await this.encrypt(row.enforcer),
+        issuedDate: new Date(row.issueddate),
+        violation: row.violation,
+        fine: parseFloat(row.fine),
+        ticketStatus: row.ticketstatus,
+        images: row.images,
+        note: row.note
+      };
+      if (!ticketsByDay[date]) {
+        ticketsByDay[date] = [];
+      }
+      ticketsByDay[date].push(ticket);
+    }
+
+    return ticketsByDay;
+  }
 }
+

@@ -9,7 +9,8 @@ const mockAPIUsers = [{
   id: '1',
   name: 'Test Organization',
   email: 'test.org@example.com',
-  role: 'api_user'
+  role: 'api_user',
+  accountStatus: 'active',
 }];
 
 // Track current state
@@ -23,7 +24,7 @@ beforeAll(() => {
   mockFetch.mockImplementation(async (url, options) => {
     if (url === 'http://localhost:4000/graphql') {
       const body = JSON.parse(options?.body as string);
-      
+
       if (body.query.includes('getAPIUsers')) {
         return Promise.resolve({
           ok: true,
@@ -34,8 +35,9 @@ beforeAll(() => {
       if (body.query.includes('addAPIUser')) {
         const newAPIUser = {
           id: String(apiUsersData.length + 1),
-          ...body.variables.apiUser,
-          role: 'api_user'
+          ...body.variables.organization,
+          role: 'registrar',
+          accountStatus: 'active',
         };
         apiUsersData.push(newAPIUser);
         return Promise.resolve({
@@ -49,6 +51,17 @@ beforeAll(() => {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ data: { deleteAPIUser: apiUsersData } })
+        });
+      }
+
+      if (body.query.includes('suspendUser')) {
+        const userId = body.variables.user.id;
+        apiUsersData = apiUsersData.map(user =>
+          user.id === userId ? { ...user, accountStatus: 'suspended' } : user
+        );
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: { suspendAPIUser: true } })
         });
       }
     }
@@ -100,28 +113,21 @@ it('should add a new API user', async () => {
     </ThemeProvider>
   );
 
-  // Click add button to open dialog
   const addButton = screen.getByText('Add API User');
   fireEvent.click(addButton);
 
-  // Fill in the form
   const nameInput = screen.getByLabelText('Organization Name');
   const emailInput = screen.getByLabelText('Organization Email');
 
   fireEvent.change(nameInput, { target: { value: 'New Test Organization' } });
   fireEvent.change(emailInput, { target: { value: 'new.test.org@example.com' } });
 
-  // Submit the form
   const submitButton = screen.getByText('Add');
   fireEvent.click(submitButton);
 
-  // Verify the new API user appears in the list
-  // Get API Users actions / service not implemented yet!
-  // await waitFor(() => {
-  //   const orgElement = screen.getByText('New Test Organization');
-  //   expect(orgElement).toBeDefined();
-  //   expect(screen.getByText('new.test.org@example.com')).toBeDefined();
-  // });
+  await waitFor(() => {
+    expect(screen.getByText('New Test Organization')).toBeDefined();
+  });
 });
 
 it('should close the dialog without adding when cancelled', async () => {
@@ -131,20 +137,37 @@ it('should close the dialog without adding when cancelled', async () => {
     </ThemeProvider>
   );
 
-  // Open dialog
   fireEvent.click(screen.getByText('Add API User'));
-  
-  // Fill form but cancel
+
   fireEvent.change(screen.getByLabelText('Organization Name'), {
     target: { value: 'Cancelled Org' }
   });
-  
-  // Click cancel
+
   fireEvent.click(screen.getByText('Cancel'));
-  
-  // Verify dialog closes and no new user added
+
   await waitFor(() => {
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.queryByText('Cancelled Org')).toBeNull();
+  });
+});
+
+it('should suspend an API user when the suspend button is clicked', async () => {
+  render(
+    <ThemeProvider theme={theme}>
+      <ManageAPIUsers onNavigate={() => {}} />
+    </ThemeProvider>
+  );
+
+  // Wait for user to load
+  await waitFor(() => {
+    expect(screen.getByText('Test Organization')).toBeDefined();
+  });
+
+  const suspendButton = screen.getByLabelText('Suspend user');
+  fireEvent.click(suspendButton);
+
+  await waitFor(() => {
+    const statusText = screen.getByText(/suspended/i);
+    expect(statusText).toBeDefined();
   });
 });

@@ -1,16 +1,27 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import Topbar from "../shared/Topbar";
+import { useEffect } from "react";
+import { getTransactionDetails } from "./actions";
 
 function PaymentConfirmation() {
   const sessionId = useSearchParams().get("session_id");
+  useEffect(() => {
+    const fetchSessionDetails = async () => {
+      if (!sessionId) {
+        console.error("No session ID found in URL");
+        return;
+      }
+      await getTransactionDetails(sessionId);
+    };
+    fetchSessionDetails();
+  }, [sessionId]);
+      
   return (
-    <div>
-      <h1>Payment Confirmation</h1>
-      <p>Your payment has been successfully processed.</p>
-      <p>Thank you for your purchase!</p>
-      <p>Session ID: {sessionId}</p>
-    </div>
+    <>
+      <Topbar />
+    </>
   );
 }
 

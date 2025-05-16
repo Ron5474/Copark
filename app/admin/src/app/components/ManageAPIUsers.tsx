@@ -9,8 +9,8 @@ import {
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GavelIcon from '@mui/icons-material/Gavel';
-import AddAPIUser from './AddAPIUser'; // Assuming this component exists in the same directory
-import { getAPIUsers, suspendAPIUser, APIUser } from '@/api/actions'; // Using existing actions
+import AddAPIUser from './AddAPIUser'; 
+import { getAPIUsers, suspendAPIUser, APIUser } from '@/api/actions'; 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: string) => void }) {

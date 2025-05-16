@@ -293,7 +293,7 @@ export class TicketService {
   //   return await this.getTicketsForVehicleID(vehicleIDs);
   // }
 
-  public async getTicketsStatsByDay(): Promise<Record<string, Ticket[]>> {
+  public async getAllTicketsCount(): Promise<Record<string, Ticket[]>> {
     const ticketQuery = `
         SELECT 
         id,

@@ -32,7 +32,7 @@ async function encrypt(userId: string): Promise<string> {
 test('getTickets should return all unpaid tickets', async () => {
     const tickets = await ticketService.getTickets();
 
-    expect(tickets).toHaveLength(7);
+    expect(tickets).toHaveLength(8);
     expect(tickets[0].ticketStatus).toBe('unpaid');
     expect(tickets[1].ticketStatus).toBe('unpaid');
     expect(tickets[2].ticketStatus).toBe('unpaid');
@@ -256,11 +256,13 @@ test('getTicketsForVehicleID should return tickets for the provided vehicle IDs'
     expect(tickets![0]).toHaveProperty('ticketStatus', 'unpaid');
 });
 
-test('getTickets should return all unpaid tickets', async () => {
-    const tickets = await ticketService.getTicketsStatsByDay();
+test('getTicketsByDay should return tickets by day', async () => {
+    const tickets = await ticketService.getAllTicketsCount();
 
-    console.log(tickets);
-    expect(tickets).toHaveLength(7);
+    // console.log(tickets);
+    expect(tickets['2025-05-15']).toHaveLength(1);
+    expect(tickets['2025-05-16']).toHaveLength(14);
+
 });
 
 // test('getTicketsForUserJWT should return tickets for the provided userJWT', async () => {

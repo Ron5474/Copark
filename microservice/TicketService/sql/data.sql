@@ -100,7 +100,7 @@ VALUES (
 INSERT INTO ticket (vehicle, enforcer, data)
 VALUES (
   '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
-  '8dc65233-c590-45b7-9b10-a5b049600901',
+  '431b3711-73bb-4c90-afcf-59116217c0db',
   jsonb_build_object(
     'issuedDate', NOW() - INTERVAL '1 day',
     'violation', 'Eating while driving',

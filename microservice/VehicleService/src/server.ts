@@ -1,5 +1,8 @@
-import dotenv from 'dotenv'
-dotenv.config()
+import * as dotenv from 'dotenv'
+import { resolve } from 'path'
+
+dotenv.config({ path: resolve(__dirname, '../../../.env') })
+
 
 import { app, bootstrap } from './app'
 

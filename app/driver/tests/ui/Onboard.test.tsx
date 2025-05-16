@@ -94,3 +94,7 @@ it('Accept TOS and Click Continue', async () => {
     expect(push).toHaveBeenCalledWith('/dashboard')
   })
   
+  it('Renders Page', async () => {
+    render(<Page />)
+    await screen.findAllByText('Terms of Service')
+  })

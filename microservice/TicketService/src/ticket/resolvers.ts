@@ -89,6 +89,20 @@ export class TicketResolver {
   }
 
   @Query(() => [Ticket])
+  @Authorized(["admin"])
+  async getTicketsStats(): Promise<Record<string, Ticket[]>> {
+    return ticketService.getAllTicketsCount();
+  }
+
+  @Query(() => [Ticket])
+  @Authorized(["admin"])
+  async getTicketsIssuedByEnforcer(
+    @Arg("enforcerID", () => String) enforcerID: string
+  ): Promise<Ticket[] | undefined> {
+    return ticketService.getTicketsIssuedByEnforcer(enforcerID);
+  }
+
+  @Query(() => [Ticket])
   @Authorized(["driver"])
   async getMyTickets(@Ctx() request: Request & {user: SessionUser}): Promise<Ticket[]> {
     // eslint-disable-next-line

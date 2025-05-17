@@ -71,3 +71,12 @@ it('Decode a valid token successfully', async () => {
 expect(jwtVerify).toHaveBeenCalledWith('valid.token', expect.anything())
 
 })
+
+it('Decode throws error if parameter missing', async () => {
+  const { decode } = authOptions.jwt!
+  
+  await expect(decode({ 
+    token: '', 
+    secret: mockSecret 
+  })).rejects.toThrow('Missing required parameters for JWT decoding')
+})

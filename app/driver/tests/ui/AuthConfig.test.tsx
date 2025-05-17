@@ -1,0 +1,45 @@
+import { vi, it, expect, beforeEach } from 'vitest'
+import { authOptions } from '../../src/app/lib/AuthConfig'
+import { jwtVerify } from 'jose'
+
+
+vi.mock('jose', async () => {
+  const actual = await vi.importActual('jose')
+  return {
+    ...actual,
+    SignJWT: vi.fn().mockReturnValue({
+      setProtectedHeader: vi.fn().mockReturnThis(),
+      setIssuedAt: vi.fn().mockReturnThis(),
+      setExpirationTime: vi.fn().mockReturnThis(),
+      sign: vi.fn().mockResolvedValue('mock.jwt.token')
+    }),
+    jwtVerify: vi.fn()
+  }
+})
+
+const mockSecret = 'test-secret'
+const mockToken = { 
+  sub: '123456', 
+  name: 'Jas Sassy', 
+  email: 'ronak@user.com',
+  iat: Math.floor(Date.now() / 1000),
+  exp: Math.floor(Date.now() / 1000) + 3600
+}
+const mockMaxAge = 3600
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
+
+it('Encode a JWT token successful', async () => {
+  const { encode } = authOptions.jwt!
+  
+  const result = await encode({ 
+    secret: mockSecret, 
+    token: mockToken, 
+    maxAge: mockMaxAge 
+  })
+  
+  expect(result).toBe('mock.jwt.token')
+})
+

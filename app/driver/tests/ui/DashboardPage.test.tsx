@@ -16,10 +16,8 @@ vi.mock('next-auth/react', () => ({
 const pushMock = vi.fn()
 
 vi.mock('next-intl', () => ({
-  // Provide all the necessary exports without importing the actual module
   useLocale: () => 'en',
   useTranslations: () => ((key: string) => {
-    // This function directly returns translations without using vi.fn()
     switch (key) {
       case 'Do Not Sell My Personal Info':
         return 'Do Not Sell My Personal Info';

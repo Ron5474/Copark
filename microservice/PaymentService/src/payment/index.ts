@@ -5,8 +5,13 @@ export interface SessionUser {
 }
 
 export interface Checkout {
+  type: string,
   item: string,
-  locale: string
+  currency: string,
+  amount: number,
+  description: string,
+  locale: string,
+  image?: string
 }
 
 export interface User {

@@ -1,10 +1,10 @@
 
 // import * as db from "./db";
 import Stripe from "stripe";
+import { Checkout } from "./index";
 export class PaymentService {
   async payment(
-    item: string,
-    locale: string,
+    checkoutDetails: Checkout,
     id?: string,
   ): Promise<string|null> {
     if (!id) {
@@ -12,22 +12,29 @@ export class PaymentService {
     }
     console.log(process.env.FRONTEND_URL);
     const stripe = new Stripe(process.env.STRIPE_SECRET as string);
-    if (item == "dailyPass") {
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
-          price: "price_1ROseAPvo0ngnUaGKlARst9I",
-          quantity: 1,
-        }
+          price_data: {
+            currency: checkoutDetails.currency,
+            product_data: {
+              name: checkoutDetails.item,
+              description: checkoutDetails.description,
+              images: checkoutDetails.image ? [checkoutDetails.image]: undefined, // optional
+            },
+            unit_amount: checkoutDetails.amount, // in cents
+          },
+        quantity: 1,
+        },
       ],
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL}/${locale}/payment-confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/${locale}`,
+      success_url: `${process.env.FRONTEND_URL}/${checkoutDetails.locale}/payment-confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}/${checkoutDetails.locale}`,
+      metadata: {
+        itemType: checkoutDetails.type,
+      },
     });
     // console.log("session", session);
     return session.url;
   } 
-
-    return null;
-  }
 }

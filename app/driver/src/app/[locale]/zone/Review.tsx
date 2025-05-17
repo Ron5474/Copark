@@ -16,6 +16,7 @@ import {
 // import CloseIcon from '@mui/icons-material/Close'
 
 import ZoneContext from './Context'
+import { Payment } from '../shared/actions'
 // import AddForm from '../AddForm'
 // import Loader from '../shared/Loader'
 // import theme from '../theme'
@@ -28,8 +29,17 @@ export default function Review() {
   
   const tempLocation = "UCSC Campus"
 
-  const checkout = () => {
-    console.log("Reroute to stripe") // delete this
+  const checkout = async () => {
+    const amount: number = parseFloat((price + 0.5).toFixed(2))*100 // in cents
+    sessionStorage.setItem('zoneNumber', zoneNumber.toString())
+    sessionStorage.setItem('durationString', durationString)
+    sessionStorage.setItem('price', amount.toString())
+    sessionStorage.setItem('vehicle', JSON.stringify(vehicle))
+    sessionStorage.setItem('tempLocation', tempLocation)
+    sessionStorage.setItem('currency', 'USD')
+   
+    // TODO: Get information on the permit style chosen and add the type and itemName accordingly
+    await Payment("daily" ,"Daily Parking Permit", amount, `Parking permit for zone #${zoneNumber} in ${tempLocation}`, "USD");
   }
 
   return (

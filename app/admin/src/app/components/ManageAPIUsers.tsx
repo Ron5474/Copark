@@ -10,8 +10,9 @@ import {
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GavelIcon from '@mui/icons-material/Gavel';
 import RestoreIcon from '@mui/icons-material/Restore';
+import PersonOffIcon from '@mui/icons-material/PersonOff';
 import AddAPIUser from './AddAPIUser';
-import { getAPIUsers, suspendAPIUser, reinstateAPIUser, APIUser } from '@/api/actions';
+import { getAPIUsers, suspendAPIUser, reinstateAPIUser, deleteAPIUser, APIUser } from '@/api/actions';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: string) => void }) {
@@ -179,6 +180,31 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
                       </IconButton>
                     </Box>
                   )}
+
+                  {/* Delete */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 500, mb: 0.5 }}>
+                      Delete
+                    </Typography>
+                    <IconButton
+                      onClick={async () => {
+                        await deleteAPIUser(user.id);
+                        fetchUsers();
+                      }}
+                      sx={{
+                        bgcolor: `${theme.palette.secondary.main}20`,
+                        color: theme.palette.secondary.main,
+                        '&:hover': {
+                          bgcolor: theme.palette.secondary.main,
+                          color: '#ffffff',
+                        },
+                      }}
+                      aria-label="Delete user"
+                      disabled={user.accountStatus === 'deleted'}
+                    >
+                      <PersonOffIcon />
+                    </IconButton>
+                  </Box>
                 </Box>
               </Box>
             ))}

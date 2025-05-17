@@ -2,6 +2,7 @@ import { test, beforeAll, afterAll, expect } from 'vitest'
 // @ts-ignore
 import supertest from 'supertest'
 import * as http from 'http'
+import killPort from 'kill-port'
 
 import db from './db'
 import { app, bootstrap } from '../src/app'
@@ -19,16 +20,34 @@ beforeAll(async () => {
   server.listen()
   await bootstrap()
 
-  // Start your Auth server
+  // Force kill anything on AUTH_PORT
+  try {
+    await killPort(AUTH_PORT)
+  } catch (error) {
+    console.log(`No process was running on port ${AUTH_PORT}`)
+  }
+
+  // Create and start auth server with retries
   authServer = http.createServer(authApp)
-  await new Promise<void>((resolve) => {
-    authServer.listen(AUTH_PORT, () => {
-      resolve()
-    })
-  })
+  
+  let retries = 3
+  while (retries > 0) {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        authServer.listen(AUTH_PORT, () => resolve())
+          .on('error', (err) => reject(err))
+      })
+      break
+    } catch (error) {
+      console.log(`Retry ${4 - retries}: Failed to start auth server, retrying...`)
+      retries--
+      if (retries === 0) throw error
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+  }
 
   return db.reset()
-})
+}, 100000)
 
 afterAll(() => {
   db.shutdown()

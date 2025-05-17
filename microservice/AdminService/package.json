@@ -29,9 +29,11 @@
     "eslint-config-typescript": "^3.0.0",
     "globals": "8",
     "joi": "^17.13.3",
+    "kill-port": "^2.0.1",
     "node-fetch": "^2.6.7",
     "nodemon": "^3.1.10",
     "supertest": "^7.1.0",
+    "tcp-port-used": "^1.0.2",
     "ts-node": "^10.9.2",
     "ts-postgres": "^2.0.4",
     "typescript": "*",
@@ -50,10 +52,9 @@
     "jose": "^4.14.4",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.15.6",
+    "reflect-metadata": "^0.2.2",
     "tsoa": "*",
-    "type-graphql": "*",
-    "reflect-metadata": "^0.2.2"
-
+    "type-graphql": "*"
   },
   "nodemonConfig": {
     "watch": [

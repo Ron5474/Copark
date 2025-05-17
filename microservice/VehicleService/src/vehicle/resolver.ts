@@ -9,6 +9,28 @@ const service = new VehicleService()
 
 @Resolver()
 export class VehicleResolver {
+  private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[] }> {
+    if (!token) {
+      throw new Error('Token not provided');
+    }
+    const response = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+
+    const res = response.status === 200 ? await response.json() : null;
+    if (!res) {
+      throw new Error('User not found');
+    }
+    return {
+      id: res.id,
+      name: res.name,
+      role: res.role
+    };
+  }
   // need to allow admin and enforcement to see all vehicles so they can get tickets for those vehicles
   // temporaryly disabled security, but really there should be another function for enforcement and admins to
   // get vehicles of a userID
@@ -17,7 +39,8 @@ export class VehicleResolver {
   @Query(() => [Vehicle])
   async myVehicles(@Ctx() request: Request & {user: SessionUser}): Promise<Vehicle[]> {
     const token = request.headers.authorization?.split(' ')[1]
-    return await service.getMyVehicles(token)
+    const userId = (await this.getUserData(token)).id  
+    return await service.getMyVehicles(userId)
   }
 
   @Authorized('driver')
@@ -27,7 +50,8 @@ export class VehicleResolver {
     @Ctx() request: Request & {user: SessionUser}
   ): Promise<Vehicle> {
     const token = request.headers.authorization?.split(' ')[1]
-    return await service.registerVehicle(input, token)
+    const userId = (await this.getUserData(token)).id  
+    return await service.registerVehicle(input, userId)
   }
 
   @Authorized('driver')
@@ -37,7 +61,8 @@ export class VehicleResolver {
     @Ctx() request: Request & {user: SessionUser}
   ): Promise<Vehicle> {
     const token = request.headers.authorization?.split(' ')[1]
-    return await service.updateVehicle(input, token)
+    const userId = (await this.getUserData(token)).id  
+    return await service.updateVehicle(input, userId)
   }
 
   @Authorized('admin', 'enforcement', 'police')

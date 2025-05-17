@@ -6,28 +6,6 @@ const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SE
 const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class VehicleService {
-  private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[] }> {
-     if (!token) {
-      throw new Error('Token not provided');
-    }
-    const response = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      })
-
-    const res = response.status === 200 ? await response.json() : null;
-    if (!res) {
-      throw new Error('User not found');
-    }
-    return {
-      id: res.id,
-      name: res.name,
-      role: res.role
-    };
-  }
 
   private async encrypt(userId: string, key=encodedKey): Promise<string> {
     return new SignJWT({ id: userId })
@@ -49,10 +27,8 @@ export class VehicleService {
     }
   }
 
-  public async getMyVehicles(token?: string): Promise<Vehicle[]> {
+  public async getMyVehicles(userId: string): Promise<Vehicle[]> {
     // const userDecrypted = await this.decrypt(userId)
-
-    const userId = (await this.getUserData(token)).id
     
 
     const result = await pool.query(
@@ -114,8 +90,7 @@ export class VehicleService {
     })))
   }
 
-  public async registerVehicle(input: RegisterVehicleInput, token?: string): Promise<Vehicle> {
-    const userId = (await this.getUserData(token)).id
+  public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
     const result = await pool.query(
       `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
       [userId, input]
@@ -127,8 +102,7 @@ export class VehicleService {
     }
   }
 
-  public async updateVehicle(input: UpdateVehicleInput, token?: string): Promise<Vehicle> {
-    const userId = (await this.getUserData(token)).id
+  public async updateVehicle(input: UpdateVehicleInput, userId: string): Promise<Vehicle> {
     const { id, ...patch } = input
 
     const vehicleID = await this.decrypt(id)

@@ -79,6 +79,8 @@ test('OAuth user with id throws error', async () => {
 
 test('OAuth User unauthorized if pool.query fails', async () => {
   const auth = new AuthService()
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'log').mockImplementation(() => {})
   vi.spyOn(pool, 'query').mockRejectedValueOnce(new Error("Database failure"))
 
   const data = {
@@ -146,6 +148,7 @@ test('AuthService Check() works fine with correct OAuth JWT', async () => {
 test('AuthService Check() throws error for invalid driver', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
+  
   await expect(new AuthService().check(`Bearer ${validJWT}`, ["driver"])).rejects.toThrow('Unauthorized3')
 })
 

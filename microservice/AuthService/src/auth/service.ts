@@ -199,7 +199,7 @@ export class AuthService {
       return undefined
     }
   } catch (err) {
-    console.log("Error in driverLogin:", err);
+    console.log("Error in driverSignup:", err);
     throw new Error("Unauthorized");
   }
   }

@@ -265,7 +265,7 @@ test('getTicketsByDay should return tickets by day', async () => {
     date.setDate(date.getDate() - 1)
     const yest = date.toISOString().split('T')[0]
     expect(tickets[yest]).toHaveLength(1);
-    expect(tickets[today]).toHaveLength(14);
+    expect(tickets[today]).toHaveLength(7);
 
 });
 

@@ -163,9 +163,10 @@ export class AdminService {
         data->>'accountStatus' AS accountStatus,
         data->'role'->>0 AS role
       FROM account
-      WHERE data->'role' @> jsonb_build_array('payroll')
+      WHERE (data->'role' @> jsonb_build_array('payroll')
         OR data->'role' @> jsonb_build_array('registrar')
-        OR data->'role' @> jsonb_build_array('campusPolice')
+        OR data->'role' @> jsonb_build_array('campusPolice'))
+      AND data->>'accountStatus' != 'deleted'
       ORDER BY data->>'name';
     `
 

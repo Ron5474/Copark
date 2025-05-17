@@ -46,7 +46,7 @@ beforeAll(() => {
         });
       }
 
-      if (body.query.includes('deleteAPIUser')) {
+      if (body.query.includes('deleteUser')) {
         apiUsersData = apiUsersData.filter(u => u.id !== body.variables.user.id);
         return Promise.resolve({
           ok: true,
@@ -212,5 +212,28 @@ it('should suspend and reinstate an API user', async () => {
   // Verify reinstated state
   await waitFor(() => {
     expect(screen.getByText(/active/i)).toBeDefined();
+  });
+});
+
+it('should delete an API user', async () => {
+  render(
+    <ThemeProvider theme={theme}>
+      <ManageAPIUsers onNavigate={() => {}} />
+    </ThemeProvider>
+  );
+
+  // Wait for initial render with user
+  await waitFor(() => {
+    expect(screen.getByText('Test Organization')).toBeDefined();
+  });
+
+  // Find and click delete button
+  const deleteButton = screen.getByLabelText('Delete user');
+  fireEvent.click(deleteButton);
+
+  // Verify user is removed from display
+  await waitFor(() => {
+    expect(screen.queryByText('Test Organization')).toBeNull();
+    expect(screen.getByText('No API users found')).toBeDefined();
   });
 });

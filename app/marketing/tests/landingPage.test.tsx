@@ -22,6 +22,7 @@ beforeEach(() => {
   }))
 
   vi.mock('next-intl', () => ({
+    useLocale: () => 'en',
     useTranslations: () => (
       vi.fn((x: string) => {
         if (x === 'card title') {

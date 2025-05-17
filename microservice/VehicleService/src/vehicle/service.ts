@@ -6,6 +6,29 @@ const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SE
 const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class VehicleService {
+  private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[] }> {
+     if (!token) {
+      throw new Error('Token not provided');
+    }
+    const response = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      })
+    console.log('response', response)
+
+    const res = response.status === 200 ? await response.json() : null;
+    if (!res) {
+      throw new Error('User not found');
+    }
+    return {
+      id: res.id,
+      name: res.name,
+      role: res.role
+    };
+  }
 
   private async encrypt(userId: string, key=encodedKey): Promise<string> {
     return new SignJWT({ id: userId })
@@ -27,8 +50,11 @@ export class VehicleService {
     }
   }
 
-  public async getMyVehicles(userId: string): Promise<Vehicle[]> {
+  public async getMyVehicles(token?: string): Promise<Vehicle[]> {
     // const userDecrypted = await this.decrypt(userId)
+
+    const userId = (await this.getUserData(token)).id
+    
 
     const result = await pool.query(
       `SELECT id, data FROM vehicle WHERE driver = $1`,

@@ -39,7 +39,6 @@ export class AuthController extends Controller {
   @Get("driver/id")
   @Security("jwt", ["driver"])
   public async getDriverId(@Request() request: express.Request): Promise<User | undefined> {
-    // console.log("authenticating user with credentials:", credentials);
     return new AuthService().getOauthUser(request.user);
   }
 

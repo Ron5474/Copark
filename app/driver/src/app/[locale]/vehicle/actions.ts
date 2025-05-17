@@ -36,6 +36,7 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
     })
 
     const result = await response.json()
+    console.log('GraphQL response:', result)
 
     if (result.errors) {
       console.error('GraphQL errors:', result.errors)

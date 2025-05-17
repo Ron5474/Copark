@@ -16,8 +16,8 @@ export class VehicleResolver {
   @Authorized('driver')
   @Query(() => [Vehicle])
   async myVehicles(@Ctx() request: Request & {user: SessionUser}): Promise<Vehicle[]> {
-    const userId = request.user.id
-    return await service.getMyVehicles(userId)
+    const token = request.headers.authorization?.split(' ')[1]
+    return await service.getMyVehicles(token)
   }
 
   @Authorized('driver')

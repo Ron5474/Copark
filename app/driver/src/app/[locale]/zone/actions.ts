@@ -43,7 +43,8 @@ export const getZoneDetails = async (zone: string): Promise<ZoneDetails> => {
     })
 
     const result = await response.json()
-
+    console.log('GraphQL response:', result)
+    
     if (result.errors) {
       console.error('GraphQL errors:', result.errors)
       throw new Error(result.errors[0].message)

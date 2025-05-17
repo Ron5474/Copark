@@ -14,9 +14,9 @@ export class AdminService {
       .sign(key)
   }
 
-  private async decrypt(token: string): Promise<string | undefined> {
+  private async decrypt(token: string, key = encodedKey): Promise<string | undefined> {
     try {
-      const { payload } = await jwtVerify(token, encodedKey)
+      const { payload } = await jwtVerify(token, key)
 
       return payload.id as string; // Extract the `id` from the payload
     } catch (error) {
@@ -194,13 +194,13 @@ export class AdminService {
       RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
     `;
 
-    const result = await pool.query(updateQuery, [await this.decrypt(user.id)]);
+    const result = await pool.query(updateQuery, [await this.decrypt(user.id, policeEncodedKey)]);
 
     const Users: User[] = [];
 
     for (const row of result.rows) {
       Users.push({
-        id: await this.encrypt(row.id),
+        id: await this.encrypt(row.id, '5y', policeEncodedKey),
         name: row.name,
         accountStatus: row.accountstatus,
         email: row.email,
@@ -219,13 +219,13 @@ export class AdminService {
       RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
     `;
 
-    const result = await pool.query(updateQuery, [await this.decrypt(user.id)]);
+    const result = await pool.query(updateQuery, [await this.decrypt(user.id, policeEncodedKey)]);
 
     const Users: User[] = [];
 
     for (const row of result.rows) {
       Users.push({
-        id: await this.encrypt(row.id),
+        id: await this.encrypt(row.id, '5y', policeEncodedKey),
         name: row.name,
         accountStatus: row.accountstatus,
         email: row.email,

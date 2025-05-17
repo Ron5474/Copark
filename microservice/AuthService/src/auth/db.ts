@@ -1,10 +1,4 @@
 import {Pool} from 'pg'
-import dotenv from 'dotenv'
-
-// dotenv.config({path: '../../.env'})
-import { resolve } from 'path'
-
-dotenv.config({ path: resolve(__dirname, '../../../../../.env') })
 
 // console.log('Connecting to PostgreSQL database...')
 // console.log('POSTGRES_HOST', process.env.POSTGRES_HOST)

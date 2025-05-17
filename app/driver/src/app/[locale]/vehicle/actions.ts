@@ -15,18 +15,11 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
   try {
     const token = await getAuthToken()
 
-    const res = await fetch("http://localhost:3010/api/v0/auth/driver/id", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    const driverToken = await res.json()
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${driverToken}`,
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
         query: `
@@ -59,19 +52,12 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
 export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
   try {
     const token = await getAuthToken()
-    const res = await fetch("http://localhost:3010/api/v0/auth/driver/id", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    const driverToken = await res.json()
 
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${driverToken}`,
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
         query: `

@@ -8,19 +8,6 @@ import { JWT } from "next-auth/jwt";
 
 dotenv.config({path: '@/driver/.env'})
 
-
-if (!process.env.NEXT_PUBLIC_GOOGLE_ID || !process.env.NEXT_PUBLIC_GOOGLE_SECRET) {
-  throw new Error("Missing Google OAuth credentials in environment variables")
-}
-
-if (!process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID || !process.env.NEXT_PUBLIC_FACEBOOK_SECRET) {
-  throw new Error("Missing Facebook OAuth credentials in environment variables")
-}
-
-if (!process.env.NEXT_PUBLIC_GITHUB_ID || !process.env.NEXT_PUBLIC_GITHUB_SECRET) {
-  throw new Error("Missing GitHub OAuth credentials in environment variables")
-}
-
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({

@@ -293,7 +293,7 @@ export class TicketService {
   //   return await this.getTicketsForVehicleID(vehicleIDs);
   // }
 
-  public async getTicketsStatsByDay(): Promise<Record<string, Ticket[]>> {
+  public async getAllTicketsCount(): Promise<Record<string, Ticket[]>> {
     const ticketQuery = `
         SELECT 
         id,
@@ -335,5 +335,49 @@ export class TicketService {
 
     return ticketsByDay;
   }
-}
 
+  public async getTicketsIssuedByEnforcer(enforcerID: string): Promise<Ticket[] | undefined> {
+
+    const enforcerDecrypted = await this.decrypt(enforcerID)
+    const result = await pool.query(
+      `
+      SELECT 
+        id,
+        vehicle,
+        enforcer,
+        data->>'issuedDate' AS issueddate,
+        data->>'violation' AS violation,
+        data->>'fine' AS fine,
+        data->>'ticketStatus' AS ticketstatus,
+        data->>'images' AS images,
+        data->>'note' AS note
+        FROM ticket
+        WHERE data->>'ticketStatus' != 'deleted'
+        AND enforcer = $1
+        ORDER BY data->>'issuedDate';
+      `,
+      [enforcerDecrypted]
+    )
+
+    if (result.rowCount === 0) return []
+
+    const tickets: Ticket[] = [];
+
+    for (const row of result.rows) {
+      tickets.push({
+        id: await this.encrypt(row.id),
+        vehicle: row.vehicle,
+        enforcer: await this.encrypt(row.enforcer),
+        issuedDate: new Date(row.issueddate),
+        violation: row.violation,
+        fine: parseFloat(row.fine),
+        ticketStatus: row.ticketstatus,
+        images: row.images,
+        note: row.note
+      });
+    }
+
+    // console.log(tickets);
+    return tickets;
+  }
+}

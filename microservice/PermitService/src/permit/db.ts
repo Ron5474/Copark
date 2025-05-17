@@ -1,10 +1,5 @@
 import { Pool } from 'pg';
 
-import * as dotenv from 'dotenv'
-import { resolve } from 'path'
-
-dotenv.config({ path: resolve(__dirname, '../../../../.env') })
-
 const pool = new Pool({
   host: process.env.POSTGRES_HOST,
   port: parseInt(process.env.POSTGRES_PORT as string, 10),

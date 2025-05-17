@@ -5,7 +5,6 @@ import { AuthUser, Credentials, User, OauthLoginData } from "./index";
 
 import { SignJWT, jwtVerify } from 'jose'
 
-
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
@@ -149,7 +148,7 @@ export class AuthService {
         }
       }
     } catch (err) {
-      void err;
+      console.log("Error in check:", err);
       throw new Error("Unauthorized3");
     }
   }
@@ -200,7 +199,7 @@ export class AuthService {
       return undefined
     }
   } catch (err) {
-    console.error("Error in driverLogin:", err);
+    console.log("Error in driverLogin:", err);
     throw new Error("Unauthorized");
   }
   }

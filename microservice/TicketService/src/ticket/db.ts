@@ -1,10 +1,5 @@
 import { Pool } from 'pg';
 
-import * as dotenv from 'dotenv'
-import { resolve } from 'path'
-
-dotenv.config({ path: resolve(__dirname, '../../../../.env') })
-
 // console.log(`ticket service is connected to ${process.env.POSTGRES_DB} database`)
 
 const pool = new Pool({

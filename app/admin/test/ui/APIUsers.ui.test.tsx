@@ -1,29 +1,32 @@
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react'
 import { ThemeProvider } from '@mui/material'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import theme from '../../src/app/theme'
 import AddAPIUser from '../../src/app/components/AddAPIUser'
 import ManageAPIUsers from '../../src/app/components/ManageAPIUsers'
-import { addAPIUser, getAPIUsers } from '../../src/api/actions'
+import { addAPIUser, getAPIUsers, suspendAPIUser, reinstateAPIUser } from '../../src/api/actions'
 
-// Mock the API actions with more detailed implementation
+
 vi.mock('../../src/api/actions', () => ({
   addAPIUser: vi.fn(),
-  getAPIUsers: vi.fn()
+  getAPIUsers: vi.fn(),
+  suspendAPIUser: vi.fn(),
+  reinstateAPIUser: vi.fn()
 }))
 
 const mockOnClose = vi.fn()
 const mockOnUserAdded = vi.fn()
 
 beforeEach(() => {
+  cleanup();
   vi.clearAllMocks()
 })
 
 it('renders correctly', () => {
   render(
     <ThemeProvider theme={theme}>
-      <AddAPIUser 
-        open={true} 
+      <AddAPIUser
+        open={true}
         onClose={mockOnClose}
         onUserAdded={mockOnUserAdded}
       />
@@ -36,11 +39,10 @@ it('renders correctly', () => {
 })
 
 it('handles form submission', async () => {
-  cleanup()
   render(
     <ThemeProvider theme={theme}>
-      <AddAPIUser 
-        open={true} 
+      <AddAPIUser
+        open={true}
         onClose={mockOnClose}
         onUserAdded={mockOnUserAdded}
       />
@@ -68,11 +70,10 @@ it('handles form submission', async () => {
 })
 
 it('handles role selection change', async () => {
-  cleanup()
   render(
     <ThemeProvider theme={theme}>
-      <AddAPIUser 
-        open={true} 
+      <AddAPIUser
+        open={true}
         onClose={mockOnClose}
         onUserAdded={mockOnUserAdded}
       />
@@ -103,11 +104,10 @@ it('handles role selection change', async () => {
 })
 
 it('closes dialog when cancel is clicked', () => {
-  cleanup(); 
   render(
     <ThemeProvider theme={theme}>
-      <AddAPIUser 
-        open={true} 
+      <AddAPIUser
+        open={true}
         onClose={mockOnClose}
         onUserAdded={mockOnUserAdded}
       />
@@ -122,14 +122,14 @@ const mockNavigate = vi.fn()
 
 beforeEach(() => {
   vi.clearAllMocks()
-  // Set up default mock implementation for other tests
+
   vi.mocked(getAPIUsers).mockResolvedValue([
-    { 
-      id: '1', 
-      name: 'Test Org', 
-      email: 'test@org.com', 
-      role: 'registrar', 
-      accountStatus: 'active', 
+    {
+      id: '1',
+      name: 'Test Org',
+      email: 'test@org.com',
+      role: 'registrar',
+      accountStatus: 'active',
     }
   ])
 })
@@ -142,14 +142,13 @@ it('renders correctly', async () => {
   )
 
   expect(screen.getByText('Manage API Users')).toBeDefined()
-  
+
   await waitFor(() => {
     expect(screen.getByText('Test Org')).toBeDefined()
   })
 })
 
 it('opens add dialog when add button is clicked', () => {
-  cleanup(); 
   render(
     <ThemeProvider theme={theme}>
       <ManageAPIUsers onNavigate={mockNavigate} />
@@ -161,7 +160,6 @@ it('opens add dialog when add button is clicked', () => {
 })
 
 it('opens add dialog and closes it properly', async () => {
-  cleanup()
   render(
     <ThemeProvider theme={theme}>
       <ManageAPIUsers onNavigate={mockNavigate} />
@@ -172,24 +170,82 @@ it('opens add dialog and closes it properly', async () => {
   expect(screen.getByRole('dialog')).toBeDefined()
 
   fireEvent.click(screen.getByText('Cancel'))
-  
+
   await waitFor(() => {
     expect(screen.queryByRole('dialog')).toBeNull()
   }, { timeout: 2000 })
 })
 
 it('shows no users message when api returns empty array', async () => {
-  // Setup mock to return empty array
   vi.mocked(getAPIUsers).mockResolvedValueOnce([])
-  
+
   render(
     <ThemeProvider theme={theme}>
       <ManageAPIUsers onNavigate={mockNavigate} />
     </ThemeProvider>
   )
 
-  // Wait for and verify the "no users" message
   await waitFor(() => {
     expect(screen.getByText('No API users found')).toBeDefined()
   })
 })
+
+it('handles suspending and reinstating an API user', async () => {
+  const mockUser = {
+    id: '1',
+    name: 'Test Org',
+    email: 'test@org.com',
+    role: 'registrar',
+    accountStatus: 'active'
+  }
+
+  vi.mocked(getAPIUsers)
+    .mockResolvedValueOnce([mockUser])
+    .mockResolvedValueOnce([{
+      ...mockUser,
+      accountStatus: 'suspended'
+    }])
+    .mockResolvedValueOnce([{
+      ...mockUser,
+      accountStatus: 'active'
+    }])
+
+  vi.mocked(suspendAPIUser).mockResolvedValueOnce([{
+    ...mockUser,
+    accountStatus: 'suspended'
+  }])
+
+  vi.mocked(reinstateAPIUser).mockResolvedValueOnce([{
+    ...mockUser,
+    accountStatus: 'active'
+  }])
+
+  render(
+    <ThemeProvider theme={theme}>
+      <ManageAPIUsers onNavigate={mockNavigate} />
+    </ThemeProvider>
+  )
+
+  await waitFor(() => {
+    expect(screen.getByText('Test Org')).toBeDefined()
+    expect(screen.getByLabelText('Suspend user')).toBeDefined()
+  })
+
+  const suspendButton = screen.getByLabelText('Suspend user')
+  fireEvent.click(suspendButton)
+
+  await waitFor(() => {
+    expect(suspendAPIUser).toHaveBeenCalledWith('1')
+    expect(screen.getByText('suspended')).toBeDefined()
+    expect(screen.getByLabelText('Reinstate user')).toBeDefined()
+  })
+
+  const reinstateButton = screen.getByLabelText('Reinstate user')
+  fireEvent.click(reinstateButton)
+
+  await waitFor(() => {
+    expect(reinstateAPIUser).toHaveBeenCalledWith('1')
+    expect(screen.getByText('active')).toBeDefined()
+  })
+})
+

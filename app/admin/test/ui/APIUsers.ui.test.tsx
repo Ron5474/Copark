@@ -4,14 +4,15 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import theme from '../../src/app/theme'
 import AddAPIUser from '../../src/app/components/AddAPIUser'
 import ManageAPIUsers from '../../src/app/components/ManageAPIUsers'
-import { addAPIUser, getAPIUsers, suspendAPIUser, reinstateAPIUser } from '../../src/api/actions'
+import { addAPIUser, getAPIUsers, suspendAPIUser, reinstateAPIUser, deleteAPIUser } from '../../src/api/actions'
 
 
 vi.mock('../../src/api/actions', () => ({
   addAPIUser: vi.fn(),
   getAPIUsers: vi.fn(),
   suspendAPIUser: vi.fn(),
-  reinstateAPIUser: vi.fn()
+  reinstateAPIUser: vi.fn(),
+  deleteAPIUser: vi.fn()
 }))
 
 const mockOnClose = vi.fn()
@@ -246,6 +247,49 @@ it('handles suspending and reinstating an API user', async () => {
   await waitFor(() => {
     expect(reinstateAPIUser).toHaveBeenCalledWith('1')
     expect(screen.getByText('active')).toBeDefined()
+  })
+})
+
+it('handles deleting an API user', async () => {
+  const mockUser = {
+    id: '1',
+    name: 'Test Org',
+    email: 'test@org.com',
+    role: 'registrar',
+    accountStatus: 'active'
+  }
+
+  // Mock initial state and after deletion
+  vi.mocked(getAPIUsers)
+    .mockResolvedValueOnce([mockUser])  // Initial load
+    .mockResolvedValueOnce([])  // After deletion
+
+  // Mock delete response
+  vi.mocked(deleteAPIUser).mockResolvedValueOnce([{
+    ...mockUser,
+    accountStatus: 'deleted'
+  }])
+
+  render(
+    <ThemeProvider theme={theme}>
+      <ManageAPIUsers onNavigate={mockNavigate} />
+    </ThemeProvider>
+  )
+
+  // Verify initial render
+  await waitFor(() => {
+    expect(screen.getByText('Test Org')).toBeDefined()
+    expect(screen.getByLabelText('Delete user')).toBeDefined()
+  })
+
+  // Click delete button
+  const deleteButton = screen.getByLabelText('Delete user')
+  fireEvent.click(deleteButton)
+
+  // Verify deletion
+  await waitFor(() => {
+    expect(deleteAPIUser).toHaveBeenCalledWith('1')
+    expect(screen.getByText('No API users found')).toBeDefined()
   })
 })
 

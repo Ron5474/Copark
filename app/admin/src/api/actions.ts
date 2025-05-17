@@ -139,3 +139,34 @@ export const reinstateAPIUser = async (id: string): Promise<User[]> => {
   const result = await response.json();
   return result.data.reinstateUser;
 };
+
+export const deleteAPIUser = async (id: string): Promise<User[]> => {
+  const token = await getAuthToken();
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query: `
+          mutation DeleteUser($user: UserInput!) {
+            deleteUser(user: $user) {
+              id
+              name 
+              email
+              accountStatus
+            }
+          }
+        `,
+      variables: {
+        user: {
+          id
+        },
+      },
+    }),
+  });
+
+  const result = await response.json();
+  return result.data.deleteUser;
+};

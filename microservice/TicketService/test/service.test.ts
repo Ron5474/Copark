@@ -260,8 +260,12 @@ test('getTicketsByDay should return tickets by day', async () => {
     const tickets = await ticketService.getAllTicketsCount();
 
     // console.log(tickets);
-    expect(tickets['2025-05-15']).toHaveLength(1);
-    expect(tickets['2025-05-16']).toHaveLength(14);
+    const date = new Date();
+    const today = date.toISOString().split('T')[0]
+    date.setDate(date.getDate() - 1)
+    const yest = date.toISOString().split('T')[0]
+    expect(tickets[yest]).toHaveLength(1);
+    expect(tickets[today]).toHaveLength(14);
 
 });
 

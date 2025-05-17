@@ -2,21 +2,20 @@ import { User, UserInput, NewUser, APIUser, APICredential, APIUserID } from "./s
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 
-const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
-const policeEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class AdminService {
-  private async encrypt(userId: string, expr = '30m', key = encodedKey): Promise<string> {
+  private async encrypt(userId: string, expr = '30m'): Promise<string> {
     return new SignJWT({ id: userId })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime(expr)
-      .sign(key)
+      .sign(encodedKey)
   }
 
-  private async decrypt(token: string, key = encodedKey): Promise<string | undefined> {
+  private async decrypt(token: string): Promise<string | undefined> {
     try {
-      const { payload } = await jwtVerify(token, key)
+      const { payload } = await jwtVerify(token, encodedKey)
 
       return payload.id as string; // Extract the `id` from the payload
     } catch (error) {
@@ -149,7 +148,7 @@ export class AdminService {
 
     if (rows.length > 0) {
       const userId = rows[0].id
-      const retid = await this.encrypt(userId, '5y', policeEncodedKey)
+      const retid = await this.encrypt(userId, '5y')
       return { id: retid }
     } else {
       return undefined
@@ -175,7 +174,7 @@ export class AdminService {
 
     for (const row of apiUsersResult.rows) {
       apiUsers.push({
-        id: await this.encrypt(row.id, '5y', policeEncodedKey),
+        id: await this.encrypt(row.id, '5y'),
         name: row.name,
         email: row.email,
         role: row.role,
@@ -187,6 +186,8 @@ export class AdminService {
   }
 
   public async suspendUser(user: UserInput): Promise<User[]> {
+    const userUUID = await this.decrypt(user.id)
+
     const updateQuery = `
       UPDATE account
       SET data = jsonb_set(data, '{accountStatus}', '"suspended"')
@@ -194,13 +195,13 @@ export class AdminService {
       RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
     `;
 
-    const result = await pool.query(updateQuery, [await this.decrypt(user.id, policeEncodedKey)]);
+    const result = await pool.query(updateQuery, [userUUID]);
 
     const Users: User[] = [];
 
     for (const row of result.rows) {
       Users.push({
-        id: await this.encrypt(row.id, '5y', policeEncodedKey),
+        id: await this.encrypt(row.id),
         name: row.name,
         accountStatus: row.accountstatus,
         email: row.email,
@@ -219,13 +220,13 @@ export class AdminService {
       RETURNING id, data->>'name' AS name, data->>'email' AS email, data->>'accountStatus' AS accountStatus;
     `;
 
-    const result = await pool.query(updateQuery, [await this.decrypt(user.id, policeEncodedKey)]);
+    const result = await pool.query(updateQuery, [await this.decrypt(user.id)]);
 
     const Users: User[] = [];
 
     for (const row of result.rows) {
       Users.push({
-        id: await this.encrypt(row.id, '5y', policeEncodedKey),
+        id: await this.encrypt(row.id),
         name: row.name,
         accountStatus: row.accountstatus,
         email: row.email,

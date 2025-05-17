@@ -4,7 +4,7 @@ import * as fs from 'fs'
 import * as dotenv from 'dotenv'
 import { resolve } from 'path'
 
-dotenv.config({ path: resolve(__dirname, '../../../../.env') })
+dotenv.config({ path: resolve(__dirname, '../../../.env') })
 
 process.env.POSTGRES_PORT = '5433'
 

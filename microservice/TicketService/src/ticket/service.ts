@@ -125,10 +125,10 @@ export class TicketService {
     };
 
     await sendTicketIssuedEmail({
-      to: 'bcoliver@ucsc.edu', // TODO: replace with real driver's email
+      to: 'coparkspace@gmail.com', // TODO: replace with real driver's email
       subject: `We issued a ticket for one of your Vehicles`,
       html: `
-        <h3>Hello Bryant Oliver</h3>
+        <h3>Hello Copark Park</h3>
         <p><strong>Violation:</strong> ${ticket.violation}</p>
         <p>Login in to copark.space to view and pay your ticket</p>
       `

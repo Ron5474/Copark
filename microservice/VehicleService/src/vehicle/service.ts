@@ -115,8 +115,8 @@ export class VehicleService {
     })))
   }
 
-  public async registerVehicle(userId: string, input: RegisterVehicleInput): Promise<Vehicle> {
-    // const userDecrypted = await this.decrypt(userId)
+  public async registerVehicle(input: RegisterVehicleInput, token?: string): Promise<Vehicle> {
+    const userId = (await this.getUserData(token)).id
     const result = await pool.query(
       `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
       [userId, input]

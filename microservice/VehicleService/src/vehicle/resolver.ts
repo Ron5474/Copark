@@ -26,8 +26,8 @@ export class VehicleResolver {
     @Arg('input', () => RegisterVehicleInput) input: RegisterVehicleInput,
     @Ctx() request: Request & {user: SessionUser}
   ): Promise<Vehicle> {
-    const userId = request.user.id
-    return await service.registerVehicle(userId, input)
+    const token = request.headers.authorization?.split(' ')[1]
+    return await service.registerVehicle(input, token)
   }
 
   @Authorized('driver')

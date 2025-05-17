@@ -36,8 +36,8 @@ export class VehicleResolver {
     @Arg('input', () => UpdateVehicleInput) input: UpdateVehicleInput,
     @Ctx() request: Request & {user: SessionUser}
   ): Promise<Vehicle> {
-    const userId = request.user.id
-    return await service.updateVehicle(userId, input)
+    const token = request.headers.authorization?.split(' ')[1]
+    return await service.updateVehicle(input, token)
   }
 
   @Authorized('admin', 'enforcement', 'police')

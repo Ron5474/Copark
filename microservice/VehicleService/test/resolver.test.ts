@@ -13,7 +13,7 @@ let authServer: http.Server
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
-const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 
 beforeAll(async () => {
   // Start your GraphQL server
@@ -42,14 +42,14 @@ afterAll(() => {
   authServer.close()
 })
 
-const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
+// const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
 
-// const driver = {
-//     "name": "Derik Driver",
-//     "email": "derik@copark.space",
-//     "picture": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWRzMmJldTdzMWtncDBweGtvM21kYnRyeDk1cHpvNnU5MWVycXEybiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/keyufLabLaJKh3xnVy/giphy.gif",
-//     "sub": "1234567890",
-//   }
+const driver = {
+    "name": "Derik Driver",
+    "email": "derik@copark.space",
+    "picture": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWRzMmJldTdzMWtncDBweGtvM21kYnRyeDk1cHpvNnU5MWVycXEybiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/keyufLabLaJKh3xnVy/giphy.gif",
+    "sub": "1234567890",
+  }
 
 async function encrypt(userId: string): Promise<string> {
   return new SignJWT({ id: userId })
@@ -68,11 +68,16 @@ const adminUser = {
 
 async function loginAs(who: string): Promise<string | undefined> {
   if (who === "driver") {
+    const token = new SignJWT(driver)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(encodedKey)
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/driver/login')
-      .set('Authorization', `Bearer ${nextAuthJWT}`)
+      .set('Authorization', `Bearer ${await token}`)
 
-    // console.log('Status:', response.status)
+    // console.log('Status:', response.status
     // console.log('Headers:', response.headers)
     // console.log('Body:', response.body)
 
@@ -80,7 +85,7 @@ async function loginAs(who: string): Promise<string | undefined> {
       throw new Error(`Login failed with status ${response.status}`)
     }
 
-    return response.body
+    return token
   }
 
   else if (who === "enforcement") {
@@ -304,8 +309,7 @@ test('Non-Driver cannot get a list of their vehicles', async () => {
 })
 
 test('Driver can get a list of their vehicles', async () => {
-    const token = await loginAs("driver")
-
+  const token = await loginAs("driver")
     const response = await supertest(server)
       .post('/graphql')
       .set('Authorization', 'Bearer ' + token)

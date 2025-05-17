@@ -17,7 +17,6 @@ export class VehicleService {
           'Content-Type': 'application/json',
         }
       })
-    console.log('response', response)
 
     const res = response.status === 200 ? await response.json() : null;
     if (!res) {
@@ -128,7 +127,8 @@ export class VehicleService {
     }
   }
 
-  public async updateVehicle(userId: string, input: UpdateVehicleInput): Promise<Vehicle> {
+  public async updateVehicle(input: UpdateVehicleInput, token?: string): Promise<Vehicle> {
+    const userId = (await this.getUserData(token)).id
     const { id, ...patch } = input
 
     const vehicleID = await this.decrypt(id)

@@ -121,7 +121,7 @@ test('getMyVehicles - does not show Driver2 vehicles belonging to Driver1', asyn
 
 test('updateVehicle - updates vehicle table correctly', async () => {
   const vehicle = await new VehicleService().registerVehicle(mock_vehicle1, mock_driver1_ID)
-  await new VehicleService().updateVehicle(mock_driver1_ID, {id: vehicle.id, ...update_vehicle1})
+  await new VehicleService().updateVehicle({id: vehicle.id, ...update_vehicle1}, mock_driver1_ID)
   const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)
   expect(vehicles[0].state).toBe('Texas')
 })
@@ -129,7 +129,7 @@ test('updateVehicle - updates vehicle table correctly', async () => {
 test('updateVehicle - Throws error because no vehicle exists', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
-  await expect(new VehicleService().updateVehicle(mock_driver1_ID, {id: mock_driver2_ID, ...update_vehicle1}))
+  await expect(new VehicleService().updateVehicle({id: mock_driver2_ID, ...update_vehicle1}, mock_driver1_ID))
   .rejects.toThrow('Vehicle not found or not owned by user')
 })
 

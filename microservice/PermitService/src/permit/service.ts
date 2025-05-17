@@ -7,7 +7,8 @@ import {
   IsValidPermitInput,
   IsValidPolice,
   MyPermits,
-  ZoneDetails
+  ZoneDetails,
+  Permit
 } from './schema'
 
 export class PermitService {
@@ -175,7 +176,7 @@ export class PermitService {
     return isWeekend ? result.rows[0].data.weekend : result.rows[0].data.weekday
   }
 
-  public async getAllPermitsByDay(): Promise<Record<string, any[]>> {
+  public async getAllPermitsByDay(): Promise<Record<string, Permit[]>> {
     const permitQuery = `
       SELECT 
         id,
@@ -192,7 +193,7 @@ export class PermitService {
     `;
 
     const permitResults = await pool.query(permitQuery);
-    const permitsByDay: Record<string, any[]> = {};
+    const permitsByDay: Record<string, Permit[]> = {};
 
     for (const row of permitResults.rows) {
       const date = new Date(row.activeDate).toISOString().split('T')[0]; // YYYY-MM-DD

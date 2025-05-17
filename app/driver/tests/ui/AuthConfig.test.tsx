@@ -52,3 +52,22 @@ it('Encode throws error if parameter missing', async () => {
   maxAge: mockMaxAge 
   })).rejects.toThrow('Missing required parameters for JWT encoding')
 })
+
+it('Decode a valid token successfully', async () => {
+  const { decode } = authOptions.jwt!
+  const mockPayload = { ...mockToken }
+  
+  vi.mocked(jwtVerify).mockResolvedValue({
+    payload: mockPayload,
+    protectedHeader: { alg: 'HS256' }
+  } as any)
+  
+  const result = await decode({ 
+    token: 'valid.token', 
+    secret: mockSecret 
+  })
+  
+  expect(result).toEqual(mockPayload)
+expect(jwtVerify).toHaveBeenCalledWith('valid.token', expect.anything())
+
+})

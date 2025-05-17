@@ -1,4 +1,4 @@
-import { test, beforeAll, afterAll, expect } from 'vitest'
+import { test, beforeAll, afterAll, expect, vi } from 'vitest'
 // @ts-ignore
 import supertest from 'supertest'
 import * as http from 'http'
@@ -106,33 +106,35 @@ test('Errors out with no auth header', async () => {
   })
 
 test('Errors out with bad auth header', async () => {
-const token = await loginAsAdmin()
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+  const token = await loginAsAdmin()
 
-const query = `
-    query {
-    getEnforcers {
-        id
-        name
-        email
-        accountStatus
-    }
-    }
-`
+  const query = `
+      query {
+      getEnforcers {
+          id
+          name
+          email
+          accountStatus
+      }
+      }
+  `
 
-const response = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + token + 'invalidtoken')
-    .send({ query })
-    .expect(200)
+  const response = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token + 'invalidtoken')
+      .send({ query })
+      .expect(200)
 
-expect(response.body.errors).toBeDefined();
-expect(response.body.errors[0].message).toBe("Unauthorized312")
+  expect(response.body.errors).toBeDefined();
+  expect(response.body.errors[0].message).toBe("Unauthorized312")
 })
 
 test('GET /playground returns the GraphQL Playground HTML', async () => {
-const response = await supertest(server)
-    .get('/playground')
-    .expect(200);
+  const response = await supertest(server)
+      .get('/playground')
+      .expect(200);
 
-expect(response.text).toContain('<title>GraphQL Playground</title>');
+  expect(response.text).toContain('<title>GraphQL Playground</title>');
 });

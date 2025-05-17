@@ -80,3 +80,16 @@ it('Decode throws error if parameter missing', async () => {
     secret: mockSecret 
   })).rejects.toThrow('Missing required parameters for JWT decoding')
 })
+
+it('Returns null if Verification of token fails', async () => {
+  const { decode } = authOptions.jwt!
+  
+  vi.mocked(jwtVerify).mockRejectedValue(new Error('Invalid token'))
+  
+  const result = await decode({ 
+    token: 'invalid.token', 
+    secret: mockSecret 
+  })
+  
+  expect(result).toBeNull()
+})

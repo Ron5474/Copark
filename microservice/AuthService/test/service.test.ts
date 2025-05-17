@@ -148,7 +148,8 @@ test('AuthService Check() works fine with correct OAuth JWT', async () => {
 test('AuthService Check() throws error for invalid driver', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
-  
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'log').mockImplementation(() => {})
   await expect(new AuthService().check(`Bearer ${validJWT}`, ["driver"])).rejects.toThrow('Unauthorized3')
 })
 

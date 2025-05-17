@@ -41,6 +41,8 @@ test('Check throws error w/o authorization', async () => {
 })
 
 test('Send Invalid Body Throws error', async () => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'log').mockImplementation(() => {})
     await supertest(server)
       .post('/api/v0/auth/check')
       .set('Authorization', `Bearer ${validJWT}`)

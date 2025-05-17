@@ -18,12 +18,12 @@ import { getAPIUsers, suspendAPIUser, reinstateAPIUser, deleteAPIUser, APIUser }
 export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: string) => void }) {
   const theme = useTheme();
   const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [APIUsers, setAPIUsers] = useState<APIUser[]>([]);
+  const [users, setUsers] = useState<APIUser[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchUsers = async () => {
     const users = await getAPIUsers();
-    setAPIUsers(users);
+    setUsers(users);
     setLoading(false);
     setLoading(false);
     return users;
@@ -87,13 +87,13 @@ export default function ManageAPIUsers({ onNavigate }: { onNavigate: (page: stri
           <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>
             Loading...
           </Typography>
-        ) : APIUsers?.length === 0 ? (
+        ) : users?.length === 0 ? (
           <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>
             No API users found
           </Typography>
         ) : (
           <Box>
-            {APIUsers?.map((user) => (
+            {users?.map((user) => (
               <Box
                 key={user.id}
                 sx={{

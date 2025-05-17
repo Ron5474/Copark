@@ -30,3 +30,19 @@ export interface ZoneDetails {
   openTime?: string
   closeTime?: string
 }
+
+export interface PaymentDetails {
+  id: string;
+  amount: number|null;
+  currency: string|null;
+  status: string;
+  payment_method: string;
+  type: string;
+}
+
+export interface PermitDetails {
+  type: string;
+  zoneNumber: string | null;
+  vehicle: Vehicle;
+  durationString?: string | null; 
+}

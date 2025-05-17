@@ -43,3 +43,12 @@ it('Encode a JWT token successful', async () => {
   expect(result).toBe('mock.jwt.token')
 })
 
+it('Encode throws error if parameter missing', async () => {
+  const { encode } = authOptions.jwt!
+  
+  await expect(encode({ 
+  secret: '', 
+  token: mockToken, 
+  maxAge: mockMaxAge 
+  })).rejects.toThrow('Missing required parameters for JWT encoding')
+})

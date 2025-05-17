@@ -15,11 +15,27 @@ import db from './db'
 import { VehicleService } from '../src/vehicle/service'
 import { Vehicle } from '../src/vehicle/schema'
 import { SignJWT } from 'jose'
-
+import {http, HttpHandler, HttpResponse} from 'msw'
+import { setupServer } from 'msw/node'
 vi.mock('server-only', () => ({}))
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 // const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+
+export const handlers: HttpHandler[] = [
+  http.get('http://localhost:3010/api/v0/auth/driver/id', async ({ request }) => {
+    const authHeader = request.headers.get('Authorization');
+    const token = authHeader?.split(' ')[1];
+
+    if (token) {
+      return HttpResponse.json({ id: token, name: 'John Doe', role: ['driver'] });
+    } else {
+      return new HttpResponse(null, { status: 401 });
+    }
+  }),
+];
+const server = setupServer(...handlers)
+server.listen();
 
 beforeEach(() => {
     return db.reset()
@@ -90,21 +106,21 @@ test('getMyVehicles - Returns Correct Number (0)', async () => {
 })
 
 test('getMyVehicles - Returns Correct Number (2)', async () => {
-  await new VehicleService().registerVehicle(mock_driver1_ID, mock_vehicle1)
-  await new VehicleService().registerVehicle(mock_driver1_ID, mock_vehicle2)
+  await new VehicleService().registerVehicle(mock_vehicle1, mock_driver1_ID)
+  await new VehicleService().registerVehicle(mock_vehicle2, mock_driver1_ID)
   const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)
   expect(vehicles.length).toBe(2)
 })
 
 test('getMyVehicles - does not show Driver2 vehicles belonging to Driver1', async () => {
-  await new VehicleService().registerVehicle(mock_driver1_ID, mock_vehicle1)
-  await new VehicleService().registerVehicle(mock_driver1_ID, mock_vehicle2)
+  await new VehicleService().registerVehicle(mock_vehicle1, mock_driver1_ID)
+  await new VehicleService().registerVehicle(mock_vehicle2, mock_driver1_ID)
   const vehicles = await new VehicleService().getMyVehicles(mock_driver2_ID)
   expect(vehicles.length).toBe(0)
 })
 
 test('updateVehicle - updates vehicle table correctly', async () => {
-  const vehicle = await new VehicleService().registerVehicle(mock_driver1_ID, mock_vehicle1)
+  const vehicle = await new VehicleService().registerVehicle(mock_vehicle1, mock_driver1_ID)
   await new VehicleService().updateVehicle(mock_driver1_ID, {id: vehicle.id, ...update_vehicle1})
   const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)
   expect(vehicles[0].state).toBe('Texas')
@@ -118,7 +134,7 @@ test('updateVehicle - Throws error because no vehicle exists', async () => {
 })
 
 test('findVehicleByPlate - Returns Correct Vehicle', async () => {
-  await new VehicleService().registerVehicle(mock_driver1_ID, mock_vehicle2)
+  await new VehicleService().registerVehicle(mock_vehicle2, mock_driver1_ID)
   const vehicle = await new VehicleService().findVehicleByPlate(mock_vehicle2.plate)
   expect((vehicle as Vehicle).nickname).toBe(mock_vehicle2.nickname)
 })
@@ -132,7 +148,7 @@ test('getVehicleById - Returns Correct Vehicle', async () => {
   const vehicleService = new VehicleService();
 
   // Register a vehicle to test retrieval
-  const registeredVehicle = await vehicleService.registerVehicle(mock_driver1_ID, mock_vehicle1);
+  const registeredVehicle = await vehicleService.registerVehicle(mock_vehicle1, mock_driver1_ID);
 
   // Retrieve the vehicle by its ID
   const retrievedVehicle = await vehicleService.getVehicleById({ id: registeredVehicle.id });

@@ -311,6 +311,7 @@ test('Driver can get a list of their vehicles', async () => {
       .set('Authorization', 'Bearer ' + token)
       .send({ query: getVehiclequery })
       .expect(200)
+    console.log(response.body)
 
     expect(response.body.data.myVehicles.length).toBe(0)
   })

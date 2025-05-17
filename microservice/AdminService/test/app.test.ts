@@ -2,6 +2,7 @@ import { test, beforeAll, afterAll, expect, vi } from 'vitest'
 // @ts-ignore
 import supertest from 'supertest'
 import * as http from 'http'
+import killPort from 'kill-port'
 
 import db from './db'
 import { app, bootstrap } from '../src/app'
@@ -19,17 +20,23 @@ beforeAll(async () => {
   server.listen()
   await bootstrap()
 
-  // Start your Auth server
+  // Force kill anything on AUTH_PORT
+  try {
+    await killPort(AUTH_PORT)
+  } catch (error) {
+    console.log(`No process was running on port ${AUTH_PORT}`)
+  }
+
+  // Create and start auth server
   authServer = http.createServer(authApp)
-  await new Promise<void>((resolve) => {
-    authServer.listen(AUTH_PORT, () => {
-    //   console.log(`Auth service running on ${AUTH_SERVICE_URL}`)
-      resolve()
-    })
+  
+  await new Promise<void>((resolve, reject) => {
+    authServer.listen(AUTH_PORT, () => resolve())
+      .on('error', (err) => reject(err))
   })
 
   return db.reset()
-})
+}, 100000)
 
 afterAll(() => {
   db.shutdown()

@@ -148,7 +148,7 @@ export class AuthService {
         }
       }
     } catch (err) {
-      console.log("Error in check:", err);
+      // console.log("Error in check:", err);
       throw new Error("Unauthorized3");
     }
   }

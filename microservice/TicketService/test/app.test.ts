@@ -82,6 +82,8 @@ test('Errors out with no auth header', async () => {
     .expect(200)
 
   expect(response.body.errors).toBeDefined()
+  expect(response.body.errors[0].message).toMatch("Unauthorized: Missing Authorization header")
+  
 })
 
 test('Errors out with badly formed auth header', async () => {
@@ -107,6 +109,8 @@ test('Errors out with badly formed auth header', async () => {
       .expect(200)
   
     expect(response.body.errors).toBeDefined()
+    expect(response.body.errors[0].message).toMatch("Unauthorized312")
+
 })
 
 test('Errors out with wrong permissions', async () => {
@@ -132,6 +136,7 @@ test('Errors out with wrong permissions', async () => {
       .expect(200)
   
     expect(response.body.errors).toBeDefined()
+    expect(response.body.errors[0].message).toMatch("Unauthorized312")
 })
 
 test('GET /playground returns the GraphQL Playground HTML', async () => {

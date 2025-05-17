@@ -174,4 +174,45 @@ export class PermitService {
     if (result.rowCount == 0) throw new Error(`Zone does not exist: ${zone}`)
     return isWeekend ? result.rows[0].data.weekend : result.rows[0].data.weekday
   }
+
+  public async getAllPermitsByDay(): Promise<Record<string, any[]>> {
+    const permitQuery = `
+      SELECT 
+        id,
+        vehicle,
+        zone,
+        data->>'type' AS type,
+        data->>'purchaseDate' AS purchaseDate,
+        data->>'activeDate' AS activeDate,
+        data->>'expireDate' AS expireDate,
+        data->>'receipt' AS receipt,
+        data->>'paymentMethod' AS paymentMethod
+      FROM permit
+      ORDER BY data->>'activeDate';
+    `;
+
+    const permitResults = await pool.query(permitQuery);
+    const permitsByDay: Record<string, any[]> = {};
+
+    for (const row of permitResults.rows) {
+      const date = new Date(row.activeDate).toISOString().split('T')[0]; // YYYY-MM-DD
+      const permit = {
+        id: row.id,
+        vehicle: row.vehicle,
+        zone: row.zone,
+        type: row.type,
+        purchaseDate: row.purchaseDate,
+        activeDate: row.activeDate,
+        expireDate: row.expireDate,
+        receipt: row.receipt,
+        paymentMethod: row.paymentMethod
+      };
+      if (!permitsByDay[date]) {
+        permitsByDay[date] = [];
+      }
+      permitsByDay[date].push(permit);
+    }
+
+    return permitsByDay;
+  }
 }

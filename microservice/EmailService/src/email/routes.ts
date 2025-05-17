@@ -1,6 +1,6 @@
 import express from 'express'
 import { sendEmail } from './mailer'
-import { EmailRequest } from './types'
+import { EmailRequest } from '../types'
 
 const router = express.Router()
 

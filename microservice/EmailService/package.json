@@ -1,15 +1,13 @@
 {
-  "name": "email-service",
+  "name": "microservices",
   "version": "1.0.0",
-  "description": "Microservice for handling all outbound emails",
-  "main": "build/src/server.js",
   "scripts": {
     "bstart": "npm run build && npm run start",
-    "start": "node build/src/server.js",
+    "start": "node build/server.js",
     "build": "tsc",
     "dev": "nodemon",
-    "lint": "eslint src/**/*.[jt]s --fix",
-    "test": "vitest run --no-file-parallelism --testTimeout=3000 --coverage"
+    "test": "vitest run --no-file-parallelism --testTimeout=3000 --coverage",
+    "lint": "eslint src/**/*.[jt]s --fix"
   },
   "author": "",
   "license": "ISC",

@@ -2,6 +2,7 @@ import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 import { Vehicle } from "../types/express";
+import { sendTicketIssuedEmail } from './emailClient'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
@@ -122,6 +123,18 @@ export class TicketService {
         images: row.images,
         note: row.note,
     };
+
+    await sendTicketIssuedEmail({
+    to: 'ysmohame@ucsc.edu', // TODO: replace with real driver's email
+    subject: `Ticket issued for vehicle ${ticket.vehicle}`,
+    html: `
+      <h3>New Ticket Issued</h3>
+      <p><strong>Violation:</strong> ${ticket.violation}</p>
+      <p><strong>Fine:</strong> $${ticket.fine}</p>
+      <p><strong>Note:</strong> ${ticket.note}</p>
+      <p><strong>Status:</strong> ${ticket.ticketStatus}</p>
+    `
+  })
 
     // console.log(ticket.id);
     return ticket;

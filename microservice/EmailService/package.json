@@ -1,0 +1,35 @@
+{
+  "name": "email-service",
+  "version": "1.0.0",
+  "description": "Microservice for handling all outbound emails",
+  "main": "build/src/server.js",
+  "scripts": {
+    "bstart": "npm run build && npm run start",
+    "start": "node build/src/server.js",
+    "build": "tsc",
+    "dev": "nodemon",
+    "lint": "eslint src/**/*.[jt]s --fix",
+    "test": "vitest run --no-file-parallelism --testTimeout=3000 --coverage"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^4.18.4",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.30",
+    "eslint": "^9.0.0",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.3",
+    "vitest": "^3.1.2"
+  },
+  "nodemonConfig": {
+    "watch": ["src"],
+    "ext": "ts",
+    "exec": "ts-node ./src/server.ts"
+  }
+}

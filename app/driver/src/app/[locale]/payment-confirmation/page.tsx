@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Topbar from "../shared/Topbar";
 import { useEffect } from "react";
-import { getTransactionDetails } from "./actions";
+import { getTransactionDetails, addPaymentDetails, addPermitDetails } from "./actions";
 import { Box, Button, Toolbar, Typography } from "@mui/material";
 import theme from "../theme";
 import { useRouter } from "@/i18n/navigation";
@@ -24,6 +24,25 @@ function PaymentConfirmation() {
       }
       const details = await getTransactionDetails(sessionId);
       setTransactionId(details.id);
+
+      await addPaymentDetails(details);
+      const vehicle = sessionStorage.getItem("vehicle");
+      const zoneNumber = sessionStorage.getItem("zoneNumber");
+      const durationString = sessionStorage.getItem("durationString");
+      const v = JSON.parse(vehicle as string);
+      const permitDetails = {
+        type: details.type as string,
+        vehicle: v ? v : undefined,
+        zoneNumber: zoneNumber,
+        durationString: durationString,
+      };
+      await addPermitDetails(details, permitDetails);
+      sessionStorage.removeItem("vehicle");
+      sessionStorage.removeItem("tempLocation");
+      sessionStorage.removeItem("zoneNumber");
+      sessionStorage.removeItem("durationString");
+      sessionStorage.removeItem("price");
+      sessionStorage.removeItem("currency");
     };
     fetchSessionDetails();
   }, [sessionId]);

@@ -28,6 +28,60 @@ async function encrypt(userId: string, key=emailEncodedKey): Promise<string> {
 
 @Resolver()
 export class TicketResolver {
+  private async getVehicleById(userID: string): Promise<Vehicle[]> {
+    if (!userID) {
+      throw new Error('User ID not provided')
+    }
+
+    const vehicleQuery = {
+      query: `
+        query {
+          getVehicleByUserId(userID: "${userID}") {
+            id
+          }
+        }
+      `
+    };
+
+    const vehicleResponse = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // 'Authorization': 'Bearer ' + (userID)
+      },
+      body: JSON.stringify(vehicleQuery)
+    });
+
+    const vehicleResult = await vehicleResponse.json();
+    const vehicleIDs: Vehicle[] =
+      vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id);
+    
+    return vehicleIDs
+  }
+
+  private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[] }> {
+    if (!token) {
+      throw new Error('Token not provided');
+    }
+    const response = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+
+    const res = response.status === 200 ? await response.json() : null;
+    if (!res) {
+      throw new Error('User not found');
+    }
+    return {
+      id: res.id,
+      name: res.name,
+      role: res.role
+    };
+  }
+
   @Query(() => [Ticket])
   @Authorized(["admin"])
   async getTickets(): Promise<Ticket[]> {
@@ -41,41 +95,12 @@ export class TicketResolver {
     // @ts-ignore
     // const userJWT = request.headers.authorization?.split(' ')[1];
     // console.log('User: ', userJWT)
-    const authRes = await fetch(
-      `http://localhost:3010/api/v0/auth/driver/id`, 
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${request.headers.authorization}`
-        },
-      }
-    );
+    const token = request.headers.authorization?.split(' ')[1]
+    const userId = (await this.getUserData(token)).id
 
-    const userID = await authRes.json();
-    const userEncrypted = await encrypt(userID.id, emailEncodedKey)
-    const vehicleQuery = {
-      query: `
-      query {
-        getVehicleByUserId(userID: "${userEncrypted}") {
-          id
-        }
-      }
-      `
-    };
-
-    const response = await fetch('http://localhost:4001/graphql', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Authorization': `${userJWT}`
-    },
-    body: JSON.stringify(vehicleQuery)
-    });
-
-    const vehicleResult = await response.json();
-    const vehicleIDs: Vehicle[] =
-    vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id);
+    const userEncrypted = await encrypt(userId, emailEncodedKey)
+    
+    const vehicleIDs: Vehicle[] = await this.getVehicleById(userEncrypted)
 
     return await ticketService.getTicketsForVehicleID(vehicleIDs)
   }
@@ -126,10 +151,6 @@ export class TicketResolver {
       const vehicleJson = await vehicleRes.json();
       const vehicleId = vehicleJson?.data?.findOrCreateVehicleByPlate?.id;
 
-      // if (!vehicleId) {
-      //   throw new Error("Unable to resolve vehicle ID");
-      // }
-
       return ticketService.createTicket({
       enforcer: (request.headers.authorization as string).split(' ')[1],
       vehicle: vehicleId,
@@ -163,30 +184,7 @@ export class TicketResolver {
       return {hasTicket: false}
     }
 
-    // get vehicles for userID
-
-    const vehicleQuery = {
-    query: `
-      query {
-        getVehicleByUserId(userID: "${userID.id}") {
-          id
-        }
-      }
-    `
-    };
-
-  const vehicleResponse = await fetch('http://localhost:4001/graphql', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Authorization': 'Bearer ' + (userID)
-    },
-    body: JSON.stringify(vehicleQuery)
-  });
-
-  const vehicleResult = await vehicleResponse.json();
-  const vehicleIDs: Vehicle[] =
-    vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id);
+    const vehicleIDs: Vehicle[] = await this.getVehicleById(userID.id)
 
     const tickets = await ticketService.getTicketsForVehicleID(vehicleIDs)
 

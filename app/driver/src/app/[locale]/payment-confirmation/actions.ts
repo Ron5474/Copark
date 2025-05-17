@@ -16,6 +16,7 @@ export async function getTransactionDetails(sessionId: string): Promise<{
       
 });
     const paymentIntent = session.payment_intent as Stripe.PaymentIntent;
+    console.log(session.line_items)
     return {
       id: paymentIntent.id,
       amount: paymentIntent.amount,

@@ -69,8 +69,8 @@ export class PaymentController extends Controller {
 
     const res = await new PaymentService().completePayment(paymentDetails, userId);
     if (!res) {
-      this.setStatus(500);
-      throw new Error("Failed to save payment details");
+      this.setStatus(200);
+      return;
     }
     this.setStatus(201);
     return;

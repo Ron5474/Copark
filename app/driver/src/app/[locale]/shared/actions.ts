@@ -26,7 +26,7 @@ export async function Payment(
   const cookieStore = await cookies();
   const authCookie = cookieStore.get(process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME as string);
 
-  const res = await fetch("http://localhost:3014/api/v0/pay", {
+  const res = await fetch("http://localhost:3014/api/v0/payment/pay", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

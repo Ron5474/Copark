@@ -33,7 +33,7 @@ export async function addPaymentDetails(
 ): Promise<void> {
   const { id, amount, currency, status, payment_method, type } = details;
   
-  const res = await fetch("http://localhost:3010/api/v0/payments", {
+  const res = await fetch("http://localhost:3014/api/v0/payment/complete", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -48,11 +48,10 @@ export async function addPaymentDetails(
       type,
     }),
   });
-  if (!res.ok) {
+
+  if (res.status !== 201 && res.status !== 200 && res.status !== 204) {
     throw new Error("Failed to save payment details");
   }
-
-  console.log("Payment details saved:", { id, amount, currency, status, payment_method, type });
 }
 
 export async function addPermitDetails(

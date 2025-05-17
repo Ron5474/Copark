@@ -28,6 +28,9 @@ services:
       - ./microservice/PermitService/sql/databases.sql:/docker-entrypoint-initdb.d/13.databases.sql
       - ./microservice/PermitService/sql/schema.sql:/docker-entrypoint-initdb.d/14.schema.sql
       - ./microservice/PermitService/sql/data.sql:/docker-entrypoint-initdb.d/15.data.sql
+      - ./microservice/PaymentService/sql/databases.sql:/docker-entrypoint-initdb.d/16.databases.sql
+      - ./microservice/PaymentService/sql/schema.sql:/docker-entrypoint-initdb.d/17.schema.sql
+      - ./microservice/PaymentService/sql/data.sql:/docker-entrypoint-initdb.d/18.data.sql
     networks:
       - external-network
 
@@ -59,6 +62,9 @@ services:
       - ./microservice/PermitService/sql/databases.sql:/docker-entrypoint-initdb.d/13.databases.sql
       - ./microservice/PermitService/sql/schema.sql:/docker-entrypoint-initdb.d/14.schema.sql
       - ./microservice/PermitService/sql/data.sql:/docker-entrypoint-initdb.d/15.data.sql
+      - ./microservice/PaymentService/sql/databases.sql:/docker-entrypoint-initdb.d/16.databases.sql
+      - ./microservice/PaymentService/sql/schema.sql:/docker-entrypoint-initdb.d/17.schema.sql
+      - ./microservice/PaymentService/sql/data.sql:/docker-entrypoint-initdb.d/18.data.sql
 
 networks:
   external-network:

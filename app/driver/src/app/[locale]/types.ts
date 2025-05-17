@@ -43,6 +43,6 @@ export interface PaymentDetails {
 export interface PermitDetails {
   type: string;
   zoneNumber: string | null;
-  vehicle: Vehicle;
+  vehicle?: Vehicle;
   durationString?: string | null; 
 }

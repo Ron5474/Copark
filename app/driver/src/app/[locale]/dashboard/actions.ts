@@ -13,7 +13,6 @@ export async function userLoginSignUpAttempt(): Promise<string|undefined> {
       Authorization: `Bearer ${authCookie?.value}`,
     },
   })
-  console.log(res);
   
   if (res.status !== 201 && res.status !== 200 && res.status !== 204) {
     return undefined;

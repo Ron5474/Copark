@@ -1,9 +1,9 @@
 
-// import * as db from "./db";
+import { pool } from "./db";
 import Stripe from "stripe";
-import { Checkout } from "./index";
+import { Checkout, PaymentDetails } from "./index";
 export class PaymentService {
-  async payment(
+  public async payment(
     checkoutDetails: Checkout,
     id?: string,
   ): Promise<string|null> {
@@ -37,4 +37,41 @@ export class PaymentService {
     // console.log("session", session);
     return session.url;
   } 
+
+  public async completePayment(
+    details: PaymentDetails,
+    id?: string,
+  ): Promise<string|undefined> {
+    if (!id) {
+      throw new Error("User ID is required");
+    }
+    
+    const query = {
+      text: `INSERT INTO payments (user, data) VALUES ($1, jsonb_build_object(` +
+      `'paymentId', $2,` +
+      `'currency', $3,` +
+      `'amount', $4,` +
+      `'status', $5,` +
+      `'payment_method', $6,` +
+      `'type', $7` +
+      `created_at, now()` +
+      `)) RETURNING id`,
+      values: [
+        id,
+        details.id,
+        details.currency,
+        details.amount,
+        details.status,
+        details.payment_method,
+        details.type,
+      ],
+    }
+
+    const res = await pool.query(query);
+    if (res.rowCount === 0) {
+      return undefined;
+    }
+    const paymentId = res.rows[0].id;
+    return paymentId;
+  }
 }

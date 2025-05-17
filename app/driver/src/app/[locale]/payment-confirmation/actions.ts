@@ -61,7 +61,7 @@ export async function addPermitDetails(
 ): Promise<void> {
   const { id, amount, currency, status, payment_method, type } = details;
   
-  const res = await fetch("http://localhost:3010/api/v0/permits", {
+  const res = await fetch("http://localhost:", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

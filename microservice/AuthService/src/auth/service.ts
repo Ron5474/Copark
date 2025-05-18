@@ -62,6 +62,10 @@ export class AuthService {
     }
   }
 
+  public async getDriverByID(driverID: string): Promise<AuthUser| undefined> {
+    return this.getUserById(driverID)
+  }
+
   public async encrypt(userId: string): Promise<string> {
     return new SignJWT({ id: userId })
       .setProtectedHeader({ alg: 'HS256' })

@@ -44,8 +44,8 @@ export class AuthController extends Controller {
 
   @Post("driver/email")
   @Security("jwt", ["admin", "enforcement"])
-  public async getDriverByID(@Body() UserID: string): Promise<AuthUser | undefined> {
-    return new AuthService().getDriverByID(UserID);
+  public async getDriverByID(@Body() UserID: {id: string}): Promise<AuthUser | undefined> {
+    return new AuthService().getDriverByID(UserID.id);
   }
 
   @Post("check")

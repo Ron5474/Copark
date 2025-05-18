@@ -70,6 +70,18 @@ test('Driver can login successfully', async () => {
     .expect(200)
 })
 
+test('Admin can get driver details', async () => {  
+  const res = await supertest(server)
+    .post('/api/v0/auth/login')
+    .send({ email: admin.email, password: admin.password })
+
+  await supertest(server)
+    .post('/api/v0/auth/driver/email')
+    .send({id: '39f48f9f-2693-446b-ad98-8e0db1ef14bd'})
+    .set('Authorization', `Bearer ${res.body.id}`)
+    .expect(200)
+})
+
 test('getDriverId works successfully', async () => {  
   await supertest(server)
     .get('/api/v0/auth/driver/id')

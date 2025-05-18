@@ -116,6 +116,13 @@ test('getOauthUser() fake user returns undefined', async () => {
   expect(user).not.toBeDefined()
 })
 
+test('getDriverbyID returns Correct User', async () => {
+  await new AuthService().driverSignup(driver)
+  const user = await new AuthService().getOauthUser(driver)
+  const driverDetails = await new AuthService().getDriverByID(user.id)
+  expect(driverDetails.email).toBe("derik@copark.space")
+})
+
 test('Admin can login successfully', async () => {
   const user = await new AuthService().authenticate(admin)
   expect(user.name).toBe('Jason Xiong')

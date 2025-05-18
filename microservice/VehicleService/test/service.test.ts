@@ -144,6 +144,11 @@ test('findVehicleByPlate - Returns null if no Vehicle found', async () => {
   expect(vehicle).toBeNull()
 })
 
+test('findOwnerByVehicleID - Returns null if no Vehicle found', async () => {
+  const vehicle = await new VehicleService().findOwnerByVehicleID({id: "b20ec061-2957-4c3b-b193-c8b40138e8f1"})
+  expect(vehicle).toBeNull()
+})
+
 test('getVehicleById - Returns Correct Vehicle', async () => {
   const vehicleService = new VehicleService();
 

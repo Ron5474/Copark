@@ -49,11 +49,11 @@ export class VehicleService {
 
   public async findOwnerByVehicleID(vehicleId: string): Promise<OwnerID| null> {
 
-    const vehicleDecrypted = await this.decrypt(vehicleId)
+    // const vehicleDecrypted = await this.decrypt(vehicleId)
     
     const result = await pool.query(
       `SELECT driver FROM vehicle WHERE id = $1`,
-      [vehicleDecrypted]
+      [vehicleId]
     )
 
     if (result.rowCount === 0) return null

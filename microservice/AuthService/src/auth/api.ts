@@ -10,7 +10,7 @@ import {
   Query
 } from "tsoa";
 import * as express from "express";
-import { Credentials, Authenticated, OauthLoginData } from "./";
+import { Credentials, Authenticated, OauthLoginData, AuthUser } from "./";
 import { AuthService } from "./service";
 import { SessionUser, User } from "./index";
 
@@ -40,6 +40,12 @@ export class AuthController extends Controller {
   @Security("jwt", ["driver"])
   public async getDriverId(@Request() request: express.Request): Promise<User | undefined> {
     return new AuthService().getOauthUser(request.user);
+  }
+
+  @Post("driver/email")
+  @Security("jwt", ["admin", "enforcement"])
+  public async getDriverByID(@Body() UserID: string): Promise<AuthUser | undefined> {
+    return new AuthService().getDriverByID(UserID);
   }
 
   @Post("check")

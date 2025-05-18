@@ -55,6 +55,12 @@ export class VehicleID {
 }
 
 @ObjectType()
+export class OwnerID {
+  @Field(() => ID)
+  id!: string
+}
+
+@ObjectType()
 export class CreatedVehicle {
   @Field(() => ID)
   id!: string

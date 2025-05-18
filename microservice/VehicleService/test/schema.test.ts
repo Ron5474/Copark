@@ -3,7 +3,7 @@ import * as http from 'http'
 import supertest from 'supertest'
 
 import { app, bootstrap } from '../src/app'
-import { Vehicle, VehicleID, CreatedVehicle } from '../src/vehicle/schema'
+import { Vehicle, VehicleID, CreatedVehicle, OwnerID } from '../src/vehicle/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
@@ -64,3 +64,10 @@ test('CreatedVehicle schema loads correctly', () => {
   expect(created.plate).toBe('TEST123')
   expect(created.country).toBe('The Greatest Country')
 })
+
+test('OwnerID schema loads correctly', () => {
+  // Create instance of User
+  const testUser = new OwnerID()
+  testUser.id = "b20ec061-2957-4c3b-b193-c8b40138e8f1"
+  expect(testUser).toBeDefined()
+});

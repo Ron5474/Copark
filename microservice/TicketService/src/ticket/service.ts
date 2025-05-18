@@ -148,7 +148,7 @@ export class TicketService {
 
     // Step 3: If driver exists, fetch their email and send email
     if (driverId) {
-      const driverRes = await fetch(`http://localhost:3010/api/driver/email`, {
+      const driverRes = await fetch(`http://localhost:3010/api/v0/auth/driver/email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

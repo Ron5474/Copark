@@ -1,9 +1,9 @@
 import {test, expect, beforeAll, afterAll, beforeEach} from 'vitest'
 import supertest from 'supertest'
 import * as http from 'http'
+import db from './db'
 
 import authApp from '../../AuthService/src/app'
-import db from './db'
 import app from '../src/app'
 import { SignJWT } from 'jose'
 
@@ -56,17 +56,21 @@ afterAll(() => {
   authServer.close()
 })
 
-async function login(): Promise<string | undefined> {
-    const token = new SignJWT(driver)
+async function generateToken(): Promise<string> {
+ return new SignJWT(driver)
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('30m')
       .sign(encodedKey)
+}
+
+async function login(): Promise<string | undefined> {
+    const token = await generateToken()
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/driver/login')
-      .set('Authorization', `Bearer ${await token}`)
+      .set('Authorization', `Bearer ${token}`)
 
-    // console.log('Status:', response.status
+    // console.log('Status:', response.status)
     // console.log('Headers:', response.headers)
     // console.log('Body:', response.body)
 
@@ -86,5 +90,39 @@ test('Post /api/v0/payment/pay - should return 302', async () => {
 
   expect(response.status).toBe(302)
   expect(response.body).toHaveProperty('url')
-  expect(response.body.url).toMatch(/https:\/\/checkout\.stripe\.com\/pay/) 
+  expect(response.body.url).toMatch(/https:\/\/checkout.stripe.com\/c\/pay*/) 
+})
+
+test('Post /api/v0/payment/complete - should return 201', async () => {
+  const token = await login()
+  const response = await supertest(app)
+    .post('/api/v0/payment/complete')
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      id: 'pi_123',
+      status: 'succeeded',
+      payment_method: 'pm_card_visa',
+      amount: 1000,
+      currency: 'USD',
+      type: 'dailyPass',
+    })
+
+  expect(response.status).toBe(201)
+})
+
+test('Post /api/v0/payment/complete - by non-existant driver should return 401', async () => {
+  const token = await generateToken()
+  const response = await supertest(app)
+    .post('/api/v0/payment/complete')
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      id: 'pi_123',
+      status: 'succeeded',
+      payment_method: 'pm_card_visa',
+      amount: 1000,
+      currency: 'USD',
+      type: 'dailyPass',
+    })
+
+  expect(response.status).toBe(401)
 })

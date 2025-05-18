@@ -26,9 +26,6 @@ export class PaymentController extends Controller {
       }
     })
     const res = response.status === 200 ? await response.json() : null;
-    if (!res) {
-      throw new Error('User not found');
-    }
     return {
       id: res.id,
       name: res.name,

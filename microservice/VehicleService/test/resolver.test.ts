@@ -180,6 +180,13 @@ query GetVehicleByUserId($userID: String!) {
   }
 }`
 
+const getOwnerByVehicleIdQuery = `
+query FindOwnerByVehicleID($vehicleId: String!) {
+  findOwnerByVehicleID(vehicle: $vehicleId) {
+    id
+  }
+}`
+
 const vehicleInput = {
   input: {
     plate: "TEST123",
@@ -202,6 +209,19 @@ mutation FindOrCreateVehicleByPlate($plate: String!) {
     state
   }
 }`
+
+test('Enforcer can find Owner using VehicleID', async () => {
+  const token = await loginAs("enforcement")
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: getOwnerByVehicleIdQuery,
+      variables: { vehicleId: "f2d7800e-67ce-41aa-b1fe-38e679112e0e" }
+    })
+  expect(response.body.data.findOwnerByVehicleID.id).toBeDefined()
+})
 
 test('Enforcer can find or create vehicle by plate', async () => {
   const token = await loginAs("enforcement")

@@ -130,7 +130,7 @@ export default function Zone() {
 }
 
 function SpecificDuration() {
-  const { zoneDetails, setDurationString, setPrice } = useContext(ZoneContext)
+  const { zoneDetails, setDurationString, price, setPrice } = useContext(ZoneContext)
 
   const maxDuration = zoneDetails?.maxDuration
   const openTime = zoneDetails?.openTime || '0:00'
@@ -180,12 +180,15 @@ function SpecificDuration() {
   }).format(endTime)
 
   setPrice(!overnight ? (totalMinutes * (zoneDetails?.hourly ?? 0) / 60) : 0)
-  // const estimatedPriceString = `$${(price ? price + 0.50 : 0).toFixed(2)}`
+  const estimatedPriceString = `$${(price ? price + 0.50 : 0).toFixed(2)}`
 
   return (
     <Box>
     <Typography>
     WIP did this on my phone
+    </Typography>
+    <Typography>
+    {endTimeString + ' ' + estimatedPriceString}
     </Typography>
     </Box>
   )

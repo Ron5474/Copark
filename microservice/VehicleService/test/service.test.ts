@@ -145,8 +145,14 @@ test('findVehicleByPlate - Returns null if no Vehicle found', async () => {
 })
 
 test('findOwnerByVehicleID - Returns null if no Vehicle found', async () => {
-  const vehicle = await new VehicleService().findOwnerByVehicleID({id: "b20ec061-2957-4c3b-b193-c8b40138e8f1"})
+  const vehicle = await new VehicleService().findOwnerByVehicleID("b20ec061-2957-4c3b-b193-c8b40138e8f1")
   expect(vehicle).toBeNull()
+})
+
+test('findOwnerByVehicleID - Returns Valid owner if Vehicle found', async () => {
+  const vehicle = await new VehicleService().findOwnerByVehicleID("f2d7800e-67ce-41aa-b1fe-38e679112e0e")
+  console.log('Vehicle: ', vehicle)
+  expect(vehicle).toBeDefined()
 })
 
 test('getVehicleById - Returns Correct Vehicle', async () => {

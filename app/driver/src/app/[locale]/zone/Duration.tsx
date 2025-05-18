@@ -101,6 +101,12 @@ export default function Zone() {
 
         :
 
+        durationOption == 'hourly' ?
+
+        <SpecificDuration/>
+
+        :
+
         null
       }
 
@@ -119,6 +125,68 @@ export default function Zone() {
       >
         Continue
       </Button>
+    </Box>
+  )
+}
+
+function SpecificDuration() {
+  const { zoneDetails, setDurationString, setPrice } = useContext(ZoneContext)
+
+  const maxDuration = zoneDetails?.maxDuration
+  const openTime = zoneDetails?.openTime || '0:00'
+  const closeTime = zoneDetails?.closeTime
+
+  const now = new Date()
+  let untilCloseMs = Infinity
+  let untilOpenMs = Infinity
+  let overnight = false
+
+  if (closeTime) {
+    const [hours, minutes] = closeTime.split(':').map(Number)
+    const close = new Date()
+    close.setHours(hours, minutes, 0, 0)
+    if (close < now) {
+      overnight = true
+      const [openHours, openMinutes] = openTime.split(':').map(Number)
+      const open = new Date()
+      open.setHours(openHours, openMinutes, 0 ,0)
+      open.setDate(open.getDate() + 1)
+      untilOpenMs = open.getTime() - now.getTime() // overnight case
+    }
+    untilCloseMs = close.getTime() - now.getTime()
+  }
+
+  let maxDurationMs = Infinity
+  if (maxDuration) {
+    const { hours = 0, minutes = 0 } = maxDuration
+    maxDurationMs = (hours * 60 + minutes) * 60 * 1000
+  }
+
+  const finalDurationMs = !overnight ? Math.min(untilCloseMs, maxDurationMs) : untilOpenMs
+
+  const totalMinutes = Math.floor(finalDurationMs / (1000 * 60))
+  const finalHours = Math.floor(totalMinutes / 60)
+  const finalMinutes = totalMinutes % 60
+
+  const durationParts: string[] = []
+  if (finalHours) durationParts.push(`${finalHours} ${finalHours === 1 ? 'hour' : 'hours'}`)
+  if (finalMinutes) durationParts.push(`${finalMinutes} ${finalMinutes === 1 ? 'minute' : 'minutes'}`)
+  setDurationString(durationParts.join(' '))
+
+  const endTime = new Date(now.getTime() + finalDurationMs)
+  const endTimeString = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(endTime)
+
+  setPrice(!overnight ? (totalMinutes * (zoneDetails?.hourly ?? 0) / 60) : 0)
+  // const estimatedPriceString = `$${(price ? price + 0.50 : 0).toFixed(2)}`
+
+  return (
+    <Box>
+    <Typography>
+    WIP did this on my phone
+    </Typography>
     </Box>
   )
 }

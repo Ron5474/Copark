@@ -1,5 +1,5 @@
 import { pool } from './db'
-import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVehicleInput, CreatedVehicle } from './schema'
+import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVehicleInput, CreatedVehicle, OwnerID } from './schema'
 import { SignJWT, jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
@@ -45,6 +45,23 @@ export class VehicleService {
       state: row.data.state,
       nickname: row.data.nickname
     })))
+  }
+
+  public async findOwnerByVehicleID(vehicleId: string): Promise<OwnerID| null> {
+
+    const vehicleDecrypted = await this.decrypt(vehicleId)
+    
+    const result = await pool.query(
+      `SELECT driver FROM vehicle WHERE id = $1`,
+      [vehicleDecrypted]
+    )
+
+    if (result.rowCount === 0) return null
+
+    const row = result.rows[0]
+    return {
+      id: row.driver,
+    }
   }
   
   public async getVehicleById(vehicleId: VehicleID): Promise<Vehicle | null> {

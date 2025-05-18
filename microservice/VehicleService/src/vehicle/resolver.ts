@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { Request } from 'express'
-import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVehicleInput, CreatedVehicle } from './schema'
+import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVehicleInput, CreatedVehicle, OwnerID } from './schema'
 import { VehicleService } from './service'
 import { SessionUser } from '../types/express'
 
@@ -63,6 +63,14 @@ export class VehicleResolver {
     const token = request.headers.authorization?.split(' ')[1]
     const userId = (await this.getUserData(token)).id  
     return await service.updateVehicle(input, userId)
+  }
+
+  @Authorized('admin', 'enforcement')
+  @Query(() => OwnerID, { nullable: true })
+  async findOwnerByVehicleID(
+     @Arg('vehicle', () => String) vehicle: string
+  ): Promise<OwnerID | null> {
+    return await service.findOwnerByVehicleID(vehicle)
   }
 
   @Authorized('admin', 'enforcement', 'police')

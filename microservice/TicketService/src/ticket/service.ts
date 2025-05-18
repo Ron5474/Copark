@@ -68,75 +68,117 @@ export class TicketService {
   }
 
   public async createTicket(newTicket: NewTicket): Promise<Ticket> {
+    const enforcerToken = newTicket.enforcer;
+    const enforcerId = await this.decrypt(enforcerToken);
+    const vehicleId = newTicket.vehicle;
 
-    // console.log(newTicket);
-    const enforcerId = await this.decrypt(newTicket.enforcer);
-    // const vehicleId = await this.decrypt(newTicket.vehicle);
-    if (!enforcerId) {
+    if (!enforcerId || !vehicleId) {
       throw new Error("Invalid enforcer or vehicle ID.");
     }
-    //TODO: Check if the enforcerId and vehicleId are valid, will need services in enforcer and vehicle microservices
 
-    const insertQuery = `
-        INSERT INTO ticket (vehicle, enforcer, data)
-        VALUES ($1, $2, jsonb_build_object(
-            'issuedDate', $3::TIMESTAMP,
-            'violation', $4::TEXT,
-            'fine', $5::NUMERIC,
-            'ticketStatus', $6::TEXT,
-            'images', $7::TEXT,
-            'note', $8::TEXT
-        ))
-        RETURNING id, vehicle, enforcer, 
-                  data->>'issuedDate' AS issueddate,
-                  data->>'violation' AS violation,
-                  data->>'fine' AS fine,
-                  data->>'ticketStatus' AS ticketstatus,
-                  data->>'images' AS images,
-                  data->>'note' AS note;
-    `;
+    // Step 1: get driver ID
+    const ownerRes = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${enforcerToken}`,
+      },
+      body: JSON.stringify({
+        query: `
+          query FindOwner($vehicle: String!) {
+            findOwnerByVehicleID(vehicle: $vehicle) {
+              id
+            }
+          }
+        `,
+        variables: { vehicle: vehicleId },
+      }),
+    });
 
+    const ownerJson = await ownerRes.json();
+    const driverId = ownerJson?.data?.findOwnerByVehicleID?.id;
+
+    // Step 2: Insert ticket
     const issuedDate = new Date().toISOString();
     const ticketStatus = 'active';
 
+    const insertQuery = `
+      INSERT INTO ticket (vehicle, enforcer, data)
+      VALUES ($1, $2, jsonb_build_object(
+        'issuedDate', $3::TIMESTAMP,
+        'violation', $4::TEXT,
+        'fine', $5::NUMERIC,
+        'ticketStatus', $6::TEXT,
+        'images', $7::TEXT,
+        'note', $8::TEXT
+      ))
+      RETURNING id, vehicle, enforcer, 
+                data->>'issuedDate' AS issueddate,
+                data->>'violation' AS violation,
+                data->>'fine' AS fine,
+                data->>'ticketStatus' AS ticketstatus,
+                data->>'images' AS images,
+                data->>'note' AS note;
+    `;
+
     const result = await pool.query(insertQuery, [
-        newTicket.vehicle,
-        enforcerId,
-        issuedDate,
-        newTicket.violation,
-        newTicket.fine,
-        ticketStatus,
-        newTicket.images || null,
-        newTicket.note
+      vehicleId,
+      enforcerId,
+      issuedDate,
+      newTicket.violation,
+      newTicket.fine,
+      ticketStatus,
+      newTicket.images || null,
+      newTicket.note,
     ]);
 
     const row = result.rows[0];
 
     const ticket: Ticket = {
-        id: await this.encrypt(row.id),
-        vehicle: row.vehicle,
-        enforcer: await this.encrypt(row.enforcer),
-        issuedDate: new Date(row.issueddate),
-        violation: row.violation,
-        fine: parseFloat(row.fine),
-        ticketStatus: row.ticketstatus,
-        images: row.images,
-        note: row.note,
+      id: await this.encrypt(row.id),
+      vehicle: row.vehicle,
+      enforcer: await this.encrypt(row.enforcer),
+      issuedDate: new Date(row.issueddate),
+      violation: row.violation,
+      fine: parseFloat(row.fine),
+      ticketStatus: row.ticketstatus,
+      images: row.images,
+      note: row.note,
     };
 
-    await sendTicketIssuedEmail({
-      to: 'coparkspace@gmail.com', // TODO: replace with real driver's email
-      subject: `We issued a ticket for one of your Vehicles`,
-      html: `
-        <h3>Hello Copark Park</h3>
-        <p><strong>Violation:</strong> ${ticket.violation}</p>
-        <p>Login in to copark.space to view and pay your ticket</p>
-      `
-    })
+    // Step 3: If driver exists, fetch their email and send email
+    if (driverId) {
+      const driverRes = await fetch(`http://localhost:3010/api/driver/email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${enforcerToken}`,
+        },
+        body: JSON.stringify({ id: driverId }),
+      });
 
-    // console.log(ticket.id);
+      if (driverRes.ok) {
+        const driver = await driverRes.json();
+
+        await sendTicketIssuedEmail({
+          to: driver.email,
+          subject: `Ticket Issued for Your Vehicle`,
+          html: `
+            <h3>Hello ${driver.name}</h3>
+            <p><strong>Violation:</strong> ${ticket.violation}</p>
+            <p>Please log in to <a href="https://copark.space">copark.space</a> to view and pay your ticket.</p>
+          `,
+        });
+      } else {
+        console.warn("Driver email not sent: failed to fetch driver info.");
+      }
+    } else {
+      console.info("No driver linked to vehicle — skipping email.");
+    }
+
     return ticket;
   }
+
 
   public async modifyTicket(input: ModifyTicketInput): Promise<Ticket | null> {
     const { id, vehicle, ...updates } = input;

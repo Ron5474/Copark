@@ -16,7 +16,8 @@ export default defineConfig({
         '**/index.ts',
         '**/index.d.ts',
         'src/server.ts',
-        'src/db.ts'
+        'src/db.ts',
+        'src/types.ts'
     ],
     },
   },

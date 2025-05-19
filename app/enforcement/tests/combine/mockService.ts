@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw'
 
 const authURL = 'http://localhost:3010/api/v0/auth'
 const permitURL = 'http://localhost:4003/graphql'
+const ticketURL = 'http://localhost:4002/graphql'
 
 const authHandlers = {
   success: http.post(authURL + '/login', async ({ request }) => {
@@ -65,6 +66,55 @@ const permitHandlers = {
   }),
 }
 
+const ticketHandlers = {
+  success: http.post(ticketURL, async ({ request }) => {
+    const body = await request.json()
 
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'query' in body &&
+      typeof body.query === 'string' &&
+      body.query.includes('CreateNewTicket')
+    ) {
+      const { plate, reason, note, images } = body.variables.input
 
-export { authHandlers, permitHandlers }
+      return HttpResponse.json({
+        data: {
+          createNewTicket: {
+            id: 'abc123',
+            issuedDate: '2024-05-18',
+            plate,
+            violation: reason,
+            fine: 75,
+            note,
+            ticketStatus: 'PENDING',
+            images: images ?? null,
+          },
+        },
+      })
+    }
+
+    return HttpResponse.json({ errors: [{ message: 'Unknown mutation' }] }, { status: 400 })
+  }),
+
+  failure: http.post(ticketURL, async ({ request }) => {
+    const body = await request.json()
+
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'query' in body &&
+      typeof body.query === 'string' &&
+      body.query.includes('CreateNewTicket')
+    ) {
+      return HttpResponse.json({
+        errors: [{ message: 'Invalid plate format' }],
+      }, { status: 200 })
+    }
+
+    return HttpResponse.json({ errors: [{ message: 'Unknown mutation' }] }, { status: 400 })
+  }),
+}
+
+export { authHandlers, permitHandlers, ticketHandlers }

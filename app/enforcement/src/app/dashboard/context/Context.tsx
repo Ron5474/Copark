@@ -23,6 +23,8 @@ type EnforcementContextType = {
   setZone: (zone: string) => void
   officerName: string
   setOfficerName: (name: string) => void
+  showSuccess: boolean
+  setShowSuccess: (val: boolean) => void
 }
 
 const EnforcementContext = createContext<EnforcementContextType | undefined>(undefined)
@@ -50,6 +52,7 @@ export function EnforcementProvider({
     }
     return ''
   })
+  const [showSuccess, setShowSuccess] = useState(false)
 
 
   return (
@@ -69,6 +72,8 @@ export function EnforcementProvider({
         setZone,
         officerName,
         setOfficerName,
+        showSuccess,
+        setShowSuccess,
       }}
     >
       {children}

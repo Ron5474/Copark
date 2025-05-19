@@ -26,6 +26,7 @@ import { Payment } from '../shared/actions'
 
 export default function Review() {
   const { zoneNumber, /*zoneDetails,*/ durationString, price, vehicle } = useContext(ZoneContext)
+  const serviceFee = price ? 0.5 : 0
   
   const tempLocation = "UCSC Campus"
 
@@ -148,7 +149,7 @@ export default function Review() {
           variant="body1"
           gutterBottom
         >
-          {`$${0.5.toFixed(2)}`}
+          {`$${serviceFee.toFixed(2)}`}
         </Typography>
       </Box>
 
@@ -166,7 +167,7 @@ export default function Review() {
           color="primary"
           fontWeight={600}
         >
-          {`$${(price + 0.5).toFixed(2)}`}
+          {`$${(price + serviceFee).toFixed(2)}`}
         </Typography>
       </Box>
 

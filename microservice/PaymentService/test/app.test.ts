@@ -126,3 +126,16 @@ test('Post /api/v0/payment/complete - by non-existant driver should return 401',
 
   expect(response.status).toBe(401)
 })
+
+test('Post /api/v0/payment/pay - Stripe error returns 500', async () => {
+  const stripeSecretKey = process.env.STRIPE_SECRET
+  process.env.STRIPE_SECRET = 'sk_test_invalid_key'
+  const token = await login()
+  const response = await supertest(app)
+    .post('/api/v0/payment/pay')
+    .set('Authorization', `Bearer ${token}`)
+    .send(sessionDetails)
+
+  process.env.STRIPE_SECRET = stripeSecretKey;
+  expect(response.status).toBe(500)
+})

@@ -107,5 +107,5 @@ it('searching sets plate from manual input', async () => {
   await user.type(zoneInput, 'A1')
   await user.click(searchBtn)
 
-  expect(screen.getByText(/Valid parking permit found/i)).toBeDefined()
+  expect(screen.getByText(/Valid Permit/i)).toBeDefined()
 })

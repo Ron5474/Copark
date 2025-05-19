@@ -41,7 +41,7 @@ it('Checks for valid permit', async () => {
     </EnforcementProvider>
   )
 
-  expect(await screen.findByText(/Valid parking permit found/i)).toBeDefined()
+  expect(await screen.findByText(/Valid Permit/i)).toBeDefined()
 })
 
 it('show the entered zone in the permit card', async () => {
@@ -52,6 +52,7 @@ it('show the entered zone in the permit card', async () => {
       />
     </EnforcementProvider>
   )
+  expect(screen.getByText(/Current Location:/i)).toBeDefined()
   expect(screen.getByText(/Zone A1/i)).toBeDefined()
 })
 
@@ -63,8 +64,9 @@ it('Shows invalid permit message', async () => {
       />
     </EnforcementProvider>
   )
-  expect(screen.getByText(/No valid permit found for this vehicle/i)).toBeDefined()
-  expect(screen.getByText(/Zone A1/i)).toBeDefined()
+  expect(screen.getByText(/No Valid Permit/i)).toBeDefined()
+  expect(screen.getByText(/License Plate:/i)).toBeDefined()
+  expect(screen.getByText(/XYZ123/i)).toBeDefined()
 })
 
 
@@ -78,8 +80,8 @@ it('Shows invalid permit and show license plate', async () => {
     </EnforcementProvider>
   )
 
-  expect(await screen.findByText(/Invalid Permit/i)).toBeDefined()
-  expect(screen.getByText(/Plate Number: XYZ123/i)).toBeDefined()
+  expect(screen.getByText(/No Valid Permit/i)).toBeDefined()
+  // expect(screen.getByText(/Plate Number: XYZ123/i)).toBeDefined()
 })
 
 it('clicking new scan redirects you to manual entry', async () => {

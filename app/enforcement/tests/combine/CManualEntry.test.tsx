@@ -48,7 +48,9 @@ it('renders PermitCard after successful permit check', async () => {
 
   await waitFor(() => {
     expect(screen.getByText(/Valid Permit/i)).toBeDefined()
-    expect(screen.getByText(/Plate Number: ABC123/i)).toBeDefined()
+    expect(screen.getByText(/License Plate:/i)).toBeDefined()
+    expect(screen.getByText(/ABC123/i)).toBeDefined()
+    expect(screen.getByText(/Current Location:/i)).toBeDefined()
     expect(screen.getByText(/Zone A1/i)).toBeDefined()
   })
 })

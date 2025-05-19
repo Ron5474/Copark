@@ -10,8 +10,8 @@ router.post('/send', async (req, res) => {
   try {
     await sendEmail(payload)
     res.status(200).json({ message: 'Email sent.' })
-  } catch (err) {
-    console.error('Email error:', err)
+  } catch {
+    // console.error('Email error:', err)
     res.status(500).json({ error: 'Failed to send email.' })
   }
 })

@@ -2,18 +2,19 @@
  * @vitest-environment node
  */
 
-import { beforeAll, afterAll, test, expect } from 'vitest';
+import { afterAll, test, expect, beforeEach } from 'vitest';
 import { SignJWT } from 'jose';
 
 import db from './db';
 import { TicketService } from '../src/ticket/service';
 import { ModifyTicketInput, NewTicket, TicketInput } from '../src/ticket/schema';
 
+
 const ticketService = new TicketService();
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
-beforeAll(async () => {
+beforeEach(async () => {
   await db.reset();
 });
 

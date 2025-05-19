@@ -8,16 +8,19 @@ import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
+import {app as EmailApp } from '../../EmailService/src/app'
 import { SignJWT,/* JWTPayload */} from 'jose'
 
 let server: http.Server // Ticket
 let authServer: http.Server
 let vehicleServer: http.Server
+let emailServer: http.Server
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 
 const VEHICLE_PORT = 4001
+const EMAIL_PORT = 3015
 // const VEHICLE_SERVICE_URL = `http://localhost:${VEHICLE_PORT}`
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
@@ -50,6 +53,11 @@ beforeAll(async () => {
   })
   await VehicleBoot()
 
+  emailServer = http.createServer(EmailApp);
+  await new Promise<void>((resolve) => {
+    emailServer.listen(EMAIL_PORT, () => resolve());
+  });
+
   return db.reset()
 })
 
@@ -57,6 +65,8 @@ afterAll(() => {
   db.shutdown()
   server.close()
   authServer.close()
+  vehicleServer.close();
+  emailServer.close();
 })
 
 async function encrypt(userId: string): Promise<string> {

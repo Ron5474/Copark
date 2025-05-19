@@ -5,6 +5,7 @@ import ManualEntryCard from './plate/ManualEntry'
 import PermitCard from './permit/Card'
 import IssueViolationForm from './violation/IssueViolationForm'
 import { useEnforcement } from './context/Context'
+import SuccessMessage from './violation/SuccessMessage'
 
 export default function EnforcementDashboardView() {
   const {
@@ -12,7 +13,31 @@ export default function EnforcementDashboardView() {
     isValidated,
     isIssuingViolation,
     setIsIssuingViolation,
+    showSuccess,
+    setShowSuccess,
+    setPlate,
+    setIsValidated,
+    setPermitResult,
+    setManualInput,
   } = useEnforcement()
+
+  if (showSuccess) {
+    return (
+      <SuccessMessage
+        title="Violation Submitted"
+        message="The violation has been recorded successfully."
+        buttonText="Back to Search"
+        onButtonClick={() => {
+          setShowSuccess(false)
+          setIsIssuingViolation(false)
+          setPlate(null)
+          setManualInput('')
+          setIsValidated(false)
+          setPermitResult(null)
+        }}
+      />
+    )
+  }
 
   return (
     <Container maxWidth="xs" sx={{ py: 3, mt: 8 }}>

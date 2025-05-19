@@ -41,6 +41,7 @@ function PaymentConfirmation() {
       sessionStorage.removeItem("vehicle");
       sessionStorage.removeItem("tempLocation");
       sessionStorage.removeItem("zoneNumber");
+      sessionStorage.removeItem("duration");
       sessionStorage.removeItem("price");
       sessionStorage.removeItem("currency");
     };

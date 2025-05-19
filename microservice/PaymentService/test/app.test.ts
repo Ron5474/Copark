@@ -139,3 +139,23 @@ test('Post /api/v0/payment/pay - Stripe error returns 500', async () => {
   process.env.STRIPE_SECRET = stripeSecretKey;
   expect(response.status).toBe(500)
 })
+
+test('Post /api/v0/payment/pay - should return 401', async () => {
+  const response = await supertest(app)
+    .post('/api/v0/payment/pay')
+    .send(sessionDetails)
+
+  expect(response.status).toBe(401)
+  expect(response.body).toHaveProperty('message', 'Unauthorized')
+})
+
+test('Post /api/v0/payment/complete - should return 401', async () => {
+  const token = await login();
+  const response = await supertest(app)
+    .post('/api/v0/payment/complete')
+    .set('Authorization', `${token}`)
+    .send(sessionDetails)
+
+  expect(response.status).toBe(401)
+  expect(response.body).toHaveProperty('message', 'Unauthorized')
+})

@@ -52,7 +52,7 @@ it('show the entered zone in the permit card', async () => {
       />
     </EnforcementProvider>
   )
-  expect(screen.getByText(/Zone: A1/i)).toBeDefined()
+  expect(screen.getByText(/Zone A1/i)).toBeDefined()
 })
 
 it('Shows invalid permit message', async () => {
@@ -64,7 +64,7 @@ it('Shows invalid permit message', async () => {
     </EnforcementProvider>
   )
   expect(screen.getByText(/No valid permit found for this vehicle/i)).toBeDefined()
-  expect(screen.getByText(/Zone: A1/i)).toBeDefined()
+  expect(screen.getByText(/Zone A1/i)).toBeDefined()
 })
 
 

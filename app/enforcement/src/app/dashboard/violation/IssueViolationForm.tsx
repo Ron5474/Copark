@@ -34,13 +34,17 @@ export default function IssueViolationForm({
 }: {
   onCancel: () => void
 }) {
-  const { plate, officerName, setShowSuccess } = useEnforcement()
+  const {
+    plate,
+    setShowSuccess,
+    zone,
+    setPlate,
+  } = useEnforcement()
+
   const [reason, setReason] = useState('')
   const [note, setNote] = useState('')
   const [photos, setPhotos] = useState<File[]>([])
   const [loading, setLoading] = useState(false)
-
-  const date = new Date().toLocaleDateString()
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -49,33 +53,31 @@ export default function IssueViolationForm({
   }
 
   const handleSubmit = async () => {
-  if (!plate || !officerName || !reason) {
-    alert('Missing required fields.')
-    return
+    if (!plate || !reason) {
+      alert('Missing required fields.')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const base64Images = await Promise.all(photos.map(toBase64))
+
+      await issueTicket({
+        plate,
+        reason,
+        note: reason === 'Other' ? note : '',
+        images: base64Images[0] ?? null,
+      })
+
+      setShowSuccess(true)
+    } catch (err) {
+      console.error('Ticket issuing failed:', err)
+      alert('Failed to issue ticket.')
+    }
+
+    setLoading(false)
   }
-
-  setLoading(true)
-
-  try {
-    const base64Images = await Promise.all(photos.map(toBase64))
-
-    await issueTicket({
-      plate,
-      reason,
-      note: reason === 'Other' ? note : '',
-      images: base64Images[0] ?? null,
-    })
-
-    setShowSuccess(true)
-  } catch (err) {
-    console.error('Ticket issuing failed:', err)
-    alert('Failed to issue ticket.')
-  }
-
-  setLoading(false)
-}
-
-
 
   return (
     <Box sx={{ bgcolor: '#f5f5f5', p: 3, borderRadius: 2, mt: 2 }}>
@@ -84,9 +86,18 @@ export default function IssueViolationForm({
       </Typography>
 
       <Stack spacing={2}>
-        <TextField label="Officer" value={officerName} fullWidth />
-        <TextField label="License Plate" value={plate ?? ''} fullWidth />
-        <TextField label="Date" value={date} fullWidth />
+        <TextField
+          label="License Plate"
+          value={plate ?? ''}
+          onChange={(e) => setPlate(e.target.value)}
+          fullWidth
+        />
+        <TextField
+          label="Current Location"
+          value={`Zone ${zone}`}
+          fullWidth
+          disabled
+        />
 
         <TextField
           label="Reason"

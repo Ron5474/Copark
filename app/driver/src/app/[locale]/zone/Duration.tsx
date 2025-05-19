@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, useMemo } from 'react'
 import {
   Box,
   Button,
@@ -134,92 +134,114 @@ export default function Zone() {
 }
 
 function SelectDuration() {
-  const { zoneDetails, setDurationString, price, setPrice } = useContext(ZoneContext)
-
+  const { zoneDetails, setDurationString, setPrice, price } = useContext(ZoneContext)
   const [selectedHours, setSelectedHours] = useState(0)
   const [selectedMinutes, setSelectedMinutes] = useState(0)
 
-  // if (!zoneDetails || !zoneDetails.maxDuration) {
-  //   return (
-  //     <Box>
-  //       <Typography>Loading parking duration options...</Typography>
-  //     </Box>
-  //   )
-  // }
+  const now = new Date()
+  const openTime = zoneDetails?.openTime || '00:00'
+  const closeTime = zoneDetails?.closeTime
 
-  const { hours: maxHours = 0, minutes: maxMinutes = 0 } = zoneDetails?.maxDuration || {}
-  const maxTotalMinutes = maxHours * 60 + maxMinutes
-  const hourlyRate = zoneDetails?.hourly || 0
+  let untilCloseMs = Infinity
+  let untilOpenMs = Infinity
+  let overnight = false
 
-  const hourOptions = Array.from({ length: maxHours + 1 }, (_, i) => i)
+  if (closeTime) {
+    const [closeHours, closeMinutes] = closeTime.split(':').map(Number)
+    const close = new Date()
+    close.setHours(closeHours, closeMinutes, 0, 0)
+    if (close < now) {
+      overnight = true
+      const [openHours, openMinutes] = openTime.split(':').map(Number)
+      const open = new Date()
+      open.setHours(openHours, openMinutes, 0 ,0)
+      open.setDate(open.getDate() + 1)
+      untilOpenMs = open.getTime() - now.getTime()
+    }
+    untilCloseMs = close.getTime() - now.getTime()
+  }
 
-  const minuteOptions = Array.from({ length: 5 }, (_, i) => i * 12).filter(
-    (min) => (selectedHours < maxHours || min <= maxMinutes)
-  )
+  let maxDurationMs = Infinity
+  if (zoneDetails?.maxDuration) {
+    const { hours = 0, minutes = 0 } = zoneDetails.maxDuration
+    maxDurationMs = (hours * 60 + minutes) * 60 * 1000
+  }
 
-  const totalSelectedMinutes = selectedHours * 60 + selectedMinutes
+  const finalDurationMs = !overnight ? Math.min(untilCloseMs, maxDurationMs) : untilOpenMs
+
+  const maxTotalMinutes = Math.floor(finalDurationMs / (1000 * 60))
+  const maxHours = Math.floor(maxTotalMinutes / 60)
+  const maxMinutes = maxTotalMinutes % 60
+
+  const hourOptions = useMemo(() => {
+    return Array.from({ length: maxHours + 1 }, (_, i) => i)
+  }, [maxHours])
+
+  const minuteOptions = useMemo(() => {
+    const max = selectedHours === maxHours ? maxMinutes : 60
+    return Array.from({ length: Math.floor(max / 5) + 1 }, (_, i) => i * 5).filter(m => m < 60)
+  }, [selectedHours, maxHours, maxMinutes])
 
   useEffect(() => {
-    if (totalSelectedMinutes > maxTotalMinutes) {
-      setSelectedHours(0)
-      setSelectedMinutes(0)
-      setDurationString('')
-      setPrice(0)
-      return
-    }
-
+    const totalMinutes = selectedHours * 60 + selectedMinutes
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
     const parts = []
-    if (selectedHours) parts.push(`${selectedHours} ${selectedHours === 1 ? 'hour' : 'hours'}`)
-    if (selectedMinutes) parts.push(`${selectedMinutes} ${selectedMinutes === 1 ? 'minute' : 'minutes'}`)
-
+    if (hours) parts.push(`${hours} ${hours === 1 ? 'hour' : 'hours'}`)
+    if (minutes) parts.push(`${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`)
     setDurationString(parts.join(' '))
-    setPrice((totalSelectedMinutes * hourlyRate) / 60)
-  }, [selectedHours, selectedMinutes, hourlyRate, maxTotalMinutes, setDurationString, setPrice, totalSelectedMinutes])
+    setPrice((totalMinutes * (zoneDetails?.hourly ?? 0)) / 60)
+  }, [selectedHours, selectedMinutes, setDurationString, setPrice, zoneDetails?.hourly])
+
 
   const estimatedPriceString = `$${(price ? price + 0.50 : 0).toFixed(2)}`
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-      <Typography variant="h5" gutterBottom sx={{ mt: '2vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', mt: 2 }}>
+      <Typography variant="h6" sx={{ mb: 1 }}>
         Select your parking duration
       </Typography>
-
-      <Box sx={{ display: 'flex', gap: 2, mt: 2, width: '100%' }}>
-        <FormControl sx={{ flex: 1 }} fullWidth>
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <FormControl fullWidth>
           <InputLabel id="hours-label">Hours</InputLabel>
           <Select
             labelId="hours-label"
             value={selectedHours}
             label="Hours"
-            onChange={(e) => setSelectedHours(Number(e.target.value))}
+            onChange={(e) => {
+              setSelectedHours(Number(e.target.value))
+              setSelectedMinutes(0)
+            }}
+            fullWidth
           >
             {hourOptions.map((hour) => (
-              <MenuItem key={hour} value={hour}>
-                {hour}
-              </MenuItem>
+              <MenuItem key={hour} value={hour}>{hour}</MenuItem>
             ))}
           </Select>
         </FormControl>
 
-        <FormControl sx={{ flex: 1 }} fullWidth>
+        <FormControl fullWidth>
           <InputLabel id="minutes-label">Minutes</InputLabel>
           <Select
             labelId="minutes-label"
             value={selectedMinutes}
             label="Minutes"
             onChange={(e) => setSelectedMinutes(Number(e.target.value))}
+            fullWidth
           >
             {minuteOptions.map((minute) => (
-              <MenuItem key={minute} value={minute}>
-                {minute}
-              </MenuItem>
+              <MenuItem key={minute} value={minute}>{minute.toString()/*.padStart(2, '0')*/}</MenuItem>
             ))}
           </Select>
         </FormControl>
       </Box>
 
-      <Typography variant="h6" sx={{ mt: 3 }}>
-        Estimated Price: {estimatedPriceString}
+      <Typography variant="h6" sx={{ mt: '2vh' }}>
+        Estimated Price: <Typography color='primary' variant="h5" component="span">{estimatedPriceString}</Typography>
+      </Typography>
+
+      <Typography variant="subtitle2" gutterBottom /*sx={{ mt: '1vh' }}*/>
+        {`Transaction fees and taxes may apply in later steps.`}
       </Typography>
     </Box>
   )
@@ -286,7 +308,7 @@ function MaxDuration() {
         margin: 'auto',
       }}
     >
-      <Typography variant="h5" gutterBottom sx={{ mt: '2vh' }}>
+      <Typography variant="h6" gutterBottom sx={{ mt: '2vh' }}>
         Review your duration
       </Typography>
 
@@ -294,8 +316,12 @@ function MaxDuration() {
         {`This rate (Maximum Parking Time) allows you to park here for ${durationString} until ${endTimeString}.`}
       </Typography>
 
-      <Typography variant="h5" gutterBottom sx={{ mt: '1vh' }}>
-        {`Estimated Price: ${estimatedPriceString}`}
+      <Typography variant="h6" sx={{ mt: '2vh' }}>
+        Estimated Price: <Typography color='primary' variant="h5" component="span">{estimatedPriceString}</Typography>
+      </Typography>
+
+      <Typography variant="subtitle2" gutterBottom>
+        {`Transaction fees and taxes may apply in later steps.`}
       </Typography>
     </Box>
   )

@@ -45,7 +45,6 @@ export class PaymentService {
     if (!id) {
       throw new Error("User ID is required");
     }
-    try {
     const query = {
       text: `INSERT INTO payments(driver, data) SELECT $1, jsonb_build_object(` +
       `'paymentId', $2::text,` +
@@ -74,9 +73,5 @@ export class PaymentService {
     }
     const paymentId = res.rows[0].id;
     return paymentId;
-  }catch (error) {
-    console.error("Error saving payment details:", error);
-    throw new Error("Failed to save payment details");
-  }
-}  
+  }  
 }

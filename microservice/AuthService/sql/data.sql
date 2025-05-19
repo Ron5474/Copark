@@ -119,8 +119,8 @@ VALUES (
   jsonb_build_object(
     'name', 'Driver 1',
     'email', 'driver1@outlook.com',
-    'phone' , '123-456-7890',
-    'pwhash', crypt('password1', gen_salt('bf')),
+    'picture' , 'https://www.google.com/img',
+    'sub', '12345677',
     'role', '["driver"]',
     'accountStatus', 'active'
   )
@@ -131,8 +131,8 @@ VALUES (
   jsonb_build_object(
     'name', 'Driver 2',
     'email', 'driver2@outlook.com',
-    'phone' , '123-456-7890',
-    'pwhash', crypt('password1', gen_salt('bf')),
+    'sub', '12345678',
+    'picture' , 'https://www.google.com/img2',
     'role', '["driver"]',
     'accountStatus', 'active'
   )
@@ -142,10 +142,10 @@ INSERT INTO account(id, data)
 VALUES (
   'b1eab387-1000-4ee3-a746-d59366e44f06',
   jsonb_build_object(
-    'name', 'Bad Driver 1',
-    'email', 'baddriver1@outlook.com',
-    'phone' , '123-456-7890',
-    'pwhash', crypt('password1', gen_salt('bf')),
+    'name', 'Driver 3',
+    'email', 'driver3@outlook.com',
+    'sub', '12345679',
+    'picture' , 'https://www.google.com/img3',
     'role', '["driver"]',
     'accountStatus', 'active'
   )

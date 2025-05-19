@@ -12,9 +12,9 @@ test('Server starts and logs startup messages', async () => {
 
   await import('../src/server')
 
-  expect(listenSpy).toHaveBeenCalledWith(3010, expect.any(Function))
+  expect(listenSpy).toHaveBeenCalledWith(3014, expect.any(Function))
 
-  expect(console.log).toHaveBeenCalledWith('Server Running on port 3010')
+  expect(console.log).toHaveBeenCalledWith('Server Running on port 3014')
 
   listenSpy.mockRestore()
 });

@@ -2,7 +2,6 @@ import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 import { Vehicle } from "../types/express";
-import { sendTicketIssuedEmail } from './emailClient'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
@@ -69,7 +68,6 @@ export class TicketService {
 
   public async createTicket(newTicket: NewTicket): Promise<Ticket> {
     const enforcerToken = newTicket.enforcer;
-    console.log("enforcer", enforcerToken)
     const enforcerId = await this.decrypt(enforcerToken);
     const vehicleId = newTicket.vehicle;
 
@@ -77,29 +75,6 @@ export class TicketService {
       throw new Error("Invalid enforcer or vehicle ID.");
     }
 
-    // Step 1: get driver ID
-    const ownerRes = await fetch('http://localhost:4001/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${enforcerToken}`,
-      },
-      body: JSON.stringify({
-        query: `
-          query FindOwner($vehicle: String!) {
-            findOwnerByVehicleID(vehicle: $vehicle) {
-              id
-            }
-          }
-        `,
-        variables: { vehicle: vehicleId },
-      }),
-    });
-
-    const ownerJson = await ownerRes.json();
-
-    const driverId = ownerJson?.data?.findOwnerByVehicleID?.id;
-    // Step 2: Insert ticket
     const issuedDate = new Date().toISOString();
     const ticketStatus = 'active';
 
@@ -146,70 +121,6 @@ export class TicketService {
       images: row.images,
       note: row.note,
     };
-
-    // Step 3: If driver exists, fetch their email and send email
-    if (driverId) {
-      const driverRes = await fetch('http://localhost:3010/api/v0/auth/driver/email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${enforcerToken}`,
-        },
-        body: JSON.stringify({ id: driverId }),
-      });
-      console.log("driver res", driverRes.status)
-      if (driverRes.ok) {
-        const driver = await driverRes.json();
-
-        // await sendTicketIssuedEmail({
-        //   to: driver.email,
-        //   subject: `Ticket Issued for Your Vehicle`,
-        //   html: `
-        //     <h3>Hello ${driver.name}</h3>
-        //     <p><strong>Violation:</strong> ${ticket.violation}</p>
-        //     <p>Please log in to <a href="https://copark.space/driver/en/dashboard">copark.space</a> to view and pay your ticket.</p>
-        //   `,
-        // });
-        await sendTicketIssuedEmail({
-          to: driver.email,
-          subject: `A Parking Ticket Has Been Issued for Your Vehicle`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px;">
-              <h2 style="color: #D32F2F;"> Parking Violation Notice</h2>
-              <p>Hello <strong>${driver.name}</strong>,</p>
-              <p>Your vehicle has been issued a ticket for the following violation:</p>
-              <ul>
-                <li><strong>Violation:</strong> ${ticket.violation}</li>
-                <li><strong>Fine:</strong> $${ticket.fine.toFixed(2)}</li>
-                <li><strong>Date Issued:</strong> ${ticket.issuedDate.toLocaleDateString()}</li>
-                ${ticket.note ? `<li><strong>Note:</strong> ${ticket.note}</li>` : ""}
-              </ul>
-              <p style="margin-top: 20px;">
-                <strong>Early Payment Discount:</strong><br>
-                If you pay this ticket within <strong>24 hours</strong>, you'll receive a <strong>20% discount</strong>.
-              </p>
-              <p>
-                You can view and pay your ticket by logging in to your dashboard:
-              </p>
-              <p>
-                <a href="https://copark.space/driver/en/dashboard" style="background-color: #1976D2; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px;">View Ticket</a>
-              </p>
-              <p>
-                <strong>Want to Challenge This Ticket?</strong><br>
-                If you believe this ticket was issued in error, you may submit a challenge request from your dashboard. Be sure to include any evidence or explanation to support your case.
-              </p>
-              <p style="margin-top: 30px;">Need help? Contact us at <a href="mailto:coparkspace@gmail.com">coparkspace@gmail.com</a>.</p>
-              <p style="color: gray; font-size: 0.9em;">This is an automated message from CoPark.</p>
-            </div>
-          `
-        });
-
-      } else {
-        console.warn("Driver email not sent: failed to fetch driver info.");
-      }
-    } else {
-      console.info("No driver linked to vehicle — skipping email.");
-    }
 
     return ticket;
   }

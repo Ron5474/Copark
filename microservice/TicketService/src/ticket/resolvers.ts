@@ -14,6 +14,7 @@ import {
 
 import { SessionUser } from "src";
 import { Vehicle } from "src/types/express";
+import { sendTicketIssuedEmail } from './emailClient'
 
 const ticketService = new TicketService();
 const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
@@ -81,6 +82,87 @@ export class TicketResolver {
       role: res.role
     };
   }
+
+  private async notifyDriverOfTicket(
+    vehicleId: string,
+    ticket: Ticket,
+    enforcerToken: string
+  ) {
+    // Step 1: Get the driver ID from VehicleService
+    const ownerRes = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${enforcerToken}`,
+      },
+      body: JSON.stringify({
+        query: `
+          query FindOwner($vehicle: String!) {
+            findOwnerByVehicleID(vehicle: $vehicle) {
+              id
+            }
+          }
+        `,
+        variables: { vehicle: vehicleId },
+      }),
+    });
+
+    const ownerJson = await ownerRes.json();
+    const driverId = ownerJson?.data?.findOwnerByVehicleID?.id;
+    if (!driverId) return console.info("No driver linked — skipping email.");
+
+    // Step 2: Get driver info from AuthService
+    const driverRes = await fetch("http://localhost:3010/api/v0/auth/driver/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${enforcerToken}`,
+      },
+      body: JSON.stringify({ id: driverId }),
+    });
+
+    if (!driverRes.ok) {
+      console.warn("Failed to fetch driver email.");
+      return;
+    }
+
+    const driver = await driverRes.json();
+
+    // Step 3: Send email
+    await sendTicketIssuedEmail({
+      to: driver.email,
+      subject: `A Parking Ticket Has Been Issued for Your Vehicle`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px;">
+          <h2 style="color: #D32F2F;"> Parking Violation Notice</h2>
+          <p>Hello <strong>${driver.name}</strong>,</p>
+          <p>Your vehicle has been issued a ticket for the following violation:</p>
+          <ul>
+            <li><strong>Violation:</strong> ${ticket.violation}</li>
+            <li><strong>Date Issued:</strong> ${ticket.issuedDate.toLocaleDateString()}</li>
+            ${ticket.note ? `<li><strong>Note:</strong> ${ticket.note}</li>` : ""}
+          </ul>
+          <p style="margin-top: 20px;">
+            <strong>Early Payment Discount:</strong><br>
+            If you pay this ticket within <strong>24 hours</strong>, you'll receive a <strong>20% discount</strong>.
+          </p>
+          <p>
+            Please log in to your dashboard to view, pay, or challenge this ticket:
+          </p>
+          <p>
+            <a href="https://copark.space/driver/en/dashboard" style="background-color: #1976D2; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px;">View Your Ticket</a>
+          </p>
+          <p>
+            <strong>Want to Challenge This Ticket?</strong><br>
+            You may submit a challenge request from your dashboard. Be sure to include any evidence or explanation to support your case.
+          </p>
+          <p style="margin-top: 30px;">Need help? Contact us at <a href="mailto:coparkspace@gmail.com">coparkspace@gmail.com</a>.</p>
+          <p style="color: gray; font-size: 0.9em;">This is an automated message from CoPark.</p>
+        </div>
+      `,
+    });
+  }
+
 
   @Query(() => [Ticket])
   @Authorized(["admin"])
@@ -165,7 +247,7 @@ export class TicketResolver {
       const vehicleJson = await vehicleRes.json();
       const vehicleId = vehicleJson?.data?.findOrCreateVehicleByPlate?.id;
 
-      return ticketService.createTicket({
+      const ticket = await ticketService.createTicket({
       enforcer: (request.headers.authorization as string).split(' ')[1],
       vehicle: vehicleId,
       violation: input.reason,
@@ -173,6 +255,8 @@ export class TicketResolver {
       note: input.note,
       images: input.images,
     })
+    await this.notifyDriverOfTicket(vehicleId, ticket, (request.headers.authorization as string).split(' ')[1])
+    return ticket
   }
 
   //need to add getTicketByEmail

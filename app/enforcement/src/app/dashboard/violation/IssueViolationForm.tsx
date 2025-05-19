@@ -45,6 +45,10 @@ export default function IssueViolationForm({
   const [note, setNote] = useState('')
   const [photos, setPhotos] = useState<File[]>([])
   const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState({
+    plate: false,
+    reason: false,
+  })
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -53,8 +57,14 @@ export default function IssueViolationForm({
   }
 
   const handleSubmit = async () => {
-    if (!plate || !reason) {
-      alert('Missing required fields.')
+    const newErrors = {
+      plate: !plate,
+      reason: !reason,
+    }
+
+    setErrors(newErrors)
+
+    if (newErrors.plate || newErrors.reason) {
       return
     }
 
@@ -64,7 +74,7 @@ export default function IssueViolationForm({
       const base64Images = await Promise.all(photos.map(toBase64))
 
       await issueTicket({
-        plate,
+        plate: plate as string,
         reason,
         note: reason === 'Other' ? note : '',
         images: base64Images[0] ?? null,
@@ -89,9 +99,18 @@ export default function IssueViolationForm({
         <TextField
           label="License Plate"
           value={plate ?? ''}
-          onChange={(e) => setPlate(e.target.value)}
+          onChange={(e) => {
+          const value = e.target.value
+          setPlate(value)
+          if (errors.plate && value) {
+            setErrors((prev) => ({ ...prev, plate: false }))
+          }
+        }}
           fullWidth
+          error={errors.plate}
+          helperText={errors.plate ? 'License plate is required.' : ''}
         />
+
         <TextField
           label="Current Location"
           value={`Zone ${zone}`}
@@ -103,8 +122,16 @@ export default function IssueViolationForm({
           label="Reason"
           select
           value={reason}
-          onChange={(e) => setReason(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value
+            setReason(value)
+            if (errors.reason && value) {
+              setErrors((prev) => ({ ...prev, reason: false }))
+            }
+          }}
           fullWidth
+          error={errors.reason}
+          helperText={errors.reason ? 'Reason is required.' : ''}
         >
           {reasons.map((r) => (
             <MenuItem key={r} value={r}>

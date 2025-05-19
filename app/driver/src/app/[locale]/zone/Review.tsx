@@ -116,7 +116,7 @@ export default function Review() {
           variant="body1"
           gutterBottom
         >
-          {`${vehicle?.nickname} - ${vehicle?.plate} (${vehicle?.state})`}
+          {`${vehicle?.nickname ? vehicle.nickname + ' - ' : ''}${vehicle?.plate} (${vehicle?.state})`}
         </Typography>
       </Box>
 

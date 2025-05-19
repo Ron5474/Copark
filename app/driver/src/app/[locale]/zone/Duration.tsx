@@ -136,7 +136,7 @@ export default function Zone() {
 function SelectDuration() {
   const { zoneDetails, setDurationString, setPrice, price } = useContext(ZoneContext)
   const [selectedHours, setSelectedHours] = useState(0)
-  const [selectedMinutes, setSelectedMinutes] = useState(0)
+  const [selectedMinutes, setSelectedMinutes] = useState(5)
 
   const now = new Date()
   const openTime = zoneDetails?.openTime || '00:00'
@@ -179,8 +179,17 @@ function SelectDuration() {
 
   const minuteOptions = useMemo(() => {
     const max = selectedHours === maxHours ? maxMinutes : 60
-    return Array.from({ length: Math.floor(max / 5) + 1 }, (_, i) => i * 5).filter(m => m < 60)
+    const step = 5
+    const rawOptions = Array.from({ length: Math.floor(max / step) + 1 }, (_, i) => i * step)
+  
+    return rawOptions.filter((m) => {
+      if (selectedHours === 0) {
+        return m >= 5 && m < 60
+      }
+      return m < 60
+    })
   }, [selectedHours, maxHours, maxMinutes])
+  
 
   useEffect(() => {
     const totalMinutes = selectedHours * 60 + selectedMinutes
@@ -209,8 +218,11 @@ function SelectDuration() {
             value={selectedHours}
             label="Hours"
             onChange={(e) => {
-              setSelectedHours(Number(e.target.value))
-              setSelectedMinutes(0)
+              const newHours = Number(e.target.value)
+              setSelectedHours(newHours)
+              if (newHours === 0 && selectedMinutes < 5) {
+                setSelectedMinutes(5)
+              }
             }}
             fullWidth
           >
@@ -230,7 +242,7 @@ function SelectDuration() {
             fullWidth
           >
             {minuteOptions.map((minute) => (
-              <MenuItem key={minute} value={minute}>{minute.toString()/*.padStart(2, '0')*/}</MenuItem>
+              <MenuItem key={minute} value={minute}>{minute.toString()}</MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -240,7 +252,7 @@ function SelectDuration() {
         Estimated Price: <Typography color='primary' variant="h5" component="span">{estimatedPriceString}</Typography>
       </Typography>
 
-      <Typography variant="subtitle2" gutterBottom /*sx={{ mt: '1vh' }}*/>
+      <Typography variant="subtitle2" gutterBottom>
         {`Transaction fees and taxes may apply in later steps.`}
       </Typography>
     </Box>

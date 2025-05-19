@@ -38,14 +38,14 @@ export default function PermitCard() {
           <Typography fontWeight="bold" color="green">Valid Permit</Typography>
           <Typography>Valid parking permit found.</Typography>
           <Typography>Plate Number: {plate}</Typography>
-          <Typography>Zone: {zone}</Typography>
+          <Typography>Current Location: Zone {zone}</Typography>
         </>
       ) : (
         <>
           <Typography fontWeight="bold" color="red">Invalid Permit</Typography>
           <Typography>No valid permit found for this vehicle.</Typography>
           <Typography>Plate Number: {plate}</Typography>
-          <Typography>Zone: {zone}</Typography>
+          <Typography>Current Location: Zone {zone}</Typography>
         </>
       )}
 

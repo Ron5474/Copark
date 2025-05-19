@@ -26,7 +26,7 @@ export default function EnforcementNavBar() {
         onChange={(event, newValue) => setValue(newValue)}
       >
         <BottomNavigationAction label="Plate look-up" />
-        <BottomNavigationAction label="Issue Ticket" />
+        {/* <BottomNavigationAction label="Issue Ticket" /> */}
         <LogoutButton />
       </BottomNavigation>
     </Paper>

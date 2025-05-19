@@ -512,3 +512,60 @@ test('Student can check their tickets successful', async () => {
 
   expect(ticket).toBeDefined()
 })
+
+test('Ticket creation sends email to vehicle owner', async () => {
+
+  const registerRes = await supertest(vehicleServer)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + ronakDriverToken)
+    .send({
+      query: `
+        mutation RegisterVehicle($input: RegisterVehicleInput!) {
+          registerVehicle(input: $input) {
+            id
+            plate
+          }
+        }
+      `,
+      variables: {
+        input: {
+          plate: "Coder123",
+          country: "US",
+          state: "California",
+          nickname: "Batmobile"
+        }
+      }
+    });
+
+  expect(registerRes.status).toBe(200);
+
+  const vehicleId = registerRes.body.data.registerVehicle.id;
+
+  expect(vehicleId).toBeDefined();
+
+  const enforcementToken = await loginAs("enforcement")
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "Coder123",
+          reason: "Being Smart",
+          note: "#1 in commits",
+          images: "https://example.com/photo.jpg"
+        }
+      }
+    })
+
+  expect(response.status).toBe(200)
+
+  const ticket = response.body.data.createNewTicket
+
+  expect(ticket).toBeDefined()
+  expect(ticket.violation).toBe("Being Smart")
+  expect(ticket.fine).toBe(50)
+  expect(ticket.note).toBe("#1 in commits")
+});

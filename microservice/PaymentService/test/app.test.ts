@@ -159,3 +159,34 @@ test('Post /api/v0/payment/complete - should return 401', async () => {
   expect(response.status).toBe(401)
   expect(response.body).toHaveProperty('message', 'Unauthorized')
 })
+
+test('Post /api/v0/payment/complete - same transaction twice returns 200', async () => {
+  const token = await login()
+  const response = await supertest(app)
+    .post('/api/v0/payment/complete')
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      id: 'pi_123',
+      status: 'succeeded',
+      payment_method: 'pm_card_visa',
+      amount: 1000,
+      currency: 'USD',
+      type: 'dailyPass',
+    })
+
+  expect(response.status).toBe(201)
+
+  const secondResponse = await supertest(app)
+    .post('/api/v0/payment/complete')
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      id: 'pi_123',
+      status: 'succeeded',
+      payment_method: 'pm_card_visa',
+      amount: 1000,
+      currency: 'USD',
+      type: 'dailyPass',
+    })
+
+  expect(secondResponse.status).toBe(200)
+})

@@ -44,5 +44,5 @@ export interface PermitDetails {
   type: string;
   zoneNumber: string | null;
   vehicle?: Vehicle;
-  durationString?: string | null; 
+  duration?: Duration | null; 
 }

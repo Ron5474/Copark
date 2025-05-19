@@ -29,7 +29,6 @@ export class PermitService {
       total
     } as Receipt
 
-
     // Stripe processing goes here
 
 
@@ -50,6 +49,8 @@ export class PermitService {
       paymentMethod: input.paymentMethod,
     }
 
+    console.log('data', data)
+
     const { rows } = await pool.query(`
       WITH selected_zone AS (
         SELECT id FROM zone
@@ -65,7 +66,7 @@ export class PermitService {
     if (!rows.length) {
       throw new Error(`Zone ${input.zone} not found`)
     }
-
+    // TODO: Hit email api to send confirmation and receipt
     return {
       type: rows[0].data.type,
       zone: rows[0].zone,

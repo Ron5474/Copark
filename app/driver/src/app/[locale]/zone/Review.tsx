@@ -25,7 +25,7 @@ import { Payment } from '../shared/actions'
 
 
 export default function Review() {
-  const { zoneNumber, /*zoneDetails,*/ durationString, price, vehicle } = useContext(ZoneContext)
+  const { zoneNumber, /*zoneDetails,*/ duration, durationString, price, vehicle } = useContext(ZoneContext)
   const serviceFee = price ? 0.5 : 0
   
   const tempLocation = "UCSC Campus"
@@ -33,7 +33,7 @@ export default function Review() {
   const checkout = async () => {
     const amount: number = parseFloat((price + serviceFee).toFixed(2))*100 // in cents
     sessionStorage.setItem('zoneNumber', zoneNumber.toString())
-    sessionStorage.setItem('durationString', durationString)
+    sessionStorage.setItem('duration', JSON.stringify(duration))
     sessionStorage.setItem('price', amount.toString())
     sessionStorage.setItem('vehicle', JSON.stringify(vehicle))
     sessionStorage.setItem('tempLocation', tempLocation)

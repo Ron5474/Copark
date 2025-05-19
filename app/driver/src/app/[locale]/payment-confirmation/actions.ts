@@ -59,19 +59,50 @@ export async function addPermitDetails(
   addPermitDetails: PermitDetails
 ): Promise<void> {
   const { id, amount, currency, status, payment_method, type } = details;
-  
-  const res = await fetch("http://localhost:", {
+  const { vehicle, zoneNumber, duration } = addPermitDetails;
+
+  const inputData = {
+    vehicle: vehicle?.plate,
+          zone: zoneNumber,
+          duration: duration,
+          paymentMethod: payment_method
+        }
+
+  const res = await fetch("http://localhost:4003/graphql", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${await getAuthToken()}`,
     },
     body: JSON.stringify({
-      id,
-      ...addPermitDetails
+      query: `
+        mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
+          purchaseZonePermit(input: $input) {
+            zone,
+            purchaseDate,
+            activeDate,
+            expireDate,
+            receipt {
+              tax,
+              service,
+              subTotal,
+              total
+            }
+            paymentMethod
+          }
+        }
+        `,
+      variables: {
+        input: inputData
+      }
     }),
   });
-  if (!res.ok) {
+
+  const result = await res.json();
+  
+  console.log("GraphQL response:", result);
+
+  if (await result.errors !== undefined) {
     throw new Error("Failed to save permit details");
   }
 

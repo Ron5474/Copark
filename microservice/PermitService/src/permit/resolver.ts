@@ -25,11 +25,48 @@ export class PermitResolver {
   @Mutation(() => Confirmation)
   async purchaseZonePermit(
     @Arg("input", () => PurchaseZoneInput) input: PurchaseZoneInput,
-    // @Ctx() request: Request
+    @Ctx() request: Request
   ): Promise<Confirmation> {
+    console.log('input', input)
     // const userId = request.user?.id
     // if (!userId) throw new Error('Unauthorized')
-    return await service.purchaseMyZonePermit(input)
+
+    const plate = input.vehicle
+
+    const vehicleQuery = `
+      query FindVehicleByPlate($plate: String!) {
+        findVehicleByPlate(plate: $plate) {
+          id
+        }
+      }
+    `
+    const vehicleRes = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${request.headers.authorization}`,
+      },
+      body: JSON.stringify({
+        query: vehicleQuery,
+        variables: { plate },
+      }),
+    })
+
+    const vehicleJson = await vehicleRes.json()
+    // console.log('vehicleJson', vehicleJson)
+
+    const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
+
+    if (!vehicleId) {
+      throw new Error('Vehicle not found')
+    }
+
+    return await service.purchaseMyZonePermit({
+      vehicle: vehicleId,
+      zone: input.zone,
+      duration: input.duration,
+      paymentMethod: input.paymentMethod
+    })
   }
 
   @Authorized('enforcement')

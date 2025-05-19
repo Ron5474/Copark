@@ -28,19 +28,19 @@ function PaymentConfirmation() {
       await addPaymentDetails(details);
       const vehicle = sessionStorage.getItem("vehicle");
       const zoneNumber = sessionStorage.getItem("zoneNumber");
-      const durationString = sessionStorage.getItem("durationString");
+      const duration = sessionStorage.getItem("duration");
+      const d = JSON.parse(duration as string);
       const v = JSON.parse(vehicle as string);
       const permitDetails = {
         type: details.type as string,
         vehicle: v ? v : undefined,
         zoneNumber: zoneNumber,
-        durationString: durationString,
+        duration: d,
       };
       await addPermitDetails(details, permitDetails);
       sessionStorage.removeItem("vehicle");
       sessionStorage.removeItem("tempLocation");
       sessionStorage.removeItem("zoneNumber");
-      sessionStorage.removeItem("durationString");
       sessionStorage.removeItem("price");
       sessionStorage.removeItem("currency");
     };

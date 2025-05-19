@@ -31,7 +31,7 @@ export default function Review() {
   const tempLocation = "UCSC Campus"
 
   const checkout = async () => {
-    const amount: number = parseFloat((price + 0.5).toFixed(2))*100 // in cents
+    const amount: number = parseFloat((price + serviceFee).toFixed(2))*100 // in cents
     sessionStorage.setItem('zoneNumber', zoneNumber.toString())
     sessionStorage.setItem('durationString', durationString)
     sessionStorage.setItem('price', amount.toString())
@@ -184,7 +184,7 @@ export default function Review() {
       <Button
         fullWidth
         variant="contained"
-        onClick={checkout}
+        onClick={price ? checkout : () => {}}
         sx={{
           width: '100%',
           marginTop: '5vh',

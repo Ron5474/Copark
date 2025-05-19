@@ -2,7 +2,7 @@
 
 import {useState, createContext} from 'react'
 
-import { Vehicle, ZoneDetails } from '../types'
+import { Vehicle, ZoneDetails, Duration } from '../types'
 
 
 const steps = ['Zone', 'Duration', 'Vehicle', 'Review', 'Payment']
@@ -15,6 +15,8 @@ const ZoneContext = createContext<{
   setZoneNumber: React.Dispatch<React.SetStateAction<string>>
   zoneDetails: ZoneDetails | undefined
   setZoneDetails: React.Dispatch<React.SetStateAction<ZoneDetails | undefined>>
+  duration: Duration
+  setDuration: React.Dispatch<React.SetStateAction<Duration>>
   durationString: string
   setDurationString: React.Dispatch<React.SetStateAction<string>>
   price: number
@@ -29,6 +31,8 @@ const ZoneContext = createContext<{
   setZoneNumber: () => {},
   zoneDetails: undefined,
   setZoneDetails: () => {},
+  duration: {minutes: 0, hours: 0},
+  setDuration: () => {},
   durationString: '',
   setDurationString: () => {},
   price: 0.0,
@@ -48,6 +52,7 @@ function ZoneProvider(props: ZoneProviderProps) {
   const [currentStep, setCurrentStep] = useState<string>('Zone')
   const [zoneNumber, setZoneNumber] = useState<string>('')
   const [zoneDetails, setZoneDetails] = useState<ZoneDetails|undefined>(undefined)
+  const [duration, setDuration] = useState<Duration>({hours: 0, minutes: 0})
   const [durationString, setDurationString] = useState<string>('')
   const [price, setPrice] = useState<number>(0)
   const [vehicle, setVehicle] = useState<Vehicle|undefined>(undefined)
@@ -64,6 +69,7 @@ function ZoneProvider(props: ZoneProviderProps) {
     currentStep, setCurrentStep,
     zoneNumber, setZoneNumber,
     zoneDetails, setZoneDetails,
+    duration, setDuration,
     durationString, setDurationString,
     price, setPrice,
     vehicle, setVehicle,

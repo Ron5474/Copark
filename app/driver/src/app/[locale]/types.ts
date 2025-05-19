@@ -18,7 +18,7 @@ export interface Vehicle {
   nickname?: string
 }
 
-interface Duration{
+export interface Duration{
   hours: number
   minutes: number
 }

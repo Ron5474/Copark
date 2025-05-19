@@ -134,7 +134,7 @@ export default function Zone() {
 }
 
 function SelectDuration() {
-  const { zoneDetails, setDurationString, setPrice, price } = useContext(ZoneContext)
+  const { zoneDetails, setDurationString, setPrice, price, setDuration } = useContext(ZoneContext)
   const [selectedHours, setSelectedHours] = useState(0)
   const [selectedMinutes, setSelectedMinutes] = useState(5)
 
@@ -195,12 +195,13 @@ function SelectDuration() {
     const totalMinutes = selectedHours * 60 + selectedMinutes
     const hours = Math.floor(totalMinutes / 60)
     const minutes = totalMinutes % 60
+    setDuration({minutes: minutes, hours: hours})
     const parts = []
     if (hours) parts.push(`${hours} ${hours === 1 ? 'hour' : 'hours'}`)
     if (minutes) parts.push(`${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`)
     setDurationString(parts.join(' '))
     setPrice((totalMinutes * (zoneDetails?.hourly ?? 0)) / 60)
-  }, [selectedHours, selectedMinutes, setDurationString, setPrice, zoneDetails?.hourly])
+  }, [selectedHours, selectedMinutes, setDuration, setDurationString, setPrice, zoneDetails?.hourly])
 
 
   const estimatedPriceString = `$${(price ? price + 0.50 : 0).toFixed(2)}`
@@ -260,7 +261,7 @@ function SelectDuration() {
 }
 
 function MaxDuration() {
-  const { zoneDetails, durationString, setDurationString, price, setPrice } = useContext(ZoneContext)
+  const { zoneDetails, durationString, setDurationString, price, setPrice, setDuration } = useContext(ZoneContext)
 
   const maxDuration = zoneDetails?.maxDuration
   const openTime = zoneDetails?.openTime || '0:00'
@@ -297,6 +298,8 @@ function MaxDuration() {
   const totalMinutes = Math.floor(finalDurationMs / (1000 * 60))
   const finalHours = Math.floor(totalMinutes / 60)
   const finalMinutes = totalMinutes % 60
+
+  setDuration({minutes: finalMinutes, hours: finalHours})
 
   const durationParts: string[] = []
   if (finalHours) durationParts.push(`${finalHours} ${finalHours === 1 ? 'hour' : 'hours'}`)

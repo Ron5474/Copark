@@ -61,6 +61,15 @@ export class ZoneDetails {
 }
 
 @InputType()
+export class ZoneDuration {
+  @Field(() => Number)
+  minutes!: number
+
+  @Field(() => Number)
+  hours!: number
+}
+
+@InputType()
 export class NewZone {
 
   @Field(() => Number)
@@ -72,8 +81,8 @@ export class NewZone {
   @Field(() => Number, { nullable: true })
   hourly?: number
 
-  @Field(() => Duration, { nullable: true })
-  maxDuration?: Duration
+  @Field(() => ZoneDuration, { nullable: true })
+  maxDuration?: ZoneDuration
 
   @Field(() => String, { nullable: true })
   openTime?: string

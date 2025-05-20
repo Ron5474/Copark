@@ -221,7 +221,7 @@ export class PermitService {
     return permitsByDay;
   }
 
-  public async createNewZone(input: NewZone): Promise<void> {
+  public async createNewZone(input: NewZone): Promise<boolean> {
     const { rows } = await pool.query(`
       INSERT INTO zone (data)
       VALUES ($1)
@@ -229,8 +229,6 @@ export class PermitService {
     `, [input])
 
     //TODO add location also as conflict
-    if (!rows.length) {
-      throw new Error(`Zone ${input.zone} already exists`)
-    }
+    return (rows.length !== 0)
   }
 }

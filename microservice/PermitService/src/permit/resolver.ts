@@ -239,10 +239,10 @@ export class PermitResolver {
   }
 
   @Authorized('admin')
-  @Query()
+  @Mutation(() => Boolean)
   async createZone(
     @Arg("input", () => NewZone) input: NewZone,
-  ): Promise<void> {
+  ): Promise<boolean> {
     return await service.createNewZone(input)
   }
 }

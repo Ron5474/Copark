@@ -3,7 +3,12 @@ import { EmailRequest } from '../types'
 import dotenv from 'dotenv'
 import { resolve } from 'path';
 
-dotenv.config({ path: resolve(__dirname, '../../../../.env') })
+const isBuilt = __dirname.includes('/build') || __dirname.includes('\\build');
+const p = resolve(__dirname, isBuilt ? '../../../../.prod.env': '../../../../.env')
+
+dotenv.config({ path: p})
+
+console.log(process.env.SMTP_PORT)
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,

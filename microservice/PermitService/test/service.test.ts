@@ -54,7 +54,7 @@ test('Purchasing different duration', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
   await expect(permitService.purchaseMyZonePermit({...permitDetails, zone: '13'}))
-      .rejects.toThrow('Zone does not exist: 13')
+      .rejects.toThrow('Zone 13 not found')
 })
 
 // test('Transaction failed', async () => {

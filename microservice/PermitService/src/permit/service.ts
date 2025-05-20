@@ -173,7 +173,7 @@ export class PermitService {
       [zone]
     )
     
-    if (result.rowCount == 0) throw new Error(`Zone does not exist: ${zone}`)
+    if (result.rowCount == 0) throw new Error(`Zone ${zone} not found`)
     return isWeekend ? result.rows[0].data.weekend : result.rows[0].data.weekday
   }
 
@@ -220,7 +220,20 @@ export class PermitService {
     return permitsByDay;
   }
 
-  // public async createNewZone(): Promise<> {
+  // public async createNewZone(input: NewZone): Promise<> {
+  //   const { rows } = await pool.query(`
+  //     INSERT INTO zone (data)
+  //     VALUES ($1)
+  //     RETURNING id, data
+  //   `, [input])
 
+
+  //   if (!rows.length) {
+  //     throw new Error(`Zone ${input.zone} already exists`)
+  //   }
+  //   return {
+  //     id: rows[0].id,
+  //     zone: rows[0].zone,
+  //   }
   // }
 }

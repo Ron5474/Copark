@@ -258,16 +258,18 @@ test('getTicketsForVehicleID should return tickets for the provided vehicle IDs'
 });
 
 test('getTicketsByDay should return tickets by day', async () => {
-    const tickets = await ticketService.getAllTicketsCount();
+    const ticketsByDay = await ticketService.getAllTicketsCount();
 
-    // console.log(tickets);
     const date = new Date();
-    const today = date.toISOString().split('T')[0]
-    date.setDate(date.getDate() - 1)
-    const yest = date.toISOString().split('T')[0]
-    expect(tickets[yest]).toHaveLength(1);
-    expect(tickets[today]).toHaveLength(7);
+    const today = date.toISOString().split('T')[0];
+    date.setDate(date.getDate() - 1);
+    const yest = date.toISOString().split('T')[0];
 
+    const todayEntry = ticketsByDay.find(entry => entry.date === today);
+    const yestEntry = ticketsByDay.find(entry => entry.date === yest);
+
+    expect(yestEntry?.tickets).toHaveLength(1);
+    expect(todayEntry?.tickets).toHaveLength(7);
 });
 
 test('getTicketsIssuedByEnforcer should return tickets issued by provided enforcer', async () => {

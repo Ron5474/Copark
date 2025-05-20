@@ -25,8 +25,6 @@ export default function Zone() {
 
   const isHourly = !!zoneDetails?.hourly
 
-  console.log("DETAILS: ", zoneDetails)
-
   const options = isHourly
   
   ?

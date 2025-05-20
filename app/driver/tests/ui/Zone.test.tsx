@@ -4,7 +4,7 @@
  * @author Bryant Oliver
  */
 
-import { vi, it, beforeEach, afterEach, expect } from 'vitest'
+import { vi, it, beforeEach, afterEach, expect, afterAll } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '../setup'
@@ -98,6 +98,10 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
+afterAll(() => {
+  vi.useRealTimers()
+})
+
 
 it('Renders guest', async () => {
   render(<MemberView />)
@@ -134,6 +138,7 @@ it('Error if zone # does not exist', async () => {
 })
 
 it('Confirm Zone takes you to duration step', async () => {
+  vi.setSystemTime(new Date('2025-05-20T10:30:00'))
   render(<MemberView />)
   const user = userEvent.setup()
   const input = screen.getByLabelText('Enter parking zone number')

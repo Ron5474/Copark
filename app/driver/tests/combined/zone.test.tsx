@@ -78,7 +78,10 @@ vi.mock('next-intl', () => ({
 
 
 beforeAll(() => server.listen())
-afterAll(() => server.close())
+afterAll(() => {
+  server.close()
+  vi.useRealTimers()
+})
 
 beforeEach(() => {
   vi.resetModules()
@@ -102,6 +105,7 @@ it('Zone Details fetch failed', async () => {
 })
 
 it('Fetch Zone Details', async () => {
+  vi.setSystemTime(new Date('2025-05-20T10:30:00'))
   render(<MemberView />)
   const user = userEvent.setup()
   const input = screen.getByLabelText('Enter parking zone number')

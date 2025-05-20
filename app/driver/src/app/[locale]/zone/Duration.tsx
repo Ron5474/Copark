@@ -245,8 +245,10 @@ function SelectDuration() {
             onChange={(e) => {
               const newHours = Number(e.target.value)
               setSelectedHours(newHours)
-              if (newHours === 0 && selectedMinutes < 5) {
+              if (newHours === 0) {
                 setSelectedMinutes(5)
+              } else {
+                setSelectedMinutes(0)
               }
             }}
             fullWidth

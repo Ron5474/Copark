@@ -32,7 +32,7 @@ export async function getTicketsByDay() {
 
   const result = await response.json()
 
-  console.log(JSON.stringify(result.data.getTicketsStats, null, 2));
+  // console.log(JSON.stringify(result.data.getTicketsStats, null, 2));
 
   if (result.errors) {
     throw new Error(result.errors[0].message)

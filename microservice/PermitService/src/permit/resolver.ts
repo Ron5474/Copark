@@ -96,6 +96,27 @@ export class PermitResolver {
 
     const token = request.headers.authorization?.replace('Bearer ', '');
     const user = await this.getUserData(token);
+    let durationString = "";
+    if (input.duration?.hours && input.duration?.minutes) {
+      if (input.duration.hours > 1) {
+      durationString += `${input.duration.hours} hours`
+      } else {
+        durationString += `${input.duration.hours} hour`
+      }
+      if (input.duration.minutes > 1) {
+        durationString += ` ${input.duration.minutes} minutes`
+      } else {
+        durationString += ` ${input.duration.minutes} minute`
+      }
+    } else if (input.duration?.hours) {
+      if (input.duration.hours > 1) {
+        durationString = `${input.duration.hours} hours`
+      } else {
+        durationString = `${input.duration.hours} hour`
+      }
+    } else if (input.duration?.minutes) {
+      durationString = `${input.duration.minutes} minutes`
+    }
 
     // Step 2: Send email
     await sendPermitEmail({
@@ -113,7 +134,7 @@ export class PermitResolver {
 
           <div style="background-color: #f9f9f9; padding: 16px; border-radius: 8px; margin: 20px 0;">
             <p><strong>Zone:</strong> ${input.zone}</p>
-            <p><strong>Duration:</strong> ${input.duration}</p>
+            <p><strong>Duration:</strong> ${durationString}</p>
             <p><strong>Vehicle Plate:</strong> ${plate}</p>
             <p><strong>Payment Method:</strong> ${input.paymentMethod}</p>
           </div>

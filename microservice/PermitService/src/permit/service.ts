@@ -8,6 +8,7 @@ import {
   IsValidPolice,
   MyPermits,
   ZoneDetails,
+  NewZone,
   Permit,
   PermitsByDay
 } from './schema'
@@ -220,20 +221,16 @@ export class PermitService {
     return permitsByDay;
   }
 
-  // public async createNewZone(input: NewZone): Promise<> {
-  //   const { rows } = await pool.query(`
-  //     INSERT INTO zone (data)
-  //     VALUES ($1)
-  //     RETURNING id, data
-  //   `, [input])
+  public async createNewZone(input: NewZone): Promise<void> {
+    const { rows } = await pool.query(`
+      INSERT INTO zone (data)
+      VALUES ($1)
+      RETURNING id, data
+    `, [input])
 
-
-  //   if (!rows.length) {
-  //     throw new Error(`Zone ${input.zone} already exists`)
-  //   }
-  //   return {
-  //     id: rows[0].id,
-  //     zone: rows[0].zone,
-  //   }
-  // }
+    //TODO add location also as conflict
+    if (!rows.length) {
+      throw new Error(`Zone ${input.zone} already exists`)
+    }
+  }
 }

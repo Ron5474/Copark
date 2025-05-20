@@ -60,6 +60,28 @@ export class ZoneDetails {
   closeTime?: string
 }
 
+@InputType()
+export class NewZone {
+
+  @Field(() => Number)
+  zone!: number
+
+  @Field(() => Number, { nullable: true })
+  daily?: number
+
+  @Field(() => Number, { nullable: true })
+  hourly?: number
+
+  @Field(() => Duration, { nullable: true })
+  maxDuration?: Duration
+
+  @Field(() => String, { nullable: true })
+  openTime?: string
+
+  @Field(() => String, { nullable: true })
+  closeTime?: string
+}
+
 @ObjectType()
 export class Receipt {
 

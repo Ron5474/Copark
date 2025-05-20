@@ -116,5 +116,5 @@ test('zoneDetails gives correct daily on weekend', async () => {
 })
 
 test('zoneDetails gives correct daily on weekend', async () => {
-  await expect(permitService.getZoneDetails('12312312312312312312123', 0)).rejects.toThrow('Zone does not exist: 12312312312312312312123')
+  await expect(permitService.getZoneDetails('12312312312312312312123', 0)).rejects.toThrow('Zone 12312312312312312312123 not found')
 })

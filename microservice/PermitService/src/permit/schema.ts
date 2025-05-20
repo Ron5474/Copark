@@ -64,9 +64,6 @@ export class ZoneDetails {
 export class Receipt {
 
   @Field(() => Number)
-  tax!: number
-
-  @Field(() => Number)
   service!: number
 
   @Field(() => Number)
@@ -160,7 +157,7 @@ export class IsValidPolice {
 @ObjectType()
 export class PermitsByDay {
   @Field(() => String)
-  date!: String;
+  date!: string;
 
   @Field(() => [Permit])
   tickets!: Permit[];

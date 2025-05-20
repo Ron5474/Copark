@@ -171,7 +171,16 @@ function FreeAlert() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} autoFocus sx={{backgroundColor: theme.palette.primary.main, color: 'white', fontSize: 15, textTransform: 'none',}}>
+          <Button
+            onClick={handleClose}
+            autoFocus
+            sx={{
+              backgroundColor: theme.palette.primary.main,
+              color: 'white',
+              fontSize: 15,
+              textTransform: 'none'
+            }}
+          >
             Okay
           </Button>
         </DialogActions>

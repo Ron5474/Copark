@@ -11,6 +11,7 @@ export async function login({ email, password }: { email: string; password: stri
   });
 
   if (!response || !response.ok) {
+    console.log('Login failed', response);
     return undefined;
   }
 

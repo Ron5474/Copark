@@ -1,4 +1,4 @@
-import { Ticket, NewTicket, ModifyTicketInput, TicketInput } from "./schema";
+import { Ticket, NewTicket, ModifyTicketInput, TicketInput, TicketsByDay } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 import { Vehicle } from "../types/express";
@@ -292,7 +292,7 @@ export class TicketService {
   //   return await this.getTicketsForVehicleID(vehicleIDs);
   // }
 
-  public async getAllTicketsCount(): Promise<Record<string, Ticket[]>> {
+  public async getAllTicketsCount(): Promise<TicketsByDay[]> {
     const ticketQuery = `
         SELECT 
         id,
@@ -311,7 +311,7 @@ export class TicketService {
 
     const ticketResults = await pool.query(ticketQuery);
 
-    const ticketsByDay: Record<string, Ticket[]> = {};
+    const ticketsMap: Map<string, Ticket[]> = new Map();
 
     for (const row of ticketResults.rows) {
       const date = new Date(row.issueddate).toISOString().split('T')[0]; // YYYY-MM-DD
@@ -326,13 +326,21 @@ export class TicketService {
         images: row.images,
         note: row.note
       };
-      if (!ticketsByDay[date]) {
-        ticketsByDay[date] = [];
+      if (!ticketsMap.has(date)) {
+        ticketsMap.set(date, []);
       }
-      ticketsByDay[date].push(ticket);
+      ticketsMap.get(date)!.push(ticket);
     }
 
-    return ticketsByDay;
+    const result: TicketsByDay[] = [];
+    for (const [date, tickets] of ticketsMap.entries()) {
+      result.push({
+        date,
+        tickets,
+      });
+    }
+
+    return result;
   }
 
   public async getTicketsIssuedByEnforcer(enforcerID: string): Promise<Ticket[] | undefined> {

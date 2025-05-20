@@ -4,7 +4,7 @@
  * @author Bryant Oliver
  */
 
-import { vi, it, afterEach, expect, beforeEach } from 'vitest'
+import { vi, it, afterEach, expect, beforeEach, afterAll } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '../setup'
@@ -16,6 +16,14 @@ import MemberView from '../../src/app/[locale]/zone/View'
 
 import { getVehicles } from '../../src/app/[locale]/vehicle/actions'
 
+const push = vi.fn();
+
+vi.mock('@/i18n/navigation', () => ({
+  useRouter: () => ({
+    push
+  })
+}))
+
 vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
   getVehicles: vi.fn(),
   addVehicle: vi.fn().mockImplementation((vehicle) =>
@@ -24,7 +32,7 @@ vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
 
 vi.mock('@/app/[locale]/zone/actions', () => ({
   getZoneDetails: vi.fn().mockResolvedValue({
-    daily: 2.50,
+    hourly: 2.50,
     maxDuration: {hours: 2, minutes: 0},
     openTime: '07:00',
     closeTime: '20:00',
@@ -121,6 +129,10 @@ beforeEach(() => {
       state: 'California',
     },
   ])
+})
+
+afterAll(() => {
+  vi.useRealTimers()
 })
 
 it('Renders guest', async () => {
@@ -263,6 +275,7 @@ it('Edit vehicle button', async () => { // TODO edit this after edit vehicle is 
 })
 
 it('Continues to next page', async () => {
+  vi.setSystemTime(new Date('2025-05-20T10:30:00'))
   render(<MemberView />)
   const user = userEvent.setup()
 
@@ -270,7 +283,7 @@ it('Continues to next page', async () => {
   await user.type(input, '123')
   await user.click(screen.getByText('Confirm Zone'))
   
-  await user.click(screen.getByText('Maximum Parking Time'))
+  await user.click(await screen.findByText('Maximum Parking Time'))
   await user.click(screen.getByLabelText('Confirm duration'))
 
   await user.click(await screen.findByText("C0P4RK"))

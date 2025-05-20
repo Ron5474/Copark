@@ -1,10 +1,7 @@
-import { vi, it, afterEach, expect } from 'vitest'
+import { vi, it, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
-import { signIn } from 'next-auth/react'
 
-import View from '../../src/app/[locale]/login/View'
-import Page from '../../src/app/[locale]/login/page'
-import React from 'react'
+import Page from '../../src/app/[locale]/tos/page'
 
 const push = vi.fn()
 
@@ -76,47 +73,8 @@ afterEach(() => {
   cleanup()
   vi.clearAllMocks()
 })
-
-it('Renders', async () => {
-  render(<View />)
-  await screen.findByText('Log In')
-})
-
-it('Click Github', async () => {
-  render(<View />)
-  const githubButton = screen.getByText('Sign In With GitHub')
-  githubButton.click()
-  const signInMock = vi.mocked(signIn)
-  expect(signInMock).toHaveBeenCalledWith('github', {
-    callbackUrl: '/driver/en/dashboard',
-    basePath: '/driver'
+  
+  it('Renders Page', async () => {
+    render(<Page />)
+    await screen.findByText('By accessing or using Copark\'s parking management services, you agree to be bound by these Terms of Service.')
   })
-})
-
-it('Click Google', async () => {
-  render(<View />)
-  const githubButton = screen.getByText('Sign In With Google')
-  githubButton.click()
-  const signInMock = vi.mocked(signIn)
-  expect(signInMock).toHaveBeenCalledWith('google', {
-    callbackUrl: '/driver/en/dashboard',
-    basePath: '/driver'
-  })
-})
-
-it('Click Facebook', async () => {
-  render(<View />)
-  const githubButton = screen.getByText('Sign In With Facebook')
-  githubButton.click()
-  const signInMock = vi.mocked(signIn)
-  expect(signInMock).toHaveBeenCalledWith('facebook', {
-    callbackUrl: '/driver/en/dashboard',
-    basePath: '/driver'
-  })
-})
-
-it('Renders Page', async () => {
-  render(<Page />)
-  await screen.findByText('Log In')
-})
-

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useContext, useEffect, useMemo } from 'react'
+import { useState, useContext, useEffect, useMemo, useRef } from 'react'
 import {
   Box,
   Button,
@@ -19,14 +19,29 @@ import theme from '../theme'
 
 
 export default function Zone() {
-  const { next } = useContext(ZoneContext)
+  const { zoneDetails, next } = useContext(ZoneContext)
   const [isValidSelection, setIsValidSelection] = useState<boolean>(true)
   const [durationOption, setDurationOption] = useState('')
 
-  const options = [
+  const isHourly = !!zoneDetails?.hourly
+
+  console.log("DETAILS: ", zoneDetails)
+
+  const options = isHourly
+  
+  ?
+  
+  [
     { label: 'By the hour and the minute', value: 'hourly' },
     { label: 'Maximum Parking Time', value: 'max' },
   ]
+
+  :
+
+  [
+    { label: 'Daily Parking', value: 'daily'}
+  ]
+
 
   const submitDuration = () => {
     const isValid = !!durationOption
@@ -99,9 +114,9 @@ export default function Zone() {
       )}
 
       {
-        durationOption == 'max' ?
+        durationOption == 'max' || durationOption == 'daily' ?
       
-        <MaxDuration/>
+        <MaxDuration option={durationOption} />
 
         :
 
@@ -110,6 +125,12 @@ export default function Zone() {
         <SelectDuration/>
 
         :
+
+        // durationOption == 'daily' ?
+
+        // <MaxDuration/>
+
+        // :
 
         null
       }
@@ -137,6 +158,9 @@ function SelectDuration() {
   const { zoneDetails, setDurationString, setPrice, price, setDuration } = useContext(ZoneContext)
   const [selectedHours, setSelectedHours] = useState(0)
   const [selectedMinutes, setSelectedMinutes] = useState(5)
+
+
+  console.log("SELECT DURATION")
 
   const now = new Date()
   const openTime = zoneDetails?.openTime || '00:00'
@@ -260,60 +284,73 @@ function SelectDuration() {
   )
 }
 
-function MaxDuration() {
+function MaxDuration({ option }: { option: string }) {
   const { zoneDetails, durationString, setDurationString, price, setPrice, setDuration } = useContext(ZoneContext)
 
-  const maxDuration = zoneDetails?.maxDuration
-  const openTime = zoneDetails?.openTime || '0:00'
-  const closeTime = zoneDetails?.closeTime
+  const optionString = option == 'hourly' ? 'Maximum Parking Time' : 'Daily Parking'
+  const endTimeStringRef = useRef('')
+  const estimatedPriceStringRef = useRef(`$${0.0.toFixed(2)}`)
 
-  const now = new Date()
-  let untilCloseMs = Infinity
-  let untilOpenMs = Infinity
-  let overnight = false
+  useEffect(() => {
 
-  if (closeTime) {
-    const [hours, minutes] = closeTime.split(':').map(Number)
-    const close = new Date()
-    close.setHours(hours, minutes, 0, 0)
-    if (close < now) {
-      overnight = true
-      const [openHours, openMinutes] = openTime.split(':').map(Number)
-      const open = new Date()
-      open.setHours(openHours, openMinutes, 0 ,0)
-      open.setDate(open.getDate() + 1)
-      untilOpenMs = open.getTime() - now.getTime() // overnight case
+    const maxDuration = zoneDetails?.maxDuration
+    const openTime = zoneDetails?.openTime || '0:00'
+    const closeTime = zoneDetails?.closeTime
+
+    const now = new Date()
+    let untilCloseMs = Infinity
+    let untilOpenMs = Infinity
+    let overnight = false
+
+    if (closeTime) {
+      const [hours, minutes] = closeTime.split(':').map(Number)
+      const close = new Date()
+      close.setHours(hours, minutes, 0, 0)
+      if (close < now) {
+        overnight = true
+        const [openHours, openMinutes] = openTime.split(':').map(Number)
+        const open = new Date()
+        open.setHours(openHours, openMinutes, 0 ,0)
+        open.setDate(open.getDate() + 1)
+        untilOpenMs = open.getTime() - now.getTime() // overnight case
+      }
+      untilCloseMs = close.getTime() - now.getTime()
     }
-    untilCloseMs = close.getTime() - now.getTime()
-  }
 
-  let maxDurationMs = Infinity
-  if (maxDuration) {
-    const { hours = 0, minutes = 0 } = maxDuration
-    maxDurationMs = (hours * 60 + minutes) * 60 * 1000
-  }
+    let maxDurationMs = Infinity
+    if (maxDuration) {
+      const { hours = 0, minutes = 0 } = maxDuration
+      maxDurationMs = (hours * 60 + minutes) * 60 * 1000
+    }
 
-  const finalDurationMs = !overnight ? Math.min(untilCloseMs, maxDurationMs) : untilOpenMs
+    const finalDurationMs = !overnight ? Math.min(untilCloseMs, maxDurationMs) : untilOpenMs
 
-  const totalMinutes = Math.floor(finalDurationMs / (1000 * 60))
-  const finalHours = Math.floor(totalMinutes / 60)
-  const finalMinutes = totalMinutes % 60
+    const totalMinutes = Math.floor(finalDurationMs / (1000 * 60))
+    const finalHours = Math.floor(totalMinutes / 60)
+    const finalMinutes = totalMinutes % 60
 
-  setDuration({minutes: finalMinutes, hours: finalHours})
+    setDuration({minutes: finalMinutes, hours: finalHours})
 
-  const durationParts: string[] = []
-  if (finalHours) durationParts.push(`${finalHours} ${finalHours === 1 ? 'hour' : 'hours'}`)
-  if (finalMinutes) durationParts.push(`${finalMinutes} ${finalMinutes === 1 ? 'minute' : 'minutes'}`)
-  setDurationString(durationParts.join(' '))
+    const durationParts: string[] = []
+    if (finalHours) durationParts.push(`${finalHours} ${finalHours === 1 ? 'hour' : 'hours'}`)
+    if (finalMinutes) durationParts.push(`${finalMinutes} ${finalMinutes === 1 ? 'minute' : 'minutes'}`)
+    setDurationString(durationParts.join(' '))
 
-  const endTime = new Date(now.getTime() + finalDurationMs)
-  const endTimeString = new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(endTime)
+    const endTime = new Date(now.getTime() + finalDurationMs)
+    endTimeStringRef.current = new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(endTime)
 
-  setPrice(!overnight ? (totalMinutes * (zoneDetails?.hourly ?? 0) / 60) : 0)
-  const estimatedPriceString = `$${(price ? price + 0.50 : 0).toFixed(2)}`
+    if (zoneDetails?.hourly) {
+      setPrice(!overnight ? (totalMinutes * (zoneDetails.hourly || 0) / 60) : 0)
+      estimatedPriceStringRef.current = `$${(price ? price + 0.50 : 0).toFixed(2)}`
+    } else if (zoneDetails?.daily) {
+      setPrice(!overnight ? zoneDetails.daily : 0)
+      estimatedPriceStringRef.current = `$${(price ? price + 0.50 : 0).toFixed(2)}`
+    }
+  }, [zoneDetails, option, setDuration, setDurationString, setPrice, price])
+  
 
   return (
     <Box
@@ -328,11 +365,11 @@ function MaxDuration() {
       </Typography>
 
       <Typography variant="body1" sx={{ marginTop: '1vh', color: '#4b4b4b' }}>
-        {`This rate (Maximum Parking Time) allows you to park here for ${durationString} until ${endTimeString}.`}
+        {`This rate (${optionString}) allows you to park here for ${durationString} until ${endTimeStringRef.current}.`}
       </Typography>
 
       <Typography variant="h6" sx={{ mt: '2vh' }}>
-        Estimated Price: <Typography color='primary' variant="h5" component="span">{estimatedPriceString}</Typography>
+        Estimated Price: <Typography color='primary' variant="h5" component="span">{estimatedPriceStringRef.current}</Typography>
       </Typography>
 
       <Typography variant="subtitle2" gutterBottom>

@@ -4,19 +4,25 @@
  * @author Bryant Oliver
  */
 
-import { vi, it, afterEach, expect } from 'vitest'
+import { vi, it, afterEach, afterAll, expect } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '../setup'
 
 import MemberView from '../../src/app/[locale]/zone/View'
 import Duration from '../../src/app/[locale]/zone/Duration'
-// import { ZoneContext } from '../../src/app/[locale]/zone/Context'
+import { ZoneProvider } from '../../src/app/[locale]/zone/Context'
 
+const mockZoneDetails = {
+  hourly: 2.50,
+  maxDuration: {hours: 2, minutes: 0},
+  openTime: '07:00',
+  closeTime: '20:00',
+}
 
 vi.mock('@/app/[locale]/zone/actions', () => ({
   getZoneDetails: vi.fn().mockResolvedValue({
-    daily: 2.50,
+    hourly: 2.50,
     maxDuration: {hours: 2, minutes: 0},
     openTime: '07:00',
     closeTime: '20:00',
@@ -97,69 +103,35 @@ vi.mock('next/headers', () => {
   }
 })
 
-// type Vehicle = React.ContextType<typeof ZoneContext>['vehicle']
-
-// vi.mock('../../src/app/[locale]/zone/Context', async () => {
-//   console.log("HIT MOCK CONTEXT")
-//   const actual = await vi.importActual<typeof import('../../src/app/[locale]/zone/Context')>(
-//     '../../src/app/[locale]/zone/Context'
-//   )
-
-//   const { createContext, useState } = await vi.importActual<typeof import('react')>('react')
-
-//   const ZoneContext = createContext<React.ContextType<typeof actual.ZoneContext>>({
-//     currentStep: 'Duration',
-//     setCurrentStep: () => {},
-//     zoneNumber: '',
-//     setZoneNumber: () => {},
-//     vehicle: undefined,
-//     setVehicle: () => {},
-//     next: () => {},
-//   })
-
-//   const ZoneProvider = ({ children }: { children: React.ReactNode }) => {
-//     const [currentStep, setCurrentStep] = useState('Duration')
-//     const [zoneNumber, setZoneNumber] = useState('')
-//     const [vehicle, setVehicle] = useState<Vehicle | undefined>()
-
-//     const next = () => {
-//       console.log("HIT MOCK NEXT")
-//       const index = actual.steps.indexOf(currentStep)
-//       const nextStep = actual.steps[index + 1]
-//       if (nextStep) setCurrentStep(nextStep)
-//     }
-
-//     return (
-//       <ZoneContext.Provider
-//         value={{ currentStep, setCurrentStep, zoneNumber, setZoneNumber, vehicle, setVehicle, next }}
-//       >
-//         {children}
-//       </ZoneContext.Provider>
-//     )
-//   }
-
-//   return {
-//     ...actual,
-//     ZoneContext,
-//     ZoneProvider,
-//   }
-// })
-
 
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
 })
 
+afterAll(() => {
+  vi.useRealTimers()
+})
+
 
 it('Renders duration options', async () => {
-  render(<Duration />)
+  vi.setSystemTime(new Date('2025-05-20T10:30:00'))
+  render(
+    <ZoneProvider initialZoneDetails={mockZoneDetails}>
+      <Duration />
+    </ZoneProvider>
+  )
   expect(await screen.findByText('Maximum Parking Time')).toBeDefined()
 })
 
 
 it('Error if option unchosen', async () => {
-  render(<Duration />)
+  vi.setSystemTime(new Date('2025-05-20T10:30:00'))
+  render(
+    <ZoneProvider initialZoneDetails={mockZoneDetails}>
+      <Duration />
+    </ZoneProvider>
+  )
   const user = userEvent.setup()
   await user.click(screen.getByLabelText('Confirm duration'))
 
@@ -177,6 +149,7 @@ it('Error if option unchosen', async () => {
 // })
 
 it('Continue takes you to vehicle step', async () => {
+  vi.setSystemTime(new Date('2025-05-20T10:30:00'))
   render(<MemberView />)
   const user = userEvent.setup()
   const input = screen.getByLabelText('Enter parking zone number')

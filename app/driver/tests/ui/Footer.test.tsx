@@ -6,9 +6,13 @@
 
 import { render, screen, cleanup } from '@testing-library/react';
 import { it, expect, afterEach, vi, beforeEach } from 'vitest';
-import '../setup'
+import userEvent from '@testing-library/user-event';
 
+import '../setup'
 import Footer from '../../src/app/[locale]/shared/Footer';
+
+const push = vi.fn();
+
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
@@ -19,6 +23,12 @@ beforeEach(() => {
     useRouter: () => ({
       push: vi.fn(),
     }),
+  }))
+
+  vi.mock('@/i18n/navigation', () => ({
+    useRouter: () => ({
+      push
+    })
   }))
 
   vi.mock('next-intl', () => ({
@@ -45,12 +55,20 @@ beforeEach(() => {
   }))
 })
 it('Renders', async () => {
-  await render(<Footer />);
+  render(<Footer />);
   expect(await screen.queryByText('Copark™')).not.toBeNull();
 });
 
-it('Test 1: Link to Do Not Sell My Personal Info', async () => {
-  await render(<Footer />);
-  const link = await screen.getByLabelText('personal-info-link');
-  expect(link.innerHTML).toBe('Do Not Sell My Personal Info');
+it('Test 1: Link to Privacy Policy', async () => {
+  render(<Footer />);
+  const link = await screen.getByLabelText('privacy-policy-link');
+  await userEvent.click(link);
+  expect(push).toHaveBeenCalledWith('/privacy')
+});
+
+it('Test 2: Link to Terms of Service', async () => {
+  render(<Footer />);
+  const link = await screen.getByLabelText('service-terms-link');
+  await userEvent.click(link);
+  expect(push).toHaveBeenCalledWith('/tos')
 });

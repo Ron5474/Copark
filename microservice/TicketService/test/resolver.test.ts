@@ -578,4 +578,105 @@ test('Ticket creation sends email to vehicle owner', async () => {
   expect(ticket.violation).toBe("Being Smart")
   expect(ticket.fine).toBe(50)
   expect(ticket.note).toBe("#1 in commits")
+})
+
+test('Admin can get ticket stats grouped by day', async () => {
+  const token = await loginAsAdmin();
+
+  const query = `
+    query {
+      getTicketsStats{
+        date
+        tickets {
+          id
+          vehicle
+          enforcer
+          issuedDate
+          violation
+          fine
+          ticketStatus
+          images
+          note
+        }
+      }
+    }
+  `;
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query })
+    .expect(200);
+
+  expect(response.body.errors).toBeUndefined();
+  const stats = response.body.data.getTicketsStats;
+  expect(Array.isArray(stats)).toBe(true);
+  expect(stats.length).toBeGreaterThan(0);
+  stats.forEach((dayStat: any) => {
+    expect(dayStat).toHaveProperty('date');
+    expect(Array.isArray(dayStat.tickets)).toBe(true);
+    dayStat.tickets.forEach((ticket: any) => {
+      expect(ticket).toHaveProperty('id');
+      expect(ticket).toHaveProperty('vehicle');
+      expect(ticket).toHaveProperty('enforcer');
+      expect(ticket).toHaveProperty('issuedDate');
+      expect(ticket).toHaveProperty('violation');
+      expect(ticket).toHaveProperty('fine');
+      expect(ticket).toHaveProperty('ticketStatus');
+      expect(ticket).toHaveProperty('images');
+      expect(ticket).toHaveProperty('note');
+    });
+  });
+});
+
+test('Admin can get tickets issued by a specific enforcer', async () => {
+  const token = await loginAsAdmin();
+
+  // Create a ticket with a known enforcer
+  const enforcerid = await encrypt('00000000-0000-0000-0000-000000000002');
+  const vehicleid = '00000000-0000-0000-0000-000000000001';
+  const createQuery = `
+    mutation CreateTicket($input: NewTicket!) {
+      createTicket(newTicket: $input) {
+        id
+        enforcer
+      }
+    }
+  `;
+  const createVariables = {
+    input: {
+      vehicle: vehicleid,
+      enforcer: enforcerid,
+      fine: 100,
+      violation: "test violation",
+      images: "test.jpg",
+    },
+  };
+  const createResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: createQuery, variables: createVariables })
+    .expect(200);
+  expect(createResponse.body.errors).toBeUndefined();
+  const ticket = createResponse.body.data.createTicket;
+
+  // Now query for tickets issued by this enforcer
+  const query = `
+    query GetTicketsIssuedByEnforcer($enforcerID: String!) {
+      getTicketsIssuedByEnforcer(enforcerID: $enforcerID) {
+        id
+        enforcer
+      }
+    }
+  `;
+  const variables = { enforcerID: enforcerid };
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query, variables })
+    .expect(200);
+  expect(response.body.errors).toBeUndefined();
+  const tickets = response.body.data.getTicketsIssuedByEnforcer;
+  expect(Array.isArray(tickets)).toBe(true);
+  expect(tickets.some((t: any) => t.id === ticket.id)).toBe(true);
 });

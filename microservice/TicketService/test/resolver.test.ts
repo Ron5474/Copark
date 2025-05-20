@@ -586,9 +586,18 @@ test('Admin can get ticket stats grouped by day', async () => {
   const query = `
     query {
       getTicketsStats{
-        id
-        vehicle
-        enforcer
+        date
+        tickets {
+          id
+          vehicle
+          enforcer
+          issuedDate
+          violation
+          fine
+          ticketStatus
+          images
+          note
+        }
       }
     }
   `;
@@ -600,19 +609,22 @@ test('Admin can get ticket stats grouped by day', async () => {
     .expect(200);
 
   expect(response.body.errors).toBeUndefined();
-  // Should be an object with date keys and array values
   const stats = response.body.data.getTicketsStats;
-  expect(typeof stats).toBe('object');
-  const days = Object.keys(stats);
-  expect(days.length).toBeGreaterThan(0);
-  days.forEach(day => {
-    expect(Array.isArray(stats[day])).toBe(true);
-    // Optionally, check that each ticket has expected fields
-    stats[day].forEach((ticket: any) => {
+  expect(Array.isArray(stats)).toBe(true);
+  expect(stats.length).toBeGreaterThan(0);
+  stats.forEach((dayStat: any) => {
+    expect(dayStat).toHaveProperty('date');
+    expect(Array.isArray(dayStat.tickets)).toBe(true);
+    dayStat.tickets.forEach((ticket: any) => {
       expect(ticket).toHaveProperty('id');
       expect(ticket).toHaveProperty('vehicle');
       expect(ticket).toHaveProperty('enforcer');
+      expect(ticket).toHaveProperty('issuedDate');
       expect(ticket).toHaveProperty('violation');
+      expect(ticket).toHaveProperty('fine');
+      expect(ticket).toHaveProperty('ticketStatus');
+      expect(ticket).toHaveProperty('images');
+      expect(ticket).toHaveProperty('note');
     });
   });
 });

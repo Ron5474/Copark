@@ -9,7 +9,8 @@ import {
   TicketInput,
   hasTicket,
   EmailInput,
-  NewTicketInput
+  NewTicketInput,
+  TicketsByDay,
 } from "./schema";
 
 import { SessionUser } from "src";
@@ -170,9 +171,9 @@ export class TicketResolver {
     return ticketService.getTickets();
   }
 
-  @Query(() => [Ticket])
+  @Query(() => [TicketsByDay])
   @Authorized(["admin"])
-  async getTicketsStats(): Promise<Record<string, Ticket[]>> {
+  async getTicketsStats(): Promise<TicketsByDay[]> {
     return ticketService.getAllTicketsCount();
   }
 

@@ -111,6 +111,6 @@ export class TicketsByDay {
   @Field(() => String)
   date!: String;
 
-  @Field(() => Ticket)
+  @Field(() => [Ticket])
   tickets!: Ticket[];
 }

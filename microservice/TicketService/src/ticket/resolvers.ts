@@ -31,9 +31,9 @@ async function encrypt(userId: string, key=emailEncodedKey): Promise<string> {
 @Resolver()
 export class TicketResolver {
   private async getVehicleById(userID: string): Promise<Vehicle[]> {
-    if (!userID) {
-      throw new Error('User ID not provided')
-    }
+    // if (!userID) {
+    //   throw new Error('User ID not provided')
+    // }
 
     const vehicleQuery = {
       query: `
@@ -62,9 +62,9 @@ export class TicketResolver {
   }
 
   private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[] }> {
-    if (!token) {
-      throw new Error('Token not provided');
-    }
+    // if (!token) {
+    //   throw new Error('Token not provided');
+    // }
     const response = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
       method: 'GET',
       headers: {

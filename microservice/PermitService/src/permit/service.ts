@@ -8,7 +8,8 @@ import {
   IsValidPolice,
   MyPermits,
   ZoneDetails,
-  Permit
+  Permit,
+  PermitsByDay
 } from './schema'
 
 export class PermitService {
@@ -177,7 +178,7 @@ export class PermitService {
     return isWeekend ? result.rows[0].data.weekend : result.rows[0].data.weekday
   }
 
-  public async getAllPermitsByDay(): Promise<Record<string, Permit[]>> {
+  public async getAllPermitsByDay(): Promise<PermitsByDay[]> {
     const permitQuery = `
       SELECT 
         id,
@@ -194,26 +195,28 @@ export class PermitService {
     `;
 
     const permitResults = await pool.query(permitQuery);
-    const permitsByDay: Record<string, Permit[]> = {};
+    const permitsByDayMap: Record<string, Permit[]> = {};
 
     for (const row of permitResults.rows) {
       const date = new Date(row.activeDate).toISOString().split('T')[0]; // YYYY-MM-DD
-      const permit = {
-        id: row.id,
+      const permit: Permit = {
         vehicle: row.vehicle,
         zone: row.zone,
         type: row.type,
-        purchaseDate: row.purchaseDate,
         activeDate: row.activeDate,
         expireDate: row.expireDate,
-        receipt: row.receipt,
-        paymentMethod: row.paymentMethod
       };
-      if (!permitsByDay[date]) {
-        permitsByDay[date] = [];
+      if (!permitsByDayMap[date]) {
+        permitsByDayMap[date] = [];
       }
-      permitsByDay[date].push(permit);
+      permitsByDayMap[date].push(permit);
     }
+
+    // Convert the map to an array of PermitsByDay objects
+    const permitsByDay: PermitsByDay[] = Object.entries(permitsByDayMap).map(([date, tickets]) => ({
+      date,
+      tickets
+    }));
 
     return permitsByDay;
   }

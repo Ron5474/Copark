@@ -49,7 +49,7 @@ export class PermitService {
       paymentMethod: input.paymentMethod,
     }
 
-    console.log('data', data)
+    // console.log('data', data)
 
     const { rows } = await pool.query(`
       WITH selected_zone AS (

@@ -156,3 +156,12 @@ export class IsValidPolice {
   @Field(() => Boolean)
   isValid!: boolean
 }
+
+@ObjectType()
+export class PermitsByDay {
+  @Field(() => String)
+  date!: String;
+
+  @Field(() => [Permit])
+  tickets!: Permit[];
+}

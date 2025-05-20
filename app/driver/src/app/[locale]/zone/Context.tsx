@@ -46,12 +46,13 @@ const ZoneContext = createContext<{
 
 interface ZoneProviderProps {
   children: React.ReactNode
+  initialZoneDetails?: ZoneDetails
 }
 
-function ZoneProvider(props: ZoneProviderProps) {
+function ZoneProvider({ children, initialZoneDetails }: ZoneProviderProps) {
   const [currentStep, setCurrentStep] = useState<string>('Zone')
   const [zoneNumber, setZoneNumber] = useState<string>('')
-  const [zoneDetails, setZoneDetails] = useState<ZoneDetails|undefined>(undefined)
+  const [zoneDetails, setZoneDetails] = useState<ZoneDetails|undefined>(initialZoneDetails)
   const [duration, setDuration] = useState<Duration>({hours: 0, minutes: 0})
   const [durationString, setDurationString] = useState<string>('')
   const [price, setPrice] = useState<number>(0)
@@ -77,7 +78,7 @@ function ZoneProvider(props: ZoneProviderProps) {
   }
   return (
     <ZoneContext.Provider value={value}>
-      {props.children}
+      {children}
     </ZoneContext.Provider>
   )
 }

@@ -24,7 +24,7 @@ vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
 
 vi.mock('@/app/[locale]/zone/actions', () => ({
   getZoneDetails: vi.fn().mockResolvedValue({
-    daily: 2.50,
+    hourly: 2.50,
     maxDuration: {hours: 2, minutes: 0},
     openTime: '07:00',
     closeTime: '20:00',
@@ -270,7 +270,7 @@ it('Continues to next page', async () => {
   await user.type(input, '123')
   await user.click(screen.getByText('Confirm Zone'))
   
-  await user.click(screen.getByText('Maximum Parking Time'))
+  await user.click(await screen.findByText('Maximum Parking Time'))
   await user.click(screen.getByLabelText('Confirm duration'))
 
   await user.click(await screen.findByText("C0P4RK"))

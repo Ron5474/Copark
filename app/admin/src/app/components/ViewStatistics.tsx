@@ -13,8 +13,8 @@ import {
   Legend,
 } from 'chart.js'
 import { getTicketsByDay } from '../../ticket/actions'
+import { Ticket } from '../../types'
 
-// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -25,40 +25,49 @@ ChartJS.register(
   Legend
 )
 
+interface TicketStat {
+  date: string;
+  tickets: Ticket[];
+}
+
 export default function ViewStatistics() {
-  const [ticketStats, setTicketStats] = useState<{ [key: string]: number }>({})
+  const [ticketStats, setTicketStats] = useState<TicketStat[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getTicketsByDay();
-        // Convert data to counts per day
-        const stats = Object.entries(data).reduce((acc, [date, tickets]) => {
-          acc[date] = tickets.length
-          return acc
-        }, {} as { [key: string]: number })
-        setTicketStats(stats)
+        const rawData = await getTicketsByDay();
+        const formattedData: TicketStat[] = Array.isArray(rawData) 
+          ? rawData.map(item => ({
+              date: item.date || new Date(item.created_at).toLocaleDateString(),
+              tickets: Array.isArray(item.tickets) ? item.tickets : []
+            }))
+          : [];
+        
+        console.log('Formatted data:', formattedData);
+        setTicketStats(formattedData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch ticket data')
+        console.error('Error fetching ticket data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch ticket data');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
+    fetchData();
   }, [])
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>
 
   const chartData = {
-    labels: Object.keys(ticketStats),
+    labels: ticketStats.map(stat => stat.date),
     datasets: [
       {
         label: 'Number of Tickets Issued',
-        data: Object.values(ticketStats),
+        data: ticketStats.map(stat => stat.tickets.length),
         fill: false,
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1

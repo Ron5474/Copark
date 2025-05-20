@@ -83,7 +83,6 @@ export async function addPermitDetails(
             activeDate,
             expireDate,
             receipt {
-              tax,
               service,
               subTotal,
               total

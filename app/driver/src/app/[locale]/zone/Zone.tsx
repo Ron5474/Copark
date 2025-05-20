@@ -136,17 +136,18 @@ export default function Zone() {
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
-// import DialogContentText from '@mui/material/DialogContentText'
-// import DialogTitle from '@mui/material/DialogTitle'
+import { DashboardContext } from "../dashboard/context";
 
 function FreeAlert() {
   const { zoneDetails } = useContext(ZoneContext)
+  const { setCurrentPage } = useContext(DashboardContext)
   const [open, setOpen] = useState<boolean>(true)
 
   const isFreeDay = !zoneDetails?.openTime && !zoneDetails?.closeTime
   // TODO tell user when next charge will be
 
   const handleClose = () => {
+    setCurrentPage('dashboard')
     setOpen(false)
   }
 
@@ -155,11 +156,8 @@ function FreeAlert() {
         open={open}
         onClose={handleClose}
       >
-        {/* <DialogTitle> */}
-          {/* {"Use Google's location service?"} */}
-        {/* </DialogTitle> */}
         <DialogContent>
-          <Typography>
+          <Typography variant='body1'>
             { isFreeDay
             
               ?
@@ -171,14 +169,10 @@ function FreeAlert() {
               `This zone is currently closed. No payment is currently necessary. Please check our hours.`
             }
           </Typography>
-          {/* <DialogContentText sx={{color: 'black'}}>
-            Let Google help apps determine location. This means sending anonymous
-            location data to Google, even when no apps are running.
-          </DialogContentText> */}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} autoFocus>
-            Okay!
+          <Button onClick={handleClose} autoFocus sx={{backgroundColor: theme.palette.primary.main, color: 'white', fontSize: 15, textTransform: 'none',}}>
+            Okay
           </Button>
         </DialogActions>
       </Dialog>

@@ -60,11 +60,30 @@ export class ZoneDetails {
   closeTime?: string
 }
 
-@ObjectType()
-export class Receipt {
+@InputType()
+export class NewZone {
 
   @Field(() => Number)
-  tax!: number
+  zone!: number
+
+  @Field(() => Number, { nullable: true })
+  daily?: number
+
+  @Field(() => Number, { nullable: true })
+  hourly?: number
+
+  @Field(() => Duration, { nullable: true })
+  maxDuration?: Duration
+
+  @Field(() => String, { nullable: true })
+  openTime?: string
+
+  @Field(() => String, { nullable: true })
+  closeTime?: string
+}
+
+@ObjectType()
+export class Receipt {
 
   @Field(() => Number)
   service!: number
@@ -160,7 +179,7 @@ export class IsValidPolice {
 @ObjectType()
 export class PermitsByDay {
   @Field(() => String)
-  date!: String;
+  date!: string;
 
   @Field(() => [Permit])
   tickets!: Permit[];

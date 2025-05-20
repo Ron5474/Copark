@@ -17,6 +17,7 @@ export default function Zone() {
   const { zoneNumber, setZoneNumber, setZoneDetails, next } = useContext(ZoneContext)
   const [zoneExists, setZoneExists] = useState<boolean>(true)
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
+  const [isFree, setIsFree] = useState<boolean>(false)
 
   const submitZone = async () => {
     setIsValidEntry(zoneNumber.length > 0)
@@ -25,7 +26,17 @@ export default function Zone() {
         const zoneDetails = await getZoneDetails(zoneNumber)
         setZoneDetails(zoneDetails)
         setZoneExists(true)
-        next()
+
+        const now = new Date()
+        const nowStr = now.toTimeString().slice(0, 5)
+        const isOpen = zoneDetails?.openTime && zoneDetails?.closeTime 
+          ? nowStr >= zoneDetails.openTime && nowStr < zoneDetails.closeTime 
+          : true
+
+        if ((zoneDetails?.hourly || zoneDetails?.daily) && isOpen)
+          next()
+        else
+          setIsFree(true)
       } catch {
         setZoneExists(false)
       }
@@ -115,6 +126,64 @@ export default function Zone() {
       >
         Confirm Zone
       </Button>
+      {isFree && <FreeAlert/>}
     </Box>
+  )
+}
+
+
+
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import { DashboardContext } from "../dashboard/context";
+
+function FreeAlert() {
+  const { zoneDetails } = useContext(ZoneContext)
+  const { setCurrentPage } = useContext(DashboardContext)
+  const [open, setOpen] = useState<boolean>(true)
+
+  const isFreeDay = !zoneDetails?.openTime && !zoneDetails?.closeTime
+  // TODO tell user when next charge will be
+
+  const handleClose = () => {
+    setCurrentPage('dashboard')
+    setOpen(false)
+  }
+
+  return (
+      <Dialog
+        open={open}
+        onClose={handleClose}
+      >
+        <DialogContent>
+          <Typography variant='body1'>
+            { isFreeDay
+            
+              ?
+
+              `This zone is not charging today. Check back tomorrow!` 
+
+              :
+
+              `This zone is currently closed. No payment is currently necessary. Please check our hours.`
+            }
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleClose}
+            autoFocus
+            sx={{
+              backgroundColor: theme.palette.primary.main,
+              color: 'white',
+              fontSize: 15,
+              textTransform: 'none'
+            }}
+          >
+            Okay
+          </Button>
+        </DialogActions>
+      </Dialog>
   )
 }

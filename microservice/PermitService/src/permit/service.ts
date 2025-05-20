@@ -8,6 +8,7 @@ import {
   IsValidPolice,
   MyPermits,
   ZoneDetails,
+  NewZone,
   Permit,
   PermitsByDay
 } from './schema'
@@ -18,13 +19,12 @@ export class PermitService {
     const totalMinutes = (input.duration?.hours || 0) * 60 + (input.duration?.minutes || 0)
 
 
-    // price service use here
+    const { hourly, daily } = await this.getZoneDetails(input.zone)
+    const price = hourly ? hourly : daily as number
     const service = 0.50
-    const subTotal = 3.00 / 60 * totalMinutes
-    const tax = (service + subTotal) * 0.0925
-    const total = service + subTotal + tax
+    const subTotal = price / 60 * totalMinutes
+    const total = service + subTotal
     const receipt = {
-      tax,
       service,
       subTotal,
       total
@@ -174,7 +174,7 @@ export class PermitService {
       [zone]
     )
     
-    if (result.rowCount == 0) throw new Error(`Zone does not exist: ${zone}`)
+    if (result.rowCount == 0) throw new Error(`Zone ${zone} not found`)
     return isWeekend ? result.rows[0].data.weekend : result.rows[0].data.weekday
   }
 
@@ -219,5 +219,18 @@ export class PermitService {
     }));
 
     return permitsByDay;
+  }
+
+  public async createNewZone(input: NewZone): Promise<void> {
+    const { rows } = await pool.query(`
+      INSERT INTO zone (data)
+      VALUES ($1)
+      RETURNING id, data
+    `, [input])
+
+    //TODO add location also as conflict
+    if (!rows.length) {
+      throw new Error(`Zone ${input.zone} already exists`)
+    }
   }
 }

@@ -16,6 +16,14 @@ import MemberView from '../../src/app/[locale]/zone/View'
 
 import { getVehicles } from '../../src/app/[locale]/vehicle/actions'
 
+const push = vi.fn();
+
+vi.mock('@/i18n/navigation', () => ({
+  useRouter: () => ({
+    push
+  })
+}))
+
 vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
   getVehicles: vi.fn(),
   addVehicle: vi.fn().mockImplementation((vehicle) =>

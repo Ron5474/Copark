@@ -46,11 +46,10 @@ export default function ViewStatistics() {
             }))
           : [];
         
-        console.log('Formatted data:', formattedData);
         setTicketStats(formattedData);
       } catch (err) {
-        console.error('Error fetching ticket data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch ticket data');
+        void err;
+        setError('Failed to fetch ticket data');
       } finally {
         setLoading(false);
       }

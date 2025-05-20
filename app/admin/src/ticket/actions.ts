@@ -1,6 +1,5 @@
 'use server';
 import { cookies } from 'next/headers';
-import { Ticket } from '../types'
 
 const getAuthToken = async () => {
   const cookieStore = await cookies();
@@ -8,7 +7,7 @@ const getAuthToken = async () => {
   return token;
 };
 
-export async function getTicketsByDay(): Promise<Record<string, Ticket[]>> {
+export async function getTicketsByDay() {
   const token = await getAuthToken();
   const query = `
     query {
@@ -33,7 +32,7 @@ export async function getTicketsByDay(): Promise<Record<string, Ticket[]>> {
 
   const result = await response.json()
 
-  console.log(result);
+  console.log(JSON.stringify(result.data.getTicketsStats, null, 2));
 
   if (result.errors) {
     throw new Error(result.errors[0].message)

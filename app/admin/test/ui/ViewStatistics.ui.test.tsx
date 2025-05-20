@@ -1,0 +1,162 @@
+import { it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import ViewStatistics from '../../src/app/components/ViewStatistics';
+import { getTicketsByDay } from '../../src/ticket/actions';
+
+vi.mock('../../src/ticket/actions', () => ({
+  getTicketsByDay: vi.fn()
+}));
+
+vi.mock('react-chartjs-2', () => ({
+  Line: () => <div data-testid="mock-chart">A cool chart.</div>
+}));
+
+beforeEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
+
+it('handles non-array data from getTicketsByDay', async () => {
+  vi.mocked(getTicketsByDay).mockResolvedValue({
+    someData: 'not an array'
+  } as any);
+
+  render(<ViewStatistics />);
+
+  await waitFor(() => {
+    expect(screen.getByTestId('mock-chart')).toBeDefined();
+  });
+
+  const chartElement = screen.getByTestId('mock-chart');
+  expect(chartElement).toBeDefined();
+});
+
+it('renders chart with valid ticket data', async () => {
+  vi.mocked(getTicketsByDay).mockResolvedValue([
+  {
+    "date": "2025-05-19",
+    "tickets": [
+      {
+        id: "1",
+        issuedDate: "2025-05-19T21:18:42.753Z"
+      }
+    ]
+  },
+  {
+    date: "2025-05-20",
+    tickets: [
+      {
+        id: "2",
+        issuedDate: "2025-05-20T21:17:42.748Z"
+      },
+      {
+        id: "3",
+        issuedDate: "2025-05-20T21:18:42.750Z"
+      },
+    ]
+  }
+]);
+
+  render(<ViewStatistics />);
+
+  await waitFor(() => {
+    expect(screen.getByText('Ticket Statistics')).toBeDefined();
+  });
+
+  const chartElement = screen.getByTestId('mock-chart');
+  expect(chartElement).toBeDefined();
+});
+
+it('handles error from getTicketsByDay', async () => {
+  // Mock getTicketsByDay to throw an error
+  vi.mocked(getTicketsByDay).mockRejectedValue(new Error('Failed to fetch tickets'));
+
+  render(<ViewStatistics />);
+
+  // Wait for error message to appear
+  await waitFor(() => {
+    expect(screen.getByText('Error: Failed to fetch ticket data')).toBeDefined();
+  });
+
+  // Verify chart is not rendered when there's an error
+  expect(screen.queryByTestId('mock-chart')).toBeNull();
+});
+
+it('handles data with only date field', async () => {
+  vi.mocked(getTicketsByDay).mockResolvedValue([
+    {
+      date: '2025-05-19',
+      tickets: []
+    }
+  ]);
+
+  render(<ViewStatistics />);
+  await waitFor(() => {
+    expect(screen.getByTestId('mock-chart')).toBeDefined();
+  });
+});
+
+it('handles data with only created_at field', async () => {
+  vi.mocked(getTicketsByDay).mockResolvedValue([
+    {
+      created_at: '2025-05-19T10:00:00Z',
+      tickets: []
+    }
+  ]);
+
+  render(<ViewStatistics />);
+  await waitFor(() => {
+    expect(screen.getByTestId('mock-chart')).toBeDefined();
+  });
+});
+
+it('handles data with non-array tickets field', async () => {
+  vi.mocked(getTicketsByDay).mockResolvedValue([
+    {
+      date: '2025-05-19',
+      tickets: 'not an array' as any
+    }
+  ]);
+
+  render(<ViewStatistics />);
+  await waitFor(() => {
+    expect(screen.getByTestId('mock-chart')).toBeDefined();
+  });
+});
+
+it('handles data with missing tickets field', async () => {
+  vi.mocked(getTicketsByDay).mockResolvedValue([
+    {
+      date: '2025-05-19'
+    }
+  ]);
+
+  render(<ViewStatistics />);
+  await waitFor(() => {
+    expect(screen.getByTestId('mock-chart')).toBeDefined();
+  });
+});
+
+it('handles complete valid data', async () => {
+  vi.mocked(getTicketsByDay).mockResolvedValue([
+    {
+      date: '2025-05-19',
+      created_at: '2025-05-19T10:00:00Z',
+      tickets: [
+        { id: '1', created_at: '2025-05-19T10:00:00Z' }
+      ]
+    },
+    {
+      date: null,
+      created_at: '2025-05-20T10:00:00Z',
+      tickets: [
+        { id: '2', created_at: '2025-05-20T10:00:00Z' }
+      ]
+    }
+  ]);
+
+  render(<ViewStatistics />);
+  await waitFor(() => {
+    expect(screen.getByTestId('mock-chart')).toBeDefined();
+  });
+});

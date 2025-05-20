@@ -7,6 +7,7 @@ import {
   IsValidPermitInput,
   IsValidPolice,
   MyPermits,
+  NewZone,
   ZoneDetails,
 } from './schema'
 import { PermitService } from './service'
@@ -233,11 +234,15 @@ export class PermitResolver {
   @Query(() => ZoneDetails)
   async zoneDetails(
     @Arg("zone", () => String) zone: string,
-    // @Ctx() request: Request
   ): Promise<ZoneDetails> {
-    // const userId = request.user?.id
-    // if (!userId) throw new Error('Unauthorized')
-
     return await service.getZoneDetails(zone)
+  }
+
+  @Authorized('admin')
+  @Query()
+  async createZone(
+    @Arg("input", () => NewZone) input: NewZone,
+  ): Promise<void> {
+    return await service.createNewZone(input)
   }
 }

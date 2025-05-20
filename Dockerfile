@@ -5,13 +5,13 @@ WORKDIR /home/copark
 
 COPY ./package.json /home/copark/package.json
 COPY ./package-lock.json /home/copark/package-lock.json
-COPY ./.env /home/copark/.env
+COPY ./.prod.env /home/copark/.prod.env
 
 
 # Copy the marketing copark
 COPY app/marketing/.next/ /home/copark/app/marketing/.next/
 COPY app/marketing/public/ /home/copark/app/marketing/public/
-COPY app/marketing/.env /home/copark/app/marketing/.env
+COPY app/marketing/.env.production /home/copark/app/marketing/.env.production
 COPY app/marketing/package.json /home/copark/app/marketing/package.json
 COPY app/marketing/package-lock.json /home/copark/app/marketing/package-lock.json
 COPY app/marketing/next.config.ts /home/copark/app/marketing/next.config.ts
@@ -30,7 +30,7 @@ COPY app/driver/messages/ /home/copark/app/driver/messages/
 COPY app/driver/package.json /home/copark/app/driver/package.json
 COPY app/driver/package-lock.json /home/copark/app/driver/package-lock.json
 COPY app/driver/next.config.ts /home/copark/app/driver/next.config.ts
-COPY app/driver/.env /home/copark/app/driver/.env
+COPY app/driver/.env.production /home/copark/app/driver/.env.production
 
 # Copy the admin copark
 COPY app/admin/.next/ /home/copark/app/admin/.next/
@@ -75,6 +75,12 @@ COPY microservice/VehicleService/sql/ /home/copark/microservice/VehicleService/s
 COPY microservice/VehicleService/build/ /home/copark/microservice/VehicleService/build/
 COPY microservice/VehicleService/package.json /home/copark/microservice/VehicleService/package.json
 COPY microservice/VehicleService/package-lock.json /home/copark/microservice/VehicleService/package-lock.json
+
+# Copy Payment microservice
+COPY microservice/PaymentService/sql/ /home/copark/microservice/PaymentService/sql/
+COPY microservice/PaymentService/build/ /home/copark/microservice/PaymentService/build/
+COPY microservice/PaymentService/package.json /home/copark/microservice/PaymentService/package.json
+COPY microservice/PaymentService/package-lock.json /home/copark/microservice/PaymentService/package-lock.json
 
 # Copy Email microservice
 COPY microservice/EmailService/build/ /home/copark/microservice/EmailService/build/

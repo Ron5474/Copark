@@ -1,9 +1,6 @@
-import { it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
-import { useRouter } from 'next/navigation';
 import Page from '../../src/app/page';
-import { useState } from 'react';
-import Home from '@/app/components/Home';
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
@@ -74,6 +71,28 @@ vi.mock('../../src/api/actions', () => ({
       accountStatus: 'suspended',
     },
   ]),
+}));
+
+vi.mock('../../src/ticket/actions', () => ({
+  getTicketsByDay: vi.fn().mockResolvedValue([
+    {
+      date: '2024-05-20',
+      tickets: [
+        { id: '1', created_at: '2024-05-20T10:00:00Z' },
+        { id: '2', created_at: '2024-05-20T11:00:00Z' }
+      ]
+    },
+    {
+      date: '2024-05-21',
+      tickets: [
+        { id: '3', created_at: '2024-05-21T09:00:00Z' }
+      ]
+    }
+  ])
+}));
+
+vi.mock('react-chartjs-2', () => ({
+  Line: () => <div data-testid="mock-chart">Ticket Statistics</div>
 }));
 
 const mockRouter = {
@@ -160,7 +179,7 @@ it('navigates to Statistics section', async () => {
   const clickableItem = statisticsText.closest('div');
   fireEvent.click(clickableItem!);
   await waitFor(() => {
-    expect(screen.getByText('Statistics Component')).toBeDefined();
+    expect(screen.getByTestId('mock-chart')).toBeDefined();
   });
 });
 

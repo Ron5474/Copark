@@ -6,6 +6,7 @@ import Home from './components/Home';
 import ManageEnforcement from './components/ManageEnforcement';
 import ManageDrivers from './components/ManageDrivers';
 import ManageAPIUsers from './components/ManageAPIUsers';
+import ViewStatistics from './components/ViewStatistics';
 
 export default function Page() {
   const [currentComponent, setCurrentComponent] = useState<string>('home');
@@ -23,7 +24,7 @@ export default function Page() {
       case 'api_users':
         return <ManageAPIUsers onNavigate={handleNavigate} />;
       case 'statistics':
-        return <Box>Statistics Component</Box>;
+        return <ViewStatistics />; // No onNavigate prop needed here
       case 'reports':
         return <Box>Reports Component</Box>;
       default:

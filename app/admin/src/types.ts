@@ -21,3 +21,15 @@ export interface NewUser {
    */
   email: string;
 }
+
+export interface Ticket {
+  id: string
+  vehicle: string
+  enforcer: string
+  issuedDate: Date
+  violation: string
+  fine: number
+  ticketStatus: string
+  images?: string
+  note?: string
+}

@@ -4,7 +4,6 @@ import { ThemeProvider } from '@mui/material';
 import theme from '../../src/app/theme';
 import ManageAPIUsers from '../../src/app/components/ManageAPIUsers';
 
-// Mock data
 const mockAPIUsers = [{
   id: '1',
   name: 'Test Organization',
@@ -13,10 +12,8 @@ const mockAPIUsers = [{
   accountStatus: 'active',
 }];
 
-// Track current state
 let apiUsersData = [...mockAPIUsers];
 
-// Mock fetch globally
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 

@@ -4,7 +4,7 @@
  * @author Bryant Oliver
  */
 
-import { vi, it, afterEach, expect, beforeEach } from 'vitest'
+import { vi, it, afterEach, expect, beforeEach, afterAll } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '../setup'
@@ -121,6 +121,10 @@ beforeEach(() => {
       state: 'California',
     },
   ])
+})
+
+afterAll(() => {
+  vi.useRealTimers()
 })
 
 it('Renders guest', async () => {
@@ -263,6 +267,7 @@ it('Edit vehicle button', async () => { // TODO edit this after edit vehicle is 
 })
 
 it('Continues to next page', async () => {
+  vi.setSystemTime(new Date('2025-05-20T10:30:00'))
   render(<MemberView />)
   const user = userEvent.setup()
 

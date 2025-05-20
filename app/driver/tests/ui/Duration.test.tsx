@@ -4,7 +4,7 @@
  * @author Bryant Oliver
  */
 
-import { vi, it, afterEach, expect } from 'vitest'
+import { vi, it, afterEach, afterAll, expect } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '../setup'
@@ -109,8 +109,13 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
+afterAll(() => {
+  vi.useRealTimers()
+})
+
 
 it('Renders duration options', async () => {
+  vi.setSystemTime(new Date('2025-05-20T10:30:00'))
   render(
     <ZoneProvider initialZoneDetails={mockZoneDetails}>
       <Duration />
@@ -121,7 +126,12 @@ it('Renders duration options', async () => {
 
 
 it('Error if option unchosen', async () => {
-  render(<Duration />)
+  vi.setSystemTime(new Date('2025-05-20T10:30:00'))
+  render(
+    <ZoneProvider initialZoneDetails={mockZoneDetails}>
+      <Duration />
+    </ZoneProvider>
+  )
   const user = userEvent.setup()
   await user.click(screen.getByLabelText('Confirm duration'))
 
@@ -139,6 +149,7 @@ it('Error if option unchosen', async () => {
 // })
 
 it('Continue takes you to vehicle step', async () => {
+  vi.setSystemTime(new Date('2025-05-20T10:30:00'))
   render(<MemberView />)
   const user = userEvent.setup()
   const input = screen.getByLabelText('Enter parking zone number')

@@ -5,15 +5,12 @@ import { render, screen, cleanup } from '@testing-library/react'
 
 import View from '../../src/app/[locale]/onboard/View'
 import Page from '../../src/app/[locale]/onboard/page'
-import React from 'react'
 
 const push = vi.fn()
 
 vi.mock('next-intl', () => ({
-  // Provide all the necessary exports without importing the actual module
   useLocale: () => 'en',
   useTranslations: () => ((key: string) => {
-    // This function directly returns translations without using vi.fn()
     switch (key) {
       case 'Do Not Sell My Personal Info':
         return 'Do Not Sell My Personal Info';

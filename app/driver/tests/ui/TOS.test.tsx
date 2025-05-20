@@ -2,7 +2,6 @@ import { vi, it, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 
 import Page from '../../src/app/[locale]/tos/page'
-import React from 'react'
 
 const push = vi.fn()
 

@@ -1,8 +1,6 @@
 import { vi, it, afterEach, expect } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
-// import userEvent from '@testing-library/user-event'
 import { signIn } from 'next-auth/react'
-
 
 import View from '../../src/app/[locale]/login/View'
 import Page from '../../src/app/[locale]/login/page'
@@ -11,10 +9,8 @@ import React from 'react'
 const push = vi.fn()
 
 vi.mock('next-intl', () => ({
-  // Provide all the necessary exports without importing the actual module
   useLocale: () => 'en',
   useTranslations: () => ((key: string) => {
-    // This function directly returns translations without using vi.fn()
     switch (key) {
       case 'Do Not Sell My Personal Info':
         return 'Do Not Sell My Personal Info';
@@ -90,7 +86,7 @@ it('Click Github', async () => {
   render(<View />)
   const githubButton = screen.getByText('Sign In With GitHub')
   githubButton.click()
-  const signInMock = vi.mocked(signIn)  // Make sure we're using the mocked function
+  const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('github', {
     callbackUrl: '/driver/en/dashboard',
     basePath: '/driver'
@@ -101,7 +97,7 @@ it('Click Google', async () => {
   render(<View />)
   const githubButton = screen.getByText('Sign In With Google')
   githubButton.click()
-  const signInMock = vi.mocked(signIn)  // Make sure we're using the mocked function
+  const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('google', {
     callbackUrl: '/driver/en/dashboard',
     basePath: '/driver'
@@ -112,7 +108,7 @@ it('Click Facebook', async () => {
   render(<View />)
   const githubButton = screen.getByText('Sign In With Facebook')
   githubButton.click()
-  const signInMock = vi.mocked(signIn)  // Make sure we're using the mocked function
+  const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('facebook', {
     callbackUrl: '/driver/en/dashboard',
     basePath: '/driver'

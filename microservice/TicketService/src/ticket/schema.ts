@@ -105,3 +105,12 @@ export class NewTicketInput {
   @Field(() => String, { nullable: true })
   images?: string;
 }
+
+@ObjectType()
+export class TicketsByDay {
+  @Field(() => String)
+  date!: String;
+
+  @Field(() => Ticket)
+  tickets!: Ticket[];
+}

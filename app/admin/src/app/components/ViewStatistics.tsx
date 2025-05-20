@@ -26,22 +26,20 @@ ChartJS.register(
 )
 
 export default function ViewStatistics() {
-  const [ticketStats, setTicketStats] = useState<{[key: string]: number}>({})
+  const [ticketStats, setTicketStats] = useState<{ [key: string]: number }>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (session?.user?.token) {
-          const data = await getTicketsByDay(session.user.token)
-          // Convert data to counts per day
-          const stats = Object.entries(data).reduce((acc, [date, tickets]) => {
-            acc[date] = tickets.length
-            return acc
-          }, {} as {[key: string]: number})
-          setTicketStats(stats)
-        }
+        const data = await getTicketsByDay();
+        // Convert data to counts per day
+        const stats = Object.entries(data).reduce((acc, [date, tickets]) => {
+          acc[date] = tickets.length
+          return acc
+        }, {} as { [key: string]: number })
+        setTicketStats(stats)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch ticket data')
       } finally {
@@ -50,7 +48,7 @@ export default function ViewStatistics() {
     }
 
     fetchData()
-  }, [session])
+  }, [])
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>

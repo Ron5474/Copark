@@ -1,6 +1,15 @@
+import { cookies } from 'next/headers';
 import { Ticket } from '../types'
 
-export async function getTicketsByDay(token: string): Promise<Record<string, Ticket[]>> {
+const getAuthToken = async () => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('session')?.value;
+  return token;
+};
+
+
+export async function getTicketsByDay(): Promise<Record<string, Ticket[]>> {
+  const token = await getAuthToken();
   const query = `
     query {
       getTicketsStats {

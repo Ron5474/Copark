@@ -54,7 +54,7 @@ export class PermitService {
     const { rows } = await pool.query(`
       WITH selected_zone AS (
         SELECT id FROM type
-        WHERE data->>'type' = 'zone'
+        WHERE data->>'name' = 'zone'
         AND TRIM(LOWER(data->>'area')) = TRIM(LOWER($2))
         LIMIT 1
       )
@@ -165,7 +165,7 @@ export class PermitService {
     const result = await pool.query(`
         SELECT data
         FROM type
-        WHERE data->>'type' = 'zone'
+        WHERE data->>'name' = 'zone'
         AND data->>'area' = $1
       `,
       [zone]

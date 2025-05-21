@@ -18,7 +18,7 @@ import ViewVehicles from "../vehicle/member/Vehicle"
 import { userLoginSignUpAttempt } from "./actions";
 // import BuyPermit from "../permit/View";
 import MobileNavBar from "./BottomNav";
-import BuyPermit from "../zone/View";
+import ZonePermit from "../zone/View";
 import TicketView from "../ticket/TicketView"
 import { signOut } from "next-auth/react";
 import { useLocale } from "next-intl";
@@ -62,7 +62,7 @@ function Dashboard() {
               <AddVehicle />
             )} */}
             {currentPage === 'buy-permit' && (
-              <BuyPermit />
+              <ZonePermit />
             )}
           </Box>
           <MobileNavBar/>

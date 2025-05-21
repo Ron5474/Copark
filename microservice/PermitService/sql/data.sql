@@ -88,7 +88,6 @@ INSERT INTO "zone" (id, data) VALUES
     )
   );
 
-      tickets.push({
 INSERT INTO permit (vehicle, zone, data) VALUES (
   '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
   'e314f688-d150-411e-aa4f-38e679112e0e',

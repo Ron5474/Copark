@@ -10,7 +10,7 @@
 */
 
 'use client'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -21,13 +21,24 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import { useRouter } from '@/i18n/navigation';
+import { setOnBoardingState, signUp } from '../signup/actions';
+import { useLocale } from 'next-intl';
 
 export default function OnboardView() {
   const [accepted, setAccepted] = useState(false);
   const router = useRouter();
+  const locale = useLocale();
   
+  useEffect(() => {
+    const handleSignup = async () => {
+      await signUp(locale);
+    }
+    handleSignup();
+  }, [locale]);
+
   const handleClick = async () => {
     if (accepted) {
+      await setOnBoardingState("complete");
       router.push('/dashboard');
     }
   };

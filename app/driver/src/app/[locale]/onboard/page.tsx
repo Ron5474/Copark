@@ -16,7 +16,7 @@ import { SessionProvider } from 'next-auth/react'
 import theme from '../theme'
 import TopBar from '../shared/Topbar'
 import Footer from '../shared/Footer'
-import { Box, CssBaseline } from '@mui/material'
+import {CssBaseline, Toolbar } from '@mui/material'
 import OnboardView from './View'
 
 const Page: NextPage = () => {
@@ -25,14 +25,9 @@ const Page: NextPage = () => {
       <SessionProvider basePath="/driver/api/auth">
         <CssBaseline />
         <TopBar />
+        <Toolbar />
         <OnboardView />
-        <Box sx={{
-          position: 'relative',
-          bottom: 0,
-          marginBottom: '0px',
-        }}>
         <Footer />
-        </Box>
       </SessionProvider>
     </ThemeProvider>
   )

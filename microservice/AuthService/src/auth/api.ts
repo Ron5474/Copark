@@ -7,10 +7,11 @@ import {
   Security,
   Request,
   Response,
-  Query
+  Query,
+  Put
 } from "tsoa";
 import * as express from "express";
-import { Credentials, Authenticated, OauthLoginData, AuthUser } from "./";
+import { Credentials, Authenticated, OauthLoginData, AuthUser, OauthSignup } from "./index";
 import { AuthService } from "./service";
 import { SessionUser, User } from "./index";
 
@@ -30,10 +31,43 @@ export class AuthController extends Controller {
       })
   }
 
-  @Post("driver/login")
+  @Post("driver/signup")
+  public async driverSignup(@Body() token: OauthSignup): Promise<string | undefined> {
+    const oauthUserData = await new AuthService().decryptOauth(token.authToken);
+    if (!oauthUserData) {
+      this.setStatus(400)
+      return undefined
+    } else {
+      const res = await new AuthService().driverSignup(oauthUserData)
+      if (!res) {
+        this.setStatus(204)
+        return undefined
+      } else {
+        this.setStatus(201)
+        return res
+      }
+    }
+  }
+
+  @Put("driver/onboarding")
   @Security("jwt", ["driver"])
-  public async driverSignup(@Request() request: express.Request): Promise<string | undefined> {
-    return new AuthService().driverSignup(request.user)
+  public async setOnBoardingState(@Request() request: express.Request, @Body() state: {newState: string}): Promise<void> {
+    return new AuthService().setOnBoardingState(request.user?.id, state.newState);
+  }
+
+  @Get("driver/login")
+  @Security("jwt", ["driver"])
+  public async driverLogin(@Request() request: express.Request): Promise<string | undefined> {
+    if (!request.user) {
+      this.setStatus(404)
+      return undefined
+    }
+    const user =  await new AuthService().activeDriver(request.user?.id);
+    if (!user) {
+      this.setStatus(404)
+      return undefined
+    }
+    return user
   }
 
   @Get("driver/id")

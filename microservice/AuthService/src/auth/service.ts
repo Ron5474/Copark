@@ -1,7 +1,7 @@
 
 import { pool } from "./db";
 import { SessionUser } from "../index";
-import { AuthUser, Credentials, User, OauthLoginData } from "./index";
+import { AuthUser, Credentials, User, OauthLoginData, OauthUser } from "./index";
 
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -38,7 +38,7 @@ export class AuthService {
     }
   }
 
-  public async getOauthUser(data: OauthLoginData|SessionUser|undefined): Promise<User| undefined> {
+  public async getOauthUser(data: OauthLoginData|SessionUser|undefined): Promise<OauthUser| undefined> {
     if (data === undefined) {
       throw new Error("Unauthorized");
     }
@@ -57,6 +57,8 @@ export class AuthService {
       const user = res.rows[0];
       return {
         id: user.id,
+        picture: data.picture,
+        sub: data.sub,
         name: user.data.name,
         role: user.data.role,
         email: user.data.email,
@@ -121,7 +123,7 @@ export class AuthService {
     }
   }
 
-  public async check(authHeader?: string, scopes?: string[]): Promise<SessionUser|OauthLoginData> {
+  public async check(authHeader?: string, scopes?: string[]): Promise<SessionUser|OauthUser> {
     if (!authHeader) {
       throw new Error("Unauthorized");
     }
@@ -148,7 +150,14 @@ export class AuthService {
       } else {
         if (payload.name && payload.email && payload.picture && payload.sub) {
           const uid = payload as unknown as OauthLoginData;
-          return { name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub };
+          const user = await this.getOauthUser(uid);
+          if (!user) throw new Error("Unauthorized1");
+          if (scopes && scopes.length > 0) {
+            if (!user.role || !scopes.some(role => user.role.includes (role))) {
+              throw new Error("Unauthorized2");
+            }
+          }
+          return {id: user.id, name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub };
         } else {
           throw new Error("Invalid token payload");
         }
@@ -157,6 +166,24 @@ export class AuthService {
       void err;
       // console.log("Error in check:", err);
       throw new Error("Unauthorized3");
+    }
+  }
+
+  public async activeDriver(userId: string|undefined): Promise<string| undefined> {
+    if (userId === undefined) {
+      throw new Error("Unauthorized");
+    }
+    const query = {
+      text: "SELECT * FROM account WHERE id = $1 AND  data->>'onboardingStatus' = 'complete'",
+      values: [userId]
+    }
+
+    const { rows } = await pool.query(query)
+
+    if (rows.length > 0) {
+      return rows[0].data.onboardingStatus
+    } else {
+      return undefined
     }
   }
 
@@ -176,7 +203,9 @@ export class AuthService {
         'email', $2::text,
         'picture', $3::text,
         'sub', $4::text,
-        'role', jsonb_build_array('driver')
+        'role', jsonb_build_array('driver'),
+        'onboardingStatus', 'tos',
+        'created_at', now()
       )
       WHERE NOT EXISTS (
         SELECT 1
@@ -203,11 +232,53 @@ export class AuthService {
       const retid = await this.encrypt(userId)
       return retid
     } else {
-      return undefined
+      const onboardingStatus = {
+        text: "SELECT data->>'onboardingStatus' AS status FROM account WHERE data->>'email' = $1::text",
+        values: [data.email]
+      }
+
+      const { rows } = await pool.query(onboardingStatus)
+
+      switch (rows[0].status) {
+        case "tos":
+          return "tos"
+        case "first-vehicle":
+          return "first-vehicle"
+        case "complete":
+          return undefined
+      }
     }
   } catch (err) {
     console.log("Error in driverSignup:", err);
     throw new Error("Unauthorized");
   }
   }
+
+  public async decryptOauth(token: string): Promise<OauthLoginData|undefined> {
+    try {
+      const { payload } = await jwtVerify(token, encodedKey);
+      if (payload.name && payload.email && payload.picture && payload.sub) {
+        const uid = payload as unknown as OauthLoginData;
+        return { name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub };
+      } else {
+        throw new Error("Invalid token payload");
+      }
+    } catch (err) {
+      console.log("Error in decryptOauth:", err);
+      return undefined;
+    }
+  }
+
+  public async setOnBoardingState(userId: string|undefined, newState: string): Promise<void> {
+    if (userId === undefined) {
+      throw new Error("Unauthorized");
+    }
+    const query = {
+      text: "UPDATE account SET data = jsonb_set(data, '{onboardingStatus}', $1::jsonb) WHERE id = $2",
+      values: [JSON.stringify(newState), userId],
+    };
+
+    await pool.query(query);
+  }
 }
+

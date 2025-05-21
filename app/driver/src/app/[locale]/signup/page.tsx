@@ -27,9 +27,10 @@ const Page: NextPage = () => {
         <TopBar />
         <SignupView />
         <Box sx={{
-          position: 'relative',
+          position: 'absolute',
           bottom: 0,
-          marginBottom: '0px',
+          left: 0,
+          right: 0,
         }}>
         <Footer />
         </Box>

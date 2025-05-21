@@ -11,6 +11,9 @@ export interface AuthUser {
   email: string //TODO: use Email type
 }
 
+export interface OauthSignup {
+  authToken: string
+}
 export interface SessionUser {
   id: string
 }
@@ -29,6 +32,15 @@ export interface User {
 
 export interface Authenticated {
   name: string
+}
+
+export interface OauthUser {
+  id: string,
+  name: string,
+  email: string,
+  role: string[],
+  picture: string,
+  sub: string,
 }
 
 export interface OauthLoginData {

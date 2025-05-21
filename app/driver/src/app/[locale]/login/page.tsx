@@ -25,13 +25,19 @@ const Page: NextPage = () => {
       <SessionProvider basePath="/driver/api/auth">
         <CssBaseline />
         <TopBar />
+        <Box 
+          sx={{ 
+            height: '100vh'
+          }}>
         <LoginView />
         <Box sx={{
-          position: 'relative',
+          position: 'absolute',
           bottom: 0,
-          marginBottom: '0px',
+          left: 0,
+          right: 0,
         }}>
-        <Footer />
+          <Footer />
+        </Box>
         </Box>
       </SessionProvider>
     </ThemeProvider>

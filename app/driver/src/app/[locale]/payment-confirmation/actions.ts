@@ -78,7 +78,8 @@ export async function addPermitDetails(
       query: `
         mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
           purchaseZonePermit(input: $input) {
-            zone,
+            type,
+            area,
             purchaseDate,
             activeDate,
             expireDate,

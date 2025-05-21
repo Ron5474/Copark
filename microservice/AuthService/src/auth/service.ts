@@ -44,7 +44,8 @@ export class AuthService {
       throw new Error("Unauthorized");
     }
 
-    if (data.type !== "OauthUserData") { 
+    if (data.type !== "OauthUserData") {
+      console.log(data)
       throw new Error("Unauthorized");
     }
     const query = {
@@ -161,6 +162,7 @@ export class AuthService {
             sub: payloadObj.sub
           };
           const user = await this.getOauthUser(uid);
+          console.log("USER", user)
           if (!user) throw new Error("Unauthorized1");
           if (scopes && scopes.length > 0) {
             if (!user.role || !scopes.some(role => user.role.includes (role))) {

@@ -42,17 +42,13 @@ export async function getTicketsByDay() {
 export async function getTicketsByEnforcer(enforcerId: string) {
   const token = await getAuthToken();
   const query = `
-    query GetTicketsIssuedByEnforcer($enforcerID: String!) {
-      getTicketsIssuedByEnforcer(enforcerID: $enforcerID) {
-        id
-        vehicle
-        enforcer
-        issuedDate
-        violation
-        fine
-        ticketStatus
-        images
-        note
+    query GetTicketsPerDayFromEnforcer($enforcerID: String!) {
+      getTicketsPerDayFromEnforcer(enforcerID: $enforcerID) {
+        date
+        tickets {
+          id
+          issuedDate
+        }
       }
     }
   `
@@ -73,9 +69,12 @@ export async function getTicketsByEnforcer(enforcerId: string) {
 
   const result = await response.json()
 
+  console.log(JSON.stringify(result.data.getTicketsPerDayFromEnforcer, null, 2))
+
+
   if (result.errors) {
     throw new Error(result.errors[0].message)
   }
 
-  return result.data.getTicketsIssuedByEnforcer
+  return result.data.getTicketsPerDayFromEnforcer
 }

@@ -2,11 +2,12 @@
 
 ----- Your insert statements go below here -----
 \connect perm;
-INSERT INTO "zone" (id, data) VALUES
+INSERT INTO type (id, data) VALUES
   (
     'e314f688-d150-411e-aa4f-38e679112e0e',
     jsonb_build_object(
-      'zone', '123',
+      'name', 'zone',
+      'area', '123',
       'weekday', jsonb_build_object(
         'hourly', 2.45,
         'openTime', '07:00',
@@ -24,11 +25,12 @@ INSERT INTO "zone" (id, data) VALUES
     )
   );
 
-INSERT INTO "zone" (id, data) VALUES
+INSERT INTO type (id, data) VALUES
   (
     '39f48f9f-2693-446b-ad98-f72298bc7bbe',
     jsonb_build_object(
-      'zone', '111',
+      'name', 'zone',
+      'area', '111',
       'weekday', jsonb_build_object(
         'hourly', 3.00,
         'openTime', '07:00',
@@ -46,11 +48,12 @@ INSERT INTO "zone" (id, data) VALUES
     )
   );
 
-INSERT INTO "zone" (id, data) VALUES
+INSERT INTO type (id, data) VALUES
   (
     'f26adf21-f967-4283-8417-8e0db1ef14bd',
     jsonb_build_object(
-      'zone', '27',
+      'name', 'zone',
+      'area', '27',
       'weekday', jsonb_build_object(
         'hourly', 2.02,
         'openTime', '07:00',
@@ -60,11 +63,12 @@ INSERT INTO "zone" (id, data) VALUES
     )
   );
 
-INSERT INTO "zone" (id, data) VALUES
+INSERT INTO type (id, data) VALUES
   (
     '1d603a73-4b75-48d8-b677-48b81b7fa3f4',
     jsonb_build_object(
-      'zone', '101',
+      'name', 'zone',
+      'area', '101',
       'weekday', jsonb_build_object(
         'daily', 9.50,
         'openTime', '07:00',
@@ -78,24 +82,41 @@ INSERT INTO "zone" (id, data) VALUES
     )
   );
 
-INSERT INTO "zone" (id, data) VALUES
+INSERT INTO type (id, data) VALUES
   (
     '6fb2ad6d-431c-47e4-b5dd-81c3847f6ad6',
     jsonb_build_object(
-      'zone', '000',
+      'name', 'zone',
+      'area', '000',
       'weekday', jsonb_build_object(),
       'weekend', jsonb_build_object()
     )
   );
 
-INSERT INTO permit (vehicle, zone, data) VALUES (
+-- INSERT INTO type (id, data) VALUES
+--   (
+--     '9ca7042e-733c-417a-8e78-d39a45a5bc66',
+--     jsonb_build_object(
+--       'name', 'lot',
+--       'area', 'A',
+--       'daily', 5.00,
+--       'quarterly', 120.00,
+--       'yearly', 400.00
+--     )
+--   );
+
+INSERT INTO permit (vehicle, type, data) VALUES (
   '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
   'e314f688-d150-411e-aa4f-38e679112e0e',
   jsonb_build_object(
-    'permitType', 'day',
     'purchaseDate', to_char((now() - interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate', to_char((now() - interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
     'expiresDate', to_char((now() + interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-    'price', 2.45,
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 2.45,
+      'total', 2.95
+    ),
     'paymentMethod', 'credit'
   )
 );

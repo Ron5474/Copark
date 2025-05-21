@@ -54,10 +54,6 @@ export class PermitResolver {
     @Arg("input", () => PurchaseZoneInput) input: PurchaseZoneInput,
     @Ctx() request: Request
   ): Promise<Confirmation> {
-    console.log('input', input)
-    // const userId = request.user?.id
-    // if (!userId) throw new Error('Unauthorized')
-
     const plate = input.vehicle
 
     const vehicleQuery = `
@@ -80,7 +76,6 @@ export class PermitResolver {
     })
 
     const vehicleJson = await vehicleRes.json()
-    // console.log('vehicleJson', vehicleJson)
 
     const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 
@@ -165,8 +160,6 @@ export class PermitResolver {
     @Arg("input", () => IsValidPermitInput) input: IsValidPermitInput,
     @Ctx() request: Request
   ): Promise<IsValid> {
-    // const userId = request.user?.id
-    // if (!userId) throw new Error('Unauthorized')
     
     const plate = input.vehicle
 
@@ -190,12 +183,11 @@ export class PermitResolver {
     })
 
     const vehicleJson = await vehicleRes.json()
-    // console.log('vehicleJson', vehicleJson)
 
     const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 
     if (!vehicleId) {
-      return {isValid: false, type: 'Vehicle Not Found', zone: input.zone}
+      return {isValid: false, type: 'Vehicle Not Found', area: input.zone}
     }
 
     return await service.isValidZonePermit({vehicle: vehicleId, zone: input.zone})
@@ -207,10 +199,6 @@ export class PermitResolver {
     @Arg("plate", () => String) plate: string,
     @Ctx() request: Request
   ): Promise<IsValidPolice> {
-    // console.log('HELOOOOOOOOOO')
-    // const userId = request.user?.id
-    // if (!userId) throw new Error('Unauthorized')
-    // console.log('HELOOOOOOOOOO 2')
     const vehicleQuery = `
       query FindVehicleByPlate($plate: String!) {
         findVehicleByPlate(plate: $plate) {
@@ -244,10 +232,7 @@ export class PermitResolver {
   @Query(() => MyPermits)
   async myPermits(
     @Arg("vehicleID", () => String) vehicleID: string,
-    // @Ctx() request: Request
   ): Promise<MyPermits> {
-    // const userId = request.user?.id
-    // if (!userId) throw new Error('Unauthorized')
 
     return await service.getMyPermits(vehicleID)
   }

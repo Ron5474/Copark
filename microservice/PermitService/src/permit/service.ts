@@ -42,7 +42,6 @@ export class PermitService {
     const expireDate = new Date(today.getTime() + durationMs).toISOString()
 
     const data = {
-      type: 'zone',
       purchaseDate,
       activeDate,
       expireDate,
@@ -54,13 +53,14 @@ export class PermitService {
 
     const { rows } = await pool.query(`
       WITH selected_zone AS (
-        SELECT id FROM zone
-        WHERE TRIM(LOWER(data->>'zone')) = TRIM(LOWER($2))
+        SELECT id FROM type
+        WHERE data->>'type' = 'zone'
+        AND TRIM(LOWER(data->>'area')) = TRIM(LOWER($2))
         LIMIT 1
       )
-      INSERT INTO permit (vehicle, zone, data)
+      INSERT INTO permit (vehicle, type, data)
       SELECT $1, id, $3 FROM selected_zone
-      RETURNING zone, data
+      RETURNING type, data
     `, [input.vehicle, input.zone, data])
 
 
@@ -69,8 +69,7 @@ export class PermitService {
     }
     // TODO: Hit email api to send confirmation and receipt
     return {
-      type: rows[0].data.type,
-      zone: rows[0].zone,
+      type: rows[0].type,
       purchaseDate: rows[0].data.purchaseDate,
       activeDate: rows[0].data.activeDate,
       expireDate: rows[0].data.expireDate,
@@ -84,21 +83,21 @@ export class PermitService {
     const result = await pool.query(`
       SELECT p.data
       FROM permit p
-      JOIN zone z ON z.id = p.zone
+      JOIN type t ON t.id = p.type
       WHERE p.vehicle = $1
-        AND TRIM(LOWER(z.data->>'zone')) = TRIM(LOWER($2))
+        AND TRIM(LOWER(t.data->>'area')) = TRIM(LOWER($2))
         AND now() >= (p.data->>'activeDate')::timestamptz
         AND now() <= (p.data->>'expireDate')::timestamptz`,
       [input.vehicle, input.zone]
     )
 
-    if (result.rowCount === 0) return { isValid: false, type: 'N/A', zone: input.zone }
+    if (result.rowCount === 0) return { isValid: false, type: 'N/A', area: input.zone }
 
     const row = result.rows[0]
     return {
       isValid: true,
       type: row.data.type,
-      zone: row.data.type,
+      area: row.data.type,
     }
   }
 
@@ -123,8 +122,7 @@ export class PermitService {
     const result = await pool.query(`
         WITH future AS (
           SELECT data->>'vehicle' AS vehicle,
-            data->>'type' AS type,
-            "zone",
+            type,
             data->>'activeDate' AS activeDate,
             data->>'expireDate' AS expireDate
           FROM permit
@@ -133,8 +131,7 @@ export class PermitService {
         ),
         active AS (
           SELECT data->>'vehicle' AS vehicle,
-            data->>'type' AS type,
-            "zone",
+            type,
             data->>'activeDate' AS activeDate,
             data->>'expireDate' AS expireDate
           FROM permit
@@ -144,8 +141,7 @@ export class PermitService {
         ),
         expired AS (
           SELECT data->>'vehicle' AS vehicle,
-            data->>'type' AS type,
-            "zone",
+            type,
             data->>'activeDate' AS activeDate,
             data->>'expireDate' AS expireDate
           FROM permit
@@ -168,8 +164,9 @@ export class PermitService {
 
     const result = await pool.query(`
         SELECT data
-        FROM "zone"
-        WHERE data->>'zone' = $1
+        FROM type
+        WHERE data->>'type' = 'zone'
+        AND data->>'area' = $1
       `,
       [zone]
     )
@@ -183,15 +180,15 @@ export class PermitService {
       SELECT 
         id,
         vehicle,
-        zone,
-        data->>'permitType' AS permittype,
-        data->>'purchaseDate' AS purchasedate,
-        data->>'expiresDate' AS expiresdate,
-        data->>'paymentMethod' AS paymentmethod,
-        data->>'price' as price
+        type,
+        data->>'purchaseDate' AS purchaseDate,
+        data->>'activeDate' AS activeDate,
+        data->>'expireDate' AS expireDate,
+        data->>'receipt' AS receipt,
+        data->>'paymentMethod' AS paymentMethod
       FROM permit
-      ORDER BY data->>'purchasedate';
-    `;
+      ORDER BY data->>'activeDate';
+    `; // TODO Fix this to join on type table to grab type.name and type.area
 
     const permitResults = await pool.query(permitQuery);
     const permitsByDayMap: Record<string, Permit[]> = {};
@@ -202,8 +199,8 @@ export class PermitService {
       // console.log('date', date)
       const permit: Permit = {
         vehicle: row.vehicle,
-        zone: row.zone,
-        type: row.permittype,
+        type: row.type,
+        area: row.area,
         activeDate: row.activeDate,
         expireDate: row.expiresdate,
       };
@@ -224,7 +221,7 @@ export class PermitService {
 
   public async createNewZone(input: NewZone): Promise<boolean> {
     const { rows } = await pool.query(`
-      INSERT INTO zone (data)
+      INSERT INTO type (data)
       VALUES ($1)
       RETURNING id, data
     `, [input])

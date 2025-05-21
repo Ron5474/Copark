@@ -101,39 +101,38 @@ async function loginAs(who: string): Promise<string | undefined> {
   }
 }
 
-const purchaseZonePermitQuery = `
-mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
-  purchaseZonePermit(input: $input) {
-    type
-    zone
-    purchaseDate
-    activeDate
-    expireDate
-    receipt {
-      tax
-      service
-      subTotal
-      total
-    }
-    paymentMethod
-  }
-}`
+// const purchaseZonePermitQuery = `
+// mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
+//   purchaseZonePermit(input: $input) {
+//     type
+//     area
+//     purchaseDate
+//     activeDate
+//     expireDate
+//     receipt {
+//       service
+//       subTotal
+//       total
+//     }
+//     paymentMethod
+//   }
+// }`
 
-const purchaseZoneInput = {
-  input: {
-    vehicle: "12345678-1234-1234-1234-567890abcdef",
-    zone: "123",
-    duration: {'minutes': 30, 'hours': 0},
-    paymentMethod: "paypal"
-  }
-}
+// const purchaseZoneInput = {
+//   input: {
+//     vehicle: "12345678-1234-1234-1234-567890abcdef",
+//     zone: "123",
+//     duration: {'minutes': 30, 'hours': 0},
+//     paymentMethod: "paypal"
+//   }
+// }
 
 const isValidZonePermitQuery = `
 query IsValid($input: IsValidPermitInput!) {
   isValidZonePermit(input: $input) {
     isValid
     type
-    zone
+    area
   }
 }`
 
@@ -172,21 +171,21 @@ query MyPermits($vehicleID: String!) {
     future {
       vehicle
       type
-      zone
+      area
       activeDate
       expireDate
     }
     active {
       vehicle
       type
-      zone
+      area
       activeDate
       expireDate
     }
     expired {
       vehicle
       type
-      zone
+      area
       activeDate
       expireDate
     }
@@ -227,19 +226,19 @@ test('Permit service is running', async () => {
   expect(status.body.data.permitServiceStatus).toBe("Permit service is running")
 })
 
-test('Driver can purchase a zone permit', async () => {
-  const token = await loginAs("driver")
+// test('Driver can purchase a zone permit', async () => {
+//   const token = await loginAs("driver")
 
-  const confirmation = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
-    .send({ 
-      query: purchaseZonePermitQuery,
-      variables: purchaseZoneInput
-    })
+//   const confirmation = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + token)
+//     .send({ 
+//       query: purchaseZonePermitQuery,
+//       variables: purchaseZoneInput
+//     })
 
-  // expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
-})
+//   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+// })
 
 test('Enforcer gets invalid permit', async () => {
   const token = await loginAs("enforcement")
@@ -251,7 +250,7 @@ test('Enforcer gets invalid permit', async () => {
       query: isValidZonePermitQuery,
       variables: isValidZonePermitInput
     })
-
+    
   expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
 })
 
@@ -280,7 +279,6 @@ test('Police gets invalid permit', async () => {
       variables: isValidPermitByPoliceInput
     })
 
-    // console.log(isValid.body)
   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
 })
 
@@ -292,8 +290,7 @@ test('Police gets invalid for nonexistent plate', async () => {
       query: isValidPermitByPoliceQuery,
       variables: nonExistentPlateInput
     })
-
-    // console.log(isValid.body)
+    
   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
 })
 

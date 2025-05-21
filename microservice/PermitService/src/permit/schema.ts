@@ -10,7 +10,7 @@ export class Permit {
   type!: string
 
   @Field(() => String)
-  zone!: string
+  area!: string
 
   @Field(() => String)
   activeDate!: string
@@ -111,9 +111,6 @@ export class Confirmation {
   type!: string
 
   @Field(() => String)
-  zone!: string
-
-  @Field(() => String)
   purchaseDate!: string
 
   @Field(() => String)
@@ -175,7 +172,7 @@ export class IsValid {
   type!: string
 
   @Field(() => String)
-  zone!: string
+  area!: string
 }
 
 @ObjectType()

@@ -34,7 +34,7 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
   const [country, setCountry] = useState<string>(Object.keys(locations)[0])
   const [state, setState] = useState<string>(Object.values(locations)[0][0])
   const [nickname, setNickname] = useState<string | undefined>()
-
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const submitVehicle = async () => {
     setIsValidEntry(plateNumber.length > 0)
     if (plateNumber.length === 0) return
@@ -194,7 +194,12 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
         </Box>
       }
       <Button
-        onClick={submitVehicle}
+        onClick={(e) => {
+          e.preventDefault()
+          setIsLoading(true)
+          submitVehicle()
+        }}
+        disabled={isLoading}
         aria-label='Submit vehicle'
         sx={{
           width: '100%',

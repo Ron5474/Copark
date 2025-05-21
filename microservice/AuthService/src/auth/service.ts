@@ -152,7 +152,14 @@ export class AuthService {
         return {type: "SessionUser", id: user.id };
       } else {
         if (payload.name && payload.email && payload.picture && payload.sub) {
-          const uid = payload as unknown as OauthLoginData;
+          const payloadObj = payload as unknown as OauthLoginData;
+          const uid: OauthLoginData = {
+            type: "OauthUserData",
+            name: payloadObj.name,
+            email: payloadObj.email,
+            picture: payloadObj.picture,
+            sub: payloadObj.sub
+          };
           const user = await this.getOauthUser(uid);
           if (!user) throw new Error("Unauthorized1");
           if (scopes && scopes.length > 0) {

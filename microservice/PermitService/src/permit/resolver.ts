@@ -80,7 +80,8 @@ export class PermitResolver {
     })
 
     const vehicleJson = await vehicleRes.json()
-    // console.log('vehicleJson', vehicleJson)
+    console.log('vehicleJson', vehicleJson)
+
 
     const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 

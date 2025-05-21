@@ -59,12 +59,15 @@ export class AuthController extends Controller {
   @Get("driver/login")
   @Security("jwt", ["driver"])
   public async driverLogin(@Request() request: express.Request): Promise<string | undefined> {
+    console.log("driver login")
     if (!request.user) {
+      console.log("user not found")
       this.setStatus(404)
       return undefined
     }
     const user =  await new AuthService().activeDriver(request.user?.id);
     if (!user) {
+      console.log("user not found")
       this.setStatus(404)
       return undefined
     }

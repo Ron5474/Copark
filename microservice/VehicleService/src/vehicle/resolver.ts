@@ -73,7 +73,7 @@ export class VehicleResolver {
     return await service.findOwnerByVehicleID(vehicle)
   }
 
-  @Authorized('admin', 'enforcement', 'police')
+  @Authorized('admin', 'enforcement', 'police', 'driver')
   @Query(() => Vehicle, { nullable: true })
   async findVehicleByPlate(
      @Arg('plate', () => String) plate: string

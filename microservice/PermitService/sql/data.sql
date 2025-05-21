@@ -26,7 +26,7 @@ INSERT INTO type (id, location, data) VALUES
         )
       ),
       'weekend', jsonb_build_object(
-        'daily', 7.95,
+        'hourly', 2.95,
         'openTime', '07:00',
         'closeTime', '20:00'
       )
@@ -81,14 +81,14 @@ INSERT INTO type (id, location, data) VALUES
       'name', 'zone',
       'area', '101',
       'weekday', jsonb_build_object(
-        'daily', 9.50,
-        'openTime', '07:00',
-        'closeTime', '20:00'
+        'hourly', 2.50,
+        'openTime', '00:00',
+        'closeTime', '23:59'
       ),
       'weekend', jsonb_build_object(
-        'daily', 9.50,
-        'openTime', '07:00',
-        'closeTime', '20:00'
+        'hourly', 2.50,
+        'openTime', '00:00',
+        'closeTime', '23:59'
       )
     )
   );

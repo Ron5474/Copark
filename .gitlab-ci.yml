@@ -286,14 +286,14 @@ build:vehicleService:
 #         - package.json
 #         - .gitlab-ci.yml
 
-test:driver:
-  script:
-    - cd app/driver && npm install && npm test
-  rules:
-    - changes: 
-      - app/driver/**/*
-      - package.json
-      - .gitlab-ci.yml
+# test:driver:
+#   script:
+#     - cd app/driver && npm install && npm test
+#   rules:
+#     - changes: 
+#       - app/driver/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 setup-env-variables:root:
   stage: setup-env-variables

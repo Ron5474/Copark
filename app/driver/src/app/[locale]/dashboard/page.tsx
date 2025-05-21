@@ -18,6 +18,7 @@ import ViewVehicles from "../vehicle/member/Vehicle"
 import { userLoginSignUpAttempt } from "./actions";
 // import BuyPermit from "../permit/View";
 import BuyPermit from "../zone/View";
+// import TicketView from "../ticket/TicketView"
 import { signOut } from "next-auth/react";
 import { useLocale } from "next-intl";
 import { SessionProvider } from "next-auth/react";
@@ -52,6 +53,9 @@ function Dashboard() {
             {currentPage === "dashboard" && (
               <DashboardView />
             )}
+            {/* {currentPage === "dashboard" && (
+              <TicketView />
+            )} */}
             {currentPage === "garage" && (
               <ViewVehicles />
             )}

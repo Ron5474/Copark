@@ -19,10 +19,9 @@ export class PermitService {
     const totalMinutes = (input.duration?.hours || 0) * 60 + (input.duration?.minutes || 0)
 
 
-    const { hourly, daily } = await this.getZoneDetails(input.zone)
-    const price = hourly || daily || 0
+    const { hourly } = await this.getZoneDetails(input.zone)
     const service = 0.50
-    const subTotal = price / 60 * totalMinutes
+    const subTotal = (hourly as number) / 60 * totalMinutes
     const total = service + subTotal
     const receipt = {
       service,

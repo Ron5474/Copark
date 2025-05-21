@@ -33,7 +33,7 @@ export default function Zone() {
           ? nowStr >= zoneDetails.openTime && nowStr < zoneDetails.closeTime 
           : true
 
-        if ((zoneDetails?.hourly || zoneDetails?.daily) && isOpen)
+        if ((zoneDetails?.hourly) && isOpen)
           next()
         else
           setIsFree(true)

@@ -86,7 +86,7 @@ vi.mock('next/headers', () => {
 
 beforeEach(() => {
   vi.mocked(getZoneDetails).mockResolvedValue({
-    daily: 2.50,
+    hourly: 2.50,
     maxDuration: { hours: 2, minutes: 0 },
     openTime: '07:00',
     closeTime: '20:00',

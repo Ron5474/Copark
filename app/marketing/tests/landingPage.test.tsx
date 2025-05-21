@@ -9,6 +9,8 @@ import { it, expect, afterEach, beforeEach, vi } from 'vitest';
 import './setup'
 import Home from '../src/app/[locale]/page';
 
+const push = vi.fn()
+
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
@@ -33,6 +35,24 @@ beforeEach(() => {
         }
       })
     ),
+  }))
+
+  vi.mock('@/i18n/navigation', () => ({
+    useRouter: () => ({
+      push
+    })
+  }))
+
+  vi.mock('next/navigation', () => ({
+    useRouter: () => ({
+      push: vi.fn(),
+      replace: vi.fn(),
+      refresh: vi.fn(),
+      back: vi.fn(),
+      forward: vi.fn(),
+    }),
+    usePathname: () => '/test',
+    useSearchParams: () => new URLSearchParams(),
   }))
 })
 

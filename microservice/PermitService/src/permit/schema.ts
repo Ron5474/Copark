@@ -45,9 +45,6 @@ export class Duration {
 export class ZoneDetails {
 
   @Field(() => Number, { nullable: true })
-  daily?: number
-
-  @Field(() => Number, { nullable: true })
   hourly?: number
 
   @Field(() => Duration, { nullable: true })
@@ -74,9 +71,6 @@ export class NewZone {
 
   @Field(() => Number)
   zone!: number
-
-  @Field(() => Number, { nullable: true })
-  daily?: number
 
   @Field(() => Number, { nullable: true })
   hourly?: number

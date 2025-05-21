@@ -311,7 +311,7 @@ export class TicketService {
 
     const ticketResults = await pool.query(ticketQuery);
 
-    const ticketsMap: Map<string, Ticket[]> = new Map();
+    const ticketsMap = new Map<string, Ticket[]>();
 
     for (const row of ticketResults.rows) {
       const date = new Date(row.issueddate).toISOString().split('T')[0]; // YYYY-MM-DD
@@ -329,7 +329,10 @@ export class TicketService {
       if (!ticketsMap.has(date)) {
         ticketsMap.set(date, []);
       }
-      ticketsMap.get(date)!.push(ticket);
+      const ticketsForDate = ticketsMap.get(date);
+      if (ticketsForDate) {
+        ticketsForDate.push(ticket);
+      }
     }
 
     const result: TicketsByDay[] = [];
@@ -367,7 +370,7 @@ export class TicketService {
 
     // console.log(result.rows);
 
-    const ticketsMap: Map<string, Ticket[]> = new Map();
+    const ticketsMap = new Map<string, Ticket[]>();
 
     for (const row of result.rows) {
       const date = new Date(row.issueddate).toISOString().split('T')[0]; // YYYY-MM-DD
@@ -385,7 +388,10 @@ export class TicketService {
       if (!ticketsMap.has(date)) {
         ticketsMap.set(date, []);
       }
-      ticketsMap.get(date)!.push(ticket);
+      const ticketsForDate = ticketsMap.get(date);
+      if (ticketsForDate) {
+        ticketsForDate.push(ticket);
+      }
     }
 
     const resultArr: TicketsByDay[] = [];

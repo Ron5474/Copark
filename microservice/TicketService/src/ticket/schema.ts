@@ -109,7 +109,7 @@ export class NewTicketInput {
 @ObjectType()
 export class TicketsByDay {
   @Field(() => String)
-  date!: String;
+  date!: string;
 
   @Field(() => [Ticket])
   tickets!: Ticket[];

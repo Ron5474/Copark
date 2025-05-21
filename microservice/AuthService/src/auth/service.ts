@@ -1,7 +1,8 @@
 
 import { pool } from "./db";
 import { SessionUser } from "../index";
-import { AuthUser, Credentials, User, OauthLoginData, OauthUser } from "./index";
+import { AuthUser, Credentials, User, OauthLoginData} from "./index";
+import { OauthUser } from "../index.d";
 
 import { SignJWT, jwtVerify } from 'jose'
 
@@ -42,7 +43,8 @@ export class AuthService {
     if (data === undefined) {
       throw new Error("Unauthorized");
     }
-    if ('id' in data) {
+
+    if (data.type !== "OauthUserData") { 
       throw new Error("Unauthorized");
     }
     const query = {
@@ -56,6 +58,7 @@ export class AuthService {
     } else {
       const user = res.rows[0];
       return {
+        type: "OauthUser",
         id: user.id,
         picture: data.picture,
         sub: data.sub,
@@ -146,7 +149,7 @@ export class AuthService {
           }
         }
 
-        return { id: user.id };
+        return {type: "SessionUser", id: user.id };
       } else {
         if (payload.name && payload.email && payload.picture && payload.sub) {
           const uid = payload as unknown as OauthLoginData;
@@ -157,7 +160,7 @@ export class AuthService {
               throw new Error("Unauthorized2");
             }
           }
-          return {id: user.id, name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub };
+          return {type: "OauthUser", id: user.id, name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub, role: user.role };
         } else {
           throw new Error("Invalid token payload");
         }
@@ -259,7 +262,7 @@ export class AuthService {
       const { payload } = await jwtVerify(token, encodedKey);
       if (payload.name && payload.email && payload.picture && payload.sub) {
         const uid = payload as unknown as OauthLoginData;
-        return { name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub };
+        return {type: "OauthUserData", name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub };
       } else {
         throw new Error("Invalid token payload");
       }

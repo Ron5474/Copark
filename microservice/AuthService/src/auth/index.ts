@@ -14,9 +14,6 @@ export interface AuthUser {
 export interface OauthSignup {
   authToken: string
 }
-export interface SessionUser {
-  id: string
-}
 
 export interface Credentials {
   email: string,
@@ -34,24 +31,16 @@ export interface Authenticated {
   name: string
 }
 
-export interface OauthUser {
-  id: string,
+export interface OauthLoginData {
+  type: "OauthUserData"
   name: string,
   email: string,
-  role: string[],
-  picture: string,
-  sub: string,
-}
-
-export interface OauthLoginData {
-  "name": string,
-  "email": string,
   /**
    * the picture url of the user
    * @maxLength 2048
    * @pattern ^https?:\/\/.*$
    * @example "https://example.com/user.jpg"
    */
-  "picture": string,
-  "sub": string,
+  picture: string,
+  sub: string,
 }

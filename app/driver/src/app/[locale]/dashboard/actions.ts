@@ -16,8 +16,9 @@ export async function userLoginSignUpAttempt(locale: string): Promise<string|und
   })
   
   if (res.status !== 201 && res.status !== 200 && res.status !== 204) {
+    cookieStore.delete(process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME as string);
     return redirect({
-      href: '/driver/login',
+      href: '/signup',
       locale: locale
       });
   }

@@ -13,7 +13,8 @@ import {
 import * as express from "express";
 import { Credentials, Authenticated, OauthLoginData, AuthUser, OauthSignup } from "./index";
 import { AuthService } from "./service";
-import { SessionUser, User } from "./index";
+import { User } from "./index";
+import { OauthUser, SessionUser } from "../index.d";
 
 @Route("auth")
 export class AuthController extends Controller {
@@ -73,7 +74,15 @@ export class AuthController extends Controller {
   @Get("driver/id")
   @Security("jwt", ["driver"])
   public async getDriverId(@Request() request: express.Request): Promise<User | undefined> {
-    return new AuthService().getOauthUser(request.user);
+    const user = request.user as OauthUser;
+    const data: OauthLoginData = {
+      type: "OauthUserData",
+      picture: user.picture,
+      sub: user.sub,
+      name: user.name,
+      email: user.email
+    };
+    return new AuthService().getOauthUser(data);
   }
 
   @Post("driver/email")
@@ -86,7 +95,7 @@ export class AuthController extends Controller {
   @Security("jwt", undefined)
   public async check(@Request() request: express.Request,
     @Body() roles: string[]
-  ): Promise<SessionUser | OauthLoginData | undefined> {
+  ): Promise<SessionUser | OauthUser | undefined> {
     // console.log('eowefjioefjiowfejiowejiowefjioefwjioefjioef')
     // console.log("ROLE!S :" + request.headers.authorization, roles)
     return new AuthService().check(request.headers.authorization, roles);

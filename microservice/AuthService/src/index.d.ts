@@ -1,14 +1,16 @@
 export interface SessionUser {
+  type: "SessionUser"
   id: string
 }
 
 export interface OauthUser {
+  type: "OauthUser"
   id: string,
   name: string,
-  email?: string,
+  email: string,
   role: string[],
-  picture?: string,
-  sub?: string,
+  picture: string,
+  sub: string,
 }
 
 

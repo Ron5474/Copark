@@ -105,11 +105,7 @@ INSERT INTO type (id, location, data) VALUES
     )
   );
 
-<<<<<<< HEAD
 INSERT INTO permit (vehicle, zone, data) VALUES (
-=======
-INSERT INTO permit (vehicle, type, data) VALUES (
->>>>>>> 0d14bec531e232d7de29fda3ed4ed892684af441
   '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
   'e314f688-d150-411e-aa4f-38e679112e0e',
   jsonb_build_object(

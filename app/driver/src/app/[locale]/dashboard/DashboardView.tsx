@@ -39,11 +39,11 @@ const permits = [
     id: "daily",
     title: "Daily",
     lots: [
-      { name: "lot R", price: "$7" },
-      { name: "any lot", price: "$15" },
-      { name: "lot A", price: "$7" },
-      { name: "lot B", price: "$7" },
-      { name: "lot C", price: "$7" },
+      { name: "Any lot", price: "$17" },
+      { name: "Lot A", price: "$14" },
+      { name: "Lot B", price: "$12" },
+      { name: "Lot C", price: "$9" },
+      { name: "Lot R", price: "$6" },
     ],
     priceRange: "$10-15",
   },
@@ -51,11 +51,11 @@ const permits = [
     id: "quarterly",
     title: "Quarterly",
     lots: [
-      { name: "lot R", price: "$7" },
-      { name: "any lot", price: "$15" },
-      { name: "lot A", price: "$7" },
-      { name: "lot B", price: "$7" },
-      { name: "lot C", price: "$7" },
+      { name: "Any lot", price: "$17" },
+      { name: "Lot A", price: "$14" },
+      { name: "Lot B", price: "$12" },
+      { name: "Lot C", price: "$9" },
+      { name: "Lot R", price: "$6" },
     ],
     priceRange: "$100",
   },
@@ -63,11 +63,11 @@ const permits = [
     id: "yearly",
     title: "Yearly",
     lots: [
-      { name: "Lot R", price: "$7" },
-      { name: "Any lot", price: "$15" },
-      { name: "Lot A", price: "$7" },
-      { name: "Lot B", price: "$7" },
-      { name: "Lot C", price: "$7" },
+      { name: "Any lot", price: "$17" },
+      { name: "Lot A", price: "$14" },
+      { name: "Lot B", price: "$12" },
+      { name: "Lot C", price: "$9" },
+      { name: "Lot R", price: "$6" },
     ],
     priceRange: "$300",
   },
@@ -99,6 +99,7 @@ export default function DashboardView() {
       >
         Available Permits
       </Typography>
+
       {permits.map((permit) => (
         <CardButton
           key={permit.id}
@@ -118,16 +119,26 @@ export default function DashboardView() {
                     key={lot.name}
                     value={lot.name}
                     control={<Radio />}
-                    label={`${lot.name} ${lot.price} dollar`}
+                    label={`${lot.name} -- ${lot.price}`}
                     aria-label={`Select ${lot.name} from ${permit.title}`}
                   />
                 ))}
               </RadioGroup>
+
+              {selectedLots[permit.id] && (
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  Selected: <strong>{selectedLots[permit.id]}</strong>
+                </Typography>
+              )}
+
               <Button
-                variant="outlined" sx={{ mt: 2 }}
-                aria-label="Purchase Permit"
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2, borderRadius: "8px", textTransform: "none", color: "#fff", }}
+                disabled={!selectedLots[permit.id]}
+                aria-label={`Purchase ${permit.title} permit`}
               >
-                  Purchase
+                Purchase Permit
               </Button>
             </Stack>
           )}

@@ -20,7 +20,7 @@ export class PermitService {
 
 
     const { hourly, daily } = await this.getZoneDetails(input.zone)
-    const price = hourly ? hourly : daily as number
+    const price = hourly || daily || 0
     const service = 0.50
     const subTotal = price / 60 * totalMinutes
     const total = service + subTotal
@@ -49,8 +49,6 @@ export class PermitService {
       paymentMethod: input.paymentMethod,
     }
 
-    // console.log('data', data)
-
     const { rows } = await pool.query(`
       WITH selected_zone AS (
         SELECT id FROM type
@@ -69,7 +67,8 @@ export class PermitService {
     }
     // TODO: Hit email api to send confirmation and receipt
     return {
-      type: rows[0].type,
+      type: 'zone',
+      area: input.zone,
       purchaseDate: rows[0].data.purchaseDate,
       activeDate: rows[0].data.activeDate,
       expireDate: rows[0].data.expireDate,

@@ -111,6 +111,9 @@ export class Confirmation {
   type!: string
 
   @Field(() => String)
+  area!: string
+
+  @Field(() => String)
   purchaseDate!: string
 
   @Field(() => String)

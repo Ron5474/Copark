@@ -78,10 +78,29 @@ function CardButton({
       sx={{
         p: 2,
         my: 2,
-        borderRadius: "10px",
-        background: (theme) =>
-          `linear-gradient(90deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+        borderRadius: "16px",
+        background: 'linear-gradient(135deg, #e0f7f7 0%, #b2dfdb 100%)',
+        border: '1px solid #80cbc4',
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.05)',
       }}
+      // sx={{
+      //   p: 2,
+      //   py: 2.5,
+      //   my: 2,
+      //   borderRadius: "16px",
+      //   background: 'linear-gradient(135deg, #e0f7f7 0%, #b2dfdb 100%)',
+      //   border: '1px solid #80cbc4',
+      //   boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.05)',
+      //   transition: 'all 0.3s ease-in-out',
+      //   '&:hover': {
+      //     background: 'linear-gradient(135deg, #d7f4f4 0%, #a8dcd8 100%)',
+      //   },
+      //   '&:focus-within': {
+      //     outline: '2px solid #26a69a',
+      //     outlineOffset: '4px',
+      //   },
+      // }}
+
     >
       <Box
         display="flex"
@@ -97,7 +116,13 @@ function CardButton({
         </Box>
 
         {!hideArrow && (
-          <IconButton onClick={onToggle}>
+          <IconButton
+            aria-label={expanded ? `Collapse ${text}` : `Expand ${text}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggle()
+            }}
+          >
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         )}

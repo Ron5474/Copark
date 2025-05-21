@@ -40,29 +40,22 @@ afterAll(() => {
 
 const permitService = new PermitService()
 
-test('Purchasing permit works', async () => {
+test('Purchasing zone permit works', async () => {
   const receipt = await permitService.purchaseMyZonePermit(permitDetails)
   expect(receipt).toBeDefined()
 })
 
-test('Purchasing different duration', async () => {
+test('Purchasing zone different duration', async () => {
   const receipt = await permitService.purchaseMyZonePermit({...permitDetails, duration: {minutes: 0, hours: 2}})
   expect(receipt.type).toBe('zone')
 })
 
-test('Purchasing different duration', async () => {
+test('Purchasing unknown zone', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
   await expect(permitService.purchaseMyZonePermit({...permitDetails, zone: '13'}))
       .rejects.toThrow('Zone 13 not found')
 })
-
-// test('Transaction failed', async () => {
-//   // eslint-disable-next-line @typescript-eslint/no-empty-function
-//   vi.spyOn(console, 'error').mockImplementation(() => {})
-//   await expect(permitService.purchaseMyZonePermit({...permitDetails, duration: {minutes: 0, hours: 2}}))
-//       .rejects.toThrow('Purchase unsuccessful')
-// })
 
 test('Vehicle has valid permit', async () => {
   await permitService.purchaseMyZonePermit(permitDetails)

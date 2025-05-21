@@ -17,8 +17,9 @@ import ViewVehicles from "../vehicle/member/Vehicle"
 // import AddVehicle from "../vehicle/AddForm";
 import { userLoginSignUpAttempt } from "./actions";
 // import BuyPermit from "../permit/View";
+import MobileNavBar from "./BottomNav";
 import BuyPermit from "../zone/View";
-// import TicketView from "../ticket/TicketView"
+import TicketView from "../ticket/TicketView"
 import { signOut } from "next-auth/react";
 import { useLocale } from "next-intl";
 import { SessionProvider } from "next-auth/react";
@@ -47,15 +48,15 @@ function Dashboard() {
           setCurrentPage: setCurrentPage}}>
             <CssBaseline />
             <Topbar />
-            <Box sx={{ height: '100vh' }}>
+            <Box sx={{ height: '100vh'/*, pb: '64px' */ }}>
               <Toolbar />
               <Toolbar />
             {currentPage === "dashboard" && (
               <DashboardView />
             )}
-            {/* {currentPage === "dashboard" && (
+            {currentPage === "tickets" && (
               <TicketView />
-            )} */}
+            )}
             {currentPage === "garage" && (
               <ViewVehicles />
             )}
@@ -66,6 +67,7 @@ function Dashboard() {
               <BuyPermit />
             )}
           </Box>
+          <MobileNavBar/>
         </DashboardContext.Provider>
       </SessionProvider>
     </ThemeProvider>

@@ -90,7 +90,7 @@ export default function DashboardView() {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: 2, pb: 7, }}>
       <Typography
         variant="h5"
         fontWeight="bold"

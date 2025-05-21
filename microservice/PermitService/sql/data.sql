@@ -2,9 +2,17 @@
 
 ----- Your insert statements go below here -----
 \connect perm;
-INSERT INTO type (id, data) VALUES
+
+INSERT INTO location (id, name) VALUES
+  (
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
+    'UCSC Campus'
+  );
+
+INSERT INTO type (id, location, data) VALUES
   (
     'e314f688-d150-411e-aa4f-38e679112e0e',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
       'name', 'zone',
       'area', '123',
@@ -25,9 +33,10 @@ INSERT INTO type (id, data) VALUES
     )
   );
 
-INSERT INTO type (id, data) VALUES
+INSERT INTO type (id, location, data) VALUES
   (
     '39f48f9f-2693-446b-ad98-f72298bc7bbe',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
       'name', 'zone',
       'area', '111',
@@ -48,9 +57,10 @@ INSERT INTO type (id, data) VALUES
     )
   );
 
-INSERT INTO type (id, data) VALUES
+INSERT INTO type (id, location, data) VALUES
   (
     'f26adf21-f967-4283-8417-8e0db1ef14bd',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
       'name', 'zone',
       'area', '27',
@@ -63,9 +73,10 @@ INSERT INTO type (id, data) VALUES
     )
   );
 
-INSERT INTO type (id, data) VALUES
+INSERT INTO type (id, location, data) VALUES
   (
     '1d603a73-4b75-48d8-b677-48b81b7fa3f4',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
       'name', 'zone',
       'area', '101',
@@ -82,9 +93,10 @@ INSERT INTO type (id, data) VALUES
     )
   );
 
-INSERT INTO type (id, data) VALUES
+INSERT INTO type (id, location, data) VALUES
   (
     '6fb2ad6d-431c-47e4-b5dd-81c3847f6ad6',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
       'name', 'zone',
       'area', '000',
@@ -93,9 +105,10 @@ INSERT INTO type (id, data) VALUES
     )
   );
 
--- INSERT INTO type (id, data) VALUES
+-- INSERT INTO type (id, location, data) VALUES
 --   (
 --     '9ca7042e-733c-417a-8e78-d39a45a5bc66',
+--     'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
 --     jsonb_build_object(
 --       'name', 'lot',
 --       'area', 'A',

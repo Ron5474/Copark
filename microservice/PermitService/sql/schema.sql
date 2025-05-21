@@ -1,8 +1,15 @@
 \connect perm;
 
+DROP TABLE IF EXISTS location CASCADE;
+CREATE TABLE location (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL
+);
+
 DROP TABLE IF EXISTS type CASCADE;
 CREATE TABLE type (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    location UUID NOT NULL REFERENCES location(id),
     data JSONB NOT NULL
 );
 

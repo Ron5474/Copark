@@ -3,11 +3,13 @@
 import { AppBar, Box, IconButton } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import theme from "../theme";
+import { useRouter } from "@/i18n/navigation";
 
 
 function Topbar() {
   const primaryColorMain = theme.palette.primary.main;
   const primaryColorLight = theme.palette.primary.light;
+  const router = useRouter();
 
   return (
   <AppBar position="fixed"
@@ -23,7 +25,7 @@ function Topbar() {
       alignItems: "center",
       borderBottom: `3px solid ${primaryColorMain}`,
     }}>
-      <picture>
+      <picture onClick={() => router.push("/")} style={{cursor: "pointer"}}>
         <source srcSet="/assets/logo-noBg.png" type="image/png" />
         <img src="/assets/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-logo" />
       </picture>

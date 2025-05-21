@@ -8,21 +8,16 @@
 #
 #######################################################################
 */
-"use client"
 import type { NextPage } from 'next'
-import { ThemeProvider } from '@mui/material/styles'
-import { SessionProvider } from 'next-auth/react'
 
-import theme from '../theme'
-import TopBar from '../shared/Topbar'
-import Footer from '../shared/Footer'
+import TopBar from '../components/Topbar'
+import Footer from '../components/Footer'
 import { Box, CssBaseline } from '@mui/material'
 import PolicyView from './View'
 
 const Page: NextPage = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <SessionProvider basePath="/driver/api/auth">
+    <>
         <CssBaseline />
         <Box 
           sx={{ 
@@ -35,8 +30,7 @@ const Page: NextPage = () => {
           <PolicyView />
           <Footer />
         </Box>
-      </SessionProvider>
-    </ThemeProvider>
+    </>
   )
 }
 

@@ -1,13 +1,18 @@
+"use client";
 /**
  * @file footer.tsx
  * @description This file contains the Footer component.
  * @author Swayam Shah
  */
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { useTranslations } from "next-intl";
 import theme from "../theme";
+import { useRouter } from "@/i18n/navigation";
+
+
 function Footer() {
   const t = useTranslations("footer");
+  const router = useRouter();
   const PrimaryColorLight = theme.palette.primary.light;
   return (
        <Box sx={{
@@ -49,11 +54,11 @@ function Footer() {
             color: "#000000",
             fontWeight: 500,
           }}>
-            <a aria-label="personal-info-link">{t("Do Not Sell My Personal Info")}</a>
-            <a aria-label="privacy-policy-link">{t("Privacy Policy")}</a>
-            <a aria-label="service-terms-link">{t("Terms of Service")}</a>
-            <a aria-label="contact-us-link">{t("Contact Us")}</a>
-            <Button sx={{padding: 0}}>{t("Dark Mode")}</Button> {/* TODO: Change theme and change this text based on current theme */}
+            {/* <a aria-label="personal-info-link">{t("Do Not Sell My Personal Info")}</a> */}
+            <a onClick={() => {router.push("/privacy")}} aria-label="privacy-policy-link">{t("Privacy Policy")}</a>
+            <a onClick={() => {router.push("/tos")}} aria-label="service-terms-link">{t("Terms of Service")}</a>
+            {/* <a aria-label="contact-us-link">{t("Contact Us")}</a> */}
+            {/* <Button sx={{padding: 0}}>{t("Dark Mode")}</Button> TODO: Change theme and change this text based on current theme */}
             </Box>
          </Box>
          <p style={{ fontSize: "14px", color: "#000000", fontWeight: 500 }}>{t("Rights Reserved")}</p>

@@ -5,12 +5,13 @@
  */
 import { Box } from "@mui/material";
 // import { getTranslations } from "next-intl/server";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import theme from "../theme";
-import { useRouter } from '@/i18n/navigation';
+import { useRouter } from 'next/navigation';
 
 function Footer() {
   const router = useRouter()
+  const locale = useLocale();
   const t = useTranslations("footer");
   const PrimaryColorLight = theme.palette.primary.light;
   return (
@@ -54,8 +55,8 @@ function Footer() {
           fontWeight: 500,
         }}>
           {/* <a aria-label="personal-info-link">{t("Do Not Sell My Personal Info")}</a> */}
-          <a onClick={() => router.push('/privacy')} aria-label="privacy-policy-link">{t("Privacy Policy")}</a>
-          <a onClick={() => router.push('/tos')} aria-label="service-terms-link">{t("Terms of Service")}</a>
+          <a onClick={() => router.push(`${process.env.NEXT_PUBLIC_MARKETING_URL}/${locale}/privacy`)} aria-label="privacy-policy-link">{t("Privacy Policy")}</a>
+          <a onClick={() => router.push(`${process.env.NEXT_PUBLIC_MARKETING_URL}/${locale}/tos`)} aria-label="service-terms-link">{t("Terms of Service")}</a>
           <a aria-label="contact-us-link">{t("Contact Us")}</a>
           {/* <Button sx={{padding: 0}}>{t("Dark Mode")}</Button> TODO: Change theme and change this text based on current theme */}
         </Box>

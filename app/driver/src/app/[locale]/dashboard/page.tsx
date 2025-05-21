@@ -34,7 +34,6 @@ function Dashboard() {
         router.push(`/login`);
       } else if (!await userLoginSignUpAttempt(locale)) {
         signOut({ callbackUrl: new URL(`/driver/${locale}/login`, window.location.origin).toString() });
-
       }   
     }
     loggedIn();

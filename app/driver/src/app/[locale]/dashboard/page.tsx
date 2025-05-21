@@ -8,7 +8,7 @@
 import React, { useEffect, useState } from "react";
 import DashboardView from "./DashboardView";
 import { DashboardContext } from "./context";
-import { ThemeProvider, Toolbar, Box, CssBaseline } from "@mui/material";
+import { ThemeProvider, Box, CssBaseline } from "@mui/material";
 import theme from "../theme";
 import Topbar from "../shared/Topbar";
 import { getUser } from "../shared/actions";
@@ -48,9 +48,7 @@ function Dashboard() {
           setCurrentPage: setCurrentPage}}>
             <CssBaseline />
             <Topbar />
-            <Box sx={{ height: '100vh'/*, pb: '64px' */ }}>
-              <Toolbar />
-              <Toolbar />
+            <Box sx={{ height: '100vh', pt: "64px" }}>
             {currentPage === "dashboard" && (
               <DashboardView />
             )}

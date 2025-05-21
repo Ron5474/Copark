@@ -343,9 +343,8 @@ export class TicketService {
     return result;
   }
 
-  public async getTicketsIssuedByEnforcer(enforcerID: string): Promise<Ticket[] | undefined> {
-
-    const enforcerDecrypted = await this.decrypt(enforcerID)
+  public async getTicketsPerDayFromEnforcer(enforcerID: string): Promise<TicketsByDay[]> {
+    const enforcerDecrypted = await this.decrypt(enforcerID);
     const result = await pool.query(
       `
       SELECT 
@@ -358,20 +357,21 @@ export class TicketService {
         data->>'ticketStatus' AS ticketstatus,
         data->>'images' AS images,
         data->>'note' AS note
-        FROM ticket
-        WHERE data->>'ticketStatus' != 'deleted'
+      FROM ticket
+      WHERE data->>'ticketStatus' != 'deleted'
         AND enforcer = $1
-        ORDER BY data->>'issuedDate';
+      ORDER BY data->>'issuedDate';
       `,
       [enforcerDecrypted]
-    )
+    );
 
-    if (result.rowCount === 0) return []
+    // console.log(result.rows);
 
-    const tickets: Ticket[] = [];
+    const ticketsMap: Map<string, Ticket[]> = new Map();
 
     for (const row of result.rows) {
-      tickets.push({
+      const date = new Date(row.issueddate).toISOString().split('T')[0]; // YYYY-MM-DD
+      const ticket: Ticket = {
         id: await this.encrypt(row.id),
         vehicle: row.vehicle,
         enforcer: await this.encrypt(row.enforcer),
@@ -381,10 +381,22 @@ export class TicketService {
         ticketStatus: row.ticketstatus,
         images: row.images,
         note: row.note
+      };
+      if (!ticketsMap.has(date)) {
+        ticketsMap.set(date, []);
+      }
+      ticketsMap.get(date)!.push(ticket);
+    }
+
+    const resultArr: TicketsByDay[] = [];
+    for (const [date, tickets] of ticketsMap.entries()) {
+      resultArr.push({
+        date,
+        tickets,
       });
     }
 
-    // console.log(tickets);
-    return tickets;
+    // console.log(resultArr);
+    return resultArr;
   }
 }

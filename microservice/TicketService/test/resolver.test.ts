@@ -632,51 +632,51 @@ test('Admin can get ticket stats grouped by day', async () => {
 test('Admin can get tickets issued by a specific enforcer', async () => {
   const token = await loginAsAdmin();
 
-  // Create a ticket with a known enforcer
-  const enforcerid = await encrypt('00000000-0000-0000-0000-000000000002');
-  const vehicleid = '00000000-0000-0000-0000-000000000001';
-  const createQuery = `
-    mutation CreateTicket($input: NewTicket!) {
-      createTicket(newTicket: $input) {
-        id
-        enforcer
-      }
-    }
-  `;
-  const createVariables = {
-    input: {
-      vehicle: vehicleid,
-      enforcer: enforcerid,
-      fine: 100,
-      violation: "test violation",
-      images: "test.jpg",
-    },
-  };
-  const createResponse = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
-    .send({ query: createQuery, variables: createVariables })
-    .expect(200);
-  expect(createResponse.body.errors).toBeUndefined();
-  const ticket = createResponse.body.data.createTicket;
-
-  // Now query for tickets issued by this enforcer
   const query = `
-    query GetTicketsIssuedByEnforcer($enforcerID: String!) {
-      getTicketsIssuedByEnforcer(enforcerID: $enforcerID) {
-        id
-        enforcer
+    query GetTicketsPerDayFromEnforcer($enforcerID: String!) {
+      getTicketsPerDayFromEnforcer(enforcerID: $enforcerID) {
+        date
+        tickets {
+          id
+          vehicle
+          enforcer
+          issuedDate
+          violation
+          fine
+          ticketStatus
+          images
+          note
+        }
       }
     }
   `;
+
+  const enforcerid = await encrypt('431b3711-73bb-4c90-afcf-59116217c0db')
   const variables = { enforcerID: enforcerid };
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
     .send({ query, variables })
     .expect(200);
+  
   expect(response.body.errors).toBeUndefined();
-  const tickets = response.body.data.getTicketsIssuedByEnforcer;
-  expect(Array.isArray(tickets)).toBe(true);
-  expect(tickets.some((t: any) => t.id === ticket.id)).toBe(true);
+  const stats = response.body.data.getTicketsPerDayFromEnforcer;
+  console.log(stats)
+  expect(Array.isArray(stats)).toBe(true);
+  expect(stats.length).toBeGreaterThan(0);
+  stats.forEach((dayStat: any) => {
+    expect(dayStat).toHaveProperty('date');
+    expect(Array.isArray(dayStat.tickets)).toBe(true);
+    dayStat.tickets.forEach((ticket: any) => {
+      expect(ticket).toHaveProperty('id');
+      expect(ticket).toHaveProperty('vehicle');
+      expect(ticket).toHaveProperty('enforcer');
+      expect(ticket).toHaveProperty('issuedDate');
+      expect(ticket).toHaveProperty('violation');
+      expect(ticket).toHaveProperty('fine');
+      expect(ticket).toHaveProperty('ticketStatus');
+      expect(ticket).toHaveProperty('images');
+      expect(ticket).toHaveProperty('note');
+    });
+  });
 });

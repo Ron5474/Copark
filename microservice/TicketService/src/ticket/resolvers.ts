@@ -177,12 +177,12 @@ export class TicketResolver {
     return ticketService.getAllTicketsCount();
   }
 
-  @Query(() => [Ticket])
+  @Query(() => [TicketsByDay])
   @Authorized(["admin"])
-  async getTicketsIssuedByEnforcer(
+  async getTicketsPerDayFromEnforcer(
     @Arg("enforcerID", () => String) enforcerID: string
-  ): Promise<Ticket[] | undefined> {
-    return ticketService.getTicketsIssuedByEnforcer(enforcerID);
+  ): Promise<TicketsByDay[]> {
+    return ticketService.getTicketsPerDayFromEnforcer(enforcerID);
   }
 
   @Query(() => [Ticket])

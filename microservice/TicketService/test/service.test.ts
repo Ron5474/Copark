@@ -273,13 +273,13 @@ test('getTicketsByDay should return tickets by day', async () => {
 });
 
 test('getTicketsIssuedByEnforcer should return tickets issued by provided enforcer', async () => {
-    const tickets = await ticketService.getTicketsIssuedByEnforcer(await encrypt('431b3711-73bb-4c90-afcf-59116217c0db'));
+    const tickets = await ticketService.getTicketsPerDayFromEnforcer(await encrypt('431b3711-73bb-4c90-afcf-59116217c0db'));
 
     expect(tickets).toHaveLength(1);
 });
 
 test('getTicketsIssuedByEnforcer should return empty array for issued by badly provided enforcer', async () => {
-    const tickets = await ticketService.getTicketsIssuedByEnforcer(await encrypt('00000000-0000-0000-1111-000000000000'));
+    const tickets = await ticketService.getTicketsPerDayFromEnforcer(await encrypt('00000000-0000-0000-1111-000000000000'));
 
     expect(tickets).toStrictEqual([]);
 });

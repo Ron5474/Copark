@@ -112,7 +112,7 @@ const purchaseZonePermitQuery = `
 mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
   purchaseZonePermit(input: $input) {
     type
-    zone
+    area
     purchaseDate
     activeDate
     expireDate

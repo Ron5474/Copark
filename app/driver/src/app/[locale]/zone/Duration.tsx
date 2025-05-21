@@ -19,27 +19,14 @@ import theme from '../theme'
 
 
 export default function Zone() {
-  const { zoneDetails, next } = useContext(ZoneContext)
+  const { next } = useContext(ZoneContext)
   const [isValidSelection, setIsValidSelection] = useState<boolean>(true)
   const [durationOption, setDurationOption] = useState('')
 
-  const isHourly = !!zoneDetails?.hourly
-
-  const options = isHourly
-  
-  ?
-  
-  [
+  const options = [
     { label: 'By the hour and the minute', value: 'hourly' },
     { label: 'Maximum Parking Time', value: 'max' },
   ]
-
-  :
-
-  [
-    { label: 'Daily Parking', value: 'daily'}
-  ]
-
 
   const submitDuration = () => {
     const isValid = !!durationOption
@@ -112,9 +99,9 @@ export default function Zone() {
       )}
 
       {
-        durationOption == 'max' || durationOption == 'daily' ?
+        durationOption == 'max' ?
       
-        <MaxDuration option={durationOption} />
+        <MaxDuration/>
 
         :
 
@@ -123,12 +110,6 @@ export default function Zone() {
         <SelectDuration/>
 
         :
-
-        // durationOption == 'daily' ?
-
-        // <MaxDuration/>
-
-        // :
 
         null
       }
@@ -156,9 +137,6 @@ function SelectDuration() {
   const { zoneDetails, setDurationString, setPrice, price, setDuration } = useContext(ZoneContext)
   const [selectedHours, setSelectedHours] = useState(0)
   const [selectedMinutes, setSelectedMinutes] = useState(5)
-
-
-  console.log("SELECT DURATION")
 
   const now = new Date()
   const openTime = zoneDetails?.openTime || '00:00'
@@ -284,10 +262,10 @@ function SelectDuration() {
   )
 }
 
-function MaxDuration({ option }: { option: string }) {
+function MaxDuration() {
   const { zoneDetails, durationString, setDurationString, price, setPrice, setDuration } = useContext(ZoneContext)
 
-  const optionString = option == 'hourly' ? 'Maximum Parking Time' : 'Daily Parking'
+  const optionString = 'Maximum Parking Time'
   const endTimeStringRef = useRef('')
   const estimatedPriceStringRef = useRef(`$${0.0.toFixed(2)}`)
 
@@ -345,11 +323,8 @@ function MaxDuration({ option }: { option: string }) {
     if (zoneDetails?.hourly) {
       setPrice(!overnight ? (totalMinutes * (zoneDetails.hourly || 0) / 60) : 0)
       estimatedPriceStringRef.current = `$${(price ? price + 0.50 : 0).toFixed(2)}`
-    } else if (zoneDetails?.daily) {
-      setPrice(!overnight ? zoneDetails.daily : 0)
-      estimatedPriceStringRef.current = `$${(price ? price + 0.50 : 0).toFixed(2)}`
     }
-  }, [zoneDetails, option, setDuration, setDurationString, setPrice, price])
+  }, [zoneDetails, setDuration, setDurationString, setPrice, price])
   
 
   return (

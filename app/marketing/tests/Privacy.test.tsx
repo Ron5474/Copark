@@ -1,7 +1,7 @@
 import { vi, it, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 
-import Page from '../../src/app/[locale]/tos/page'
+import Page from '../src/app/[locale]/privacy/page'
 
 const push = vi.fn()
 
@@ -76,5 +76,5 @@ afterEach(() => {
   
   it('Renders Page', async () => {
     render(<Page />)
-    await screen.findByText('By accessing or using Copark\'s parking management services, you agree to be bound by these Terms of Service.')
+    await screen.findByText('Your Privacy Matters')
   })

@@ -40,29 +40,22 @@ afterAll(() => {
 
 const permitService = new PermitService()
 
-test('Purchasing permit works', async () => {
+test('Purchasing zone permit works', async () => {
   const receipt = await permitService.purchaseMyZonePermit(permitDetails)
   expect(receipt).toBeDefined()
 })
 
-test('Purchasing different duration', async () => {
+test('Purchasing zone different duration', async () => {
   const receipt = await permitService.purchaseMyZonePermit({...permitDetails, duration: {minutes: 0, hours: 2}})
   expect(receipt.type).toBe('zone')
 })
 
-test('Purchasing different duration', async () => {
+test('Purchasing unknown zone', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
   await expect(permitService.purchaseMyZonePermit({...permitDetails, zone: '13'}))
       .rejects.toThrow('Zone 13 not found')
 })
-
-// test('Transaction failed', async () => {
-//   // eslint-disable-next-line @typescript-eslint/no-empty-function
-//   vi.spyOn(console, 'error').mockImplementation(() => {})
-//   await expect(permitService.purchaseMyZonePermit({...permitDetails, duration: {minutes: 0, hours: 2}}))
-//       .rejects.toThrow('Purchase unsuccessful')
-// })
 
 test('Vehicle has valid permit', async () => {
   await permitService.purchaseMyZonePermit(permitDetails)
@@ -110,17 +103,11 @@ test('zoneDetails gives correct hourly on weekday', async () => {
   expect(hourly).toBe(2.45)
 })
 
-test('zoneDetails gives correct daily on weekend', async () => {
-  const { daily } = await permitService.getZoneDetails('123', 0) // Sunday
-  expect(daily).toBe(7.95)
-})
-
-test('zoneDetails gives correct daily on weekend', async () => {
+test('zoneDetails errors on wrong zone', async () => {
   await expect(permitService.getZoneDetails('12312312312312312312123', 0)).rejects.toThrow('Zone 12312312312312312312123 not found')
 })
 
 test('getPermitsByDay retusn permits by day bought', async () => {
   const permits = await permitService.getAllPermitsByDay()
-  console.log(permits)
   expect(permits.length).toBe(1)
 });

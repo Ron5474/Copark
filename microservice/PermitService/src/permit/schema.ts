@@ -10,7 +10,7 @@ export class Permit {
   type!: string
 
   @Field(() => String)
-  zone!: string
+  area!: string
 
   @Field(() => String)
   activeDate!: string
@@ -45,9 +45,6 @@ export class Duration {
 export class ZoneDetails {
 
   @Field(() => Number, { nullable: true })
-  daily?: number
-
-  @Field(() => Number, { nullable: true })
   hourly?: number
 
   @Field(() => Duration, { nullable: true })
@@ -74,9 +71,6 @@ export class NewZone {
 
   @Field(() => Number)
   zone!: number
-
-  @Field(() => Number, { nullable: true })
-  daily?: number
 
   @Field(() => Number, { nullable: true })
   hourly?: number
@@ -111,7 +105,7 @@ export class Confirmation {
   type!: string
 
   @Field(() => String)
-  zone!: string
+  area!: string
 
   @Field(() => String)
   purchaseDate!: string
@@ -175,7 +169,7 @@ export class IsValid {
   type!: string
 
   @Field(() => String)
-  zone!: string
+  area!: string
 }
 
 @ObjectType()

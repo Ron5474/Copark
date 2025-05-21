@@ -25,7 +25,6 @@ export const getZoneDetails = async (zone: string): Promise<ZoneDetails> => {
         query: `
           query GetZoneDetails($zone: String!) {
             zoneDetails(zone: $zone) {
-              daily
               hourly
               maxDuration {
                 hours

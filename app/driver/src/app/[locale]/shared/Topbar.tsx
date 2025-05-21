@@ -65,7 +65,7 @@ function Topbar() {
   const primaryColorMain = theme.palette.primary.main
   const primaryColorLight = theme.palette.primary.light
 
-  const { currentPage, setCurrentPage } = useContext(DashboardContext)
+  const { currentPage, setCurrentPage } = useContext(DashboardContext) || {}
 
   const handleBackClick = () => {
     setCurrentPage("dashboard")
@@ -89,7 +89,7 @@ function Topbar() {
         justifyContent="space-between"
       >
         <Box sx={{ width: 40, display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
-          {currentPage !== "dashboard" ? (
+          {currentPage && currentPage !== "dashboard" ? (
             <IconButton
               onClick={handleBackClick}
               aria-label="back to dashboard"

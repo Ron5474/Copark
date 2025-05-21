@@ -48,7 +48,7 @@ function Dashboard() {
           setCurrentPage: setCurrentPage}}>
             <CssBaseline />
             <Topbar />
-            <Box sx={{ height: '100vh', pt: "64px" }}>
+            <Box sx={{ height: '100vh', pt: "70px" }}>
             {currentPage === "dashboard" && (
               <DashboardView />
             )}

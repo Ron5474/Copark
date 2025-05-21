@@ -6,7 +6,7 @@
 
 import { render, screen, cleanup } from '@testing-library/react';
 import { it, expect, afterEach, vi, beforeEach } from 'vitest';
-import userEvent from '@testing-library/user-event';
+// import userEvent from '@testing-library/user-event';
 
 import '../setup'
 import Footer from '../../src/app/[locale]/shared/Footer';

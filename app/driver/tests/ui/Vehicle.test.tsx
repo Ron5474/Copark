@@ -52,6 +52,7 @@ vi.mock('@/app/api/auth/[...nextauth]/route', () => ({
 }))
 
 vi.mock('next-intl', () => ({
+  useLocale: () => 'en',
   useTranslations: () => (
     vi.fn((x: string) => {
       switch (x) {

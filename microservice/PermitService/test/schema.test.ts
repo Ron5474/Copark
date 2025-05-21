@@ -1,10 +1,19 @@
 import { test, beforeAll, afterAll, expect } from 'vitest'
 import * as http from 'http'
-// @ts-ignore
-import supertest from 'supertest'
-
 import { app, bootstrap } from '../src/app'
-import { Permit, MyPermits, Duration, ZoneDetails, Receipt, Confirmation, DurationInput, IsValidPermitInput, IsValid, IsValidPolice } from '../src/permit/schema'
+import {
+  Permit,
+  MyPermits,
+  Duration,
+  ZoneDetails,
+  Receipt,
+  Confirmation,
+  DurationInput,
+  IsValidPermitInput,
+  IsValid,
+  IsValidPolice,
+  PermitsByDay
+} from '../src/permit/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
@@ -85,13 +94,11 @@ test('ZoneDetails schema loads correctly', () => {
 
 test('Receipt schema loads correctly', () => {
   const receipt = new Receipt()
-  receipt.tax = 1.5
   receipt.service = 0.5
   receipt.subTotal = 10
   receipt.total = 12
 
   expect(receipt).toBeDefined()
-  expect(receipt.tax).toBe(1.5)
   expect(receipt.service).toBe(0.5)
   expect(receipt.subTotal).toBe(10)
   expect(receipt.total).toBe(12)
@@ -99,7 +106,6 @@ test('Receipt schema loads correctly', () => {
 
 test('Confirmation schema loads correctly', () => {
   const receipt = new Receipt()
-  receipt.tax = 1
   receipt.service = 1
   receipt.subTotal = 10
   receipt.total = 12
@@ -161,4 +167,14 @@ test('IsValidPolice schema loads correctly', () => {
 
   expect(isValidPolice).toBeDefined()
   expect(isValidPolice.isValid).toBe(false)
+})
+
+test('PermitsByDay schema loads correctly', () => {
+  const permitsByDay = new PermitsByDay()
+  permitsByDay.date = '2025-05-11'
+  permitsByDay.permits = [new Permit()]
+
+  expect(permitsByDay).toBeDefined()
+  expect(permitsByDay.date).toBe('2025-05-11')
+  expect(permitsByDay.permits).toHaveLength(1)
 })

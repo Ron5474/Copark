@@ -191,5 +191,5 @@ export class PermitsByDay {
   date!: string;
 
   @Field(() => [Permit])
-  tickets!: Permit[];
+  permits!: Permit[];
 }

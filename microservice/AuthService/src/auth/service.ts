@@ -5,7 +5,7 @@ import { AuthUser, Credentials, User, OauthLoginData } from "./index";
 
 import { SignJWT, jwtVerify } from 'jose'
 
-console.log(process.env.JWT_SECRET);
+// console.log(process.env.JWT_SECRET);
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 

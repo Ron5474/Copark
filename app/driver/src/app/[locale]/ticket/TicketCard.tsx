@@ -10,11 +10,7 @@ interface Ticket {
 }
 
 export default function TicketView({ticket}: {ticket: Ticket}) {
-  // const status = {
-  //   'unpaid': 'error',
-  //   'challenged': 'warning',
-  //   'paid': 'success'
-  // }
+  const  bgColor = ticket.ticketStatus === 'paid' ? 'success' : ((ticket.ticketStatus === 'unpaid') ? 'error' : 'warning')
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardActionArea>
@@ -23,9 +19,9 @@ export default function TicketView({ticket}: {ticket: Ticket}) {
             Ticket #{ticket.id.substring(0, 5)}
           </Typography>
           <Chip
-            label='Pending'
+            label={ticket.ticketStatus}
             variant='filled'
-            sx={{color: 'white', bgcolor: `${'error'}.main`, fontWeight: 'bold'}} 
+            sx={{color: 'white', bgcolor: `${bgColor}.main`, fontWeight: 'bold'}} 
           />
         </CardContent>
       </CardActionArea>

@@ -14,16 +14,18 @@ async function getAuthToken(): Promise<string> {
 
 export async function getTransactionDetails(sessionId: string): Promise<PaymentDetails> {
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['payment_intent.charges', 'line_items'],
+      expand: ['payment_intent.charges', 'line_items', 'payment_intent.payment_method'],
       
 });
     const paymentIntent = session.payment_intent as Stripe.PaymentIntent;
+    const paymentMethod = paymentIntent.payment_method as Stripe.PaymentMethod;
+    
     return {
       id: paymentIntent.id,
       amount: paymentIntent.amount,
       currency: paymentIntent.currency,
       status: paymentIntent.status,
-      payment_method: paymentIntent.payment_method as string,
+      payment_method: paymentMethod.card ? paymentMethod.card.brand + " " + paymentMethod.card.last4 : paymentMethod.type,
       type: session.metadata?.itemType as string,
     };
 }

@@ -1,15 +1,45 @@
 import { it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react';
 import ViewStatistics from '../../src/app/components/ViewStatistics';
 import { getTicketsByDay } from '../../src/ticket/actions';
+import { getTicketsByEnforcer } from '../../src/ticket/actions';
+import { getEnforcers } from '../../src/enforcement/actions';
 
+// Mock all required actions
 vi.mock('../../src/ticket/actions', () => ({
-  getTicketsByDay: vi.fn()
+  getTicketsByDay: vi.fn(),
+  getTicketsByEnforcer: vi.fn()
+}));
+
+vi.mock('../../src/enforcement/actions', () => ({
+  getEnforcers: vi.fn()
 }));
 
 vi.mock('react-chartjs-2', () => ({
   Line: () => <div data-testid="mock-chart">A cool chart.</div>
 }));
+
+// Mock data
+const mockEnforcers = [
+  { id: '1', name: 'Enforcer 1', email: 'enforcer1@test.com', accountStatus: 'active' },
+  { id: '2', name: 'Enforcer 2', email: 'enforcer2@test.com', accountStatus: 'active' }
+];
+
+const mockTicketsByEnforcer = [
+  {
+    date: '2025-05-19',
+    tickets: [
+      { id: '1', issuedDate: '2025-05-19T10:00:00Z' }
+    ]
+  },
+  {
+    date: '2025-05-20',
+    tickets: [
+      { id: '2', issuedDate: '2025-05-20T10:00:00Z' },
+      { id: '3', issuedDate: '2025-05-20T11:00:00Z' }
+    ]
+  }
+];
 
 beforeEach(() => {
   cleanup();
@@ -158,5 +188,65 @@ it('handles complete valid data', async () => {
   render(<ViewStatistics />);
   await waitFor(() => {
     expect(screen.getByTestId('mock-chart')).toBeDefined();
+  });
+});
+
+// Add new tests for enforcer chart
+// it('renders enforcer selector and chart', async () => {
+//   vi.mocked(getEnforcers).mockResolvedValue(mockEnforcers);
+//   vi.mocked(getTicketsByEnforcer).mockResolvedValue(mockTicketsByEnforcer);
+
+//   render(<ViewStatistics />);
+
+//   // Switch to enforcer view
+//   const enforcerTab = screen.getByText('Tickets by Enforcer');
+//   fireEvent.click(enforcerTab);
+
+//   await waitFor(() => {
+//     // Find select by its label text
+//     const selectLabel = screen.getByText('Select Enforcer');
+//     expect(selectLabel).toBeDefined();
+//     expect(screen.getByTestId('mock-chart')).toBeDefined();
+//   });
+// });
+
+// it('loads tickets when selecting different enforcer', async () => {
+//   vi.mocked(getEnforcers).mockResolvedValue(mockEnforcers);
+//   vi.mocked(getTicketsByEnforcer).mockResolvedValue(mockTicketsByEnforcer);
+
+//   render(<ViewStatistics />);
+
+//   // Switch to enforcer view
+//   const enforcerTab = screen.getByText('Tickets by Enforcer');
+//   fireEvent.click(enforcerTab);
+
+//   // Find the select element by its displayed value
+//   const selectElement = screen.getByText('Enforcer 1');
+//   fireEvent.mouseDown(selectElement);
+
+//   // Wait for dropdown and select option
+//   await waitFor(() => {
+//     const option = screen.getByText('Enforcer 2');
+//     fireEvent.click(option);
+//   });
+
+//   await waitFor(() => {
+//     expect(getTicketsByEnforcer).toHaveBeenCalledWith('2');
+//     expect(screen.getByTestId('mock-chart')).toBeDefined();
+//   });
+// });
+
+it('handles error in enforcer tickets fetch', async () => {
+  vi.mocked(getEnforcers).mockResolvedValue(mockEnforcers);
+  vi.mocked(getTicketsByEnforcer).mockRejectedValue(new Error('Failed to fetch enforcer tickets'));
+
+  render(<ViewStatistics />);
+
+  // Switch to enforcer view
+  const enforcerTab = screen.getByText('Tickets by Enforcer');
+  fireEvent.click(enforcerTab);
+
+  await waitFor(() => {
+    expect(screen.getByText('Error: Failed to fetch ticket data')).toBeDefined();
   });
 });

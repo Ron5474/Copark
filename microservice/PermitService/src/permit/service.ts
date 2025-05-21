@@ -184,38 +184,39 @@ export class PermitService {
         id,
         vehicle,
         zone,
-        data->>'type' AS type,
-        data->>'purchaseDate' AS purchaseDate,
-        data->>'activeDate' AS activeDate,
-        data->>'expireDate' AS expireDate,
-        data->>'receipt' AS receipt,
-        data->>'paymentMethod' AS paymentMethod
+        data->>'permitType' AS permittype,
+        data->>'purchaseDate' AS purchasedate,
+        data->>'expiresDate' AS expiresdate,
+        data->>'paymentMethod' AS paymentmethod,
+        data->>'price' as price
       FROM permit
-      ORDER BY data->>'activeDate';
+      ORDER BY data->>'purchasedate';
     `;
 
     const permitResults = await pool.query(permitQuery);
     const permitsByDayMap: Record<string, Permit[]> = {};
 
     for (const row of permitResults.rows) {
-      const date = new Date(row.activeDate).toISOString().split('T')[0]; // YYYY-MM-DD
+      // console.log(row.purchasedate)
+      const date = row.purchasedate.split('T')[0];
+      // console.log('date', date)
       const permit: Permit = {
         vehicle: row.vehicle,
         zone: row.zone,
-        type: row.type,
+        type: row.permittype,
         activeDate: row.activeDate,
-        expireDate: row.expireDate,
+        expireDate: row.expiresdate,
       };
+
       if (!permitsByDayMap[date]) {
         permitsByDayMap[date] = [];
       }
       permitsByDayMap[date].push(permit);
     }
 
-    // Convert the map to an array of PermitsByDay objects
-    const permitsByDay: PermitsByDay[] = Object.entries(permitsByDayMap).map(([date, tickets]) => ({
+    const permitsByDay: PermitsByDay[] = Object.entries(permitsByDayMap).map(([date, permits]) => ({
       date,
-      tickets
+      permits
     }));
 
     return permitsByDay;

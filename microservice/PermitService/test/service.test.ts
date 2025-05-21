@@ -118,3 +118,9 @@ test('zoneDetails gives correct daily on weekend', async () => {
 test('zoneDetails gives correct daily on weekend', async () => {
   await expect(permitService.getZoneDetails('12312312312312312312123', 0)).rejects.toThrow('Zone 12312312312312312312123 not found')
 })
+
+test('getPermitsByDay retusn permits by day bought', async () => {
+  const permits = await permitService.getAllPermitsByDay()
+  console.log(permits)
+  expect(permits.length).toBe(1)
+});

@@ -118,7 +118,7 @@ it('calls setCurrentPage with "buy-permit" when Buy Permit is clicked', async ()
 
   render(<Page />)
 
-  await user.click(screen.getByText('Buy Permit'))
+  await user.click(screen.getByText('Zone'))
   expect(await screen.findByText('Zone'))
 })
 

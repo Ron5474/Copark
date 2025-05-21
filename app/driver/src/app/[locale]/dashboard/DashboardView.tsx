@@ -119,7 +119,7 @@ export default function DashboardView() {
                     key={lot.name}
                     value={lot.name}
                     control={<Radio />}
-                    label={`${lot.name} -- ${lot.price}`}
+                    label={`${lot.name} - ${lot.price}`}
                     aria-label={`Select ${lot.name} from ${permit.title}`}
                   />
                 ))}
@@ -136,7 +136,11 @@ export default function DashboardView() {
                 color="primary"
                 sx={{ mt: 2, borderRadius: "8px", textTransform: "none", color: "#fff", }}
                 disabled={!selectedLots[permit.id]}
-                aria-label={`Purchase ${permit.title} permit`}
+                aria-label={
+                  !selectedLots[permit.id]
+                    ? `Purchase ${permit.title} permit disabled`
+                    : `Purchase ${permit.title} permit enabled`
+                }
               >
                 Purchase Permit
               </Button>

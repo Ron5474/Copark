@@ -4,7 +4,7 @@ import * as http from 'http'
 import supertest from 'supertest'
 
 import { app, bootstrap } from '../src/app'
-import { Ticket, NewTicket, TicketInput, ModifyTicketInput, hasTicket } from '../src/ticket/schema'
+import { Ticket, NewTicket, TicketInput, ModifyTicketInput, hasTicket, TicketsByDay } from '../src/ticket/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
@@ -103,6 +103,16 @@ test('ModifyTicketInput schema loads correctly', () => {
   expect(testModifyTicketInput.fine).toBe(100);
   expect(testModifyTicketInput.ticketStatus).toBe('active');
   expect(testModifyTicketInput.images).toBe('image1.jpg');
+});
+
+test('User schema loads correctly', () => {
+  // Create instance of User
+  const testUser = new TicketsByDay();
+  testUser.date = '2023-10-01';
+  testUser.tickets = [new Ticket()];
+
+  expect(testUser).toBeDefined();
+  expect(testUser.date).toBe('2023-10-01');
 });
 
 test('GET playground', async () => {

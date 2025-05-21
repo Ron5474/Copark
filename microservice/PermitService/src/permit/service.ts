@@ -61,10 +61,6 @@ export class PermitService {
       RETURNING type, data
     `, [input.vehicle, input.zone, data])
 
-
-    if (!rows.length) {
-      throw new Error(`Zone ${input.zone} not found`)
-    }
     // TODO: Hit email api to send confirmation and receipt
     return {
       type: 'zone',
@@ -220,12 +216,16 @@ export class PermitService {
 
   public async createNewZone(input: NewZone): Promise<boolean> {
     const { rows } = await pool.query(`
-      INSERT INTO type (data)
-      VALUES ($1)
+      INSERT INTO zone (data)
+      SELECT $1
+      WHERE NOT EXISTS (
+        SELECT 1 FROM zone
+        WHERE data->>'zone' = $1->>'zone'
+          AND data->>'location' = $1->>'location'
+      )
       RETURNING id, data
     `, [input])
-
-    //TODO add location also as conflict
+  
     return (rows.length !== 0)
   }
 }

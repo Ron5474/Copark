@@ -34,7 +34,8 @@ const View: NextPage = () => {
         }}
       > */}
         <TopBar />
-        <Box sx={{ /*width: '92%',*/ margin: 'auto', top: 0 }}>
+        {/*sorry Bryant, I changed this to make it fit the bottom nav well*/}
+        <Box sx={{ /*width: '92%',*/  pb: 9, px: 2, margin: 'auto', top: 0 }}>
           <ThemeProvider theme={theme}>
             <ZoneProvider>
               <ZoneView />

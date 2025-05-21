@@ -199,7 +199,6 @@ const myPermitsInput = {
 const zoneDetailsQuery = `
 query ZoneDetails($zone: String!) {
   zoneDetails(zone: $zone) {
-    daily
     hourly
     maxDuration {
       minutes

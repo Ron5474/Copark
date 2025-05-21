@@ -9,6 +9,7 @@ import {
   MyPermits,
   NewZone,
   ZoneDetails,
+  PermitsByDay,
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
@@ -265,5 +266,11 @@ export class PermitResolver {
     @Arg("input", () => NewZone) input: NewZone,
   ): Promise<boolean> {
     return await service.createNewZone(input)
+  }
+
+  @Authorized(["admin"])
+  @Query(() => [PermitsByDay])
+  async getTicketsStats(): Promise<PermitsByDay[]> {
+    return await service.getAllPermitsByDay();
   }
 }

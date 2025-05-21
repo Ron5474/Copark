@@ -10,11 +10,36 @@ import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber"
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar"
 import LogoutIcon from "@mui/icons-material/Logout"
 import { useContext, useEffect, useState } from "react"
+import { signOut } from 'next-auth/react'
+import { Session } from 'next-auth';
+import { useRouter } from 'next/navigation'
+
 import { DashboardContext } from "./context"
+import { getUser } from '../shared/actions';
 
 export default function MobileNavBar() {
+  const [session, setSession] = useState<Session | undefined>(undefined)
   const { currentPage, setCurrentPage } = useContext(DashboardContext)
   const [value, setValue] = useState(0)
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    const locale = window.location.pathname.split('/')[1]
+    if (!session) {
+      router.push(`/${locale}/login`)
+      return;
+    }
+    signOut({ callbackUrl: `/${locale}` })
+  };
+
+
+  useEffect(() => {
+    async function fetchUser() {
+      const res = await getUser()
+      setSession(res)
+    }
+    fetchUser()
+  }, [])
 
   useEffect(() => {
     const pageToIndex = {
@@ -58,7 +83,7 @@ export default function MobileNavBar() {
         <BottomNavigationAction label="Home" icon={<HomeIcon />} />
         <BottomNavigationAction label="Tickets" icon={<ConfirmationNumberIcon />} />
         <BottomNavigationAction label="Garage" icon={<DirectionsCarIcon />} />
-        <BottomNavigationAction label="Logout" icon={<LogoutIcon />} />
+        <BottomNavigationAction label="Logout" icon={<LogoutIcon />} onClick={handleLogout}/>
       </BottomNavigation>
     </Paper>
   )

@@ -10,6 +10,11 @@ interface Ticket {
 }
 
 export default function TicketView({ticket}: {ticket: Ticket}) {
+  // const status = {
+  //   'unpaid': 'error',
+  //   'challenged': 'warning',
+  //   'paid': 'success'
+  // }
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardActionArea>
@@ -20,7 +25,7 @@ export default function TicketView({ticket}: {ticket: Ticket}) {
           <Chip
             label='Pending'
             variant='filled'
-            sx={{color: 'white', bgcolor: 'error.main', fontWeight: 'bold'}} 
+            sx={{color: 'white', bgcolor: `${'error'}.main`, fontWeight: 'bold'}} 
           />
         </CardContent>
       </CardActionArea>

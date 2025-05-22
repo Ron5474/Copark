@@ -218,16 +218,18 @@ export class PermitService {
   }
 
   public async createNewZone(input: NewZone): Promise<boolean> {
+    const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO Don't hardcode this
     const { rows } = await pool.query(`
-      INSERT INTO zone (data)
+      INSERT INTO type (data)
       SELECT $1
       WHERE NOT EXISTS (
-        SELECT 1 FROM zone
-        WHERE data->>'zone' = $1->>'zone'
-          AND data->>'location' = $1->>'location'
+        SELECT 1 FROM type
+        WHERE location = $2
+        AND data->>'area' = $1->>'zone'
+        AND data->>'name' = 'zone'
       )
       RETURNING id, data
-    `, [input])
+    `, [input, location])
   
     return (rows.length !== 0)
   }
@@ -245,6 +247,21 @@ export class PermitService {
     if (result.rowCount == 0) throw new Error(`Lot type ${lot} not found`)
     return result.rows[0].data
   }
+
+  // public async createNewLot(input: NewLot): Promise<boolean> {
+  //   const { rows } = await pool.query(`
+  //     INSERT INTO zone (data)
+  //     SELECT $1
+  //     WHERE NOT EXISTS (
+  //       SELECT 1 FROM zone
+  //       WHERE data->>'zone' = $1->>'zone'
+  //         AND data->>'location' = $1->>'location'
+  //     )
+  //     RETURNING id, data
+  //   `, [input])
+  
+  //   return (rows.length !== 0)
+  // }
 
   public async purchaseMyLotPermit(input: PurchaseLotInput): Promise<Confirmation> {
 

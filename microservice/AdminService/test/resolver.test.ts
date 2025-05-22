@@ -12,12 +12,17 @@ let server: http.Server
 let authServer: http.Server
 
 const AUTH_PORT = 3010
+const TICKET_PORT = 4002
+
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 
 beforeAll(async () => {
-  // Start your GraphQL server
+  // Start your GraphQL server on ADMIN_PORT
   server = http.createServer(app)
-  server.listen()
+  await new Promise<void>((resolve, reject) => {
+    server.listen(TICKET_PORT, () => resolve())
+      .on('error', (err) => reject(err))
+  })
   await bootstrap()
 
   // Force kill anything on AUTH_PORT

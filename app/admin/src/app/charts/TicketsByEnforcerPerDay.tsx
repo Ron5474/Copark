@@ -49,8 +49,9 @@ export default function TicketsByEnforcerPerDay() {
           setSelectedEnforcer(data[0].id)
         }
       } catch (err) {
-        void err;
         setError('Failed to fetch enforcers')
+      } finally {
+        setLoading(false)
       }
     }
     fetchEnforcers()
@@ -64,10 +65,8 @@ export default function TicketsByEnforcerPerDay() {
       try {
         setLoading(true)
         const tickets = await getTicketsByEnforcer(selectedEnforcer)
-
         setTicketStats(tickets)
       } catch (err) {
-        void err;
         setError('Failed to fetch ticket data')
       } finally {
         setLoading(false)

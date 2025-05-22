@@ -88,14 +88,29 @@ it('handles enforcer selection change', async () => {
   });
 });
 
+it('handles error in enforcers fetch', async () => {
+  const errorMessage = 'Failed to fetch enforcers';
+  vi.mocked(getEnforcers).mockRejectedValue(new Error(errorMessage));
+  
+  render(<TicketsByEnforcerPerDay />);
+
+  await waitFor(() => {
+    expect(screen.getByText(`Error: ${errorMessage}`)).toBeDefined();
+  });
+
+  // Chart should not be rendered when there's an error
+  expect(screen.queryByTestId('mock-chart')).toBeNull();
+});
+
 it('handles error in tickets fetch', async () => {
+  const errorMessage = 'Failed to fetch ticket data';
   vi.mocked(getEnforcers).mockResolvedValue(mockEnforcers);
-  vi.mocked(getTicketsByEnforcer).mockRejectedValue(new Error('Failed to fetch tickets'));
+  vi.mocked(getTicketsByEnforcer).mockRejectedValue(new Error(errorMessage));
 
   render(<TicketsByEnforcerPerDay />);
 
   await waitFor(() => {
-    expect(screen.getByText('Error: Failed to fetch ticket data')).toBeDefined();
+    expect(screen.getByText(`Error: ${errorMessage}`)).toBeDefined();
   });
 });
 

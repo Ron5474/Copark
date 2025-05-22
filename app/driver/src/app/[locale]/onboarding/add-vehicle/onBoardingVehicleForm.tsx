@@ -26,20 +26,27 @@ import {
 
 import theme from '../../theme'
 import { addVehicle } from '../../vehicle/actions'
+import { setOnBoardingState } from '../../signup/actions'
+import { useRouter } from '@/i18n/navigation'
 
 
-export default function AddForm({ isGuest = false, close = () => {} }: { isGuest?: boolean, close?: () => void }) {
+export default function AddForm() {
   const [plateNumber, setPlateNumber] = useState<string>('')
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
   const [country, setCountry] = useState<string>(Object.keys(locations)[0])
   const [state, setState] = useState<string>(Object.values(locations)[0][0])
   const [nickname, setNickname] = useState<string | undefined>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const router = useRouter()
+
   const submitVehicle = async () => {
     setIsValidEntry(plateNumber.length > 0)
     if (plateNumber.length === 0) return
+    setIsLoading(true)
     await addVehicle({plate: plateNumber, country, state, nickname: nickname})
-    close()
+    await setOnBoardingState('complete')
+    router.push('/dashboard')
   }
 
   useEffect(() => {
@@ -166,7 +173,6 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
         </TextField>
       </Box>
       {
-        isGuest ? null :
         <Box sx={{marginTop: '2vh'}}>
           <Box sx={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
             <Typography variant="body1" sx={{ margin: 0 }}>
@@ -196,7 +202,6 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
       <Button
         onClick={(e) => {
           e.preventDefault()
-          setIsLoading(true)
           submitVehicle()
         }}
         disabled={isLoading}
@@ -211,7 +216,7 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
           textTransform: 'none',
         }}
       >
-        {isGuest ? "Continue" : "Save"}
+        Continue to Dashboard
       </Button>
     </Box>
   )

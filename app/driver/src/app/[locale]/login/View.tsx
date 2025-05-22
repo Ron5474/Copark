@@ -22,6 +22,7 @@ import { useEffect } from 'react';
 import { getUser } from '../shared/actions';
 import { useRouter } from '@/i18n/navigation';
 import { useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 
 export default function LoginView() {
@@ -90,6 +91,9 @@ export default function LoginView() {
         >
           Sign In With Facebook
         </Button>
+        <p style={{ color: 'gray', fontSize: '12px', marginTop: '10px' }}>
+          New to Copark? <Link href="/signup" style={{ textDecoration: "underline" }}>Sign Up</Link>
+        </p>
       </Stack>
     </Container>
   );

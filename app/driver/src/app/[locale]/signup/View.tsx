@@ -20,7 +20,7 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import { signIn } from "next-auth/react"
 import { useEffect } from 'react';
 import { getUser } from '../shared/actions';
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useLocale } from 'next-intl';
 
 
@@ -90,6 +90,9 @@ export default function SignupView() {
         >
           Sign Up With Facebook
         </Button>
+         <p style={{ color: 'gray', fontSize: '12px', marginTop: '10px' }}>
+                  Already a Member? <Link href="/login" style={{ textDecoration: "underline" }}>login</Link>
+                </p>
       </Stack>
     </Container>
   );

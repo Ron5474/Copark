@@ -24,7 +24,7 @@ const Page: NextPage = () => {
         }}>
         <Toolbar />
         <OnboardingContext.Provider value={{ currentPage: page, setCurrentPage: setPage }}>
-          {page === 0 && <SplashScreen />}
+          {page === 0 && <><Toolbar /><SplashScreen /></>}
           {page === 1 && <AddVehicle />}
         </OnboardingContext.Provider>
         </Box>

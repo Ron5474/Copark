@@ -1,5 +1,7 @@
 import { IsEmail } from "class-validator";
 import { Field, ObjectType, InputType, ID } from "type-graphql";
+import { Ticket } from "../../../TicketService/src/ticket/schema";
+import { Permit } from "../../../PermitService/src/permit/schema";
 
 @ObjectType()
 export class User {
@@ -69,4 +71,16 @@ export class APIUser {
 
   @Field(() => String)
   accountStatus!: string
+}
+
+@ObjectType()
+export class ReportDay {
+  @Field(() => String)
+  date!: string;
+
+  @Field(() => [Ticket])
+  tickets!: Ticket[];
+
+  @Field(() => [Permit])
+  permits!: Permit[];
 }

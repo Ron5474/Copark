@@ -341,10 +341,10 @@ setup-env-variables:marketing-app:
     paths:
       - app/marketing/.env
 
-conatainerize:setup:
-  stage: conatainerize
-  script:
-    - npm run installs
+# conatainerize:setup:
+#   stage: conatainerize
+#   script:
+#     - npm run installs
 
 # conatainerize:build-docker-image:
 #   stage: conatainerize

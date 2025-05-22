@@ -31,6 +31,13 @@ export interface Authenticated {
   name: string
 }
 
+export interface loginResponse {
+  email: string
+  name: string
+  role: string[]
+  onboardingState: string
+}
+
 export interface OauthLoginData {
   type: "OauthUserData"
   name: string,

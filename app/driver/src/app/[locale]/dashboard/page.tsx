@@ -15,7 +15,7 @@ import { getUser } from "../shared/actions";
 import { useRouter } from "@/i18n/navigation";
 import ViewVehicles from "../vehicle/member/Vehicle"
 // import AddVehicle from "../vehicle/AddForm";
-import { userLoginSignUpAttempt } from "./actions";
+import { userLoginAttempt } from "./actions";
 // import BuyPermit from "../permit/View";
 import MobileNavBar from "./BottomNav";
 import ZonePermit from "../zone/View";
@@ -32,7 +32,7 @@ function Dashboard() {
     const loggedIn = async () => {
       if (!await getUser()) {
         router.push(`/login`);
-      } else if (!await userLoginSignUpAttempt(locale)) {
+      } else if (!await userLoginAttempt(locale)) {
         signOut({ callbackUrl: new URL(`/driver/${locale}/login`, window.location.origin).toString() });
       }   
     }

@@ -21,7 +21,7 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import { useRouter } from '@/i18n/navigation';
-import { setOnBoardingState, signUp } from '../../signup/actions';
+import { setOnBoardingState } from '../../signup/actions';
 import { useLocale } from 'next-intl';
 
 export default function OnboardView() {
@@ -31,14 +31,14 @@ export default function OnboardView() {
   
   useEffect(() => {
     const handleSignup = async () => {
-      await signUp(locale);
+      await setOnBoardingState("tos");
     }
     handleSignup();
   }, [locale]);
 
   const handleClick = async () => {
     if (accepted) {
-      await setOnBoardingState("complete");
+      await setOnBoardingState("first-vehicle");
       router.push('/onboarding/add-vehicle');
       // router.push('/dashboard');
     }

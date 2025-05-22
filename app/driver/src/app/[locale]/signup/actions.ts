@@ -15,8 +15,8 @@ export async function signUp(locale: string): Promise<void> {
     body: JSON.stringify({authToken: await token}),
   });
   
-  console.log("SIGNUP RESPONSE", res);
-  console.log("SIGNUP RESPONSE", await res.json());
+  // console.log("SIGNUP RESPONSE", res);
+  // console.log("SIGNUP RESPONSE", await res.json());
 
   if (res.status === 204) {
     redirect({

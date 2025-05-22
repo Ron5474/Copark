@@ -1,7 +1,7 @@
 
 import { pool } from "./db";
 import { SessionUser } from "../index";
-import { AuthUser, Credentials, User, OauthLoginData} from "./index";
+import { AuthUser, Credentials, User, OauthLoginData, loginResponse} from "./index";
 import { OauthUser } from "../index.d";
 
 import { SignJWT, jwtVerify } from 'jose'
@@ -181,19 +181,24 @@ export class AuthService {
     }
   }
 
-  public async activeDriver(userId: string|undefined): Promise<string| undefined> {
+  public async activeDriver(userId: string|undefined): Promise<loginResponse| undefined> {
     if (userId === undefined) {
       throw new Error("Unauthorized");
     }
     const query = {
-      text: "SELECT * FROM account WHERE id = $1 AND  data->>'onboardingStatus' = 'complete'",
+      text: "SELECT * FROM account WHERE id = $1",
       values: [userId]
     }
 
     const { rows } = await pool.query(query)
 
     if (rows.length > 0) {
-      return rows[0].data.onboardingStatus
+      return {
+        email: rows[0].data.email,
+        name: rows[0].data.name,
+        role: rows[0].data.role,
+        onboardingState: rows[0].data.onboardingStatus
+      }
     } else {
       return undefined
     }

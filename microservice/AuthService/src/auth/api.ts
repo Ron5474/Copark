@@ -11,7 +11,7 @@ import {
   Put
 } from "tsoa";
 import * as express from "express";
-import { Credentials, Authenticated, OauthLoginData, AuthUser, OauthSignup } from "./index";
+import { Credentials, Authenticated, OauthLoginData, AuthUser, OauthSignup, loginResponse } from "./index";
 import { AuthService } from "./service";
 import { User } from "./index";
 import { OauthUser, SessionUser } from "../index.d";
@@ -58,7 +58,7 @@ export class AuthController extends Controller {
 
   @Get("driver/login")
   @Security("jwt", ["driver"])
-  public async driverLogin(@Request() request: express.Request): Promise<string | undefined> {
+  public async driverLogin(@Request() request: express.Request): Promise<loginResponse | undefined> {
     console.log("driver login")
     if (!request.user) {
       console.log("user not found")

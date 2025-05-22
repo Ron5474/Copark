@@ -191,7 +191,7 @@ it('handles complete valid data', async () => {
   });
 });
 
-it.only('renders enforcer selector and chart', async () => {
+it('renders enforcer selector and chart', async () => {
   vi.mocked(getEnforcers).mockResolvedValue(mockEnforcers);
   vi.mocked(getTicketsByEnforcer).mockResolvedValue(mockTicketsByEnforcer);
 

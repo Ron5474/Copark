@@ -3,6 +3,7 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import ViewStatistics from '../../src/app/components/ViewStatistics';
+import { getTicketsByEnforcer } from '../../src/ticket/actions';
 
 const server = setupServer();
 
@@ -81,3 +82,53 @@ it('handles network errors gracefully', async () => {
     expect(screen.getByText('Error: Failed to fetch ticket data')).toBeDefined();
   });
 });
+
+it('successfully fetches tickets by enforcer', async () => {
+  const mockTicketData = [
+    {
+      date: '2024-01-01',
+      tickets: [
+        { id: '1', issuedDate: '2024-01-01T10:00:00Z' },
+        { id: '2', issuedDate: '2024-01-01T11:00:00Z' }
+      ]
+    }
+  ];
+
+  server.use(
+    http.post('http://localhost:4002/graphql', ({ request }) => {
+      return HttpResponse.json({
+        data: {
+          getTicketsPerDayFromEnforcer: mockTicketData
+        }
+      });
+    })
+  );
+
+  const result = await getTicketsByEnforcer('enforcer-123');
+  expect(result).toEqual(mockTicketData);
+});
+
+it('handles error response from tickets by enforcer endpoint', async () => {
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.json({
+        errors: [{ message: 'Failed to fetch enforcer tickets' }]
+      });
+    })
+  );
+
+  await expect(getTicketsByEnforcer('enforcer-123')).rejects.toThrow(
+    'Failed to fetch enforcer tickets'
+  );
+});
+
+it('handles network error when fetching tickets by enforcer', async () => {
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.error();
+    })
+  );
+
+  await expect(getTicketsByEnforcer('enforcer-123')).rejects.toThrow();
+});
+

@@ -127,6 +127,7 @@ INSERT INTO permit (vehicle, type, data) VALUES (
     'expireDate', to_char((now() + interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
     'area', '123',
     'type,', 'zone',
+    'ticketStatus', 'unpaid',
     'receipt', jsonb_build_object(
       'service', 0.50,
       'subTotal', 2.45,

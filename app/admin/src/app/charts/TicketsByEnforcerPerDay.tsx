@@ -65,8 +65,6 @@ export default function TicketsByEnforcerPerDay() {
         setLoading(true)
         const tickets = await getTicketsByEnforcer(selectedEnforcer)
 
-        console.log('Tickets:', tickets)
-
         setTicketStats(tickets)
       } catch (err) {
         void err;

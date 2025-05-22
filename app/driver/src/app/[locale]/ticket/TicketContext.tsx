@@ -7,7 +7,7 @@ import { TicketContextType } from '../types'
 
 const TicketContext = createContext<TicketContextType|undefined>(undefined)
 
-export function GlobalProvider({children}: {children: React.ReactNode} ) {
+export function TicketProvider({children}: {children: React.ReactNode} ) {
   const [currentView, setCurrentView] = useState<string>('TicketList')
 
   return (

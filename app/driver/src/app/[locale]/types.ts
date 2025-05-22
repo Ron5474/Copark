@@ -50,4 +50,12 @@ export interface PermitDetails {
 export type TicketContextType = {
   currentView: string,
   setCurrentView: React.Dispatch<React.SetStateAction<string>>,
+  tickets: Ticket[],
+  setTickets: React.Dispatch<React.SetStateAction<Ticket[]>>,
+}
+
+export interface Ticket {
+  id: string
+  ticketStatus: string
+  issueddate: string
 }

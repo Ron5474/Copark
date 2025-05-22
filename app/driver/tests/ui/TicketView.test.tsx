@@ -9,7 +9,8 @@ import { it, expect, afterEach, vi, beforeEach } from 'vitest';
 // import userEvent from '@testing-library/user-event';
 
 import '../setup'
-import TicketView from '../../src/app/[locale]/ticket/TicketView';
+import TicketPage from '../../src/app/[locale]/ticket/TicketPage';
+import { TicketProvider } from '../../src/app/[locale]/ticket/TicketContext';
 
 // const push = vi.fn();
 
@@ -56,6 +57,9 @@ beforeEach(() => {
 //   }))
 })
 it('Renders', async () => {
-  render(<TicketView />);
+  render(
+    <TicketProvider>
+      <TicketPage />
+    </TicketProvider>);
   expect(await screen.queryByText('Your Tickets')).not.toBeNull();
 });

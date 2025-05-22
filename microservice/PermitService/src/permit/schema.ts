@@ -85,6 +85,22 @@ export class NewZone {
   closeTime?: string
 }
 
+@InputType()
+export class NewLot {
+
+  @Field(() => Number)
+  lot!: number
+
+  @Field(() => Number, { nullable: true })
+  daily?: number
+
+  @Field(() => Number, { nullable: true })
+  quarterly?: number
+
+  @Field(() => Number, { nullable: true })
+  yearly?: number
+}
+
 @ObjectType()
 export class LotDetails {
 

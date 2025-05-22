@@ -13,6 +13,7 @@ import {
   PermitsByDay,
   LotDetails,
   PurchaseLotInput,
+  NewLot,
 } from './schema'
 
 export class PermitService {
@@ -248,20 +249,22 @@ export class PermitService {
     return result.rows[0].data
   }
 
-  // public async createNewLot(input: NewLot): Promise<boolean> {
-  //   const { rows } = await pool.query(`
-  //     INSERT INTO zone (data)
-  //     SELECT $1
-  //     WHERE NOT EXISTS (
-  //       SELECT 1 FROM zone
-  //       WHERE data->>'zone' = $1->>'zone'
-  //         AND data->>'location' = $1->>'location'
-  //     )
-  //     RETURNING id, data
-  //   `, [input])
+  public async createNewLot(input: NewLot): Promise<boolean> {
+    const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO Don't hardcode this
+    const { rows } = await pool.query(`
+      INSERT INTO type (data)
+      SELECT $1
+      WHERE NOT EXISTS (
+        SELECT 1 FROM type
+        WHERE location = $2
+        AND data->>'area' = $1->>'lot'
+        AND data->>'name' = 'lot'
+      )
+      RETURNING id, data
+    `, [input, location])
   
-  //   return (rows.length !== 0)
-  // }
+    return (rows.length !== 0)
+  }
 
   public async purchaseMyLotPermit(input: PurchaseLotInput): Promise<Confirmation> {
 

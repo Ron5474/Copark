@@ -12,6 +12,7 @@ import {
   PermitsByDay,
   LotDetails,
   PurchaseLotInput,
+  NewLot,
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
@@ -288,6 +289,14 @@ export class PermitResolver {
     @Arg("lot", () => String) lot: string,
   ): Promise<LotDetails> {
     return await service.getLotDetails(lot)
+  }
+
+  @Authorized('admin')
+  @Mutation(() => Boolean)
+  async createLot(
+    @Arg("input", () => NewLot) input: NewLot,
+  ): Promise<boolean> {
+    return await service.createNewLot(input)
   }
 
   @Authorized('driver')

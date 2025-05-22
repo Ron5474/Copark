@@ -423,7 +423,7 @@ export class TicketService {
     const result = await pool.query(query, [decryptedID]);
 
     if (result.rows.length === 0) {
-      throw new Error("No delete found.");
+      throw new Error("Ticket not found.");
     }
 
     const row = result.rows[0];
@@ -458,7 +458,7 @@ export class TicketService {
     const result = await pool.query(query, [decryptedID]);
 
     if (result.rows.length === 0) {
-      throw new Error("No delete found.");
+      throw new Error("Ticket not found.");
     }
 
     const row = result.rows[0];

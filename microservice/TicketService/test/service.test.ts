@@ -284,7 +284,7 @@ test('getTicketsIssuedByEnforcer should return empty array for issued by badly p
 test('acceptTicketChallenge can accept a challenge', async () => {
     const tickets = await ticketService.acceptTicketChallenge({ id: await encrypt('6b5531a5-5ba9-419b-98bb-eda4b0eb2953') });
 
-    console.log(tickets);
+    // console.log(tickets);
     // expect(tickets).toHaveLength(1);
     expect(tickets.ticketStatus).toBe('accepted');
 });
@@ -292,9 +292,17 @@ test('acceptTicketChallenge can accept a challenge', async () => {
 test('rejectTicketChallenge can reject a challenge', async () => {
     const tickets = await ticketService.rejectTicketChallenge({ id: await encrypt('08639453-71e7-4407-86d0-56c8eb1d8419') });
 
-    console.log(tickets);
+    // console.log(tickets);
     // expect(tickets).toHaveLength(1);
     expect(tickets.ticketStatus).toBe('unpaid');
+});
+
+test('acceptTicketChallenge errors with an unfound ID', async () => {
+    await expect(ticketService.acceptTicketChallenge({ id: await encrypt('00000001-0001-0001-0001-000000000000') })).rejects.toThrow('Ticket not found.');
+});
+
+test('rejectTicketChallenge errors with an unfound ID', async () => {
+    await expect(ticketService.rejectTicketChallenge({ id: await encrypt('00000001-0001-0001-0001-000000000000') })).rejects.toThrow('Ticket not found.');
 });
 
 // test('getTicketsForUserJWT should return tickets for the provided userJWT', async () => {

@@ -4,6 +4,7 @@ import ViewStatistics from '../../src/app/components/ViewStatistics';
 import { getTicketsByDay } from '../../src/ticket/actions';
 import { getTicketsByEnforcer } from '../../src/ticket/actions';
 import { getEnforcers } from '../../src/enforcement/actions';
+import { getAllPermitsByDay } from '../../src/permit/actions';
 
 // Mock all required actions
 vi.mock('../../src/ticket/actions', () => ({
@@ -13,6 +14,10 @@ vi.mock('../../src/ticket/actions', () => ({
 
 vi.mock('../../src/enforcement/actions', () => ({
   getEnforcers: vi.fn()
+}));
+
+vi.mock('../../src/permit/actions', () => ({
+  getAllPermitsByDay: vi.fn()
 }));
 
 vi.mock('react-chartjs-2', () => ({
@@ -215,4 +220,78 @@ it('handles error in enforcer tickets fetch', async () => {
   await waitFor(() => {
     expect(screen.getByText('Error: Failed to fetch ticket data')).toBeDefined();
   });
+});
+
+it('renders permits chart when permits tab is clicked', async () => {
+  // Mock the permit data
+  vi.mocked(getAllPermitsByDay).mockResolvedValue([
+    {
+      date: "2025-05-19",
+      permits: [
+        {
+          vehicle: "ABC123",
+          type: "zone",
+          area: "A1",
+          activeDate: "2025-05-19T10:00:00Z",
+          expireDate: "2025-05-19T12:00:00Z"
+        }
+      ]
+    },
+    {
+      date: "2025-05-20", 
+      permits: [
+        {
+          vehicle: "DEF456",
+          type: "zone",
+          area: "B2",
+          activeDate: "2025-05-20T14:00:00Z",
+          expireDate: "2025-05-20T16:00:00Z"
+        },
+        {
+          vehicle: "GHI789",
+          type: "zone", 
+          area: "C3",
+          activeDate: "2025-05-20T15:00:00Z",
+          expireDate: "2025-05-20T17:00:00Z"
+        }
+      ]
+    }
+  ]);
+
+  render(<ViewStatistics />);
+
+  // Click the permits tab
+  const permitsTab = screen.getByText('Permits by Day');
+  fireEvent.click(permitsTab);
+
+  // Wait for chart to render
+  await waitFor(() => {
+    expect(screen.getByTestId('mock-chart')).toBeDefined();
+  });
+
+  // Verify the chart is rendered
+  const chartElement = screen.getByTestId('mock-chart');
+  expect(chartElement).toBeDefined();
+
+  // Verify getAllPermitsByDay was called
+  expect(getAllPermitsByDay).toHaveBeenCalled();
+});
+
+// Add error handling test
+it('handles error in permits fetch', async () => {
+  vi.mocked(getAllPermitsByDay).mockRejectedValue(new Error('Failed to fetch permits'));
+
+  render(<ViewStatistics />);
+
+  // Click the permits tab
+  const permitsTab = screen.getByText('Permits by Day');
+  fireEvent.click(permitsTab);
+
+  // Wait for error message
+  await waitFor(() => {
+    expect(screen.getByText('Error: Failed to fetch permit data')).toBeDefined();
+  });
+
+  // Verify chart is not rendered when there's an error
+  expect(screen.queryByTestId('mock-chart')).toBeNull();
 });

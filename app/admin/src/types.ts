@@ -44,3 +44,26 @@ export interface PermitsByDay {
     expireDate: string;
   }[];
 }
+
+export interface ChallengedTicket {
+  id: string;
+  vehicle: string;
+  violation: string;
+  fine: number;
+  ticketStatus: 'challenged';
+  issuedDate: string;
+  note: string;
+  images: string[];
+}
+
+export interface Enforcer {
+  id: string;
+  name: string;
+  email: string;
+  accountStatus: 'active' | 'suspended' | 'deleted';
+}
+
+export interface NewEnforcerInput {
+  name: string;
+  email: string;
+}

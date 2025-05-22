@@ -6,6 +6,7 @@ import Home from './components/Home';
 import ManageEnforcement from './components/ManageEnforcement';
 import ManageAPIUsers from './components/ManageAPIUsers';
 import ViewStatistics from './components/ViewStatistics';
+import ManageTicketChallenges from './components/ManageTicketChallenges';
 
 export default function Page() {
   const [currentComponent, setCurrentComponent] = useState<string>('home');
@@ -19,7 +20,7 @@ export default function Page() {
       case 'enforcement':
         return <ManageEnforcement onNavigate={handleNavigate} />;
       case 'tickets':
-        return <Box>Ticket Challenges Components</Box>;
+        return <ManageTicketChallenges />;
       case 'api_users':
         return <ManageAPIUsers onNavigate={handleNavigate} />;
       case 'statistics':

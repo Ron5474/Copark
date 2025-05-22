@@ -6,7 +6,8 @@ import {
   UserInput,
   APIUser,
   APICredential,
-  APIUserID
+  APIUserID,
+  ReportDay
 } from "./schema";
 
 const adminService = new AdminService();
@@ -69,5 +70,12 @@ export class AdminResolver {
     @Arg("user", () => UserInput) user: UserInput
   ): Promise<User[]> {
     return adminService.reinstateUser(user);
+  }
+
+  @Mutation(() => [ReportDay])
+  @Authorized(["admin"])
+  async generateReport(
+  ): Promise<ReportDay[]> {
+    return;
   }
 }

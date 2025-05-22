@@ -276,7 +276,7 @@ export class PermitResolver {
 
   @Authorized(["admin"])
   @Query(() => [PermitsByDay])
-  async getTicketsStats(): Promise<PermitsByDay[]> {
+  async getPermitStats(): Promise<PermitsByDay[]> {
     return await service.getAllPermitsByDay();
   }
 }

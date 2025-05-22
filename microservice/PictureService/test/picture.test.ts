@@ -72,7 +72,7 @@ test('Enforcer can extract plate from image', async () => {
     })
 
   expect(response.status).toBe(200)
-  console.log(response.body)
+  // console.log(response.body)
   // expect(response.body.data.recognizePlate.plate).toBeTypeOf('string')
   // expect(response.body.data.recognizePlate.confidence).toBeGreaterThanOrEqual(0)
 }, 6000)

@@ -73,15 +73,15 @@ export class AdminResolver {
   }
 
   @Authorized(["admin"])
-  @Mutation(() => [ReportDay])
+  @Query(() => [ReportDay])
   async generateReport(
       @Ctx() request: Request
   ): Promise<ReportDay[]> {
     const ticketQuery = `
-      query GetPermitStats{
-        getPermitStats {
+      query GetTicketsStats{
+        getTicketsStats {
           date
-          Permit {
+          Ticket {
             id
           }
         }

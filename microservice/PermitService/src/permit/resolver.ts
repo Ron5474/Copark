@@ -114,6 +114,27 @@ export class PermitResolver {
       durationString = `${input.duration.minutes} minutes`
     }
 
+    let brand;
+    switch (input.paymentMethod.split(" ")[0]) {
+      case 'visa':
+        brand = 'https://cdn.visa.com/v2/assets/images/logos/visa/blue/logo.png'
+        break
+      case 'mastercard':
+        brand = 'https://www.mastercard.com/content/dam/public/brandcenter/assets/images/logos/mclogo-for-footer.svg'
+        break
+      case 'amex':
+        brand = 'https://www.aexp-static.com/cdaas/one/statics/axp-static-assets/1.8.0/package/dist/img/logos/dls-logo-bluebox-solid.svg'
+        break
+      case 'discover':
+        brand = 'https://www.discover.com/content/dam/discover/en_us/credit-cards/card-acquisitions/grey-redesign/global/images/icons/icon-discover-logo-136-23.png'
+        break
+      default:
+        brand = input.paymentMethod.split(" ")[0] ? input.paymentMethod.split(" ")[0] : input.paymentMethod
+        break
+    }
+    const b = input.paymentMethod.split(" ")[0] ? input.paymentMethod.split(" ")[0] : undefined
+    const showLogo = b && (b === 'visa' || b === 'mastercard' || b === 'amex' || b === 'discover')
+
     // Step 2: Send email
     await sendPermitEmail({
       to: user.email,
@@ -132,7 +153,7 @@ export class PermitResolver {
             <p><strong>Zone:</strong> ${input.zone}</p>
             <p><strong>Duration:</strong> ${durationString}</p>
             <p><strong>Vehicle Plate:</strong> ${plate}</p>
-            <p><strong>Payment Method:</strong> ${input.paymentMethod}</p>
+            <p><strong>Payment Method: ${!showLogo ? brand: `<img src=${brand} alt="${b}" style="height: 1em; vertical-align: middle;" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
           </div>
 
           <p style="font-size: 15px; color: #7f8c8d;">

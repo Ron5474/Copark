@@ -19,7 +19,7 @@ import { userLoginSignUpAttempt } from "./actions";
 // import BuyPermit from "../permit/View";
 import MobileNavBar from "./BottomNav";
 import ZonePermit from "../zone/View";
-import TicketView from "../ticket/TicketView"
+import TicketPage from "../ticket/TicketPage"
 import { signOut } from "next-auth/react";
 import { useLocale } from "next-intl";
 import { SessionProvider } from "next-auth/react";
@@ -52,7 +52,7 @@ function Dashboard() {
               <DashboardView />
             )}
             {currentPage === "tickets" && (
-              <TicketView />
+              <TicketPage />
             )}
             {currentPage === "garage" && (
               <ViewVehicles />

@@ -180,7 +180,7 @@ export class PermitService {
         type,
         data->>'purchaseDate' AS purchasedate,
         data->>'activeDate' AS activedate,
-        data->>'expiresDate' AS expiresdate,
+        data->>'expireDate' AS expiredate,
         data->>'receipt' AS receipt,
         data->>'paymentMethod' AS paymentmethod,
         data->>'area' AS area
@@ -200,7 +200,7 @@ export class PermitService {
         type: row.type,
         area: row.area,
         activeDate: row.activedate,
-        expireDate: row.expiresdate,
+        expireDate: row.expiredate,
       };
       // console.log('permit', permit)
 

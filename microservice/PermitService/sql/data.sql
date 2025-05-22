@@ -124,8 +124,9 @@ INSERT INTO permit (vehicle, type, data) VALUES (
   jsonb_build_object(
     'purchaseDate', to_char((now() - interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
     'activeDate', to_char((now() - interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-    'expiresDate', to_char((now() + interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate', to_char((now() + interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
     'area', '123',
+    'type,', 'zone',
     'receipt', jsonb_build_object(
       'service', 0.50,
       'subTotal', 2.45,

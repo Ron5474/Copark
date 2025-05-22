@@ -265,7 +265,8 @@ test('Enforcer gets valid permit', async () => {
     })
 
   // expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
-  expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
+  console.log(isValid.body)
+  expect(isValid.body.data.isValidZonePermit.isValid).toBe(true)
 
 })
 

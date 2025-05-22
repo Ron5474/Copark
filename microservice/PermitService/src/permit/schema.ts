@@ -13,6 +13,9 @@ export class Permit {
   area!: string
 
   @Field(() => String)
+  purchaseDate?: string
+
+  @Field(() => String)
   activeDate!: string
 
   @Field(() => String)

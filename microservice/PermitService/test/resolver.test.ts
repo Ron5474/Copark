@@ -320,3 +320,39 @@ test('Driver has no permits', async () => {
 
   expect(details.body.data.zoneDetails.hourly).toBe(2.45)
 })
+
+test('Admin can get ticket stats grouped by day', async () => {
+  const token = await loginAs("admin");
+
+  const query = `
+    query GetPermitStats {
+      getPermitStats {
+        date
+        permits {
+          vehicle
+          area
+          activeDate
+          expireDate
+        }
+      }
+    }
+  `;
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query })
+    .expect(200);
+
+  expect(response.body.errors).toBeUndefined();
+  const stats = response.body.data.getTicketsStats;
+  expect(Array.isArray(stats)).toBe(true);
+  expect(stats.length).toBeGreaterThan(0);
+  stats.forEach((dayStat: any) => {
+    expect(dayStat).toHaveProperty('date');
+    expect(Array.isArray(dayStat.permits)).toBe(true);
+    dayStat.permit.forEach((permit: any) => {
+      expect(permit).toHaveProperty('id');
+    });
+  });
+});

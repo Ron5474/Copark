@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Authorized, Ctx } from "type-graphql";
 import { AdminService } from "./service";
 import { 
   User,
@@ -72,10 +72,40 @@ export class AdminResolver {
     return adminService.reinstateUser(user);
   }
 
-  @Mutation(() => [ReportDay])
   @Authorized(["admin"])
+  @Mutation(() => [ReportDay])
   async generateReport(
+      @Ctx() request: Request
   ): Promise<ReportDay[]> {
-    return;
+    const ticketQuery = `
+      query GetPermitStats{
+        getPermitStats {
+          date
+          Permit {
+            id
+          }
+        }
+      }
+    `
+    const ticketRes = await fetch('http://localhost:4002/graphql', {
+      method: 'POST',
+      headers: {
+      'Content-Type': 'application/json',
+      // eslint-disable-next-line
+      // @ts-ignore
+      Authorization: `${request.headers.authorization}`,
+      },
+      body: JSON.stringify({
+      query: ticketQuery,
+      }),
+    })
+
+    const ticketJson = await ticketRes.json()
+    const ticketData = ticketJson?.data?.getPermitStats
+
+    console.log(ticketData)
+    return ticketData;
+
+    // still need to add permit data and aggregate it
   }
 }

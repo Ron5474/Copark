@@ -109,3 +109,31 @@ VALUES (
     'images', '[]'
   )
 );
+
+INSERT INTO ticket (id, vehicle, enforcer, data)
+VALUES (
+  '6b5531a5-5ba9-419b-98bb-eda4b0eb2953',
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '431b3711-73bb-4c90-afcf-59116217c0db',
+  jsonb_build_object(
+    'issuedDate', NOW() - INTERVAL '1 day',
+    'violation', 'this is a challenged ticket that will be accepted',
+    'fine', 2,
+    'ticketStatus', 'challenged',
+    'images', '[]'
+  )
+);
+
+INSERT INTO ticket (id, vehicle, enforcer, data)
+VALUES (
+  '08639453-71e7-4407-86d0-56c8eb1d8419',
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '431b3711-73bb-4c90-afcf-59116217c0db',
+  jsonb_build_object(
+    'issuedDate', NOW() - INTERVAL '1 day',
+    'violation', 'this is a challenged ticket that will be rejected',
+    'fine', 2,
+    'ticketStatus', 'challenged',
+    'images', '[]'
+  )
+);

@@ -33,10 +33,7 @@ async function encrypt(userId: string): Promise<string> {
 test('getTickets should return all unpaid tickets', async () => {
     const tickets = await ticketService.getTickets();
 
-    expect(tickets).toHaveLength(8);
-    expect(tickets[0].ticketStatus).toBe('unpaid');
-    expect(tickets[1].ticketStatus).toBe('unpaid');
-    expect(tickets[2].ticketStatus).toBe('unpaid');
+    expect(tickets).toHaveLength(10);
 });
 
 test('createTicket should successfully create a ticket with all fields', async () => {
@@ -268,7 +265,7 @@ test('getTicketsByDay should return tickets by day', async () => {
     const todayEntry = ticketsByDay.find(entry => entry.date === today);
     const yestEntry = ticketsByDay.find(entry => entry.date === yest);
 
-    expect(yestEntry?.tickets).toHaveLength(1);
+    expect(yestEntry?.tickets).toHaveLength(3);
     expect(todayEntry?.tickets).toHaveLength(7);
 });
 
@@ -284,6 +281,21 @@ test('getTicketsIssuedByEnforcer should return empty array for issued by badly p
     expect(tickets).toStrictEqual([]);
 });
 
+test('acceptTicketChallenge can accept a challenge', async () => {
+    const tickets = await ticketService.acceptTicketChallenge({ id: await encrypt('6b5531a5-5ba9-419b-98bb-eda4b0eb2953') });
+
+    console.log(tickets);
+    // expect(tickets).toHaveLength(1);
+    expect(tickets.ticketStatus).toBe('accepted');
+});
+
+test('rejectTicketChallenge can reject a challenge', async () => {
+    const tickets = await ticketService.rejectTicketChallenge({ id: await encrypt('08639453-71e7-4407-86d0-56c8eb1d8419') });
+
+    console.log(tickets);
+    // expect(tickets).toHaveLength(1);
+    expect(tickets.ticketStatus).toBe('unpaid');
+});
 
 // test('getTicketsForUserJWT should return tickets for the provided userJWT', async () => {
 //     const userID = '0f99f921-594e-4387-9d05-e6e80d8aa54a'

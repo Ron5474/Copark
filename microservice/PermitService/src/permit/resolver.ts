@@ -291,6 +291,12 @@ export class PermitResolver {
     return await service.getLotDetails(lot)
   }
 
+  @Authorized('driver')
+  @Query(() => [LotDetails])
+  async allLotDetails(): Promise<LotDetails[]> {
+    return await service.getAllLotDetails()
+  }
+
   @Authorized('admin')
   @Mutation(() => Boolean)
   async createLot(

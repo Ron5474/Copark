@@ -249,6 +249,18 @@ export class PermitService {
     return result.rows[0].data
   }
 
+  public async getAllLotDetails(): Promise<LotDetails[]> {
+    const result = await pool.query(`
+        SELECT data
+        FROM type
+        WHERE data->>'name' = 'lot'
+      `,
+      []
+    )
+    
+    return result.rows.map((row) => row.data)
+  }
+
   public async createNewLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO Don't hardcode this
     const { rows } = await pool.query(`

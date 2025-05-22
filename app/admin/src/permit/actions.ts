@@ -37,6 +37,9 @@ export async function getAllPermitsByDay(): Promise<PermitsByDay[]> {
   });
 
   const result = await response.json();
+
+  console.log('GraphQL Response:', result);
+
   if (result.errors) {
     throw new Error(result.errors[0].message);
   }

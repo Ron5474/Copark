@@ -10,6 +10,7 @@ import {
   NewZone,
   ZoneDetails,
   PermitsByDay,
+  LotDetails,
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
@@ -278,5 +279,13 @@ export class PermitResolver {
   @Query(() => [PermitsByDay])
   async getPermitStats(): Promise<PermitsByDay[]> {
     return await service.getAllPermitsByDay();
+  }
+
+  @Authorized('driver')
+  @Query(() => LotDetails)
+  async lotDetails(
+    @Arg("lot", () => String) lot: string,
+  ): Promise<LotDetails> {
+    return await service.getLotDetails(lot)
   }
 }

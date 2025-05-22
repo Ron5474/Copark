@@ -86,6 +86,19 @@ export class NewZone {
 }
 
 @ObjectType()
+export class LotDetails {
+
+  @Field(() => Number, { nullable: true })
+  daily?: number
+
+  @Field(() => Duration, { nullable: true })
+  quarterly?: Duration
+
+  @Field(() => String, { nullable: true })
+  yearly?: string
+}
+
+@ObjectType()
 export class Receipt {
 
   @Field(() => Number)

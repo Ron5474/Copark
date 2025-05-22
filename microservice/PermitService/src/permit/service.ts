@@ -10,7 +10,8 @@ import {
   ZoneDetails,
   NewZone,
   Permit,
-  PermitsByDay
+  PermitsByDay,
+  LotDetails
 } from './schema'
 
 export class PermitService {
@@ -228,5 +229,19 @@ export class PermitService {
     `, [input])
   
     return (rows.length !== 0)
+  }
+
+  public async getLotDetails(lot: string): Promise<LotDetails> {
+    const result = await pool.query(`
+        SELECT data
+        FROM type
+        WHERE data->>'name' = 'lot'
+        AND data->>'area' = $1
+      `,
+      [lot]
+    )
+    
+    if (result.rowCount == 0) throw new Error(`Lot type ${lot} not found`)
+    return result.rows[0].data
   }
 }

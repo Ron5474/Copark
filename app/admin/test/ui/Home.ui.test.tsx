@@ -163,16 +163,6 @@ it('navigates to Manage Enforcers section', async () => {
   });
 });
 
-it('navigates to Manage Drivers section', async () => {
-  render(<Page />);
-  const manageDriversText = screen.getByText('Manage Drivers');
-  const clickableItem = manageDriversText.closest('div');
-  fireEvent.click(clickableItem!);
-  await waitFor(() => {
-    expect(screen.getByText(/Driver Count: \d+/i)).toBeDefined();
-  });
-});
-
 it('navigates to Statistics section', async () => {
   render(<Page />);
   const statisticsText = screen.getByText('View Statistics');

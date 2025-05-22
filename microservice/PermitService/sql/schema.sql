@@ -3,7 +3,7 @@
 DROP TABLE IF EXISTS location CASCADE;
 CREATE TABLE location (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL
+    data JSONB NOT NULL
 );
 
 DROP TABLE IF EXISTS type CASCADE;

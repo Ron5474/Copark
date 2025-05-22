@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg, Authorized, Ctx } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
 import { AdminService } from "./service";
 import { 
   User,
@@ -7,7 +7,7 @@ import {
   APIUser,
   APICredential,
   APIUserID,
-  ReportDay
+  // ReportDay
 } from "./schema";
 
 const adminService = new AdminService();

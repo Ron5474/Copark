@@ -4,7 +4,6 @@ import { Box } from '@mui/material';
 import { useState } from 'react';
 import Home from './components/Home';
 import ManageEnforcement from './components/ManageEnforcement';
-import ManageDrivers from './components/ManageDrivers';
 import ManageAPIUsers from './components/ManageAPIUsers';
 import ViewStatistics from './components/ViewStatistics';
 
@@ -19,8 +18,8 @@ export default function Page() {
     switch (currentComponent) {
       case 'enforcement':
         return <ManageEnforcement onNavigate={handleNavigate} />;
-      case 'drivers':
-        return <ManageDrivers onNavigate={handleNavigate} />;
+      case 'tickets':
+        return <Box>Ticket Challenges Components</Box>;
       case 'api_users':
         return <ManageAPIUsers onNavigate={handleNavigate} />;
       case 'statistics':

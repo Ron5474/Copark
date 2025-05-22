@@ -6,7 +6,8 @@ import {
   UserInput,
   APIUser,
   APICredential,
-  APIUserID
+  APIUserID,
+  // ReportDay
 } from "./schema";
 
 const adminService = new AdminService();
@@ -70,4 +71,42 @@ export class AdminResolver {
   ): Promise<User[]> {
     return adminService.reinstateUser(user);
   }
+
+  // @Authorized(["admin"])
+  // @Query(() => [ReportDay])
+  // async generateReport(
+  //     @Ctx() request: Request
+  // ): Promise<ReportDay[]> {
+  //   const ticketQuery = `
+  //     query GetTicketsStats {
+  //       getTicketsStats {
+  //         date
+  //         tickets {
+  //           id
+  //         }
+  //       }
+  //     }
+  //   `
+  //   const ticketRes = await fetch('http://localhost:4002/graphql', {
+  //     method: 'POST',
+  //     headers: {
+  //     'Content-Type': 'application/json',
+  //     // eslint-disable-next-line
+  //     // @ts-ignore
+  //     Authorization: `${request.headers.authorization}`,
+  //     },
+  //     body: JSON.stringify({
+  //     query: ticketQuery,
+  //     }),
+  //   })
+
+  //   const ticketJson = await ticketRes.json()
+  //   console.log(ticketJson)
+  //   const ticketData = ticketJson?.data?.getTicketsStats
+
+  //   console.log(ticketData)
+  //   return ticketData;
+
+  //   // still need to add permit data and aggregate it
+  // }
 }

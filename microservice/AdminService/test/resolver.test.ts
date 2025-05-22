@@ -12,12 +12,17 @@ let server: http.Server
 let authServer: http.Server
 
 const AUTH_PORT = 3010
+const TICKET_PORT = 4002
+
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 
 beforeAll(async () => {
-  // Start your GraphQL server
+  // Start your GraphQL server on ADMIN_PORT
   server = http.createServer(app)
-  server.listen()
+  await new Promise<void>((resolve, reject) => {
+    server.listen(TICKET_PORT, () => resolve())
+      .on('error', (err) => reject(err))
+  })
   await bootstrap()
 
   // Force kill anything on AUTH_PORT
@@ -397,4 +402,28 @@ test('Admin can get a list of API users', async () => {
   expect(apiUsers[0]).toHaveProperty('name')
   expect(apiUsers[0]).toHaveProperty('email')
   expect(apiUsers[0]).toHaveProperty('role')
+})
+
+test('Admin can get a list of enforcers', async () => {
+  const token = await loginAsAdmin()
+
+  const query = `
+    query {
+      generateReport {
+        date
+        tickets {
+          id
+        }
+      }
+    }
+  `
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query })
+    .expect(200)
+
+  expect(response.body.errors).toBeUndefined()
+  console.log(response.body.data.generateReport)
 })

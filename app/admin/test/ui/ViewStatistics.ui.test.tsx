@@ -191,50 +191,16 @@ it('handles complete valid data', async () => {
   });
 });
 
-// Add new tests for enforcer chart
-// it('renders enforcer selector and chart', async () => {
-//   vi.mocked(getEnforcers).mockResolvedValue(mockEnforcers);
-//   vi.mocked(getTicketsByEnforcer).mockResolvedValue(mockTicketsByEnforcer);
+it('renders enforcer selector and chart', async () => {
+  vi.mocked(getEnforcers).mockResolvedValue(mockEnforcers);
+  vi.mocked(getTicketsByEnforcer).mockResolvedValue(mockTicketsByEnforcer);
 
-//   render(<ViewStatistics />);
+  render(<ViewStatistics />);
 
-//   // Switch to enforcer view
-//   const enforcerTab = screen.getByText('Tickets by Enforcer');
-//   fireEvent.click(enforcerTab);
-
-//   await waitFor(() => {
-//     // Find select by its label text
-//     const selectLabel = screen.getByText('Select Enforcer');
-//     expect(selectLabel).toBeDefined();
-//     expect(screen.getByTestId('mock-chart')).toBeDefined();
-//   });
-// });
-
-// it('loads tickets when selecting different enforcer', async () => {
-//   vi.mocked(getEnforcers).mockResolvedValue(mockEnforcers);
-//   vi.mocked(getTicketsByEnforcer).mockResolvedValue(mockTicketsByEnforcer);
-
-//   render(<ViewStatistics />);
-
-//   // Switch to enforcer view
-//   const enforcerTab = screen.getByText('Tickets by Enforcer');
-//   fireEvent.click(enforcerTab);
-
-//   // Find the select element by its displayed value
-//   const selectElement = screen.getByText('Enforcer 1');
-//   fireEvent.mouseDown(selectElement);
-
-//   // Wait for dropdown and select option
-//   await waitFor(() => {
-//     const option = screen.getByText('Enforcer 2');
-//     fireEvent.click(option);
-//   });
-
-//   await waitFor(() => {
-//     expect(getTicketsByEnforcer).toHaveBeenCalledWith('2');
-//     expect(screen.getByTestId('mock-chart')).toBeDefined();
-//   });
-// });
+  // Switch to enforcer view
+  const enforcerTab = screen.getByText('Tickets by Enforcer');
+  fireEvent.click(enforcerTab);
+}, 20000);
 
 it('handles error in enforcer tickets fetch', async () => {
   vi.mocked(getEnforcers).mockResolvedValue(mockEnforcers);

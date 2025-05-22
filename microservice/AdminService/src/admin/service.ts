@@ -1,6 +1,7 @@
 import { User, UserInput, NewUser, APIUser, APICredential, APIUserID } from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
+// import { Ticket } from "../../../TicketService/src/ticket/schema";
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
@@ -260,4 +261,9 @@ export class AdminService {
 
     return Users;
   }
+
+  // change this any later
+  // public async generateReport(): Promise<any> {
+
+  // }
 }

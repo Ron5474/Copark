@@ -11,10 +11,8 @@ import React from 'react'
 const push = vi.fn()
 
 vi.mock('next-intl', () => ({
-  // Provide all the necessary exports without importing the actual module
   useLocale: () => 'en',
   useTranslations: () => ((key: string) => {
-    // This function directly returns translations without using vi.fn()
     switch (key) {
       case 'Do Not Sell My Personal Info':
         return 'Do Not Sell My Personal Info';
@@ -45,7 +43,10 @@ vi.mock('next-intl', () => ({
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({
     push
-  })
+  }),
+  Link: ({ children, href, ...props }: { children: React.ReactNode, href: string, [key: string]: any }) => (
+    <a href={href} {...props}>{children}</a>
+  )
 }))
 
 vi.mock('next/navigation', () => ({
@@ -92,7 +93,7 @@ it('Click Github', async () => {
   githubButton.click()
   const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('github', {
-    callbackUrl: '/driver/en/onboard',
+    callbackUrl: '/driver/en/onboarding/tos',
     basePath: '/driver'
   })
 })
@@ -103,7 +104,7 @@ it('Click Google', async () => {
   githubButton.click()
   const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('google', {
-    callbackUrl: '/driver/en/onboard',
+    callbackUrl: '/driver/en/onboarding/tos',
     basePath: '/driver'
   })
 })
@@ -114,7 +115,7 @@ it('Click Facebook', async () => {
   githubButton.click()
   const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('facebook', {
-    callbackUrl: '/driver/en/onboard',
+    callbackUrl: '/driver/en/onboarding/tos',
     basePath: '/driver'
   })
 })

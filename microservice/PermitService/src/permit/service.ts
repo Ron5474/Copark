@@ -11,7 +11,8 @@ import {
   NewZone,
   Permit,
   PermitsByDay,
-  LotDetails
+  LotDetails,
+  PurchaseLotInput,
 } from './schema'
 
 export class PermitService {
@@ -243,5 +244,73 @@ export class PermitService {
     
     if (result.rowCount == 0) throw new Error(`Lot type ${lot} not found`)
     return result.rows[0].data
+  }
+
+  public async purchaseMyLotPermit(input: PurchaseLotInput): Promise<Confirmation> {
+
+    const details = await this.getLotDetails(input.lot)
+    const service = 0.50
+    let subTotal
+    switch (input.duration) {
+      case 'daily':
+        subTotal = details.daily
+        break
+      case 'quarterly':
+        subTotal = details.quarterly
+        break
+      case 'yearly':
+        subTotal = details.yearly
+        break
+      default:
+        throw new Error('Incorrect permit option')
+    }
+    if (subTotal === undefined) throw new Error(`Lot type ${input.lot} does not have ${input.duration} duration option`)
+    const total = service + subTotal
+    const receipt = {
+      service,
+      subTotal,
+      total
+    } as Receipt
+
+    // Stripe processing goes here
+
+
+    const today = new Date()
+
+    const purchaseDate = today.toISOString()
+    const activeDate = today.toISOString() // TODO allow purchases in advance
+    
+    const expireDate = new Date().toISOString() // TODO this needs to be a specific date/time based on lot details somehow
+
+    const data = {
+      purchaseDate,
+      activeDate,
+      expireDate,
+      receipt,
+      paymentMethod: input.paymentMethod,
+    }
+
+    const { rows } = await pool.query(`
+      WITH selected_lot AS (
+        SELECT id FROM type
+        WHERE data->>'name' = 'lot'
+        AND TRIM(LOWER(data->>'area')) = TRIM(LOWER($2))
+        LIMIT 1
+      )
+      INSERT INTO permit (vehicle, type, data)
+      SELECT $1, id, $3 FROM selected_lot
+      RETURNING type, data
+    `, [input.vehicle, input.lot, data])
+
+    // TODO: Hit email api to send confirmation and receipt
+    return {
+      type: 'zone',
+      area: input.lot,
+      purchaseDate: rows[0].data.purchaseDate,
+      activeDate: rows[0].data.activeDate,
+      expireDate: rows[0].data.expireDate,
+      receipt: rows[0].data.receipt,
+      paymentMethod: rows[0].data.paymentMethod,
+    }
   }
 }

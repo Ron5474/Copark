@@ -91,11 +91,11 @@ export class LotDetails {
   @Field(() => Number, { nullable: true })
   daily?: number
 
-  @Field(() => Duration, { nullable: true })
-  quarterly?: Duration
+  @Field(() => Number, { nullable: true })
+  quarterly?: number
 
-  @Field(() => String, { nullable: true })
-  yearly?: string
+  @Field(() => Number, { nullable: true })
+  yearly?: number
 }
 
 @ObjectType()
@@ -157,6 +157,22 @@ export class PurchaseZoneInput {
 
   @Field(() => DurationInput)
   duration!: DurationInput
+
+  @Field(() => String)
+  paymentMethod!: string
+}
+
+
+@InputType()
+export class PurchaseLotInput {
+  @Field(() => ID)
+  vehicle!: string
+
+  @Field(() => String)
+  lot!: string
+
+  @Field(() => String)
+  duration!: string
 
   @Field(() => String)
   paymentMethod!: string

@@ -345,14 +345,14 @@ test('Admin can get ticket stats grouped by day', async () => {
     .expect(200);
 
   expect(response.body.errors).toBeUndefined();
-  const stats = response.body.data.getTicketsStats;
+  const stats = response.body.data.getPermitStats;
   expect(Array.isArray(stats)).toBe(true);
   expect(stats.length).toBeGreaterThan(0);
   stats.forEach((dayStat: any) => {
     expect(dayStat).toHaveProperty('date');
     expect(Array.isArray(dayStat.permits)).toBe(true);
-    dayStat.permit.forEach((permit: any) => {
-      expect(permit).toHaveProperty('id');
+    dayStat.permits.forEach((permit: any) => {
+      expect(permit).toHaveProperty('vehicle');
     });
   });
 });

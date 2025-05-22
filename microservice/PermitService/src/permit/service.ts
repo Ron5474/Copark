@@ -175,14 +175,15 @@ export class PermitService {
         id,
         vehicle,
         type,
-        data->>'purchaseDate' AS purchaseDate,
-        data->>'activeDate' AS activeDate,
-        data->>'expireDate' AS expireDate,
+        data->>'purchaseDate' AS purchasedate,
+        data->>'activeDate' AS activedate,
+        data->>'expiresDate' AS expiresdate,
         data->>'receipt' AS receipt,
-        data->>'paymentMethod' AS paymentMethod
+        data->>'paymentMethod' AS paymentmethod,
+        data->>'area' AS area
       FROM permit
-      ORDER BY data->>'activeDate';
-    `; // TODO Fix this to join on type table to grab type.name and type.area
+      ORDER BY data->>'activedate';
+    `;
 
     const permitResults = await pool.query(permitQuery);
     const permitsByDayMap: Record<string, Permit[]> = {};
@@ -195,9 +196,10 @@ export class PermitService {
         vehicle: row.vehicle,
         type: row.type,
         area: row.area,
-        activeDate: row.activeDate,
+        activeDate: row.activedate,
         expireDate: row.expiresdate,
       };
+      // console.log('permit', permit)
 
       if (!permitsByDayMap[date]) {
         permitsByDayMap[date] = [];

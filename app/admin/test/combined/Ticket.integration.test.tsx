@@ -48,7 +48,7 @@ it('successfully displays ticket data from API', async () => {
   render(<ViewStatistics />);
   await waitFor(() => {
     expect(screen.getByTestId('mock-chart')).toBeDefined();
-    expect(screen.getByText('Ticket Statistics')).toBeDefined();
+    expect(screen.getByText('Statistics')).toBeDefined();
   });
 });
 

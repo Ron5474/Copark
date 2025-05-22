@@ -90,7 +90,7 @@ it('renders chart with valid ticket data', async () => {
   render(<ViewStatistics />);
 
   await waitFor(() => {
-    expect(screen.getByText('Ticket Statistics')).toBeDefined();
+    expect(screen.getByText('Statistics')).toBeDefined();
   });
 
   const chartElement = screen.getByTestId('mock-chart');

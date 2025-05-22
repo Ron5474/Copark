@@ -7,14 +7,12 @@ import { getTicketsByEnforcer } from '../../src/ticket/actions';
 
 const server = setupServer();
 
-// Mock next/headers for auth token
 vi.mock('next/headers', () => ({
   cookies: () => ({
     get: () => ({ value: 'mock-token' }),
   }),
 }));
 
-// Mock react-chartjs-2
 vi.mock('react-chartjs-2', () => ({
   Line: () => <div data-testid="mock-chart">A cool chart.</div>
 }));

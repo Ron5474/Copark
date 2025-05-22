@@ -33,3 +33,14 @@ export interface Ticket {
   images?: string
   note?: string
 }
+
+export interface PermitsByDay {
+  date: string;
+  permits: {
+    vehicle: string;
+    type: string;
+    area: string;
+    activeDate: string;
+    expireDate: string;
+  }[];
+}

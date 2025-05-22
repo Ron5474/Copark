@@ -125,7 +125,6 @@ export class TicketService {
     return ticket;
   }
 
-
   public async modifyTicket(input: ModifyTicketInput): Promise<Ticket | null> {
     const { id, vehicle, ...updates } = input;
   
@@ -404,5 +403,75 @@ export class TicketService {
 
     // console.log(resultArr);
     return resultArr;
+  }
+
+  public async acceptTicketChallenge(ticketID: TicketInput): Promise<Ticket | null> {
+    const decryptedID = await this.decrypt(ticketID.id);
+
+    const query = `
+      UPDATE ticket
+      SET data = jsonb_set(data, '{ticketStatus}', '"accepted"', true)
+      WHERE id = $1
+      RETURNING id, vehicle, enforcer, 
+                data->>'issuedDate' AS issueddate,
+                data->>'violation' AS violation,
+                data->>'fine' AS fine,
+                data->>'ticketStatus' AS ticketstatus,
+                data->>'images' AS images
+    `;
+
+    const result = await pool.query(query, [decryptedID]);
+
+    if (result.rows.length === 0) {
+      throw new Error("No delete found.");
+    }
+
+    const row = result.rows[0];
+
+    return {
+      id: await this.encrypt(row.id),
+      vehicle: row.vehicle,
+      enforcer: await this.encrypt(row.enforcer),
+      issuedDate: new Date(row.issueddate),
+      violation: row.violation,
+      fine: parseFloat(row.fine),
+      ticketStatus: row.ticketstatus,
+      images: row.images,
+    } as Ticket;
+  }
+
+  public async rejectTicketChallenge(ticketID: TicketInput): Promise<Ticket | null> {
+    const decryptedID = await this.decrypt(ticketID.id);
+
+    const query = `
+      UPDATE ticket
+      SET data = jsonb_set(data, '{ticketStatus}', '"unpaid"', true)
+      WHERE id = $1
+      RETURNING id, vehicle, enforcer, 
+                data->>'issuedDate' AS issueddate,
+                data->>'violation' AS violation,
+                data->>'fine' AS fine,
+                data->>'ticketStatus' AS ticketstatus,
+                data->>'images' AS images
+    `;
+
+    const result = await pool.query(query, [decryptedID]);
+
+    if (result.rows.length === 0) {
+      throw new Error("No delete found.");
+    }
+
+    const row = result.rows[0];
+
+    return {
+      id: await this.encrypt(row.id),
+      vehicle: row.vehicle,
+      enforcer: await this.encrypt(row.enforcer),
+      issuedDate: new Date(row.issueddate),
+      violation: row.violation,
+      fine: parseFloat(row.fine),
+      ticketStatus: row.ticketstatus,
+      images: row.images,
+    } as Ticket;
   }
 }

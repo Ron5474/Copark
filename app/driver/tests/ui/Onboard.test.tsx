@@ -3,8 +3,8 @@ import { render, screen, cleanup } from '@testing-library/react'
 // import userEvent from '@testing-library/user-event'
 
 
-import View from '../../src/app/[locale]/onboard/View'
-import Page from '../../src/app/[locale]/onboard/page'
+import View from '../../src/app/[locale]/onboarding/tos/View'
+import Page from '../../src/app/[locale]/onboarding/tos/page'
 
 const push = vi.fn()
 

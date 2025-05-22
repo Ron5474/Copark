@@ -29,7 +29,7 @@ export default function SignupView() {
   const router = useRouter()
   const locale = useLocale()
   const handleClick = async (provider: string) => {
-    await signIn(provider, { callbackUrl: `/driver/${locale}/onboard`, basePath: '/driver' })
+    await signIn(provider, { callbackUrl: `/driver/${locale}/onboarding/tos`, basePath: '/driver' })
   }
 
   useEffect(() => {

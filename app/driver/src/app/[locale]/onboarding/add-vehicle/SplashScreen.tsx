@@ -1,0 +1,95 @@
+'use client'
+/**
+ * @file SplashScreen.tsx
+ * @description This file contains the SplashScreen component which is used to display a splash screen
+ * @author Swayam Shah
+ */
+
+import { useContext } from 'react';
+import { OnboardingContext } from './context';
+
+import { Box, Button, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import Feature from './Feature';
+
+export default function SplashScreen() {
+  const context = useContext(OnboardingContext);
+
+  const handleNext = () => {
+    context.setCurrentPage(1);
+  }
+
+  return(
+   <Box sx={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: 2,
+    textAlign: 'center',
+    backgroundColor: "white",
+    borderRadius: '25px',
+    margin: "0 50px 0 50px",
+    boxShadow: (theme) => theme.shadows[3],
+   }}>
+    <Box sx={{
+      backgroundColor: (theme) => theme.palette.primary.light,
+      borderRadius: '25px',
+    }}>
+      <picture>
+        <source media="(max-width: 600px)" srcSet="/driver/assets/Add_car.svg" />
+        <img src="/driver/assets/Add_car.svg" alt="Splash Screen" style={{ width: '50%', height: 'auto' }} />
+      </picture>
+    </Box>
+      <Typography variant="h5" sx={{ marginTop: 2, color: (theme) => theme.palette.primary.dark }}>
+        <strong>Welcome to Your<br />
+        Digital Garage</strong>
+      </Typography>
+      <Typography variant="body1" sx={{
+        color: "gray"
+      }}>
+        Start your journey by adding your first vehicle and get your permits with a tap.
+      </Typography>
+    <Box sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+      padding: 2,
+      marginTop: 2,
+    }}>
+      <Feature icon = "/driver/assets/feature1-onboarding.svg" title="Single Click permits" desc="Purchase permits with a single click" />
+      <Feature icon = "/driver/assets/feature2-onboarding.svg" title="Check and Pay for Tickets" desc="Check for tickets on your vehicle and pay instantly" />
+    </Box>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        padding: 2,
+      }}>
+      <Button sx={{
+        backgroundColor: (theme) => theme.palette.primary.main,
+        color: "white",
+        borderRadius: '15px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        padding: 2,
+      }} onClick={handleNext}>
+        <AddIcon />
+        Add Your First Vehicle
+      </Button>
+      <Typography variant="body2" sx={{
+        color: "gray",
+        marginTop: 2,
+      }}>
+       Your data is secure • Add unlimited vehicles later
+      </Typography>
+    </Box>
+   </Box>
+  )
+}

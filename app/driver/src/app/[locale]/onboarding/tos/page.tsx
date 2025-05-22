@@ -13,9 +13,9 @@ import type { NextPage } from 'next'
 import { ThemeProvider } from '@mui/material/styles'
 import { SessionProvider } from 'next-auth/react'
 
-import theme from '../theme'
-import TopBar from '../shared/Topbar'
-import Footer from '../shared/Footer'
+import theme from '../../theme'
+import TopBar from '../../shared/Topbar'
+import Footer from '../../shared/Footer'
 import {CssBaseline, Toolbar } from '@mui/material'
 import OnboardView from './View'
 

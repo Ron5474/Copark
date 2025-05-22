@@ -1,0 +1,40 @@
+<svg width="220" height="180" viewBox="0 0 280 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- {/* Shield Background */} -->
+        <path
+          d="M140 20L220 60V130C220 174.18 185.23 210 140 230C94.77 210 60 174.18 60 130V60L140 20Z"
+          fill="#41A9AB"
+          opacity="0.1"
+        />
+        <path
+          d="M140 30L210 65V130C210 169.15 180.22 200 140 218C99.78 200 70 169.15 70 130V65L140 30Z"
+          fill="#41A9AB"
+          opacity="0.2"
+        />
+
+        <!-- {/* Car body */} -->
+        <path
+          d="M190 140H90C85 140 80 135 80 130L90 100C95 90 105 85 115 85H165C175 85 185 90 190 100L200 130C200 135 195 140 190 140Z"
+          fill="#41A9AB"
+        />
+
+        <!-- {/* Car top */} -->
+        <path d="M170 85H110L115 65C118 60 123 55 130 55H150C157 55 162 60 165 65L170 85Z" fill="#41A9AB" />
+
+        <!-- {/* Windows */} -->
+        <path d="M160 85H120L125 70C127 65 130 62 135 62H145C150 62 153 65 155 70L160 85Z" fill="#a5d8ff" />
+
+        <!-- {/* Lights */} -->
+        <rect x="80" y="110" width="10" height="8" rx="4" fill="#ffeb3b" />
+        <rect x="190" y="110" width="10" height="8" rx="4" fill="#ff5252" />
+
+        <!-- {/* Wheels */} -->
+        <circle cx="110" cy="140" r="15" fill="#424242" />
+        <circle cx="110" cy="140" r="7" fill="#9e9e9e" />
+        <circle cx="170" cy="140" r="15" fill="#424242" />
+        <circle cx="170" cy="140" r="7" fill="#9e9e9e" />
+
+        <!-- {/* Lock Icon */} -->
+        <circle cx="140" cy="110" r="20" fill="#F45A59" />
+        <rect x="132" y="105" width="16" height="15" rx="2" fill="white" />
+        <rect x="137" y="100" width="6" height="10" rx="3" fill="white" />
+      </svg>

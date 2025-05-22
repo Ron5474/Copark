@@ -1,0 +1,23 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circle background -->
+  <circle cx="50" cy="50" r="45" fill="#4F46E5" stroke="#3730A3" stroke-width="2"/>
+  
+  <!-- Ticket icon -->
+  <g transform="translate(25, 30)">
+    <!-- Main ticket body -->
+    <rect x="0" y="0" width="50" height="35" rx="4" fill="white"/>
+    
+    <!-- Ticket perforations (left side) -->
+    <circle cx="0" cy="17.5" r="3" fill="#4F46E5"/>
+    
+    <!-- Ticket perforations (right side) -->
+    <circle cx="50" cy="17.5" r="3" fill="#4F46E5"/>
+    
+    <!-- Check mark -->
+    <path d="M15 18 L22 25 L35 12" stroke="#4F46E5" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Ticket details lines -->
+    <line x1="8" y1="8" x2="25" y2="8" stroke="#E5E7EB" stroke-width="2" stroke-linecap="round"/>
+    <line x1="8" y1="27" x2="20" y2="27" stroke="#E5E7EB" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

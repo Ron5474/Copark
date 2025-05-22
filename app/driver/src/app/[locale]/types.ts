@@ -46,3 +46,8 @@ export interface PermitDetails {
   vehicle?: Vehicle;
   duration?: Duration | null; 
 }
+
+export type TicketContextType = {
+  currentView: string,
+  setCurrentView: React.Dispatch<React.SetStateAction<string>>,
+}

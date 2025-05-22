@@ -178,11 +178,11 @@ export class PermitService {
         id,
         vehicle,
         type,
-        data->>'purchaseDate' AS purchasedate,
-        data->>'activeDate' AS activedate,
-        data->>'expireDate' AS expiredate,
+        data->>'purchaseDate' AS purchaseDate,
+        data->>'activeDate' AS activeDate,
+        data->>'expireDate' AS expireDate,
         data->>'receipt' AS receipt,
-        data->>'paymentMethod' AS paymentmethod,
+        data->>'paymentMethod' AS paymentMethod,
         data->>'area' AS area
       FROM permit
       ORDER BY data->>'activedate';
@@ -199,8 +199,8 @@ export class PermitService {
         vehicle: row.vehicle,
         type: row.type,
         area: row.area,
-        activeDate: row.activedate,
-        expireDate: row.expiredate,
+        activeDate: row.activeDate,
+        expireDate: row.expireDate,
       };
       // console.log('permit', permit)
 
@@ -324,7 +324,7 @@ export class PermitService {
 
     // TODO: Hit email api to send confirmation and receipt
     return {
-      type: 'zone',
+      type: 'lot',
       area: input.lot,
       purchaseDate: rows[0].data.purchaseDate,
       activeDate: rows[0].data.activeDate,

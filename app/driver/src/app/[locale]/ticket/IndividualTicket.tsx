@@ -13,6 +13,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+
 import { useState } from 'react'
 import { useTicketState } from './TicketContext'
 
@@ -104,7 +105,7 @@ export default function IndividualTicket() {
                   color: '#333333'
                 }}
               >
-                {currentTicket?.violation || 'No violation specified'}
+                {currentTicket?.violation}
               </Typography>
             </Paper>
           </Box>
@@ -127,26 +128,10 @@ export default function IndividualTicket() {
               color="text.primary"
               sx={{ ml: 4.5, fontSize: '1rem' }}
             >
-              {currentTicket?.issueddate || 'Not specified'}
+              {currentTicket?.issueddate}
             </Typography>
           </Box>
 
-          {/* Additional Details */}
-          {/* {currentTicket.location && (
-            <Box sx={{ mb: 3 }}>
-              <Typography 
-                variant="subtitle2" 
-                color="#00796b"
-                fontWeight="600"
-                sx={{ mb: 1 }}
-              >
-                LOCATION
-              </Typography>
-              <Typography variant="body1" color="text.primary">
-                {currentTicket.location}
-              </Typography>
-            </Box>
-          )} */}
         </CardContent>
       </Card>
 
@@ -247,8 +232,7 @@ export default function IndividualTicket() {
                       }}
                     />
                   </picture>
-                  
-                  {/* Photo Label */}
+
                   <Box 
                     sx={{ 
                       position: 'absolute',
@@ -310,9 +294,6 @@ export default function IndividualTicket() {
             fontWeight: 600,
             py: 1.5,
             borderRadius: 2,
-            '&:hover': {
-              bgcolor: '#005a4d'
-            }
           }}
         >
           Challenge Ticket
@@ -328,9 +309,6 @@ export default function IndividualTicket() {
             py: 1.5,
             mt: '15px',
             borderRadius: 2,
-            '&:hover': {
-              bgcolor: '#005a4d'
-            }
           }}
         >
           Pay Ticket

@@ -32,7 +32,7 @@ export function TicketProvider({children}: {children: React.ReactNode} ) {
         violation: "Expired meter",
         fine: 45.50,
         ticketStatus: "challenged",
-        images: ["https://picsum.photos/id/19/2500/1667.jpg", "https://picsum.photos/id/19/2500/1667.jpg"]
+        images: ["https://picsum.photos/id/19/2500/1667.jpg"]
       },
     ])
   }

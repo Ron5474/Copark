@@ -14,13 +14,14 @@ import {Fragment} from 'react'
 
 import { useTicketState } from './TicketContext'
 import TicketList from './TicketList'
+import IndividualTicket from './IndividualTicket'
 
 export default function TicketView() {
   const {currentView} = useTicketState()
 
   return (
     <Fragment>
-      {currentView === 'TicketList' ? <TicketList /> : <>Need to Implement</>}
+      {currentView === 'TicketList' ? <TicketList /> : currentView === 'IndividualTicket' ? <IndividualTicket /> : <>Need to Implement</>}
     </Fragment>
   );
 }

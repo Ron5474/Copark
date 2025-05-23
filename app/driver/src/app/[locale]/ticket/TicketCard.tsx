@@ -9,11 +9,14 @@ import { useTicketState } from './TicketContext'
 import { Ticket } from '../types'
 
 export default function TicketCard({ticket}: {ticket: Ticket}) {
-  const {setCurrentTicket} = useTicketState()
+  const {setCurrentTicket, setCurrentView} = useTicketState()
   const  bgColor = ticket.ticketStatus === 'paid' ? 'success' : ((ticket.ticketStatus === 'unpaid') ? 'error' : 'warning')
   return (
     <Card sx={{ maxWidth: 345 }}>
-      <CardActionArea onClick={() => {setCurrentTicket(ticket)}}>
+      <CardActionArea onClick={() => {
+        setCurrentTicket(ticket)
+        setCurrentView('IndividualTicket')
+      }}>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography gutterBottom variant="h5" component="div">

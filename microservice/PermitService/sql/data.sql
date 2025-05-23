@@ -120,7 +120,7 @@ INSERT INTO type (id, location, data) VALUES
 
 INSERT INTO type (id, location, data) VALUES
   (
-    '93e3c80a-95ca-4f21-803a-2680b4d1994e',
+    'b7a7d5d0-1b8f-4b02-a012-5c667ef2ecb1',
     'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
       'name', 'lot',
@@ -146,7 +146,7 @@ INSERT INTO type (id, location, data) VALUES
 
 INSERT INTO type (id, location, data) VALUES
   (
-    '93e3c80a-95ca-4f21-803a-2680b4d1994e',
+    '1a6fc438-e678-426a-a5fd-44cd6740ffb2',
     'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
       'name', 'lot',
@@ -159,7 +159,7 @@ INSERT INTO type (id, location, data) VALUES
 
 INSERT INTO type (id, location, data) VALUES
   (
-    '93e3c80a-95ca-4f21-803a-2680b4d1994e',
+    'f1a4a8d3-8c3e-4e30-b37f-bf90cd41972b',
     'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
       'name', 'lot',

@@ -111,3 +111,21 @@ test('getPermitsByDay retusn permits by day bought', async () => {
   const permits = await permitService.getAllPermitsByDay()
   expect(permits.length).toBe(1)
 });
+
+test('admin create zone', async () => {
+  expect(await permitService.createNewZone({
+    zone: 789,
+    weekday: {
+      hourly: 2.50,
+      maxDuration: {minutes: 30, hours: 1},
+      openTime: '07:00',
+      closeTime: '20:00'
+    },
+    weekend: {
+      hourly: 2.50,
+      maxDuration: {minutes: 30, hours: 1},
+      openTime: '07:00',
+      closeTime: '20:00'
+    }
+  }))
+})

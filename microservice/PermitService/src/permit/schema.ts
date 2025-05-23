@@ -70,10 +70,7 @@ export class ZoneDuration {
 }
 
 @InputType()
-export class NewZone {
-
-  @Field(() => Number)
-  zone!: number
+export class Zoneday {
 
   @Field(() => Number, { nullable: true })
   hourly?: number
@@ -86,6 +83,20 @@ export class NewZone {
 
   @Field(() => String, { nullable: true })
   closeTime?: string
+}
+
+@InputType()
+export class NewZone {
+
+  @Field(() => Number)
+  zone!: number
+
+  @Field(() => Zoneday)
+  weekday!: Zoneday
+
+  @Field(() => Zoneday)
+  weekend!: Zoneday
+
 }
 
 @InputType()

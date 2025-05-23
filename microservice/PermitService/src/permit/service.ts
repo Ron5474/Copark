@@ -221,17 +221,22 @@ export class PermitService {
 
   public async createNewZone(input: NewZone): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO Don't hardcode this
+    const data = {
+      name: 'zone',
+      area: input.zone,
+      ...input
+    }
     const { rows } = await pool.query(`
-      INSERT INTO type (data)
-      SELECT $1
+      INSERT INTO type (location, data)
+      SELECT $2, $1
       WHERE NOT EXISTS (
         SELECT 1 FROM type
         WHERE location = $2
-        AND data->>'area' = $1->>'zone'
+        AND data->>'area' = $3
         AND data->>'name' = 'zone'
       )
       RETURNING id, data
-    `, [input, location])
+    `, [data, location, data.zone])
   
     return (rows.length !== 0)
   }

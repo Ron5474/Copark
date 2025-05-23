@@ -114,7 +114,9 @@ INSERT INTO type (id, location, data) VALUES
     jsonb_build_object(
       'name', 'lot',
       'area', 'ANY',
-      'daily', 15
+      'daily', 15,
+      'quarterly', 200,
+      'yearly', 500
     )
   );
 

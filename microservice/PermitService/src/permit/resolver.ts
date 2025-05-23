@@ -13,6 +13,7 @@ import {
   LotDetails,
   PurchaseLotInput,
   NewLot,
+  LotGroup,
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
@@ -291,11 +292,17 @@ export class PermitResolver {
     return await service.getLotDetails(lot)
   }
 
+  // @Authorized('driver')
+  // @Query(() => [LotDetails])
+  // async allLotDetails(): Promise<LotDetails[]> {
+  //   return await service.getAllLotDetails()
+  // }
   @Authorized('driver')
-  @Query(() => [LotDetails])
-  async allLotDetails(): Promise<LotDetails[]> {
-    return await service.getAllLotDetails()
+  @Query(() => [LotGroup])
+  async allLotDetails(): Promise<LotGroup[]> {
+    return await service.getAllLotDetails();
   }
+
 
   @Authorized('admin')
   @Mutation(() => Boolean)

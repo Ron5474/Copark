@@ -22,7 +22,7 @@ export function TicketProvider({children}: {children: React.ReactNode} ) {
         violation: "Parking in no-parking zone",
         fine: 75.00,
         ticketStatus: "unpaid",
-        images: ["img_front.jpg", "img_side.jpg"]
+        images: ["https://picsum.photos/id/19/2500/1667.jpg", "https://picsum.photos/id/19/2500/1667.jpg"]
       },
       {
         id: "enc_2c3d4e5f6g7h8i9j0k1l2m",
@@ -32,7 +32,7 @@ export function TicketProvider({children}: {children: React.ReactNode} ) {
         violation: "Expired meter",
         fine: 45.50,
         ticketStatus: "challenged",
-        images: ["img_meter.jpg", "img_vehicle.jpg"]
+        images: ["https://picsum.photos/id/19/2500/1667.jpg", "https://picsum.photos/id/19/2500/1667.jpg"]
       },
     ])
   }

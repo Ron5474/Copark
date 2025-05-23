@@ -52,12 +52,19 @@ export type TicketContextType = {
   setCurrentView: React.Dispatch<React.SetStateAction<string>>,
   tickets: Ticket[],
   setTickets: React.Dispatch<React.SetStateAction<Ticket[]>>,
+  currentTicket: Ticket | undefined,
+  setCurrentTicket: React.Dispatch<React.SetStateAction<Ticket | undefined>>,
 }
 
 export interface Ticket {
   id: string
+  vehicle: string
+  enforcer: string
+  violation: string
   ticketStatus: string
   issueddate: string
+  fine: number
+  images: Array<string>
 }
 
 export interface Lot {

@@ -235,3 +235,24 @@ export class PermitsByDay {
   @Field(() => [Permit])
   permits!: Permit[];
 }
+
+@ObjectType()
+export class Lot {
+  @Field(() => String)
+  name!: string;
+
+  @Field(() => String)
+  price!: string;
+}
+
+@ObjectType()
+export class LotGroup {
+  @Field(() => String)
+  id!: string;
+
+  @Field(() => String)
+  title!: string;
+
+  @Field(() => [Lot])
+  lots!: Lot[];
+}

@@ -1,22 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { 
   Box, 
   Typography, 
-  Card, 
-  CardContent, 
   Stack,
   Button,
-  Chip,
-  Paper,
   useTheme
 } from '@mui/material'
 
-// Mock data based on ticket structure from other services
 const mockChallengedTickets = [
   {
-    id: "enc_7f8a9b3c4d5e6f7g8h9i0j",
+    id: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMxMTFkMmZmLWJiZmYtNGU5Yy1hZDNhLTgwYWU5YTkxOTI3NSJ9.TNstWQ63-iX-W01hrYZdGy4ErP-8DbRsXrPCdnG7GcA",
     vehicle: "ABC-1234",
     enforcer: "enc_5e6f7g8h9i0j1k2l3m4n5o",
     issuedDate: "2025-03-15",
@@ -28,7 +23,7 @@ const mockChallengedTickets = [
     challengeReason: "Emergency situation - medical emergency required immediate parking"
   },
   {
-    id: "enc_2c3d4e5f6g7h8i9j0k1l2m",
+    id: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcwZDI4OGY2LTJiNzctNDZhZS1iNTc0LWQ5NmJkMzU5ODUxNiJ9.Lx01-yIXjpozcBNobxBJ3mIZGYFSGqTchQyJuIedg60",
     vehicle: "XYZ-9876",
     enforcer: "enc_8h9i0j1k2l3m4n5o6p7q8r",
     issuedDate: "2025-04-02",
@@ -41,9 +36,13 @@ const mockChallengedTickets = [
   }
 ]
 
+const getShortId = (jwt: string) => jwt.slice(-8).toUpperCase();
+
 export default function ManageTicketChallenges() {
   const theme = useTheme()
   const [challengedTickets, setChallengedTickets] = useState(mockChallengedTickets)
+
+  void setChallengedTickets;
 
   return (
     <Box sx={{ p: 4, bgcolor: '#ffffff' }}>
@@ -112,7 +111,7 @@ export default function ManageTicketChallenges() {
                       color: theme.palette.primary.dark
                     }}
                   >
-                    Ticket #{ticket.id}
+                    Ticket #{getShortId(ticket.id)}
                   </Typography>
                   <Typography
                     sx={{

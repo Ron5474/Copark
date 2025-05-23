@@ -5,17 +5,15 @@ import CardActionArea from '@mui/material/CardActionArea'
 import Chip from '@mui/material/Chip'
 import Box from '@mui/material/Box'
 
-interface Ticket {
-  id: string
-  ticketStatus: string
-  issueddate: string
-}
+import { useTicketState } from './TicketContext'
+import { Ticket } from '../types'
 
 export default function TicketCard({ticket}: {ticket: Ticket}) {
+  const {setCurrentTicket} = useTicketState()
   const  bgColor = ticket.ticketStatus === 'paid' ? 'success' : ((ticket.ticketStatus === 'unpaid') ? 'error' : 'warning')
   return (
     <Card sx={{ maxWidth: 345 }}>
-      <CardActionArea onClick={() => {console.log('Clicked on this card', ticket.id)}}>
+      <CardActionArea onClick={() => {setCurrentTicket(ticket)}}>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography gutterBottom variant="h5" component="div">

@@ -17,7 +17,7 @@ import TicketList from './TicketList'
 
 export default function TicketView() {
   const {currentView} = useTicketState()
-  console.log('Curr: ', currentView)
+
   return (
     <Fragment>
       {currentView === 'TicketList' ? <TicketList /> : <>Need to Implement</>}

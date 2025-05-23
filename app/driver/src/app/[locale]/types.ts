@@ -59,3 +59,14 @@ export interface Ticket {
   ticketStatus: string
   issueddate: string
 }
+
+export interface Lot {
+  name: string
+  price: string
+}
+
+export interface LotGroup {
+  id: string
+  title: string
+  lots: Lot[]
+}

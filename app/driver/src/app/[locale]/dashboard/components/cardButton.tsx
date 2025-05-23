@@ -50,9 +50,82 @@
 // }
 
 // export default CardButton;
+// "use client";
+
+// import { Box, Paper, Typography, Collapse, IconButton } from "@mui/material";
+// import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+// import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+
+// type CardButtonProps = {
+//   icon: string;
+//   text: string;
+//   expanded: boolean;
+//   onToggle: () => void;
+//   children?: React.ReactNode;
+//   hideArrow?: boolean;
+// };
+
+// function CardButton({
+//   text,
+//   expanded,
+//   onToggle,
+//   children,
+//   hideArrow = false
+// }: CardButtonProps) {
+//   return (
+//     <Paper
+//       elevation={3}
+//       sx={{
+//         p: 2,
+//         my: 2,
+//         borderRadius: "16px",
+//         background: 'linear-gradient(135deg, #e0f7f7 0%, #b2dfdb 100%)',
+//         border: '1px solid #80cbc4',
+//         boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.05)',
+//       }}
+//     >
+//       <Box
+//         display="flex"
+//         justifyContent="space-between"
+//         alignItems="center"
+//         onClick={onToggle}
+//         sx={{ cursor: "pointer" }}
+//       >
+//         <Typography variant="h6" fontWeight="bold">
+//           {text}
+//         </Typography>
+
+//         {!hideArrow && (
+//           <IconButton
+//             aria-label={expanded ? `Collapse ${text}` : `Expand ${text}`}
+//             onClick={(e) => {
+//               e.stopPropagation()
+//               onToggle()
+//             }}
+//           >
+//             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+//           </IconButton>
+//         )}
+//       </Box>
+
+//       <Collapse in={expanded} timeout="auto" unmountOnExit>
+//         <Box
+//           mt={2}
+//           px={2}
+//           py={1}
+//           sx={{ backgroundColor: "#f0fdfd", borderRadius: "12px" }}
+//         >
+//           {children}
+//         </Box>
+//       </Collapse>
+//     </Paper>
+//   );
+// }
+
+// export default CardButton;
 "use client";
 
-import { Box, Paper, Typography, Collapse, IconButton } from "@mui/material";
+import { Box, Paper, Typography, Collapse, IconButton, Chip } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
@@ -63,6 +136,7 @@ type CardButtonProps = {
   onToggle: () => void;
   children?: React.ReactNode;
   hideArrow?: boolean;
+  badgeText?: string;
 };
 
 function CardButton({
@@ -70,7 +144,8 @@ function CardButton({
   expanded,
   onToggle,
   children,
-  hideArrow = false
+  hideArrow = false,
+  badgeText,
 }: CardButtonProps) {
   return (
     <Paper
@@ -78,10 +153,11 @@ function CardButton({
       sx={{
         p: 2,
         my: 2,
+        minHeight: "100px",
         borderRadius: "16px",
-        background: 'linear-gradient(135deg, #e0f7f7 0%, #b2dfdb 100%)',
-        border: '1px solid #80cbc4',
-        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.05)',
+        background: "linear-gradient(135deg, #e0f7f7 0%, #b2dfdb 100%)",
+        border: "1px solid #80cbc4",
+        boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.05)",
       }}
     >
       <Box
@@ -91,9 +167,33 @@ function CardButton({
         onClick={onToggle}
         sx={{ cursor: "pointer" }}
       >
-        <Typography variant="h6" fontWeight="bold">
-          {text}
-        </Typography>
+        <Box>
+          <Typography variant="h6" fontWeight="bold">
+            {text}
+          </Typography>
+          {badgeText && (
+            <Chip
+              label={badgeText}
+              size="small"
+              sx={{
+                mt: 0.5,
+                fontWeight: 600,
+                backgroundColor:
+                  badgeText === "Best Value"
+                    ? "#aed581"
+                    : badgeText === "Quick Access"
+                    ? "#81d4fa"
+                    : "#eeeeee",
+                color:
+                  badgeText === "Best Value"
+                    ? "#33691e"
+                    : badgeText === "Quick Access"
+                    ? "#01579b"
+                    : "#333",
+              }}
+            />
+          )}
+        </Box>
 
         {!hideArrow && (
           <IconButton

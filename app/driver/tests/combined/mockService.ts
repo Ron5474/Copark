@@ -162,13 +162,50 @@ const zoneDetails: ZoneDetails = {
   closeTime: '20:00'
 }
 
+const lotDetailsMock = [
+  {
+    id: "daily",
+    title: "Daily",
+    lots: [
+      { name: "Any lot", price: "$15" },
+      { name: "Lot A", price: "$12" },
+      { name: "Lot B", price: "$10" },
+      { name: "Lot C", price: "$8" },
+      { name: "Lot R", price: "$6" },
+    ],
+  },
+  {
+    id: "quarterly",
+    title: "Quarterly",
+    lots: [
+      { name: "Any lot", price: "$200" },
+      { name: "Lot A", price: "$150" },
+      { name: "Lot B", price: "$120" },
+      { name: "Lot C", price: "$100" },
+      { name: "Lot R", price: "$80" },
+    ],
+  },
+  {
+    id: "yearly",
+    title: "Yearly",
+    lots: [
+      { name: "Any lot", price: "$500" },
+      { name: "Lot A", price: "$350" },
+      { name: "Lot B", price: "$300" },
+      { name: "Lot C", price: "$250" },
+      { name: "Lot R", price: "$200" },
+    ],
+  },
+]
+
 const permit = (server: Server, failGet=false): void => {
   server.use(
     http.post(permitURL, async ({ request }) => {
       const body = await request.json()
 
       if (body && typeof body === 'object' && typeof body.query === 'string') {
-        if (body.query.includes('query GetZoneDetails')) {
+        const query = body.query
+        if (query.includes('query GetZoneDetails')) {
           if (!failGet) {
             return HttpResponse.json({
               data: {
@@ -179,6 +216,23 @@ const permit = (server: Server, failGet=false): void => {
             return HttpResponse.json({
               errors: [{ message: 'Failed to connect' }],
             }, { status: 200 })
+          }
+        }
+
+        if (query.includes('query GetLotDetails')) {
+          if (!failGet) {
+            return HttpResponse.json({
+              data: {
+                allLotDetails: lotDetailsMock,
+              },
+            })
+          } else {
+            return HttpResponse.json(
+              {
+                errors: [{ message: 'Failed to connect to GetLotDetails' }],
+              },
+              { status: 200 }
+            )
           }
         }
       }

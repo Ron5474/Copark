@@ -109,35 +109,66 @@ INSERT INTO type (id, location, data) VALUES
 
 INSERT INTO type (id, location, data) VALUES
   (
+    'e6a7230d-3842-4a11-96e4-6715e1185a25',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
+    jsonb_build_object(
+      'name', 'lot',
+      'area', 'ANY',
+      'daily', 15
+    )
+  );
+
+INSERT INTO type (id, location, data) VALUES
+  (
     '93e3c80a-95ca-4f21-803a-2680b4d1994e',
     'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
       'name', 'lot',
       'area', 'A',
-      'daily', 14,
-      'quarterly', 100,
+      'daily', 12,
+      'quarterly', 150,
+      'yearly', 350
+    )
+  );
+
+INSERT INTO type (id, location, data) VALUES
+  (
+    '93e3c80a-95ca-4f21-803a-2680b4d1994e',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
+    jsonb_build_object(
+      'name', 'lot',
+      'area', 'B',
+      'daily', 10,
+      'quarterly', 120,
       'yearly', 300
     )
   );
 
-INSERT INTO permit (vehicle, type, data) VALUES (
-  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
-  'e314f688-d150-411e-aa4f-38e679112e0e',
-  jsonb_build_object(
-    'purchaseDate', to_char((now() - interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-    'activeDate', to_char((now() - interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-    'expireDate', to_char((now() + interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-    'area', '123',
-    'type,', 'zone',
-    'ticketStatus', 'unpaid',
-    'receipt', jsonb_build_object(
-      'service', 0.50,
-      'subTotal', 2.45,
-      'total', 2.95
-    ),
-    'paymentMethod', 'credit'
-  )
-);
+INSERT INTO type (id, location, data) VALUES
+  (
+    '93e3c80a-95ca-4f21-803a-2680b4d1994e',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
+    jsonb_build_object(
+      'name', 'lot',
+      'area', 'C',
+      'daily', 8,
+      'quarterly', 100,
+      'yearly', 250
+    )
+  );
+
+INSERT INTO type (id, location, data) VALUES
+  (
+    '93e3c80a-95ca-4f21-803a-2680b4d1994e',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
+    jsonb_build_object(
+      'name', 'lot',
+      'area', 'R',
+      'daily', 6,
+      'quarterly', 80,
+      'yearly', 200
+    )
+  );
 
 INSERT INTO permit (vehicle, type, data) VALUES (
   '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',

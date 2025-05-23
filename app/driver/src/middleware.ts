@@ -1,8 +1,36 @@
-import createMiddleware from 'next-intl/middleware';
-import {routing} from './i18n/routing';
+// import createMiddleware from 'next-intl/middleware';
+// import {routing} from './i18n/routing';
  
-export default createMiddleware(routing);
+// export default createMiddleware(routing);
+
+// export const config = {
+//   matcher: ['/', '/(en|es)/:path*'],
+// };
+import createMiddleware from 'next-intl/middleware'
+import { NextRequest, NextResponse } from 'next/server'
+import { routing } from './i18n/routing'
+
+const intlMiddleware = createMiddleware(routing)
+const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? 'next-auth.session-token'
+
+export default function middleware(request: NextRequest) {
+  const response = intlMiddleware(request)
+
+  const pathname = request.nextUrl.pathname
+  const isDashboard = pathname.startsWith('/en/dashboard') || pathname.startsWith('/es/dashboard')
+
+  const sessionToken = request.cookies.get(AUTH_COOKIE_NAME)
+
+
+  if (isDashboard && !sessionToken) {
+    const locale = pathname.split('/')[1] // 'en' or 'es'
+    const loginUrl = new URL(`/driver/${locale}/login`, request.url)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  return response
+}
 
 export const config = {
   matcher: ['/', '/(en|es)/:path*'],
-};
+}

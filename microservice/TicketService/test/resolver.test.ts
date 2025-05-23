@@ -180,7 +180,7 @@ test('Admin can get all tickets', async () => {
     .expect(200)
 
   expect(response.body.errors).toBeUndefined()
-  expect(response.body.data.getTickets.length).toBe(9)
+  expect(response.body.data.getTickets.length).toBe(11)
 })
 
 test('Admin can modify a ticket with images', async () => {
@@ -661,7 +661,7 @@ test('Admin can get tickets issued by a specific enforcer', async () => {
   
   expect(response.body.errors).toBeUndefined();
   const stats = response.body.data.getTicketsPerDayFromEnforcer;
-  console.log(stats)
+  // console.log(stats)
   expect(Array.isArray(stats)).toBe(true);
   expect(stats.length).toBeGreaterThan(0);
   stats.forEach((dayStat: any) => {

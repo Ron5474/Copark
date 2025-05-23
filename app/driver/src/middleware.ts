@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { routing } from './i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
-const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? 'next-auth.session-token'
+const AUTH_COOKIE_NAME = process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME ?? 'next-auth.session-token'
 
 export default function middleware(request: NextRequest) {
   const response = intlMiddleware(request)

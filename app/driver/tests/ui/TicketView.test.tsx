@@ -11,6 +11,7 @@ import { it, expect, afterEach, vi, beforeEach } from 'vitest';
 import '../setup'
 import TicketPage from '../../src/app/[locale]/ticket/TicketPage';
 import { TicketProvider } from '../../src/app/[locale]/ticket/TicketContext';
+import userEvent from '@testing-library/user-event';
 
 // const push = vi.fn();
 
@@ -62,4 +63,32 @@ it('Renders', async () => {
       <TicketPage />
     </TicketProvider>);
   expect(await screen.queryByText('Your Tickets')).not.toBeNull();
+});
+
+it('Renders Individual Tickets', async () => {
+  render(
+    <TicketProvider>
+      <TicketPage />
+    </TicketProvider>);
+  userEvent.click(await screen.findByText('2025-03-15'))
+  await screen.findByText("Parking in no-parking zone")
+});
+
+it('Click on View Photos', async () => {
+  render(
+    <TicketProvider>
+      <TicketPage />
+    </TicketProvider>);
+  userEvent.click(await screen.findByText('2025-03-15'))
+  userEvent.click(await screen.findByText('View All Photos'))
+  await screen.findByText("Show Less")
+});
+
+it('Click on View Photos', async () => {
+  render(
+    <TicketProvider>
+      <TicketPage />
+    </TicketProvider>);
+  userEvent.click(await screen.findByText('2025-04-02'))
+  await screen.findByText("Pay Ticket")
 });

@@ -258,7 +258,6 @@ export default function IndividualTicket() {
               ))}
             </Box>
 
-            {/* Show remaining count when collapsed */}
             {!imageExpanded && currentTicket.images.length > 1 && (
               <Box sx={{ mt: 2, textAlign: 'center' }}>
                 <Chip 

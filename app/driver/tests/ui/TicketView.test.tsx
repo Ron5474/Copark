@@ -4,14 +4,14 @@
  * @author Ronak Patel
  */
 
-import { render, screen, cleanup } from '@testing-library/react';
-import { it, expect, afterEach, vi, beforeEach } from 'vitest';
-// import userEvent from '@testing-library/user-event';
+import { render, screen, cleanup } from '@testing-library/react'
+import { it, expect, afterEach, vi, beforeEach } from 'vitest'
+import userEvent from '@testing-library/user-event';
 
 import '../setup'
-import TicketPage from '../../src/app/[locale]/ticket/TicketPage';
-import { TicketProvider } from '../../src/app/[locale]/ticket/TicketContext';
-import userEvent from '@testing-library/user-event';
+import TicketPage from '../../src/app/[locale]/ticket/TicketPage'
+import { TicketProvider, useTicketState } from '../../src/app/[locale]/ticket/TicketContext'
+
 
 // const push = vi.fn();
 
@@ -84,11 +84,31 @@ it('Click on View Photos', async () => {
   await screen.findByText("Show Less")
 });
 
-it('Click on View Photos', async () => {
+it('Click on Ticket with One Photo evidence', async () => {
   render(
     <TicketProvider>
       <TicketPage />
     </TicketProvider>);
   userEvent.click(await screen.findByText('2025-04-02'))
   await screen.findByText("Pay Ticket")
+});
+
+it('Click on Ticket with Three Photo evidence', async () => {
+  render(
+    <TicketProvider>
+      <TicketPage />
+    </TicketProvider>);
+  userEvent.click(await screen.findByText("2025-04-03"))
+  await screen.findByText("Pay Ticket")
+});
+
+it('Throw Undefined Context Error', () => {
+  const TestComponent = () => {
+    useTicketState()
+    return <div>Testing Div</div>;
+  };
+
+  expect(() => {
+    render(<TestComponent />);
+  }).toThrow('Context is undefined');
 });

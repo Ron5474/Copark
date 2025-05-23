@@ -10,7 +10,7 @@ import { Ticket } from '../types'
 
 export default function TicketCard({ticket}: {ticket: Ticket}) {
   const {setCurrentTicket, setCurrentView} = useTicketState()
-  const  bgColor = ticket.ticketStatus === 'paid' ? 'success' : ((ticket.ticketStatus === 'unpaid') ? 'error' : 'warning')
+  const  bgColor = (ticket.ticketStatus === 'unpaid') ? 'error' : 'warning'
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardActionArea onClick={() => {

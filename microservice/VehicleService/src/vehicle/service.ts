@@ -130,7 +130,13 @@ export class VehicleService {
 
     const result = await pool.query(
       `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
-      [userId, input]
+      [
+        userId,
+        {
+          ...input,
+          plate: input.plate.toUpperCase()
+        }
+      ]
     )
 
     return {

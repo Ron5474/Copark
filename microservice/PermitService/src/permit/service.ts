@@ -14,6 +14,7 @@ import {
   LotDetails,
   PurchaseLotInput,
   NewLot,
+  LotGroup,
 } from './schema'
 
 export class PermitService {
@@ -249,17 +250,51 @@ export class PermitService {
     return result.rows[0].data
   }
 
-  public async getAllLotDetails(): Promise<LotDetails[]> {
-    const result = await pool.query(`
-        SELECT data
-        FROM type
-        WHERE data->>'name' = 'lot'
-      `,
-      []
-    )
+  // public async getAllLotDetails(): Promise<LotDetails[]> {
+  //   const result = await pool.query(`
+  //       SELECT data
+  //       FROM type
+  //       WHERE data->>'name' = 'lot'
+  //     `,
+  //     []
+  //   )
     
-    return result.rows.map((row) => row.data)
+  //   return result.rows.map((row) => row.data)
+  // }
+  public async getAllLotDetails(): Promise<LotGroup[]> {
+    const query = `
+      SELECT data
+      FROM type
+      WHERE data->>'name' = 'lot'
+    `;
+
+    const result = await pool.query(query);
+    const lotMap: Record<string, LotGroup> = {};
+
+    for (const row of result.rows) {
+      const data = row.data;
+      const area = data.area;
+
+      for (const permitType of ['daily', 'quarterly', 'yearly'] as const) {
+        if (!lotMap[permitType]) {
+          lotMap[permitType] = {
+            id: permitType,
+            title: permitType.charAt(0).toUpperCase() + permitType.slice(1),
+            lots: []
+          };
+        }
+
+        lotMap[permitType].lots.push({
+          name: `Lot ${area}`,
+          price: `$${data[permitType]}`,
+        });
+      }
+    }
+
+    return Object.values(lotMap);
   }
+
+
 
   public async createNewLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO Don't hardcode this

@@ -129,3 +129,24 @@ test('admin create zone', async () => {
     }
   }))
 })
+
+test('admin creates zone that already exists', async () => {
+  expect(await permitService.createNewZone({
+    zone: 27,
+    weekday: {
+      hourly: 2.02,
+      openTime: '07:00',
+      closeTime: '20:00'
+    },
+    weekend: {}
+  })).toBeFalsy()
+})
+
+test('lotDetails gives correct A daily permit', async () => {
+  const { daily } = await permitService.getLotDetails('A') // Wednesday
+  expect(daily).toBe(12)
+})
+
+test('lotDetails errors on wrong lot type', async () => {
+  await expect(permitService.getLotDetails('12312312312312312312123')).rejects.toThrow('Lot type 12312312312312312312123 not found')
+})

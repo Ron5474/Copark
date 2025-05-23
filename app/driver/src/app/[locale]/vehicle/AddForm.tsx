@@ -35,11 +35,30 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
   const [state, setState] = useState<string>(Object.values(locations)[0][0])
   const [nickname, setNickname] = useState<string | undefined>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null) // new
+
+  // const submitVehicle = async () => {
+  //   setIsValidEntry(plateNumber.length > 0)
+  //   if (plateNumber.length === 0) return
+  //   await addVehicle({plate: plateNumber, country, state, nickname: nickname})
+  //   close()
+  // }
+
+  // new
   const submitVehicle = async () => {
     setIsValidEntry(plateNumber.length > 0)
+    setErrorMessage(null)
+
     if (plateNumber.length === 0) return
-    await addVehicle({plate: plateNumber, country, state, nickname: nickname})
-    close()
+
+    try {
+      await addVehicle({ plate: plateNumber, country, state, nickname })
+      close()
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Something went wrong'
+      setErrorMessage(message)
+      setIsLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -84,7 +103,7 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
         >
           License Plate Number
         </Typography>
-        <TextField
+        {/* <TextField
           required
           fullWidth
           error={!isValidEntry}
@@ -92,6 +111,17 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
             isValidEntry ?
             "Must be 1-10 characters" :
             "License plate number is required"
+          } */}
+        <TextField
+          required
+          fullWidth
+          error={!isValidEntry || !!errorMessage}
+          helperText={
+            errorMessage
+              ? errorMessage
+              : isValidEntry
+                ? "Must be 1-10 characters"
+                : "License plate number is required"
           }
           placeholder="e.g. 1ABC123"
           value={plateNumber}

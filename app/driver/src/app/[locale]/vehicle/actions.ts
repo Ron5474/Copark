@@ -80,7 +80,10 @@ export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
     const result = await response.json()
 
     if (result.errors) {
-      console.error('GraphQL errors:', result.errors)
+      const message = result.errors[0]?.message
+      if (message.includes("already registered")) {
+        throw new Error("This plate has already been registered.")
+      }
       throw new Error('Failed to register vehicle')
     }
 

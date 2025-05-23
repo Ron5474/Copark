@@ -172,3 +172,44 @@ test('admin creates lot that already exists', async () => {
     daily: 15
   })).toBeFalsy()
 })
+
+test('Purchasing daily lot permit works', async () => {
+  const receipt = await permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'A',
+    duration: 'daily',
+    paymentMethod: 'paypal'
+  })
+  expect(receipt).toBeDefined()
+})
+
+test('Purchasing quarterly lot permit works', async () => {
+  const receipt = await permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'A',
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  })
+  expect(receipt).toBeDefined()
+})
+
+test('Purchasing yearly lot permit works', async () => {
+  const receipt = await permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'A',
+    duration: 'yearly',
+    paymentMethod: 'paypal'
+  })
+  expect(receipt).toBeDefined()
+})
+
+test('Purchasing wrong lot permit doesn\'t work', async () => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'A',
+    duration: 'biweekly',
+    paymentMethod: 'paypal'
+  })).rejects.toThrow('Incorrect permit option')
+})

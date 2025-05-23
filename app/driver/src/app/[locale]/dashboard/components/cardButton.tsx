@@ -108,15 +108,17 @@ function CardButton({
                 backgroundColor:
                   badgeText === "Best Value"
                     ? "#aed581"
-                    : badgeText === "Quick Access"
-                    ? "#81d4fa"
-                    : "#eeeeee",
+                    : "#81d4fa",
+                    // : badgeText === "Quick Access"
+                    // ? "#81d4fa"
+                    // : "#eeeeee",
                 color:
                   badgeText === "Best Value"
                     ? "#33691e"
-                    : badgeText === "Quick Access"
-                    ? "#01579b"
-                    : "#333",
+                    : "#01579b",
+                    // : badgeText === "Quick Access"
+                    // ? "#01579b"
+                    // : "#333",
               }}
             />
           )}

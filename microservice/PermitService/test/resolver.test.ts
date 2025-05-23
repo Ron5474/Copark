@@ -308,7 +308,7 @@ test('Driver has no permits', async () => {
   expect(permits.body.data.myPermits.active.length).toBe(0)
 })
 
-test('Driver has no permits', async () => {
+test('Zone details', async () => {
   const token = await loginAs("driver")
 
   const details = await supertest(server)
@@ -349,10 +349,10 @@ test('Admin can get ticket stats grouped by day', async () => {
   const stats = response.body.data.getPermitStats;
   expect(Array.isArray(stats)).toBe(true);
   expect(stats.length).toBeGreaterThan(0);
-  stats.forEach((dayStat: any) => {
+  stats.forEach((dayStat: { date: string; permits: { vehicle: string; area: string; activeDate: string; expireDate: string }[] }) => {
     expect(dayStat).toHaveProperty('date');
     expect(Array.isArray(dayStat.permits)).toBe(true);
-    dayStat.permits.forEach((permit: any) => {
+    dayStat.permits.forEach((permit: { vehicle: string; area: string; activeDate: string; expireDate: string }) => {
       expect(permit).toHaveProperty('vehicle');
     });
   });

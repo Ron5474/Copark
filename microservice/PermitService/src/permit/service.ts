@@ -79,7 +79,7 @@ export class PermitService {
   public async isValidZonePermit(input: IsValidPermitInput): Promise<IsValid> {
 
     const result = await pool.query(`
-      SELECT p.data
+      SELECT p.data, t.data as type
       FROM permit p
       JOIN type t ON t.id = p.type
       WHERE p.vehicle = $1
@@ -94,8 +94,8 @@ export class PermitService {
     const row = result.rows[0]
     return {
       isValid: true,
-      type: row.data.type,
-      area: row.data.type,
+      type: row.type.name,
+      area: row.data.area,
     }
   }
 

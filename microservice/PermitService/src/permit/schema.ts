@@ -102,8 +102,8 @@ export class NewZone {
 @InputType()
 export class NewLot {
 
-  @Field(() => Number)
-  lot!: number
+  @Field(() => String)
+  lot!: string
 
   @Field(() => Number, { nullable: true })
   daily?: number

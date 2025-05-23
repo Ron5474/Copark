@@ -156,3 +156,19 @@ test('getAllLotDetails gives correct daily permits', async () => {
   console.log(data)
   expect(data[0].lots.length).toBe(5) // 5 daily permit lots
 })
+
+test('admin create lot', async () => {
+  expect(await permitService.createNewLot({
+    lot: 'F',
+    daily: 10,
+    quarterly: 50,
+    yearly: 200
+  }))
+})
+
+test('admin creates lot that already exists', async () => {
+  expect(await permitService.createNewLot({
+    lot: 'ANY',
+    daily: 15
+  })).toBeFalsy()
+})

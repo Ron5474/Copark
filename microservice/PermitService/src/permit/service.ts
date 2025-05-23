@@ -304,16 +304,16 @@ export class PermitService {
   public async createNewLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO Don't hardcode this
     const { rows } = await pool.query(`
-      INSERT INTO type (data)
-      SELECT $1
+      INSERT INTO type (location, data)
+      SELECT $2, $1
       WHERE NOT EXISTS (
         SELECT 1 FROM type
         WHERE location = $2
-        AND data->>'area' = $1->>'lot'
+        AND data->>'area' = $3
         AND data->>'name' = 'lot'
       )
       RETURNING id, data
-    `, [input, location])
+    `, [input, location, input.lot])
   
     return (rows.length !== 0)
   }

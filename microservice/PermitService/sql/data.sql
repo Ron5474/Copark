@@ -3,7 +3,7 @@
 ----- Your insert statements go below here -----
 \connect perm;
 
-INSERT INTO location (id, name) VALUES
+INSERT INTO location (id, data) VALUES
   (
     'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(

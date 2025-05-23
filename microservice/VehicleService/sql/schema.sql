@@ -5,3 +5,5 @@ CREATE TABLE vehicle(
     driver UUID,
     data JSONB NOT NULL
 );
+
+CREATE UNIQUE INDEX unique_plate ON vehicle (LOWER(data->>'plate'));

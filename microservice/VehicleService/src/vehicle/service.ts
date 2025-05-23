@@ -107,7 +107,27 @@ export class VehicleService {
     })))
   }
 
+  // public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
+  //   const result = await pool.query(
+  //     `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
+  //     [userId, input]
+  //   )
+
+  //   return {
+  //     id: await this.encrypt(result.rows[0].id),
+  //     ...input
+  //   }
+  // }
   public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
+    const existing = await pool.query(
+      `SELECT id FROM vehicle WHERE LOWER(data->>'plate') = LOWER($1)`,
+      [input.plate]
+    )
+
+    if ((existing?.rowCount ?? 0) > 0) {
+      throw new Error('This license plate is already registered')
+    }
+
     const result = await pool.query(
       `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
       [userId, input]
@@ -118,6 +138,7 @@ export class VehicleService {
       ...input
     }
   }
+
 
   public async updateVehicle(input: UpdateVehicleInput, userId: string): Promise<Vehicle> {
     const { id, ...patch } = input

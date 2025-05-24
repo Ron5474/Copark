@@ -11,7 +11,8 @@ import {
   TextField,
   Stack,
   IconButton,
-  Tooltip
+  Tooltip,
+  Alert
 } from '@mui/material';
 import { LocalParking, AddCircle } from '@mui/icons-material';
 import { getZones, createZone } from '../../permit/actions';
@@ -217,7 +218,13 @@ export default function ManageZones() {
             />
           </Stack>
           {error && (
-            <Typography color="error" sx={{ mt: 2 }}>
+            <Typography 
+              color="error"
+              sx={{ 
+                mt: 2,
+                fontSize: '0.875rem'
+              }}
+            >
               {error}
             </Typography>
           )}

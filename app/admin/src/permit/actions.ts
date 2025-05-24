@@ -89,11 +89,6 @@ export async function createZone(input: {
   });
 
   const result = await response.json();
-
-  if (result.errors) {
-    throw new Error(result.errors[0].message);
-  }
-
   return result.data.createZone;
 }
 
@@ -126,10 +121,5 @@ export async function getZones(): Promise<Zone[]> {
   });
 
   const result = await response.json();
-
-  if (result.errors) {
-    throw new Error(result.errors[0].message);
-  }
-
   return result.data.getZones;
 }

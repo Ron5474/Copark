@@ -93,7 +93,7 @@ it('Click Github', async () => {
   githubButton.click()
   const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('github', {
-    callbackUrl: '/driver/en/onboarding/tos',
+    callbackUrl: '/driver/en/signup/blank',
     basePath: '/driver'
   })
 })
@@ -104,7 +104,7 @@ it('Click Google', async () => {
   githubButton.click()
   const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('google', {
-    callbackUrl: '/driver/en/onboarding/tos',
+    callbackUrl: '/driver/en/signup/blank',
     basePath: '/driver'
   })
 })
@@ -115,7 +115,7 @@ it('Click Facebook', async () => {
   githubButton.click()
   const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('facebook', {
-    callbackUrl: '/driver/en/onboarding/tos',
+    callbackUrl: '/driver/en/signup/blank',
     basePath: '/driver'
   })
 })

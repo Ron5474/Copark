@@ -14,6 +14,9 @@ export class Vehicle {
   @Field(() => String)
   state!: string
 
+  @Field(() => String)
+  default?: boolean
+
   @Field(() => String, { nullable: true })
   nickname?: string // only visible to the owner
 }
@@ -54,6 +57,8 @@ export class VehicleID {
   id!: string
 }
 
+
+
 @ObjectType()
 export class OwnerID {
   @Field(() => ID)
@@ -86,4 +91,19 @@ export class createdVehicleInput {
 
   @Field(() => String, { nullable: true })
   state?: string;
+}
+
+@InputType()
+export class setDefaultVehicleInput {
+  @Field(() => ID)
+  id!: string
+}
+
+@ObjectType()
+export class DefaultVehicleDetails {
+  @Field(() => ID)
+  id!: string
+
+  @Field(() => String)
+  plate!: string
 }

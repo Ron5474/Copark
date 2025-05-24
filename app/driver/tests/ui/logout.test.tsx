@@ -2,7 +2,7 @@ import { render, waitFor, cleanup } from '@testing-library/react';
 import { vi, it, expect, afterEach } from 'vitest';
 import Page from '@/app/[locale]/dashboard/page';
 import { getUser } from '@/app/[locale]/shared/actions';
-import { userLoginSignUpAttempt } from '@/app/[locale]/dashboard/actions';
+import { userLoginAttempt } from '@/app/[locale]/dashboard/actions';
 import { signOut } from 'next-auth/react';
 
 vi.mock('next-auth/react', () => {
@@ -17,6 +17,27 @@ vi.mock('@/i18n/navigation', () => ({
     push: vi.fn(),
   }),
 }))
+
+vi.mock('next/headers', () => {
+  const mockCookies = {
+    get: vi.fn((name) => {
+      if (name === 'auth-token') {
+        return { value: 'mocked-auth-token-123' };
+      }
+      return null;
+    }),
+    getAll: vi.fn(() => [
+      { name: 'auth-token', value: 'mocked-auth-token-123' },
+    ]),
+    set: vi.fn(),
+    delete: vi.fn(),
+  }
+
+  return {
+    cookies: () => mockCookies,
+    headers: () => new Headers(),
+  }
+})
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -39,7 +60,11 @@ vi.mock('@/app/[locale]/shared/actions', () => ({
 }))
 
 vi.mock('@/app/[locale]/dashboard/actions', () => ({
-  userLoginSignUpAttempt: vi.fn(),
+  userLoginAttempt: vi.fn(),
+}))
+
+vi.mock('@/app/[locale]/dashboard/permitActions', () => ({
+  getLotDetails: vi.fn().mockResolvedValue([]),
 }))
 
 afterEach(() => {
@@ -53,7 +78,7 @@ it('Redirects to /driver/en/login signOut when userLoginSignUpAttempt fails', as
     expires: '2025-10-01T00:00:00.000Z',
   })
 
-  vi.mocked(userLoginSignUpAttempt).mockResolvedValue(undefined)
+  vi.mocked(userLoginAttempt).mockResolvedValue(undefined)
 
   render(<Page />);
 

@@ -43,6 +43,7 @@ export async function Payment(
   })
   
   const data = await res.json();
+  console.log(data);
   if (data.url) {
     redirect(data.url);
   }

@@ -18,8 +18,12 @@ import { useState } from 'react'
 import { useTicketState } from './TicketContext'
 
 export default function IndividualTicket() {
-  const { currentTicket } = useTicketState()
+  const { currentTicket, setCurrentView } = useTicketState()
   const [imageExpanded, setImageExpanded] = useState(false)
+
+  const handleViewChange = (view: string) => {
+    setCurrentView(view)
+  }
 
   return (
     <Box 
@@ -283,7 +287,8 @@ export default function IndividualTicket() {
           textAlign: 'center'
         }}
       >
-        <Button 
+        <Button
+          onClick={() => handleViewChange('ChallengeTicket')}
           variant="contained"
           size="large"
           fullWidth

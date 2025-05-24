@@ -114,3 +114,15 @@ export class TicketsByDay {
   @Field(() => [Ticket])
   tickets!: Ticket[];
 }
+
+@InputType()
+export class ChallengeTicketInput {
+  @Field(() => TicketInput)
+  ticketID!: TicketInput;
+
+  @Field(() => String)
+  challengeReason!: string;
+
+  @Field(() => [String], { nullable: true })
+  evidence?: string[];
+}

@@ -4,7 +4,7 @@
  * @author Ronak Patel
  */
 
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, waitFor } from '@testing-library/react'
 import { it, expect, afterEach, vi, beforeEach } from 'vitest'
 import userEvent from '@testing-library/user-event';
 
@@ -111,4 +111,35 @@ it('Throw Undefined Context Error', () => {
   expect(() => {
     render(<TestComponent />);
   }).toThrow('Context is undefined');
+});
+
+it('Click on Challenge Ticket', async () => {
+  render(
+    <TicketProvider>
+      <TicketPage />
+    </TicketProvider>);
+  userEvent.click(await screen.findByText("2025-04-03"))
+  userEvent.click(await screen.findByText("Challenge Ticket"))
+  await screen.findByText("Reason")
+});
+
+it('Click on Challenge Ticket and Add Reason', async () => {
+  const user = userEvent.setup()
+  
+  render(
+    <TicketProvider>
+      <TicketPage />
+    </TicketProvider>
+  )
+
+  await user.click(await screen.findByText("2025-04-03"))
+  await user.click(await screen.findByText("Challenge Ticket"))
+  await screen.findByText("Reason")
+  const reasonInput = await screen.findByPlaceholderText("Please describe the reason for your challenge... (minimum 25 characters)")
+  await user.type(reasonInput, "My reason for challenge is that I was parked at a valid spot")
+  const submitButton = await screen.findByLabelText("Submit Challenge")
+  await waitFor(() => {
+    expect(submitButton).toBeDefined()
+  })
+  await user.click(submitButton)
 });

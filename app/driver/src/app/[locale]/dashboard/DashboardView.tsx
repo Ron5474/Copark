@@ -35,6 +35,7 @@ import {
 import CardButton from "./components/cardButton";
 import { DashboardContext } from "./context";
 import type { LotGroup } from "../types";
+import { Payment } from "../shared/actions";
 
 export default function DashboardView() {
   const context = useContext(DashboardContext);
@@ -62,6 +63,20 @@ export default function DashboardView() {
       ...prev,
       [permitId]: lotName,
     }));
+  };
+
+  const checkout = async (permit: LotGroup) => {
+    const selectedLot = selectedLots[permit.id];
+    const lot = permit.lots.find((lot) => lot.name === selectedLot);
+    if (selectedLot) {
+      await Payment(
+        "permit",
+        selectedLot,
+        lot ? parseFloat(lot.price.slice(1))*100 : 0,
+        `${permit.id.charAt(0).toUpperCase() + permit.id.slice(1)} Permit for ${selectedLot}`,
+        "USD"
+      );
+    }
   };
 
   if (loading) {
@@ -126,6 +141,11 @@ export default function DashboardView() {
                 color: "#fff",
               }}
               disabled={!selectedLots[permit.id]}
+              onClick={() => {
+                if (selectedLots[permit.id]) {
+                  checkout(permit);
+                }
+              }}
               aria-label={
                 !selectedLots[permit.id]
                   ? `Purchase ${permit.title} permit disabled`

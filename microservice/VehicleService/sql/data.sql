@@ -82,3 +82,8 @@ INSERT INTO vehicle (id, driver, data) VALUES
     )
   );
 
+INSERT INTO defaultVehicle(driver, vehicle) VALUES
+  (
+    'b1eab387-1000-4ee3-a746-d59366e44f06',
+    '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5'
+  );

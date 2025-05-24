@@ -2,8 +2,8 @@ import { pool } from './db'
 import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVehicleInput, CreatedVehicle, OwnerID } from './schema'
 import { SignJWT, jwtVerify } from 'jose'
 
-const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
-const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+// const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class VehicleService {
 
@@ -38,8 +38,11 @@ export class VehicleService {
 
     if (result.rows.length == 0) return []
 
+    const defaultVehicle = await this.getDefaultVehicleId(userId)
+
     return Promise.all(result.rows.map(async row => ({
       id: await this.encrypt(row.id),
+      default: defaultVehicle == null ? false : defaultVehicle.id == row.id,
       plate: row.data.plate,
       country: row.data.country,
       state: row.data.state,
@@ -87,7 +90,7 @@ export class VehicleService {
 
   public async getVehicleByUserId(userID: string): Promise<VehicleID[]> {
 
-    const userDecrypted = await this.decrypt(userID, emailEncodedKey)
+    const userDecrypted = await this.decrypt(userID, encodedKey)
 
     // const userDecrypted = await this.decrypt(userID, encodedKey)
     const result = await pool.query(
@@ -139,12 +142,21 @@ export class VehicleService {
       ]
     )
 
+    const vehicles = await pool.query(
+      `SELECT COUNT(*) FROM vehicle WHERE driver = $1`,
+      [userId]
+    )
+    if (parseInt(vehicles.rows[0].count) == 1) {
+      await this.setDefaultVehicle({ id:  await this.encrypt(result.rows[0].id) }, userId)
+    }
+    const defaultVehicle = await this.getDefaultVehicleId(userId)
     return {
       id: await this.encrypt(result.rows[0].id),
+      default: defaultVehicle == null ? false : defaultVehicle.id == result.rows[0].id,
       ...input
     }
   }
-
+  
 
   public async updateVehicle(input: UpdateVehicleInput, userId: string): Promise<Vehicle> {
     const { id, ...patch } = input
@@ -173,6 +185,67 @@ export class VehicleService {
     return { id, ...updated }
   }
 
+  public async getDefaultVehicle(userId: string): Promise<{
+    id: string
+    plate: string
+  } | null> {
+    const result = await pool.query(
+      `SELECT t1.vehicle AS vehicle, t2.data->>'plate' AS plate  FROM defaultVehicle t1, vehicle t2 WHERE t1.driver = $1 AND t1.vehicle = t2.id`,
+      [userId]
+    )
+
+    if (result.rowCount === 0) return null
+
+    const row = result.rows[0]
+    return {
+      id: await this.encrypt(row.vehicle),
+      plate: row.plate
+    }
+  }
+
+  private async getDefaultVehicleId(userId: string): Promise<{
+    id: string
+    plate: string
+  } | null> {
+    const result = await pool.query(
+      `SELECT t1.vehicle AS vehicle, t2.data->>'plate' AS plate  FROM defaultVehicle t1, vehicle t2 WHERE t1.driver = $1 AND t1.vehicle = t2.id`,
+      [userId]
+    )
+
+    if (result.rowCount === 0) return null
+
+    const row = result.rows[0]
+    return {
+      id: row.vehicle,
+      plate: row.plate
+    }
+  }
+
+  public async setDefaultVehicle(vehicleID: VehicleID, userId: string): Promise<VehicleID> {
+    const vehicleDecrypted = await this.decrypt(vehicleID.id)
+
+    const existing = await pool.query(
+      `SELECT * FROM defaultVehicle WHERE driver = $1`,
+      [userId]
+    )
+
+    if (existing.rowCount === 0) {
+      await pool.query(
+        `INSERT INTO defaultVehicle (driver, vehicle) VALUES ($1, $2)`,
+        [userId, vehicleDecrypted]
+      )
+
+      return { id: await this.encrypt(vehicleID.id) }
+    }
+
+    await pool.query(
+      `UPDATE defaultVehicle SET vehicle = $1 WHERE driver = $2`,
+      [vehicleDecrypted, userId]
+    )
+
+    return {id: await this.encrypt(vehicleID.id)}
+  }
+
   public async findVehicleByPlate(plate: string): Promise<Vehicle | null> {
     const result = await pool.query(
       `SELECT id, data FROM vehicle WHERE data->>'plate' = $1`,
@@ -180,6 +253,7 @@ export class VehicleService {
     )
 
     if (result.rowCount === 0) return null
+
 
     const row = result.rows[0]
     return {

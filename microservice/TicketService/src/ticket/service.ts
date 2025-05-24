@@ -474,4 +474,7 @@ export class TicketService {
       images: row.images,
     } as Ticket;
   }
+
+  // public async challengeTicket(ticketID: TicketInput): Promise<Ticket | null> {
+  // }
 }

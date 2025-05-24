@@ -212,10 +212,10 @@ export class PermitResolver {
     const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 
     if (!vehicleId) {
-      return {isValid: false, type: 'Vehicle Not Found', area: input.zone}
+      return {isValid: false, type: 'Vehicle Not Found', area: 'N/A'}
     }
 
-    return await service.isValidZonePermit({vehicle: vehicleId, zone: input.zone})
+    return await service.isValidZonePermit({vehicle: vehicleId})
   }
 
   @Authorized('police')

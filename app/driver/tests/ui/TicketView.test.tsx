@@ -4,7 +4,7 @@
  * @author Ronak Patel
  */
 
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, waitFor } from '@testing-library/react'
 import { it, expect, afterEach, vi, beforeEach } from 'vitest'
 import userEvent from '@testing-library/user-event';
 
@@ -111,4 +111,14 @@ it('Throw Undefined Context Error', () => {
   expect(() => {
     render(<TestComponent />);
   }).toThrow('Context is undefined');
+});
+
+it('Click on Challenge Ticket', async () => {
+  render(
+    <TicketProvider>
+      <TicketPage />
+    </TicketProvider>);
+  userEvent.click(await screen.findByText("2025-04-03"))
+  userEvent.click(await screen.findByText("Challenge Ticket"))
+  await screen.findByText("Reason")
 });

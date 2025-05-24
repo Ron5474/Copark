@@ -15,6 +15,7 @@ import {
   PurchaseLotInput,
   NewLot,
   LotGroup,
+  Zone,
 } from './schema'
 
 export class PermitService {
@@ -386,7 +387,7 @@ export class PermitService {
     }
   }
 
-  public async getZones(): Promise<NewZone[]> {
+  public async getZones(): Promise<Zone[]> {
     const result = await pool.query(`
       SELECT data
       FROM type 
@@ -394,10 +395,20 @@ export class PermitService {
       ORDER BY (data->>'area')::int
     `)
 
-    return result.rows.map(row => ({
-      zone: row.data.area,
-      weekday: row.data.weekday,
-      weekend: row.data.weekend
-    }))
+    return result.rows.map(row => {
+      const weekdayData = row.data.weekday || {}
+      const duration = weekdayData.maxDuration || { hours: 0, minutes: 0 }
+      
+      return {
+        zone: row.data.area,
+        hourly: weekdayData.hourly || 0,
+        maxDuration: {
+          hours: duration.hours || 0,
+          minutes: duration.minutes || 0
+        },
+        openTime: weekdayData.openTime || '00:00',
+        closeTime: weekdayData.closeTime || '23:59'
+      }
+    })
   }
 }

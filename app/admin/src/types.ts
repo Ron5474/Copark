@@ -67,3 +67,14 @@ export interface NewEnforcerInput {
   name: string;
   email: string;
 }
+
+export interface Zone {
+  zone: string
+  hourly: number
+  maxDuration: {
+    hours: number
+    minutes: number
+  }
+  openTime: string
+  closeTime: string
+}

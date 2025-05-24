@@ -1,6 +1,6 @@
 'use server'
 import { cookies } from 'next/headers';
-import { PermitsByDay } from '../types';
+import { PermitsByDay, Zone } from '../types';
 
 const API_URL = 'http://localhost:4003/graphql';
 
@@ -78,4 +78,41 @@ export async function createZone(input: {
   }
 
   return result.data.createZone;
+}
+
+
+
+export async function getZones(): Promise<Zone[]> {
+  const token = await getAuthToken();
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query: `
+        query GetZones {
+          getZones {
+            zone
+            hourly
+            maxDuration {
+              hours
+              minutes
+            }
+            openTime
+            closeTime
+          }
+        }
+      `
+    }),
+  });
+
+  const result = await response.json();
+
+  if (result.errors) {
+    throw new Error(result.errors[0].message);
+  }
+
+  return result.data.getZones;
 }

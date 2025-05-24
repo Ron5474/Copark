@@ -10,11 +10,7 @@ import {
   DialogActions,
   TextField,
   Stack,
-  IconButton,
-  Tooltip,
-  Alert
 } from '@mui/material';
-import { LocalParking, AddCircle } from '@mui/icons-material';
 import { getZones, createZone } from '../../permit/actions';
 import { Zone } from '../../types';
 

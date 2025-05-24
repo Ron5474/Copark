@@ -86,10 +86,10 @@ export class PermitService {
         AND TRIM(LOWER(t.data->>'area')) = TRIM(LOWER($2))
         AND now() >= (p.data->>'activeDate')::timestamptz
         AND now() <= (p.data->>'expireDate')::timestamptz`,
-      [input.vehicle, input.zone]
+      [input.vehicle]
     )
 
-    if (result.rowCount === 0) return { isValid: false, type: 'N/A', area: input.zone }
+    if (result.rowCount === 0) return { isValid: false, type: 'N/A', area: 'N/A'}
 
     const row = result.rows[0]
     return {

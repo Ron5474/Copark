@@ -7,3 +7,11 @@ CREATE TABLE vehicle(
 );
 
 CREATE UNIQUE INDEX unique_plate ON vehicle (LOWER(data->>'plate'));
+
+DROP TABLE IF EXISTS defaultVehicle CASCADE;
+CREATE TABLE defaultVehicle(
+   driver UUID PRIMARY KEY,
+   vehicle UUID REFERENCES vehicle(id) ON DELETE CASCADE
+);
+
+CREATE INDEX driver ON defaultVehicle(driver);

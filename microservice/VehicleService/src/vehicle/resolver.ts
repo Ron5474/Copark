@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { Request } from 'express'
-import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVehicleInput, CreatedVehicle, OwnerID } from './schema'
+import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVehicleInput, CreatedVehicle, OwnerID, DefaultVehicleDetails, setDefaultVehicleInput } from './schema'
 import { VehicleService } from './service'
 import { SessionUser } from '../types/express'
 
@@ -44,6 +44,23 @@ export class VehicleResolver {
   }
 
   @Authorized('driver')
+  @Query(() => DefaultVehicleDetails)
+  public async getDefaultVehicle(
+    @Ctx() request: Request & {user: SessionUser}
+  ): Promise<DefaultVehicleDetails> {
+    const token = request.headers.authorization?.split(' ')[1]
+    const userId = (await this.getUserData(token)).id
+    const defaultVehicle = await service.getDefaultVehicle(userId) 
+    if (!defaultVehicle) {
+      throw new Error('No default vehicle found')
+    }
+    return {
+      id: defaultVehicle.id,
+      plate: defaultVehicle.plate,
+    }
+  }
+
+  @Authorized('driver')
   @Mutation(() => Vehicle)
   async registerVehicle(
     @Arg('input', () => RegisterVehicleInput) input: RegisterVehicleInput,
@@ -63,6 +80,17 @@ export class VehicleResolver {
     const token = request.headers.authorization?.split(' ')[1]
     const userId = (await this.getUserData(token)).id  
     return await service.updateVehicle(input, userId)
+  }
+
+  @Authorized('driver')
+  @Mutation(() => Vehicle)
+  async setDefaultVehicle(
+    @Arg('input', () => setDefaultVehicleInput) vehicleID: setDefaultVehicleInput,
+    @Ctx() request: Request & {user: SessionUser}
+  ): Promise<VehicleID> {
+    const token = request.headers.authorization?.split(' ')[1]
+    const userId = (await this.getUserData(token)).id  
+    return await service.setDefaultVehicle(vehicleID, userId)
   }
 
   @Authorized('admin', 'enforcement')

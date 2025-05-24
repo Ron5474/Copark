@@ -17,7 +17,7 @@ const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 const VEHC_PORT = 4001
 // const VEHC_SERVICE_URL = `http://localhost:${VEHC_PORT}`
 
-// const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET + 'apiexit')
+// const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 beforeAll(async () => {
   // Start your GraphQL server

@@ -23,7 +23,7 @@ export async function login({ email, password }: { email: string; password: stri
       return undefined;
     }
     const cookieStore = await cookies();
-    cookieStore.set('session', authenticated.id, {
+    cookieStore.set('sessionEnf', authenticated.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -38,6 +38,6 @@ export async function login({ email, password }: { email: string; password: stri
 
 export async function logout() {
   const cookieStore = await cookies();
-  cookieStore.delete('session');
+  cookieStore.delete('sessionEnf');
   redirect('/login');
 }

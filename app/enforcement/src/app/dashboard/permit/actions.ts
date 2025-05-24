@@ -7,13 +7,13 @@ const getAuthToken = async () => {
   return token
 }
 
-export async function checkPermit(plate: string, zone: string) {
+export async function checkPermit(plate: string) {
   const query = `
     query IsValidZonePermit($input: IsValidPermitInput!) {
       isValidZonePermit(input: $input) {
         isValid
         type
-        zone
+        area
       }
     }
   `
@@ -30,7 +30,6 @@ export async function checkPermit(plate: string, zone: string) {
       variables: {
         input: {
           vehicle: plate,
-          zone,
         },
       },
     }),

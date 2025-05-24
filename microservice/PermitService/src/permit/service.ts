@@ -385,4 +385,19 @@ export class PermitService {
       paymentMethod: rows[0].data.paymentMethod,
     }
   }
+
+  public async getZones(): Promise<NewZone[]> {
+    const result = await pool.query(`
+      SELECT data
+      FROM type 
+      WHERE data->>'name' = 'zone'
+      ORDER BY (data->>'area')::int
+    `)
+
+    return result.rows.map(row => ({
+      zone: row.data.area,
+      weekday: row.data.weekday,
+      weekend: row.data.weekend
+    }))
+  }
 }

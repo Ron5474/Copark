@@ -438,4 +438,9 @@ export class PermitResolver {
 
     return purchaseMyZonePermit
   }
+
+  @Query(() => [NewZone])
+  async getZones(): Promise<NewZone[]> {
+    return await service.getZones()
+  }
 }

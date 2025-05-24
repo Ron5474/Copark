@@ -73,7 +73,7 @@ export default function DashboardView() {
         "permit",
         selectedLot,
         lot ? parseFloat(lot.price.slice(1))*100 : 0,
-        `${permit.id.charAt(0).toUpperCase() + permit.id.slice(1)}Permit for ${selectedLot}`,
+        `${permit.id.charAt(0).toUpperCase() + permit.id.slice(1)} Permit for ${selectedLot}`,
         "USD"
       );
     }

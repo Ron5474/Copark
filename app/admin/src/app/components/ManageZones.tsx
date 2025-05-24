@@ -9,8 +9,11 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Stack
+  Stack,
+  IconButton,
+  Tooltip
 } from '@mui/material';
+import { LocalParking, AddCircle } from '@mui/icons-material';
 import { getZones, createZone } from '../../permit/actions';
 import { Zone } from '../../types';
 
@@ -51,6 +54,7 @@ export default function ManageZones() {
         });
       }
     } catch (err) {
+      void err;
       setError(err instanceof Error ? err.message : 'Failed to create zone');
     }
   };
@@ -93,7 +97,7 @@ export default function ManageZones() {
             }
           }}
         >
-          Create New Zone
+          Add New Zone
         </Button>
       </Box>
 

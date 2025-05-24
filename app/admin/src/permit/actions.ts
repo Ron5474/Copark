@@ -52,6 +52,23 @@ export async function createZone(input: {
   openTime?: string,
   closeTime?: string
 }): Promise<boolean> {
+  // Transform the flat input structure into the required nested structure
+  const zoneInput = {
+    zone: input.zone,
+    weekday: {
+      hourly: input.hourly,
+      maxDuration: input.maxDuration,
+      openTime: input.openTime,
+      closeTime: input.closeTime
+    },
+    weekend: {
+      hourly: input.hourly,
+      maxDuration: input.maxDuration,
+      openTime: input.openTime,
+      closeTime: input.closeTime
+    }
+  };
+
   const token = await getAuthToken();
   const response = await fetch(API_URL, {
     method: 'POST',
@@ -66,7 +83,7 @@ export async function createZone(input: {
         }
       `,
       variables: {
-        input
+        input: zoneInput
       }
     }),
   });

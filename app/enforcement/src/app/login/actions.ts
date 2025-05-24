@@ -19,6 +19,9 @@ export async function login({ email, password }: { email: string; password: stri
   const authenticated = text ? JSON.parse(text) : null;
 
   if (authenticated && authenticated.id) {
+    if (authenticated.role !== '["enforcement"]') { // there must be a better way
+      return undefined;
+    }
     const cookieStore = await cookies();
     cookieStore.set('session', authenticated.id, {
       httpOnly: true,

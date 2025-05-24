@@ -14,6 +14,7 @@ import {
   PurchaseLotInput,
   NewLot,
   LotGroup,
+  Zone,
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
@@ -437,5 +438,11 @@ export class PermitResolver {
     });
 
     return purchaseMyZonePermit
+  }
+
+  @Query(() => [Zone])
+  @Authorized('admin')
+  async getZones(): Promise<Zone[]> {
+    return await service.getZones()
   }
 }

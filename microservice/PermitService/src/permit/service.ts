@@ -15,6 +15,7 @@ import {
   PurchaseLotInput,
   NewLot,
   LotGroup,
+  Zone,
 } from './schema'
 
 export class PermitService {
@@ -384,5 +385,30 @@ export class PermitService {
       receipt: rows[0].data.receipt,
       paymentMethod: rows[0].data.paymentMethod,
     }
+  }
+
+  public async getZones(): Promise<Zone[]> {
+    const result = await pool.query(`
+      SELECT data
+      FROM type 
+      WHERE data->>'name' = 'zone'
+      ORDER BY (data->>'area')::int
+    `)
+
+    return result.rows.map(row => {
+      const weekdayData = row.data.weekday || {}
+      const duration = weekdayData.maxDuration || { hours: 0, minutes: 0 }
+      
+      return {
+        zone: row.data.area,
+        hourly: weekdayData.hourly || 0,
+        maxDuration: {
+          hours: duration.hours || 0,
+          minutes: duration.minutes || 0
+        },
+        openTime: weekdayData.openTime || '00:00',
+        closeTime: weekdayData.closeTime || '23:59'
+      }
+    })
   }
 }

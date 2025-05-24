@@ -9,8 +9,8 @@ import authApp from '../../AuthService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 
 let server: http.Server
-let authServer: http.Server
-let vehcServer: http.Server
+let authServer: any
+let vehcServer: any
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
@@ -43,11 +43,11 @@ beforeEach( async () => {
   return db.reset()
 })
 
-afterAll(() => {
-  db.shutdown()
-  server.close()
-  authServer.close()
-  vehcServer.close()
+afterAll(async () => {
+  await db.shutdown()
+  if (server) server.close()
+  if (authServer) authServer.close()
+  if (vehcServer) vehcServer.close()
 })
 
 const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
@@ -355,5 +355,44 @@ test('Admin can get ticket stats grouped by day', async () => {
     dayStat.permits.forEach((permit: { vehicle: string; area: string; activeDate: string; expireDate: string }) => {
       expect(permit).toHaveProperty('vehicle');
     });
+  });
+});
+
+test('Admin can get all zones', async () => {
+  const token = await loginAs("admin");
+
+  const query = `
+    query GetZones {
+      getZones {
+        zone
+        hourly
+        maxDuration {
+          hours
+          minutes
+        }
+        openTime
+        closeTime
+      }
+    }
+  `;
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query })
+    .expect(200);
+
+  expect(response.body.errors).toBeUndefined();
+  const zones = response.body.data.getZones;
+  expect(Array.isArray(zones)).toBe(true);
+  
+  zones.forEach((zone: any) => {
+    expect(zone).toHaveProperty('zone');
+    expect(zone).toHaveProperty('hourly');
+    expect(zone).toHaveProperty('maxDuration');
+    expect(zone.maxDuration).toHaveProperty('hours');
+    expect(zone.maxDuration).toHaveProperty('minutes');
+    expect(zone).toHaveProperty('openTime');
+    expect(zone).toHaveProperty('closeTime');
   });
 });

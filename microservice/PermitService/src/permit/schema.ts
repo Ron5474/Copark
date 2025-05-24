@@ -1,4 +1,4 @@
-import { Field, ObjectType, InputType, ID } from 'type-graphql'
+import { Field, ObjectType, InputType, ID, Float } from 'type-graphql'
 
 @ObjectType()
 export class Permit {
@@ -263,4 +263,22 @@ export class LotGroup {
 
   @Field(() => [Lot])
   lots!: Lot[];
+}
+
+@ObjectType()
+export class Zone {
+  @Field(() => String)
+  zone!: string
+
+  @Field(() => Float)
+  hourly!: number
+
+  @Field(() => Duration)
+  maxDuration!: Duration
+
+  @Field(() => String)
+  openTime!: string
+
+  @Field(() => String)
+  closeTime!: string
 }

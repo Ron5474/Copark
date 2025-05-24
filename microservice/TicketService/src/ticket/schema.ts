@@ -117,8 +117,8 @@ export class TicketsByDay {
 
 @InputType()
 export class ChallengeTicketInput {
-  @Field(() => Ticket)
-  ticket!: Ticket;
+  @Field(() => TicketInput)
+  ticketID!: TicketInput;
 
   @Field(() => String)
   challengeReason!: string;

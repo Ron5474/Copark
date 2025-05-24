@@ -78,6 +78,7 @@ export default function ChallengeTicket() {
         
           <Box sx={{ pt: 2 }}>
             <Button
+              aria-label='Submit Challenge'
               variant="contained"
               size="large"
               fullWidth

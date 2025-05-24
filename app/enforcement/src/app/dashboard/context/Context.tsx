@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState } from 'react'
 type PermitResult = {
   isValid: boolean
   type: string
-  zone: string
+  area: string
 } | null
 
 type EnforcementContextType = {
@@ -19,10 +19,6 @@ type EnforcementContextType = {
   setIsIssuingViolation: (val: boolean) => void
   permitResult: PermitResult
   setPermitResult: (val: PermitResult) => void
-  zone: string
-  setZone: (zone: string) => void
-  officerName: string
-  setOfficerName: (name: string) => void
   showSuccess: boolean
   setShowSuccess: (val: boolean) => void
 }
@@ -33,25 +29,16 @@ export function EnforcementProvider({
   children,
   initialPlate = null,
   initialManualInput = '',
-  initialZone = '',
 }: {
   children: React.ReactNode
   initialPlate?: string | null
   initialManualInput?: string
-  initialZone?: string
 }) {
   const [plate, setPlate] = useState<string | null>(initialPlate)
   const [manualInput, setManualInput] = useState(initialManualInput)
   const [isValidated, setIsValidated] = useState(false)
   const [isIssuingViolation, setIsIssuingViolation] = useState(false)
   const [permitResult, setPermitResult] = useState<PermitResult>(null)
-  const [zone, setZone] = useState<string>(initialZone)
-  const [officerName, setOfficerName] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('name') || ''
-    }
-    return ''
-  })
   const [showSuccess, setShowSuccess] = useState(false)
 
 
@@ -68,10 +55,6 @@ export function EnforcementProvider({
         setIsIssuingViolation,
         permitResult,
         setPermitResult,
-        zone,
-        setZone,
-        officerName,
-        setOfficerName,
         showSuccess,
         setShowSuccess,
       }}

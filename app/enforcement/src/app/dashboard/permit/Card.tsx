@@ -84,7 +84,6 @@ export default function PermitCard() {
     setIsIssuingViolation,
     permitResult,
     setPermitResult,
-    zone,
   } = useEnforcement()
 
   const handleNewScan = () => {
@@ -95,37 +94,28 @@ export default function PermitCard() {
   }
 
   const handleIssueCitation = () => {
-    console.log(`Issuing citation for ${plate}`)
     setIsIssuingViolation(true)
   }
-
-  const isValid = permitResult?.isValid
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh' }}>
       <Paper elevation={3} sx={{ p: 3, borderRadius: 3, width: '100%', maxWidth: 420 }}>
         <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography
-            variant="h4"
-            fontWeight="bold"
-            color={isValid ? 'success.main' : 'error.main'}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            gap={1}
-          >
-            {isValid ? (
-              <>
-                <CheckIcon sx={{ fontSize: 32 }} />
-                Valid Permit
-              </>
-            ) : (
-              <>
-                <CloseIcon sx={{ fontSize: 32 }} />
-                No Valid Permit
-              </>
-            )}
-          </Typography>
+          {permitResult && permitResult.area !== 'N/A' ? (
+            <>
+              <CheckIcon sx={{ fontSize: 32, color: 'success.main', mb: 1 }} />
+              <Typography variant="h5" fontWeight="bold">
+                Permit Found
+              </Typography>
+            </>
+          ) : (
+            <>
+              <CloseIcon sx={{ fontSize: 32, color: 'error.main', mb: 1 }} />
+              <Typography variant="h5" fontWeight="bold">
+                No Permit Found
+              </Typography>
+            </>
+          )}
         </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
@@ -147,10 +137,15 @@ export default function PermitCard() {
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', pb: 1, borderBottom: 1, borderColor: 'divider' }}>
             <Typography variant="body2" color="text.secondary">
-              Current Location:
+              Permit type:
             </Typography>
             <Chip
-              label={`Zone ${zone}`}
+              // label={permitResult?.area || 'N/A'}
+              label={
+                permitResult
+                  ? `${permitResult.type} - ${permitResult.area}`
+                  : 'N/A'
+              }
               color="info"
               size="small"
               sx={{ fontWeight: 'bold' }}

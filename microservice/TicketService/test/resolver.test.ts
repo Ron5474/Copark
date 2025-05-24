@@ -572,6 +572,8 @@ test('Ticket creation sends email to vehicle owner', async () => {
 
   expect(response.status).toBe(200)
 
+  // console.log(response.body)
+  // response is actually that enforcer ID is invalid
   const ticket = response.body.data.createNewTicket
 
   expect(ticket).toBeDefined()

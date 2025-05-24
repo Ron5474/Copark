@@ -7,7 +7,6 @@ import {
   InputAdornment,
   IconButton,
   Typography,
-  TextField,
 } from '@mui/material'
 import { useState } from 'react'
 import SearchIcon from '@mui/icons-material/Search'
@@ -25,17 +24,14 @@ export default function ManualEntryCard({
     setPlate,
     setIsValidated,
     setPermitResult,
-    zone,
-    setZone,
   } = useEnforcement()
 
   const [inputError, setInputError] = useState(false)
 
   const handleSearch = async () => {
-    const trimmed = manualInput.trim()
-    const trimmedZone = zone.trim()
+    const trimmed = manualInput.trim().toUpperCase()
 
-    if (!trimmed || !trimmedZone) {
+    if (!trimmed) {
       setInputError(true)
       return
     }
@@ -43,13 +39,13 @@ export default function ManualEntryCard({
     setInputError(false)
 
     try {
-      const result = await checkPermit(trimmed.toUpperCase(), trimmedZone.toUpperCase())
-      setPlate(trimmed.toUpperCase())
+      const result = await checkPermit(trimmed)
+      setPlate(trimmed)
       setPermitResult(result)
       setIsValidated(true)
     } catch (err) {
       console.error('Permit check failed:', err)
-      setPermitResult({ isValid: false, type: 'N/A', zone: trimmedZone })
+      setPermitResult({ isValid: false, type: 'Error', area: 'N/A' })
       setIsValidated(true)
     }
   }
@@ -78,18 +74,10 @@ export default function ManualEntryCard({
         />
       </FormControl>
 
-      <TextField
-        label="Zone"
-        variant="standard"
-        fullWidth
-        sx={{ mt: 2 }}
-        value={zone}
-        onChange={(e) => setZone(e.target.value)}
-      />
       {inputError && (
-          <Typography color="error" variant="caption">
-            Please enter a license plate and zone
-          </Typography>
+        <Typography color="error" variant="caption">
+          Please enter a license plate
+        </Typography>
       )}
     </>
   )

@@ -7,10 +7,15 @@ import {
   Button,
   MenuItem,
   Stack,
+  IconButton,
+  Paper,
 } from '@mui/material'
+import Image from 'next/image'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { useState } from 'react'
 import { useEnforcement } from '../context/Context'
 import { issueTicket } from './actions'
+import { toBase64 } from './toBase64'
 
 const reasons = [
   'No Valid Permit',
@@ -20,64 +25,40 @@ const reasons = [
   'Other',
 ]
 
-const toBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = reject
-  })
-}
-
-export default function IssueViolationForm({
-  onCancel,
-}: {
-  onCancel: () => void
-}) {
-  const {
-    plate,
-    setShowSuccess,
-    zone,
-    setPlate,
-  } = useEnforcement()
+export default function IssueViolationForm({ onCancel }: { onCancel: () => void }) {
+  const { plate, setShowSuccess, setPlate } = useEnforcement()
 
   const [reason, setReason] = useState('')
   const [note, setNote] = useState('')
-  const [photos, setPhotos] = useState<File[]>([])
+  const [photo, setPhoto] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState({
-    plate: false,
-    reason: false,
-  })
+  const [errors, setErrors] = useState({ plate: false, reason: false })
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setPhotos(Array.from(e.target.files))
+    if (e.target.files && e.target.files[0]) {
+      setPhoto(e.target.files[0])
     }
   }
 
+  const removePhoto = () => {
+    setPhoto(null)
+  }
+
   const handleSubmit = async () => {
-    const newErrors = {
-      plate: !plate,
-      reason: !reason,
-    }
-
+    const newErrors = { plate: !plate, reason: !reason }
     setErrors(newErrors)
-
-    if (newErrors.plate || newErrors.reason) {
-      return
-    }
+    if (newErrors.plate || newErrors.reason) return
 
     setLoading(true)
 
     try {
-      const base64Images = await Promise.all(photos.map(toBase64))
+      const base64Image = photo ? await toBase64(photo) : null
 
       await issueTicket({
         plate: plate as string,
         reason,
         note: reason === 'Other' ? note : '',
-        images: base64Images[0] ?? null,
+        images: base64Image,
       })
 
       setShowSuccess(true)
@@ -100,22 +81,13 @@ export default function IssueViolationForm({
           label="License Plate"
           value={plate ?? ''}
           onChange={(e) => {
-          const value = e.target.value
-          setPlate(value)
-          if (errors.plate && value) {
-            setErrors((prev) => ({ ...prev, plate: false }))
-          }
-        }}
+            const value = e.target.value
+            setPlate(value)
+            if (errors.plate && value) setErrors((prev) => ({ ...prev, plate: false }))
+          }}
           fullWidth
           error={errors.plate}
           helperText={errors.plate ? 'License plate is required.' : ''}
-        />
-
-        <TextField
-          label="Current Location"
-          value={`Zone ${zone}`}
-          fullWidth
-          disabled
         />
 
         <TextField
@@ -125,9 +97,7 @@ export default function IssueViolationForm({
           onChange={(e) => {
             const value = e.target.value
             setReason(value)
-            if (errors.reason && value) {
-              setErrors((prev) => ({ ...prev, reason: false }))
-            }
+            if (errors.reason && value) setErrors((prev) => ({ ...prev, reason: false }))
           }}
           fullWidth
           error={errors.reason}
@@ -152,38 +122,39 @@ export default function IssueViolationForm({
         )}
 
         <Button variant="outlined" component="label">
-          Upload Violation Photos
+          Upload Photo (1 Max)
           <input
-            aria-label="Upload Violation Photos"
             hidden
             accept="image/*"
-            multiple
             type="file"
             onChange={handlePhotoUpload}
           />
         </Button>
 
-        {photos.length > 0 && (
-          <Typography variant="body2">
-            {photos.length} file(s) selected
-          </Typography>
+        {photo && (
+          <Paper elevation={1} sx={{ position: 'relative', width: '100%', maxWidth: 300 }}>
+            <Image
+              src={URL.createObjectURL(photo)}
+              alt="Violation photo"
+              width={300}
+              height={180}
+              style={{ borderRadius: 4, width: '100%', height: 'auto' }}
+            />
+            <IconButton
+              size="small"
+              onClick={removePhoto}
+              sx={{ position: 'absolute', top: 2, right: 2, background: '#fff' }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Paper>
         )}
 
         <Stack direction="row" spacing={2}>
-          <Button
-            variant="contained"
-            color="error"
-            fullWidth
-            onClick={onCancel}
-          >
+          <Button variant="contained" color="error" fullWidth onClick={onCancel}>
             Cancel
           </Button>
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={handleSubmit}
-            disabled={loading}
-          >
+          <Button variant="contained" fullWidth onClick={handleSubmit} disabled={loading}>
             {loading ? 'Issuing...' : 'Submit Violation'}
           </Button>
         </Stack>

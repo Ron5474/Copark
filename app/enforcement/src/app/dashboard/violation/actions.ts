@@ -11,7 +11,7 @@ type TicketInput = {
 
 export async function issueTicket({ plate, reason, note, images }: TicketInput) {
   const cookieStore = cookies()
-  const token = (await cookieStore).get('session')?.value
+  const token = (await cookieStore).get('sessionEnf')?.value
 
   if (!token) {
     throw new Error('Unauthorized: No session token found.')

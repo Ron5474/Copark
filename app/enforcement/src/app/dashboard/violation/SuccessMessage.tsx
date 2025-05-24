@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { Box, Paper, Typography, Button } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { useEnforcement } from '../context/Context'
 
 type SuccessMessageProps = {
   title: string
@@ -17,13 +18,15 @@ export default function SuccessMessage({
   buttonText,
   onButtonClick,
 }: SuccessMessageProps) {
+  const { setTitle } = useEnforcement()
   useEffect(() => {
+    setTitle('Success')
     const timeout = setTimeout(() => {
       onButtonClick()
     }, 2500)
 
     return () => clearTimeout(timeout)
-  }, [onButtonClick])
+  }, [onButtonClick, setTitle])
 
   return (
     <Box

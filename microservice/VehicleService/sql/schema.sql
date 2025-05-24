@@ -6,10 +6,12 @@ CREATE TABLE vehicle(
     data JSONB NOT NULL
 );
 
-DROP TABLE IF EXISTS default CASCADE;
-CREATE TABLE default(
+CREATE UNIQUE INDEX unique_plate ON vehicle (LOWER(data->>'plate'));
+
+DROP TABLE IF EXISTS defaultVehicle CASCADE;
+CREATE TABLE defaultVehicle(
    driver UUID PRIMARY KEY,
    vehicle UUID REFERENCES vehicle(id) ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX unique_plate ON vehicle (LOWER(data->>'plate'));
+CREATE INDEX driver ON defaultVehicle(driver);

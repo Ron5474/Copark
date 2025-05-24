@@ -77,13 +77,13 @@ export class PermitService {
   }
 
   public async isValidZonePermit(input: IsValidPermitInput): Promise<IsValid> {
-
+            // AND TRIM(LOWER(t.data->>'area')) = TRIM(LOWER($2))
     const result = await pool.query(`
       SELECT p.data, t.data as type
       FROM permit p
       JOIN type t ON t.id = p.type
       WHERE p.vehicle = $1
-        AND TRIM(LOWER(t.data->>'area')) = TRIM(LOWER($2))
+
         AND now() >= (p.data->>'activeDate')::timestamptz
         AND now() <= (p.data->>'expireDate')::timestamptz`,
       [input.vehicle]

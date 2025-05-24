@@ -19,8 +19,6 @@ type EnforcementContextType = {
   setIsIssuingViolation: (val: boolean) => void
   permitResult: PermitResult
   setPermitResult: (val: PermitResult) => void
-  officerName: string
-  setOfficerName: (name: string) => void
   showSuccess: boolean
   setShowSuccess: (val: boolean) => void
 }
@@ -41,12 +39,6 @@ export function EnforcementProvider({
   const [isValidated, setIsValidated] = useState(false)
   const [isIssuingViolation, setIsIssuingViolation] = useState(false)
   const [permitResult, setPermitResult] = useState<PermitResult>(null)
-  const [officerName, setOfficerName] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('name') || ''
-    }
-    return ''
-  })
   const [showSuccess, setShowSuccess] = useState(false)
 
 
@@ -63,8 +55,6 @@ export function EnforcementProvider({
         setIsIssuingViolation,
         permitResult,
         setPermitResult,
-        officerName,
-        setOfficerName,
         showSuccess,
         setShowSuccess,
       }}

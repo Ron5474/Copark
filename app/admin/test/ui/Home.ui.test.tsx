@@ -95,6 +95,31 @@ vi.mock('react-chartjs-2', () => ({
   Line: () => <div data-testid="mock-chart">Ticket Statistics</div>
 }));
 
+vi.mock('../../src/permit/actions', () => ({
+  getZones: vi.fn().mockResolvedValue([
+    {
+      zone: "1",
+      hourly: 2.50,
+      maxDuration: {
+        hours: 2,
+        minutes: 0
+      },
+      openTime: "08:00",
+      closeTime: "18:00"
+    },
+    {
+      zone: "2",
+      hourly: 3.50,
+      maxDuration: {
+        hours: 4,
+        minutes: 0
+      },
+      openTime: "07:00",
+      closeTime: "20:00"
+    }
+  ])
+}));
+
 const mockRouter = {
   push: vi.fn(),
 };
@@ -190,5 +215,15 @@ it('navigates to API Users section', async () => {
   fireEvent.click(clickableItem!);
   await waitFor(() => {
     expect(screen.getByText('Add API User')).toBeDefined();
+  });
+});
+
+it('navigates to Manage Zones section', async () => {
+  render(<Page />);
+  const manageZonesText = screen.getByText('Manage Zones');
+  const clickableItem = manageZonesText.closest('div');
+  fireEvent.click(clickableItem!);
+  await waitFor(() => {
+    expect(screen.getByText(/Zone Count: \d+/i)).toBeDefined();
   });
 });

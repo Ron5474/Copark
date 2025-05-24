@@ -44,3 +44,38 @@ export async function getAllPermitsByDay(): Promise<PermitsByDay[]> {
 
   return result.data.getPermitStats;
 }
+
+export async function createZone(input: {
+  zone: number,
+  hourly?: number,
+  maxDuration?: { hours: number, minutes: number },
+  openTime?: string,
+  closeTime?: string
+}): Promise<boolean> {
+  const token = await getAuthToken();
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query: `
+        mutation CreateZone($input: NewZone!) {
+          createZone(input: $input)
+        }
+      `,
+      variables: {
+        input
+      }
+    }),
+  });
+
+  const result = await response.json();
+
+  if (result.errors) {
+    throw new Error(result.errors[0].message);
+  }
+
+  return result.data.createZone;
+}

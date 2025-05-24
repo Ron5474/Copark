@@ -1,21 +1,25 @@
 'use client'
+
 import { Fragment } from 'react'
 import type { NextPage } from 'next'
+import { ThemeProvider, CssBaseline } from '@mui/material'
+import theme from '../theme'
 
 import EnforcementAppBar from '../shared/TopBar'
-import EnforcementNavBar from '../shared/NavBar'
 import DashboardContent from './Content'
 import { EnforcementProvider } from './context/Context'
 
 const View: NextPage = () => {
   return (
-    <EnforcementProvider>
-      <Fragment>
-        <EnforcementAppBar />
-        <DashboardContent />
-        <EnforcementNavBar />
-      </Fragment>
-    </EnforcementProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <EnforcementProvider>
+        <Fragment>
+          <EnforcementAppBar />
+          <DashboardContent />
+        </Fragment>
+      </EnforcementProvider>
+    </ThemeProvider>
   )
 }
 

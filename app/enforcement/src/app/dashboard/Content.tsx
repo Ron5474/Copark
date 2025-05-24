@@ -1,6 +1,12 @@
 'use client'
 
-import { Container, Box, Typography } from '@mui/material'
+import {
+  Container,
+  Box,
+  Typography,
+  Paper,
+} from '@mui/material'
+import EditNoteIcon from '@mui/icons-material/Search'
 import ManualEntryCard from './plate/ManualEntry'
 import PermitCard from './permit/Card'
 import IssueViolationForm from './violation/IssueViolationForm'
@@ -42,17 +48,66 @@ export default function EnforcementDashboardView() {
   return (
     <Container maxWidth="xs" sx={{ py: 3, mt: 8 }}>
       {!plate && (
-        <>
-          <Box display="flex" alignItems="center" mt={3} mb={1}>
-            <Box sx={{ flex: 1, height: 1, bgcolor: 'red' }} />
-            <Typography variant="body2" sx={{ mx: 2, fontWeight: 'bold', color: 'red' }}>
-              Manual Entry
-            </Typography>
-            <Box sx={{ flex: 1, height: 1, bgcolor: 'red' }} />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '80vh',
+            px: 2,
+            backgroundColor: 'background.default',
+          }}
+        >
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              borderRadius: '50%',
+              bgcolor: 'background.paper',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mb: 2,
+              boxShadow: 3,
+            }}
+          >
+            <EditNoteIcon sx={{ fontSize: 42, color: 'primary.main' }} />
           </Box>
 
-          <ManualEntryCard />
-        </>
+          <Typography variant="h5" sx={{ mb: 1 }}>
+            Manual License Plate Entry
+          </Typography>
+
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: 3, maxWidth: 300, textAlign: 'center' }}
+          >
+            Type in the license plate below to view permit information or issue a citation.
+          </Typography>
+
+          <Paper
+            elevation={3}
+            sx={{
+              width: '100%',
+              maxWidth: 400,
+              px: 3,
+              py: 4,
+              borderRadius: 3,
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              textAlign="center"
+              mb={2}
+            >
+              Enter Plate Details
+            </Typography>
+
+            <ManualEntryCard />
+          </Paper>
+        </Box>
       )}
 
       {plate && isValidated && !isIssuingViolation && <PermitCard />}
@@ -63,3 +118,4 @@ export default function EnforcementDashboardView() {
     </Container>
   )
 }
+

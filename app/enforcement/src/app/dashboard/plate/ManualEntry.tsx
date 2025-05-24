@@ -4,27 +4,28 @@ import {
   FormControl,
   InputLabel,
   Input,
-  InputAdornment,
-  IconButton,
   Typography,
+  Button,
+  Stack,
 } from '@mui/material'
 import { useState } from 'react'
-import SearchIcon from '@mui/icons-material/Search'
 import { useEnforcement } from '../context/Context'
 import { checkPermit } from '../permit/actions'
+import { useEffect } from 'react'
 
-export default function ManualEntryCard({
-  showSearchButton = true,
-}: {
-  showSearchButton?: boolean
-}) {
+export default function ManualEntryCard() {
   const {
     manualInput,
     setManualInput,
     setPlate,
     setIsValidated,
     setPermitResult,
+    setTitle,
   } = useEnforcement()
+
+  useEffect(() => {
+    setTitle('Dashboard')
+  }, [setTitle])
 
   const [inputError, setInputError] = useState(false)
 
@@ -51,7 +52,7 @@ export default function ManualEntryCard({
   }
 
   return (
-    <>
+    <Stack spacing={2}>
       <FormControl fullWidth variant="standard">
         <InputLabel htmlFor="plate">License Plate</InputLabel>
         <Input
@@ -61,16 +62,8 @@ export default function ManualEntryCard({
             setManualInput(e.target.value)
             setInputError(false)
           }}
-          endAdornment={
-            showSearchButton && (
-              <InputAdornment position="end">
-                <IconButton onClick={handleSearch} aria-label="Search">
-                  <SearchIcon />
-                </IconButton>
-              </InputAdornment>
-            )
-          }
           sx={{ textAlign: 'center' }}
+          aria-label="License Plate"
         />
       </FormControl>
 
@@ -79,6 +72,15 @@ export default function ManualEntryCard({
           Please enter a license plate
         </Typography>
       )}
-    </>
+
+      <Button
+        variant="contained"
+        fullWidth
+        onClick={handleSearch}
+        aria-label="Search License Plate"
+      >
+        Search
+      </Button>
+    </Stack>
   )
 }

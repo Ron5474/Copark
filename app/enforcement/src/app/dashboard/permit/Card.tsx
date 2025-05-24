@@ -11,6 +11,7 @@ import {
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import { useEnforcement } from '../context/Context'
+import { useEffect } from 'react'
 
 export default function PermitCard() {
   const {
@@ -21,7 +22,12 @@ export default function PermitCard() {
     setIsIssuingViolation,
     permitResult,
     setPermitResult,
+    setTitle,
   } = useEnforcement()
+
+  useEffect(() => {
+    setTitle('Permit Details')
+  }, [setTitle])
 
   const handleNewScan = () => {
     setPlate(null)
@@ -124,7 +130,8 @@ export default function PermitCard() {
 
         <Stack direction="row" spacing={2} mt={4}>
           <Button
-            color="primary"
+            // color="primary"
+            sx={{bgcolor: !permitExists ? 'grey.400' : 'primary.main'}}
             fullWidth
             variant="contained"
             onClick={handleNewScan}

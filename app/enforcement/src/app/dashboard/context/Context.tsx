@@ -21,6 +21,8 @@ type EnforcementContextType = {
   setPermitResult: (val: PermitResult) => void
   showSuccess: boolean
   setShowSuccess: (val: boolean) => void
+  title: string
+  setTitle: (val: string) => void
 }
 
 const EnforcementContext = createContext<EnforcementContextType | undefined>(undefined)
@@ -40,6 +42,7 @@ export function EnforcementProvider({
   const [isIssuingViolation, setIsIssuingViolation] = useState(false)
   const [permitResult, setPermitResult] = useState<PermitResult>(null)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [title, setTitle] = useState('Dashboard')
 
 
   return (
@@ -57,6 +60,8 @@ export function EnforcementProvider({
         setPermitResult,
         showSuccess,
         setShowSuccess,
+        title,
+        setTitle,
       }}
     >
       {children}

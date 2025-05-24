@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 
 const getAuthToken = async () => {
   const cookieStore = await cookies()
-  const token = cookieStore.get('session')?.value
+  const token = cookieStore.get('sessionEnf')?.value
   return token
 }
 

@@ -7,6 +7,7 @@ import ManageEnforcement from './components/ManageEnforcement';
 import ManageAPIUsers from './components/ManageAPIUsers';
 import ViewStatistics from './components/ViewStatistics';
 import ManageTicketChallenges from './components/ManageTicketChallenges';
+import ManageZones from './components/ManageZones';
 
 export default function Page() {
   const [currentComponent, setCurrentComponent] = useState<string>('home');
@@ -27,6 +28,8 @@ export default function Page() {
         return <ViewStatistics />; // No onNavigate prop needed here
       case 'reports':
         return <Box>Reports Component</Box>;
+      case 'zones':
+        return <ManageZones />;
       default:
         return <Box>Welcome to Admin Dashboard</Box>;
     }

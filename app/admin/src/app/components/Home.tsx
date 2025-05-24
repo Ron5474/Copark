@@ -16,6 +16,7 @@ export default function Home({ onNavigate, children }: HomeProps) {
     { label: 'View Statistics', component: 'statistics' },
     { label: 'Generate Reports', component: 'reports' },
     { label: 'Manage API Users', component: 'api_users' },
+    { label: 'Manage Zones', component: 'zones' },
   ];
 
   const drawerWidth = 240;

@@ -396,3 +396,77 @@ test('Admin can get all zones', async () => {
     expect(zone).toHaveProperty('closeTime');
   });
 });
+
+test('Admin can create a new zone', async () => {
+  const token = await loginAs("admin");
+
+  const mutation = `
+    mutation CreateZone($input: NewZone!) {
+      createZone(input: $input)
+    }
+  `;
+
+  const variables = {
+    input: {
+      zone: 999,
+      weekday: {
+        hourly: 3.50,
+        maxDuration: {
+          hours: 2,
+          minutes: 30
+        },
+        openTime: "08:00",
+        closeTime: "18:00"
+      },
+      weekend: {
+        hourly: 3.50,
+        maxDuration: {
+          hours: 2,
+          minutes: 30
+        },
+        openTime: "08:00",
+        closeTime: "18:00"
+      }
+    }
+  };
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: mutation, variables })
+    .expect(200);
+
+  expect(response.body.errors).toBeUndefined();
+  expect(response.body.data.createZone).toBe(true);
+
+  // Verify the zone was created
+  const verifyQuery = `
+    query GetZones {
+      getZones {
+        zone
+        hourly
+        maxDuration {
+          hours
+          minutes
+        }
+        openTime
+        closeTime
+      }
+    }
+  `;
+
+  const verifyResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: verifyQuery });
+
+  const newZone = verifyResponse.body.data.getZones
+    .find((z: any) => z.zone === "999");
+  
+  expect(newZone).toBeDefined();
+  expect(newZone.hourly).toBe(3.50);
+  expect(newZone.maxDuration.hours).toBe(2);
+  expect(newZone.maxDuration.minutes).toBe(30);
+  expect(newZone.openTime).toBe("08:00");
+  expect(newZone.closeTime).toBe("18:00");
+});

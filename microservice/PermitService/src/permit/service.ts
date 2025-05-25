@@ -3,7 +3,7 @@ import {
   Confirmation,
   Receipt,
   PurchaseZoneInput,
-  IsValid,
+  CheckedPermit,
   IsValidPolice,
   MyPermits,
   ZoneDetails,
@@ -76,7 +76,7 @@ export class PermitService {
     }
   }
 
-  public async getValidPermit(vid: string): Promise<IsValid> {
+  public async getValidPermit(vid: string): Promise<CheckedPermit> {
     const result = await pool.query(`
       SELECT t.data
       FROM permit p
@@ -87,11 +87,10 @@ export class PermitService {
       [vid]
     )
 
-    if (result.rowCount === 0) return { isValid: false, type: 'N/A', area: 'N/A'}
+    if (result.rowCount === 0) return { type: 'N/A', area: 'N/A'}
 
     const row = result.rows[0]
     return {
-      isValid: true,
       type: row.data.name,
       area: row.data.area,
     }

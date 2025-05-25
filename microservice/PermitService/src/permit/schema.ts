@@ -209,10 +209,7 @@ export class PurchaseLotInput {
 }
 
 @ObjectType()
-export class IsValid {
-
-  @Field(() => Boolean)
-  isValid!: boolean
+export class CheckedPermit {
 
   @Field(() => String)
   type!: string

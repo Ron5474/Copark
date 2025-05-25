@@ -3,7 +3,7 @@ import { Request } from 'express'
 import {
   Confirmation,
   PurchaseZoneInput,
-  IsValid,
+  CheckedPermit,
   IsValidPolice,
   MyPermits,
   NewZone,
@@ -180,11 +180,11 @@ export class PermitResolver {
   }
 
   @Authorized('enforcement')
-  @Query(() => IsValid)
+  @Query(() => CheckedPermit)
   async checkPermit(
     @Arg("plate", () => String) plate: string,
     @Ctx() request: Request
-  ): Promise<IsValid> {
+  ): Promise<CheckedPermit> {
 
     const vehicleQuery = `
       query FindVehicleByPlate($plate: String!) {
@@ -210,7 +210,7 @@ export class PermitResolver {
     const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 
     if (!vehicleId) {
-      return {isValid: false, type: 'Vehicle Not Found', area: 'N/A'}
+      return {type: 'Vehicle Not Found', area: 'N/A'}
     }
 
     return await service.getValidPermit(vehicleId)

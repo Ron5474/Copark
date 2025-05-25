@@ -488,6 +488,50 @@ export class TicketService {
     } as Ticket;
   }
 
+  public async challengeTicket(ticketID: TicketInput, challengeReason: string): Promise<ChallengeTicket | null> {
+    const decryptedID = await this.decrypt(ticketID.id);
+
+    const query = `
+      UPDATE ticket
+      SET data = jsonb_set(
+        jsonb_set(data, '{ticketStatus}', '"challenged"', true),
+        '{challengeReason}',
+        $2::text::jsonb,
+        true
+      )
+      WHERE id = $1
+      RETURNING id, vehicle, enforcer,
+                data->>'issuedDate' AS issueddate,
+                data->>'violation' AS violation,
+                data->>'fine' AS fine,
+                data->>'ticketStatus' AS ticketstatus,
+                data->>'images' AS images,
+                data->>'note' AS note,
+                data->>'challengeReason' AS challengereason
+    `;
+
+    const result = await pool.query(query, [decryptedID, JSON.stringify(challengeReason)]);
+
+    if (result.rows.length === 0) {
+      throw new Error("Ticket not found.");
+    }
+
+    const row = result.rows[0];
+
+    return {
+      id: await this.encrypt(row.id),
+      vehicle: row.vehicle,
+      enforcer: await this.encrypt(row.enforcer),
+      issuedDate: new Date(row.issueddate),
+      violation: row.violation,
+      fine: parseFloat(row.fine),
+      ticketStatus: row.ticketstatus,
+      images: row.images,
+      note: row.note,
+      challengeReason: row.challengereason
+    };
+  }
+
   public async getChallengedTickets(): Promise<ChallengeTicket[]> {
     const query = `
       SELECT 

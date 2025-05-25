@@ -1,5 +1,5 @@
 import { vi, it, afterEach, expect, } from 'vitest'
-import { render, screen, cleanup, waitFor } from '@testing-library/react'
+import { render, cleanup, waitFor } from '@testing-library/react'
 import React from 'react'
 import { signOut } from 'next-auth/react';
 
@@ -141,4 +141,3 @@ it('Renders Page with correct content', async () => {
 		expect(push).toHaveBeenCalledWith('/dashboard')
 	})
 })
-

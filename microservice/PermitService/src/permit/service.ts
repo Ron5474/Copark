@@ -77,27 +77,57 @@ export class PermitService {
     }
   }
 
+  // public async isValidZonePermit(input: IsValidPermitInput): Promise<IsValid> {
+  //           // AND TRIM(LOWER(t.data->>'area')) = TRIM(LOWER($2))
+  //   const result = await pool.query(`
+  //     SELECT p.data, t.data as type
+  //     FROM permit p
+  //     JOIN type t ON t.id = p.type
+  //     WHERE p.vehicle = $1
+
+  //       AND now() >= (p.data->>'activeDate')::timestamptz
+  //       AND now() <= (p.data->>'expireDate')::timestamptz`,
+  //     [input.vehicle]
+  //   )
+
+  //   if (result.rowCount === 0) return { isValid: false, type: 'N/A', area: 'N/A'}
+
+  //   const row = result.rows[0]
+  //   return {
+  //     isValid: true,
+  //     type: row.type.name,
+  //     area: row.data.area,
+  //   }
+  // }
+
   public async isValidZonePermit(input: IsValidPermitInput): Promise<IsValid> {
-            // AND TRIM(LOWER(t.data->>'area')) = TRIM(LOWER($2))
     const result = await pool.query(`
-      SELECT p.data, t.data as type
+      SELECT p.data AS permit_data, t.data AS type_data
       FROM permit p
       JOIN type t ON t.id = p.type
-      WHERE p.vehicle = $1
+      WHERE p.vehicle = $1  
+    `, [input.vehicle]);
 
-        AND now() >= (p.data->>'activeDate')::timestamptz
-        AND now() <= (p.data->>'expireDate')::timestamptz`,
-      [input.vehicle]
-    )
+    if (result.rowCount === 0) {
+      return {
+        isValid: false,
+        type: 'N/A',
+        area: 'N/A',
+      };
+    }
 
-    if (result.rowCount === 0) return { isValid: false, type: 'N/A', area: 'N/A'}
+    const row = result.rows[0];
 
-    const row = result.rows[0]
+    const permit = typeof row.permit_data === 'string' ? JSON.parse(row.permit_data) : row.permit_data;
+    const type = typeof row.type_data === 'string' ? JSON.parse(row.type_data) : row.type_data;
+
+    const area = permit?.area ?? type?.area ?? 'N/A';
+
     return {
       isValid: true,
-      type: row.type.name,
-      area: row.data.area,
-    }
+      type: type?.name,
+      area,
+    };
   }
 
   public async isValidPermitPolice(vid: string): Promise<IsValidPolice> {

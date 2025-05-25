@@ -216,7 +216,7 @@ export class PermitResolver {
       return {isValid: false, type: 'Vehicle Not Found', area: 'N/A'}
     }
 
-    return await service.isValidZonePermit({vehicle: vehicleId, zone: input.zone})
+    return await service.isValidZonePermit({vehicle: vehicleId})
   }
 
   @Authorized('police')

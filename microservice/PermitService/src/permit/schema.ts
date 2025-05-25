@@ -213,9 +213,6 @@ export class IsValidPermitInput {
 
   @Field(() => ID)
   vehicle!: string;
-
-  @Field(() => String)
-  zone!: string;
 }
 
 @ObjectType()

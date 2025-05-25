@@ -14,7 +14,7 @@ export class Vehicle {
   @Field(() => String)
   state!: string
 
-  @Field(() => String)
+  @Field(() => Boolean)
   default?: boolean
 
   @Field(() => String, { nullable: true })

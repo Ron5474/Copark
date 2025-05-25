@@ -212,7 +212,7 @@ export class PurchaseLotInput {
 export class IsValidPermitInput {
 
   @Field(() => ID)
-  vehicle!: string
+  vehicle!: string;
 }
 
 @ObjectType()

@@ -134,37 +134,7 @@ export class ChallengeTicketInput {
 }
 
 @ObjectType()
-export class ChallengeTicket {
-  @Field(() => ID)
-  id!: string;
-
-  @Field(() => String)  
-  vehicle!: string;
-
-  @Field(() => String)  
-  enforcer!: string;
-
-  @Field(() => Date)  
-  issuedDate!: Date;
-
-  @Field(() => String)  
-  violation!: string;
-
-  @Field(() => Number)  
-  fine!: number;
-
-  @Field(() => String)  
-  ticketStatus!: string;
-
-  @Field(() => String, { nullable: true })  
-  images?: string;
-
-  @Field(() => String, { nullable: true })
-  note?: string;
-
-  @Field(() => String)
+export class ChallengeTicket extends Ticket {
+  @Field()
   challengeReason!: string;
-
-  @Field(() => [String], { nullable: true })
-  evidence?: string[];
 }

@@ -19,7 +19,6 @@ import { SessionUser } from "src";
 import { Vehicle } from "src/types/express";
 import { sendTicketIssuedEmail } from './emailClient'
 
-const ticketService = new TicketService();
 const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 async function encrypt(userId: string, key=emailEncodedKey): Promise<string> {
@@ -32,6 +31,8 @@ async function encrypt(userId: string, key=emailEncodedKey): Promise<string> {
 
 @Resolver()
 export class TicketResolver {
+  constructor(private ticketService: TicketService) {}
+
   private async getVehicleById(userID: string): Promise<Vehicle[]> {
     // if (!userID) {
     //   throw new Error('User ID not provided')
@@ -170,13 +171,13 @@ export class TicketResolver {
   @Query(() => [Ticket])
   @Authorized(["admin"])
   async getTickets(): Promise<Ticket[]> {
-    return ticketService.getTickets();
+    return this.ticketService.getTickets();
   }
 
   @Query(() => [TicketsByDay])
   @Authorized(["admin"])
   async getTicketsStats(): Promise<TicketsByDay[]> {
-    return ticketService.getAllTicketsCount();
+    return this.ticketService.getAllTicketsCount();
   }
 
   @Query(() => [TicketsByDay])
@@ -184,7 +185,7 @@ export class TicketResolver {
   async getTicketsPerDayFromEnforcer(
     @Arg("enforcerID", () => String) enforcerID: string
   ): Promise<TicketsByDay[]> {
-    return ticketService.getTicketsPerDayFromEnforcer(enforcerID);
+    return this.ticketService.getTicketsPerDayFromEnforcer(enforcerID);
   }
 
   @Query(() => [Ticket])
@@ -201,19 +202,19 @@ export class TicketResolver {
     
     const vehicleIDs: Vehicle[] = await this.getVehicleById(userEncrypted)
 
-    return await ticketService.getTicketsForVehicleID(vehicleIDs)
+    return await this.ticketService.getTicketsForVehicleID(vehicleIDs)
   }
 
   @Mutation(() => Ticket)
   @Authorized(["enforcement", "admin"])
   async createTicket(@Arg("newTicket", () => NewTicket) newTicket: NewTicket): Promise<Ticket> {
-    return ticketService.createTicket(newTicket);
+    return this.ticketService.createTicket(newTicket);
   }
 
   @Mutation(() => Ticket, { nullable: true })
   @Authorized(["enforcement", "admin"])
   async modifyTicket(@Arg("input", () => ModifyTicketInput) input: ModifyTicketInput): Promise<Ticket | null> {
-    return ticketService.modifyTicket(input);
+    return this.ticketService.modifyTicket(input);
   }
 
   @Mutation(() => Ticket, { nullable: true })
@@ -229,7 +230,7 @@ export class TicketResolver {
   @Mutation(() => Ticket, { nullable: true })
   @Authorized(["enforcement", "admin"])
   async deleteTicket(@Arg("id", () => TicketInput) id: TicketInput): Promise<Ticket | null> {
-    return ticketService.deleteTicket(id);
+    return this.ticketService.deleteTicket(id);
   }
 
   @Mutation(() => Ticket)
@@ -260,7 +261,7 @@ export class TicketResolver {
       const vehicleJson = await vehicleRes.json();
       const vehicleId = vehicleJson?.data?.findOrCreateVehicleByPlate?.id;
 
-      const ticket = await ticketService.createTicket({
+      const ticket = await this.ticketService.createTicket({
       enforcer: (request.headers.authorization as string).split(' ')[1],
       vehicle: vehicleId,
       violation: input.reason,
@@ -297,11 +298,41 @@ export class TicketResolver {
 
     const vehicleIDs: Vehicle[] = await this.getVehicleById(userID.id)
 
-    const tickets = await ticketService.getTicketsForVehicleID(vehicleIDs)
+    const tickets = await this.ticketService.getTicketsForVehicleID(vehicleIDs)
 
     if (tickets?.length > 0) {
       return {hasTicket: true}
     }
     return {hasTicket: false}
+  }
+
+  @Mutation(() => ChallengeTicket)
+  async challengeTicket(
+    @Arg('ticketID') ticketID: TicketInput,
+    @Arg('challengeReason') challengeReason: string
+  ): Promise<ChallengeTicket | null> {
+    return await this.ticketService.challengeTicket(ticketID, challengeReason);
+  }
+
+  @Query(() => [ChallengeTicket])
+  @Authorized(['admin', 'enforcement'])
+  async getChallengedTickets(): Promise<ChallengeTicket[]> {
+    return await this.ticketService.getChallengedTickets();
+  }
+
+  @Mutation(() => Ticket)
+  @Authorized(['admin'])
+  async acceptTicketChallenge(
+    @Arg('ticketID') ticketID: TicketInput
+  ): Promise<Ticket | null> {
+    return await this.ticketService.acceptTicketChallenge(ticketID);
+  }
+
+  @Mutation(() => Ticket)
+  @Authorized(['admin'])
+  async rejectTicketChallenge(
+    @Arg('ticketID') ticketID: TicketInput
+  ): Promise<Ticket | null> {
+    return await this.ticketService.rejectTicketChallenge(ticketID);
   }
 }

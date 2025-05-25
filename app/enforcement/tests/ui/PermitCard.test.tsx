@@ -5,7 +5,9 @@ import React from 'react'
 
 import { EnforcementProvider, useEnforcement } from '@/app/dashboard/context/Context'
 import PermitCard from '@/app/dashboard/permit/Card'
-import ManualEntryCard from '@/app/dashboard/plate/ManualEntry'
+// import ManualEntryCard from '@/app/dashboard/plate/ManualEntry'
+import IssueViolationForm from '@/app/dashboard/violation/IssueViolationForm'
+import EnforcementDashboardView from '@/app/dashboard/Content'
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -20,7 +22,7 @@ afterEach(() => {
 function TestPermitCardWithResult({
   permitResult,
 }: {
-  permitResult: { isValid: boolean; type: string; zone: string }
+  permitResult: { isValid: boolean; type: string; area: string }
 }) {
   const { setPermitResult, setIsValidated } = useEnforcement()
 
@@ -32,88 +34,67 @@ function TestPermitCardWithResult({
   return <PermitCard />
 }
 
-it('Checks for valid permit', async () => {
+it('Shows permit found', async () => {
   render(
-    <EnforcementProvider initialPlate="XYZ123" initialManualInput="" initialZone="A1">
+    <EnforcementProvider initialPlate="XYZ123" >
       <TestPermitCardWithResult
-        permitResult={{ isValid: true, type: 'Residential', zone: 'A1' }}
+        permitResult={{ isValid: true, type: 'Residential', area: 'A1' }}
       />
     </EnforcementProvider>
   )
 
-  expect(await screen.findByText(/Valid Permit/i)).toBeDefined()
-})
-
-it('show the entered zone in the permit card', async () => {
-  render(
-    <EnforcementProvider initialPlate="XYZ123" initialManualInput="" initialZone="A1">
-      <TestPermitCardWithResult
-        permitResult={{ isValid: true, type: 'Residential', zone: 'A1' }}
-      />
-    </EnforcementProvider>
-  )
-  expect(screen.getByText(/Current Location:/i)).toBeDefined()
-  expect(screen.getByText(/Zone A1/i)).toBeDefined()
-})
-
-it('Shows invalid permit message', async () => {
-  render(
-    <EnforcementProvider initialPlate="XYZ123" initialManualInput="" initialZone="A1">
-      <TestPermitCardWithResult
-        permitResult={{ isValid: false, type: 'Residential', zone: 'A1' }}
-      />
-    </EnforcementProvider>
-  )
-  expect(screen.getByText(/No Valid Permit/i)).toBeDefined()
+  expect(await screen.findByText(/Permit Found/i)).toBeDefined()
   expect(screen.getByText(/License Plate:/i)).toBeDefined()
   expect(screen.getByText(/XYZ123/i)).toBeDefined()
+  expect(screen.getByText(/Residential - A1/i)).toBeDefined()
 })
 
-
-
-it('Shows invalid permit and show license plate', async () => {
+it('shows No Permit Found', async () => {
   render(
-    <EnforcementProvider initialPlate="XYZ123" initialManualInput="" initialZone="A1">
+    <EnforcementProvider initialPlate="XYZ123">
       <TestPermitCardWithResult
-        permitResult={{ isValid: false, type: 'Residential', zone: 'A1' }}
+        permitResult={{ isValid: false, type: 'Error', area: 'N/A' }}
       />
     </EnforcementProvider>
   )
-
-  expect(screen.getByText(/No Valid Permit/i)).toBeDefined()
-  // expect(screen.getByText(/Plate Number: XYZ123/i)).toBeDefined()
+  expect(await screen.findByText(/No Permit Found/i)).toBeDefined()
+  expect(screen.getByText(/License Plate:/i)).toBeDefined()
+  expect(screen.getByText(/XYZ123/i)).toBeDefined()
+  expect(screen.getByText(/Error - N\/A/i)).toBeDefined()
 })
 
-it('clicking new scan redirects you to manual entry', async () => {
+it('clicking new search redirects you to manual entry', async () => {
   const user = userEvent.setup()
 
   render(
     <EnforcementProvider initialPlate="XYZ987">
       <PermitCard />
-      <ManualEntryCard/>
+      <EnforcementDashboardView/>
     </EnforcementProvider>
   )
 
-  const newScan = screen.getByLabelText('New Scan')
+  const newScan = screen.getByLabelText('New Search')
   await user.click(newScan)
-
-  expect(screen.getByLabelText('Search'))
+  
+  expect(await screen.findByText('Manual License Plate Entry')).toBeDefined()
 })
 
-it('clicking "Issue Citation" logs issuing message with plate', async () => {
+it('clicking "Issue Citation" displays IssueViolationForm', async () => {
   const user = userEvent.setup()
-  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
 
   render(
     <EnforcementProvider initialPlate="XYZ987">
       <PermitCard />
+      <IssueViolationForm onCancel={function (): void {
+        throw new Error('Function not implemented.')
+      } }/>
     </EnforcementProvider>
   )
 
-  const issueButton = screen.getByRole('button', { name: /Issue Citation/i })
+  expect(screen.getByText(/Permit Type:/i)).toBeDefined()
+
+  const issueButton = screen.getByLabelText('Issue Citation')
   await user.click(issueButton)
-
-  expect(logSpy).toHaveBeenCalledWith('Issuing citation for XYZ987')
-
-  logSpy.mockRestore()
+  expect(await screen.findByText('Issue Violation')).toBeDefined()
+  expect(screen.getByLabelText('Reason')).toBeDefined()
 })

@@ -11,6 +11,7 @@ import {
   EmailInput,
   NewTicketInput,
   TicketsByDay,
+  PaidTicketInput,
 } from "./schema";
 
 import { SessionUser } from "src";
@@ -212,6 +213,16 @@ export class TicketResolver {
   @Authorized(["enforcement", "admin"])
   async modifyTicket(@Arg("input", () => ModifyTicketInput) input: ModifyTicketInput): Promise<Ticket | null> {
     return ticketService.modifyTicket(input);
+  }
+
+  @Mutation(() => Ticket, { nullable: true })
+  @Authorized(["driver"])
+  async markTicketAsPaid(@Arg("input", () => PaidTicketInput) input: PaidTicketInput): Promise<Ticket | null> {
+    const updatedInput : ModifyTicketInput = {
+      id: input.id,
+      ticketStatus: 'paid'
+    }
+    return ticketService.modifyTicket(updatedInput);
   }
 
   @Mutation(() => Ticket, { nullable: true })

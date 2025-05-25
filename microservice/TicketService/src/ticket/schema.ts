@@ -84,6 +84,12 @@ export class ModifyTicketInput {
   images?: string;
 }
 
+@InputType()
+export class PaidTicketInput {
+  @Field(() => ID)
+  id!: string;
+}
+
 @ObjectType()
 export class hasTicket {
 

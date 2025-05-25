@@ -3,7 +3,8 @@ import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 import { Vehicle } from "../types/express";
 
-const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 
 export class TicketService {
   private async encrypt(userId: string): Promise<string> {
@@ -11,17 +12,29 @@ export class TicketService {
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('30m')
-      .sign(encodedKey)
+      .sign(internalKey)
   }
 
   private async decrypt(token: string): Promise<string | undefined> {
     try {
-      const { payload } = await jwtVerify(token, encodedKey)
+      const { payload } = await jwtVerify(token, internalKey)
 
       return payload.id as string; // Extract the `id` from the payload
     } catch (error) {
       void error;
       // console.error('Failed to decrypt token:', error);
+      return undefined; // Return undefined if the token is invalid or expired
+    }
+  }
+
+  private async decryptUser(userJWT: string): Promise<string | undefined> {
+    try {
+      const { payload } = await jwtVerify(userJWT, encodedKey)
+
+      return payload.id as string; // Extract the `id` from the payload
+    } catch (error) {
+      void error;
+      // console.error('Failed to decrypt user JWT:', error);
       return undefined; // Return undefined if the token is invalid or expired
     }
   }
@@ -68,7 +81,7 @@ export class TicketService {
 
   public async createTicket(newTicket: NewTicket): Promise<Ticket> {
     const enforcerToken = newTicket.enforcer;
-    const enforcerId = await this.decrypt(enforcerToken);
+    const enforcerId = await this.decryptUser(enforcerToken);
     const vehicleId = newTicket.vehicle;
 
     if (!enforcerId || !vehicleId) {

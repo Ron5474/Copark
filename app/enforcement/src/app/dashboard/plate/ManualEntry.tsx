@@ -63,7 +63,6 @@ export default function ManualEntryCard() {
             setInputError(false)
           }}
           sx={{ textAlign: 'center' }}
-          aria-label="License Plate"
         />
       </FormControl>
 

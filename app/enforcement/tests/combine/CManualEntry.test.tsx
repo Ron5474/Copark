@@ -42,20 +42,18 @@ it('renders PermitCard after successful permit check', async () => {
 
   const user = userEvent.setup()
 
-  await user.type(screen.getByLabelText(/license plate/i), 'ABC123')
-  await user.type(screen.getByLabelText(/zone/i), 'A1')
-  await user.click(screen.getByRole('button', { name: /search/i }))
+  await user.type(screen.getByLabelText('License Plate'), 'ABC123')
+  await user.click(screen.getByLabelText('Search License Plate'))
 
   await waitFor(() => {
-    expect(screen.getByText(/Valid Permit/i)).toBeDefined()
+    expect(screen.getByText(/Permit Found/i)).toBeDefined()
     expect(screen.getByText(/License Plate:/i)).toBeDefined()
     expect(screen.getByText(/ABC123/i)).toBeDefined()
-    expect(screen.getByText(/Current Location:/i)).toBeDefined()
-    expect(screen.getByText(/Zone A1/i)).toBeDefined()
+    expect(screen.getByText(/Residential - A1/i)).toBeDefined()
   })
 })
 
-it('renders Invalid Permit after GraphQL failure', async () => {
+it('renders No Permit Found', async () => {
   server.use(permitHandlers.failure)
 
   render(
@@ -66,14 +64,25 @@ it('renders Invalid Permit after GraphQL failure', async () => {
 
   const user = userEvent.setup()
 
-  await user.type(screen.getByLabelText(/license plate/i), 'BAD999')
-  await user.type(screen.getByLabelText(/zone/i), 'Z9')
-  await user.click(screen.getByRole('button', { name: /search/i }))
+  await user.type(screen.getByLabelText('License Plate'), 'BAD999')
+  await user.click(screen.getByLabelText('Search License Plate'))
 
   await waitFor(() => {
-    expect(screen.getByText(/zone/i)).toBeDefined()
+    expect(screen.getByText(/No Permit Found/i)).toBeDefined()
+    expect(screen.getByText(/License Plate:/i)).toBeDefined()
+    expect(screen.getByText(/BAD999/i)).toBeDefined()
+    expect(screen.getByText(/Error - N\/A/i)).toBeDefined()
   })
 })
+
+it('throws if GraphQL returns top-level error', async () => {
+  server.use(permitHandlers.graphqlError)
+
+  await expect(checkPermit('SOMEPLATE')).rejects.toThrow(
+    'GraphQL error: Zone not permitted'
+  )
+})
+
 
 it('throws if no session token is found', async () => {
   const { cookies } = await import('next/headers')
@@ -87,7 +96,7 @@ it('throws if no session token is found', async () => {
 
   mockCookies.get.mockImplementationOnce(() => undefined)
 
-  await expect(() => checkPermit('NOAUTH', 'Z0')).rejects.toThrow(
+  await expect(() => checkPermit('NOAUTH')).rejects.toThrow(
     'Unauthorized: Missing session token'
   )
 })

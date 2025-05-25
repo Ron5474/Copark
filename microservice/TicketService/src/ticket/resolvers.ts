@@ -11,6 +11,7 @@ import {
   EmailInput,
   NewTicketInput,
   TicketsByDay,
+  ChallengeTicket,
   PaidTicketInput,
 } from "./schema";
 

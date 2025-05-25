@@ -150,6 +150,24 @@ const ticketHandlers = {
 
     return HttpResponse.json({ errors: [{ message: 'Unknown mutation' }] }, { status: 400 })
   }),
+
+  graphqlError: http.post(ticketURL, async ({ request }) => {
+  const body = await request.json()
+  if (
+      typeof body === 'object' &&
+      body !== null &&
+      'query' in body &&
+      typeof body.query === 'string' &&
+      body.query.includes('CreateNewTicket')
+    ) {
+    return HttpResponse.json({
+      errors: [{ message: 'Ticket service internal error' }],
+    }, { status: 200 })
+  }
+
+  return HttpResponse.json({ errors: [{ message: 'Unknown mutation' }] }, { status: 400 })
+}),
+
 }
 
 export { authHandlers, permitHandlers, ticketHandlers }

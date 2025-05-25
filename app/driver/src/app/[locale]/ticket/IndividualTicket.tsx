@@ -17,6 +17,7 @@ import { useState } from 'react'
 
 import { Payment } from '../shared/actions'
 import { useTicketState } from './TicketContext'
+import theme from '../theme'
 
 export default function IndividualTicket() {
   const { currentTicket, setCurrentView } = useTicketState()
@@ -28,6 +29,17 @@ export default function IndividualTicket() {
 
   const handleTicketPayment = async () => {
     const amount = parseFloat((currentTicket?.fine || 0).toFixed(2))*100
+    const paymentDetails = {
+      price: amount,
+      currency: 'USD',
+    }
+    const permitDetails = {
+      type: "ticket",
+      ticketId: currentTicket?.id,
+      ticketFine: amount
+    }
+    sessionStorage.setItem('paymentDetails', JSON.stringify(paymentDetails))
+    sessionStorage.setItem('ticketDetails', JSON.stringify(permitDetails))
     await Payment("ticket", "Ticket Payment", amount, `Payment for Ticket ${currentTicket?.id.substring(0, 5)}`, "USD")
   }
 
@@ -299,7 +311,8 @@ export default function IndividualTicket() {
           size="large"
           fullWidth
           sx={{ 
-            bgcolor: '#00796b',
+            bgcolor: theme.palette.primary.dark,
+            color: 'white',
             textTransform: 'none',
             fontWeight: 600,
             py: 1.5,
@@ -314,7 +327,8 @@ export default function IndividualTicket() {
           size="large"
           fullWidth
           sx={{
-            bgcolor: '#00796b',
+            bgcolor: theme.palette.primary.dark,
+            color: 'white',
             textTransform: 'none',
             fontWeight: 600,
             py: 1.5,

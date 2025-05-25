@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Topbar from "../shared/Topbar";
 import { useEffect } from "react";
-import { getTransactionDetails, addPaymentDetails, addPermitDetails } from "./actions";
+import { getTransactionDetails, addPaymentDetails, addPermitDetails, addTicketDetails } from "./actions";
 import { Box, Button, Toolbar, Typography } from "@mui/material";
 import theme from "../theme";
 import { useRouter } from "@/i18n/navigation";
@@ -22,13 +22,23 @@ function PaymentConfirmation() {
         console.error("No session ID found in URL");
         return;
       }
-      const details = await getTransactionDetails(sessionId);
-      setTransactionId(details.id);
+      const paymentDetails = await getTransactionDetails(sessionId);
+      setTransactionId(paymentDetails.id);
 
-      await addPaymentDetails(details);
-      const permitDetails = JSON.parse(sessionStorage.getItem("permitDetails") || "{}");
-      if (permitDetails.type === "permit") {
-        await addPermitDetails(details, permitDetails);
+      await addPaymentDetails(paymentDetails);
+      const permitDetails = sessionStorage.getItem("permitDetails");
+      const ticketDetails = sessionStorage.getItem("ticketDetails");
+      let details;
+      if (permitDetails) {
+        details = JSON.parse(permitDetails);
+      } else if (ticketDetails) {
+        details = JSON.parse(ticketDetails);
+      }
+      console.log("Permit Details:", details);
+      if (details.type === "permit") {
+        await addPermitDetails(paymentDetails, details);
+      } else if (details.type === "ticket") {
+        await addTicketDetails(details);
       }
       sessionStorage.removeItem("permitDetails");
       sessionStorage.removeItem("paymentDetails");

@@ -165,3 +165,52 @@ export async function addPermitDetails(
     throw new Error("Permit Type not resolved");
   }
 }
+
+export async function addTicketDetails(
+  TicketDetails: {
+    type: string;
+    ticketId: string;
+    ticketFine: number;
+  },
+) {
+  if (TicketDetails.type !== "ticket") {
+    throw new Error("Invalid ticket type");
+  }
+  try {
+    const { ticketId } = TicketDetails;
+    const res = await fetch("http://localhost:4002/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${await getAuthToken()}`,
+      },
+      body: JSON.stringify({
+        query: `mutation AddTicket($input: PaidTicketInput!) {
+        markTicketAsPaid(input: $input) {
+          id
+          vehicle
+          fine
+          }
+        }`,
+          variables: {
+            input: {
+              id: ticketId
+            }
+          }
+      }),
+    });
+    
+    const result = await res.json();
+    console.log("GraphQL response:", result);
+
+    if (res.status !== 201 && res.status !== 200 && res.status !== 204) {
+      throw new Error("Failed to save ticket details");
+    } 
+    if (result.errors) {
+      throw new Error(`Failed to save ticket details: ${result.errors[0].message}`);
+    }
+  } catch (error) {
+    console.error("Error adding ticket details:", error);
+    throw new Error("Failed to save ticket details");
+  }
+}

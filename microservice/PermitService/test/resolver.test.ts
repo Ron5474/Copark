@@ -251,7 +251,7 @@ test('Enforcer gets invalid permit', async () => {
       query: isValidZonePermitQuery,
       variables: isValidZonePermitInput
     })
-    
+
   expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
 })
 
@@ -425,8 +425,6 @@ test('Admin can create a new zone', async () => {
     newZoneNumber++;
   }
 
-  console.log(`Creating new zone: ${newZoneNumber}`);
-
   const mutation = `
     mutation CreateZone($input: NewZone!) {
       createZone(input: $input)
@@ -466,8 +464,6 @@ test('Admin can create a new zone', async () => {
   expect(response.body.errors).toBeUndefined();
   expect(response.body.data.createZone).toBe(true);
 
-  console.log("Zone created successfully");
-
   // Verify the zone was created
   const verifyQuery = `
     query GetZones {
@@ -493,7 +489,6 @@ test('Admin can create a new zone', async () => {
     .find((z: any) => z.zone === newZoneNumber.toString());
 
   expect(newZone).toBeDefined();
-
   expect(newZone.hourly).toBe(3.50);
   expect(newZone.maxDuration.hours).toBe(2);
   expect(newZone.maxDuration.minutes).toBe(30);

@@ -132,3 +132,39 @@ export class ChallengeTicketInput {
   @Field(() => [String], { nullable: true })
   evidence?: string[];
 }
+
+@ObjectType()
+export class ChallengeTicket {
+  @Field(() => ID)
+  id!: string;
+
+  @Field(() => String)  
+  vehicle!: string;
+
+  @Field(() => String)  
+  enforcer!: string;
+
+  @Field(() => Date)  
+  issuedDate!: Date;
+
+  @Field(() => String)  
+  violation!: string;
+
+  @Field(() => Number)  
+  fine!: number;
+
+  @Field(() => String)  
+  ticketStatus!: string;
+
+  @Field(() => String, { nullable: true })  
+  images?: string;
+
+  @Field(() => String, { nullable: true })
+  note?: string;
+
+  @Field(() => String)
+  challengeReason!: string;
+
+  @Field(() => [String], { nullable: true })
+  evidence?: string[];
+}

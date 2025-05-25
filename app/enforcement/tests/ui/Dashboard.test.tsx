@@ -28,7 +28,17 @@ it('Renders Enforcement Dashboard', async () => {
       <View />
     </EnforcementProvider>
   )
-  expect(await screen.findByText('Enforcement Dashboard')).toBeDefined()
+  expect(await screen.findByText('Dashboard')).toBeDefined()
+})
+
+it('renders dashboard intro text and form title', async () => {
+  render(
+    <EnforcementProvider>
+      <EnforcementDashboardView />
+    </EnforcementProvider>
+  )
+  expect(await screen.findByText('Manual License Plate Entry')).toBeDefined()
+  expect(screen.getByText('Enter Plate Details')).toBeDefined()
 })
 
 it('renders license plate input', () => {
@@ -52,37 +62,15 @@ it('can type in the plate input', async () => {
   expect((input as HTMLInputElement).value).toBe('helloworld')
 })
 
-it('Zone and plate are required', async () => {
+it('License plate is required', async () => {
   render(
       <EnforcementProvider>
         <EnforcementDashboardView />
       </EnforcementProvider>
     )
   const user = userEvent.setup()
-  const input = screen.getByLabelText('License Plate')
-  const searchButton = screen.getByLabelText('Search')
-
-  await user.type(input, 'TEST123')
+  const searchButton = screen.getByLabelText('Search License Plate')
   await user.click(searchButton)
 
-  expect(await screen.getByText('Please enter a license plate and zone')).toBeDefined()
+  expect(screen.getByText('Please enter a license plate')).toBeDefined()
 })
-
-// it('starts a new scan use types a new license plate', async () => {
-//   render(
-//       <EnforcementProvider>
-//         <EnforcementDashboardView />
-//       </EnforcementProvider>
-//     )
-//   const user = userEvent.setup()
-
-//   const input = screen.getByLabelText('License Plate')
-//   const searchButton = screen.getByRole('button', { name: /Search/i })
-//   await user.type(input, 'ABC999')
-//   await user.click(searchButton)
-
-//   const newScanButton = await screen.findByRole('button', { name: /New Scan/i })
-//   await user.click(newScanButton)
-
-//   expect(await screen.findByLabelText('Manual Entry')).toBeDefined()
-// })

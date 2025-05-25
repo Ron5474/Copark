@@ -62,8 +62,8 @@ vi.mock('@/app/dashboard/permit/actions', async () => {
   return {
     checkPermit: vi.fn(async () => ({
       isValid: true,
-      type: 'Residential',
-      zone: 'A1',
+      type: 'Lot',
+      area: 'A1',
     })),
   }
 })
@@ -81,10 +81,10 @@ it('shows error when trying to search with empty input', async () => {
     </EnforcementProvider>
   )
 
-  const searchBtn = screen.getByLabelText('Search')
+  const searchBtn = screen.getByLabelText('Search License Plate')
   await user.click(searchBtn)
 
-  expect(await screen.findByText(/please enter a license plate and zone/i)).toBeDefined()
+  expect(await screen.findByText(/please enter a license plate/i)).toBeDefined()
 })
 
 it('searching sets plate from manual input', async () => {
@@ -99,13 +99,11 @@ it('searching sets plate from manual input', async () => {
     </EnforcementProvider>
   )
 
-  const plateInput = screen.getByLabelText(/license plate/i)
-  const zoneInput = screen.getByLabelText(/zone/i)
-  const searchBtn = screen.getByLabelText('Search')
+  const plateInput = screen.getByLabelText('License Plate')
+  const searchBtn = screen.getByLabelText('Search License Plate')
 
   await user.type(plateInput, 'abc123')
-  await user.type(zoneInput, 'A1')
   await user.click(searchBtn)
 
-  expect(screen.getByText(/Valid Permit/i)).toBeDefined()
+  expect(screen.getByText(/Permit Found/i)).toBeDefined()
 })

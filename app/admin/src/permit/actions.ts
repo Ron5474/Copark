@@ -27,8 +27,6 @@ export async function getAllPermitsByDay(): Promise<PermitsByDay[]> {
               vehicle
               type
               area
-              activeDate
-              expireDate
             }
           }
         }

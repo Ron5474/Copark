@@ -68,6 +68,18 @@ export default function DashboardView() {
   const checkout = async (permit: LotGroup) => {
     const selectedLot = selectedLots[permit.id];
     const lot = permit.lots.find((lot) => lot.name === selectedLot);
+    const permitDetails = {
+      type: "permit",
+      duration: permit.id,
+      permitType: "lot",
+      lot: selectedLot,
+    };
+    sessionStorage.setItem("permitDetails", JSON.stringify(permitDetails));
+    const paymentDetails = {
+      price: lot ? parseFloat(lot.price.slice(1)) * 100 : 0, // Convert to cents
+      currency: "USD",
+    };
+    sessionStorage.setItem("paymentDetails", JSON.stringify(paymentDetails));
     if (selectedLot) {
       await Payment(
         "permit",

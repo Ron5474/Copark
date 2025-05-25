@@ -62,22 +62,8 @@ export async function addPermitDetails(
 ): Promise<void> {
   const { id, amount, currency, status, payment_method, type } = details;
   const { vehicle, zoneNumber, duration } = addPermitDetails;
-
-  const inputData = {
-    vehicle: vehicle?.plate,
-          zone: zoneNumber,
-          duration: duration,
-          paymentMethod: payment_method
-        }
-
-  const res = await fetch("http://localhost:4003/graphql", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${await getAuthToken()}`,
-    },
-    body: JSON.stringify({
-      query: `
+  
+  const permitQuery = `
         mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
           purchaseZonePermit(input: $input) {
             type,
@@ -93,7 +79,23 @@ export async function addPermitDetails(
             paymentMethod
           }
         }
-        `,
+        `
+
+  const inputData = {
+    vehicle: vehicle?.plate,
+          zone: zoneNumber,
+          duration: duration,
+          paymentMethod: payment_method
+        }
+
+  const res = await fetch("http://localhost:4003/graphql", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${await getAuthToken()}`,
+    },
+    body: JSON.stringify({
+      query: permitQuery,
       variables: {
         input: inputData
       }

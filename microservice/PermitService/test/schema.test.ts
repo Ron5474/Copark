@@ -21,33 +21,30 @@ beforeAll(async () => {
   server = http.createServer(app)
   server.listen()
   await bootstrap()
-});
+})
 
 afterAll(() => {
-  server.close();
-});
+  server.close()
+})
   
 test('Permit schema loads correctly', () => {
-    const testPermit = new Permit();
-    testPermit.vehicle = 'vehicle1';
-    testPermit.type = 'temporary';
-    testPermit.zone = '123';
-    testPermit.activeDate = '2025-05-11T12:00:00.000Z';
-    testPermit.expireDate = '2025-05-11T12:00:00.000Z';
+    const testPermit = new Permit()
+    testPermit.vehicle = 'vehicle1'
+    testPermit.type = 'temporary'
+    testPermit.activeDate = '2025-05-11T12:00:00.000Z'
+    testPermit.expireDate = '2025-05-11T12:00:00.000Z'
 
-    expect(testPermit).toBeDefined();
-    expect(testPermit.vehicle).toBe('vehicle1');
-    expect(testPermit.type).toBe('temporary');
-    expect(testPermit.zone).toBe('123');
-    expect(testPermit.activeDate).toBe('2025-05-11T12:00:00.000Z');
-    expect(testPermit.expireDate).toBe('2025-05-11T12:00:00.000Z');
-});
+    expect(testPermit).toBeDefined()
+    expect(testPermit.vehicle).toBe('vehicle1')
+    expect(testPermit.type).toBe('temporary')
+    expect(testPermit.activeDate).toBe('2025-05-11T12:00:00.000Z')
+    expect(testPermit.expireDate).toBe('2025-05-11T12:00:00.000Z')
+})
 
 test('MyPermits schema loads correctly', () => {
   const permit = new Permit()
   permit.vehicle = 'v'
   permit.type = 't'
-  permit.zone = 'z'
   permit.activeDate = 'a'
   permit.expireDate = 'e'
 
@@ -78,14 +75,12 @@ test('ZoneDetails schema loads correctly', () => {
   duration.hours = 1
 
   const zoneDetails = new ZoneDetails()
-  zoneDetails.daily = 10
   zoneDetails.hourly = 2
   zoneDetails.maxDuration = duration
   zoneDetails.openTime = '08:00'
   zoneDetails.closeTime = '18:00'
 
   expect(zoneDetails).toBeDefined()
-  expect(zoneDetails.daily).toBe(10)
   expect(zoneDetails.hourly).toBe(2)
   expect(zoneDetails.maxDuration).toBe(duration)
   expect(zoneDetails.openTime).toBe('08:00')
@@ -112,7 +107,6 @@ test('Confirmation schema loads correctly', () => {
 
   const confirmation = new Confirmation()
   confirmation.type = 'purchase'
-  confirmation.zone = 'A'
   confirmation.purchaseDate = '2025-05-11'
   confirmation.activeDate = '2025-05-12'
   confirmation.expireDate = '2025-05-13'
@@ -121,7 +115,6 @@ test('Confirmation schema loads correctly', () => {
 
   expect(confirmation).toBeDefined()
   expect(confirmation.type).toBe('purchase')
-  expect(confirmation.zone).toBe('A')
   expect(confirmation.purchaseDate).toBe('2025-05-11')
   expect(confirmation.activeDate).toBe('2025-05-12')
   expect(confirmation.expireDate).toBe('2025-05-13')
@@ -142,23 +135,19 @@ test('DurationInput schema loads correctly', () => {
 test('IsValidPermitInput schema loads correctly', () => {
   const isValidPermitInput = new IsValidPermitInput()
   isValidPermitInput.vehicle = 'vehicleZ'
-  isValidPermitInput.zone = 'zoneA'
 
   expect(isValidPermitInput).toBeDefined()
   expect(isValidPermitInput.vehicle).toBe('vehicleZ')
-  expect(isValidPermitInput.zone).toBe('zoneA')
 })
 
 test('IsValid schema loads correctly', () => {
   const isValid = new IsValid()
   isValid.isValid = true
   isValid.type = 'temporary'
-  isValid.zone = 'zoneB'
 
   expect(isValid).toBeDefined()
   expect(isValid.isValid).toBe(true)
   expect(isValid.type).toBe('temporary')
-  expect(isValid.zone).toBe('zoneB')
 })
 
 test('IsValidPolice schema loads correctly', () => {

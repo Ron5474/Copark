@@ -31,7 +31,7 @@ it('allows access to enforcement login page without session', async () => {
 
 it('allows access to protected routes with valid session', async () => {
   const request = new NextRequest(new URL('http://localhost:3001/enforcement'), {
-    headers: new Headers({ cookie: 'session=valid-session-id' }),
+    headers: new Headers({ cookie: 'sessionEnf=valid-session-id' }),
   })
 
   await middleware(request)
@@ -40,7 +40,7 @@ it('allows access to protected routes with valid session', async () => {
 
 it('redirects to /enforcement if logged in and accesses login page', async () => {
   const request = new NextRequest(new URL('http://localhost:3001/enforcement/login'), {
-    headers: new Headers({ cookie: 'session=valid-session-id' }),
+    headers: new Headers({ cookie: 'sessionEnf=valid-session-id' }),
   })
 
   await middleware(request)

@@ -9,6 +9,7 @@ import HomeIcon from "@mui/icons-material/Home"
 import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber"
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar"
 import LogoutIcon from "@mui/icons-material/Logout"
+import { useTranslations } from "next-intl";
 import { useContext, useEffect, useState } from "react"
 import { signOut } from 'next-auth/react'
 import { Session } from 'next-auth';
@@ -18,6 +19,7 @@ import { DashboardContext } from "./context"
 import { getUser } from '../shared/actions';
 
 export default function MobileNavBar() {
+  const t = useTranslations('bottomNav');
   const [session, setSession] = useState<Session | undefined>(undefined)
   const { currentPage, setCurrentPage } = useContext(DashboardContext)
   const [value, setValue] = useState(0)
@@ -80,10 +82,10 @@ export default function MobileNavBar() {
           "& .Mui-selected": { color: "#00796b" },
         }}
       >
-        <BottomNavigationAction label="Home" icon={<HomeIcon />} />
-        <BottomNavigationAction label="Tickets" icon={<ConfirmationNumberIcon />} />
-        <BottomNavigationAction label="Garage" icon={<DirectionsCarIcon />} />
-        <BottomNavigationAction label="Logout" icon={<LogoutIcon />} onClick={handleLogout}/>
+        <BottomNavigationAction label={t('home')} icon={<HomeIcon />} />
+        <BottomNavigationAction label={t('tickets')} icon={<ConfirmationNumberIcon />} />
+        <BottomNavigationAction label={t('garage')} icon={<DirectionsCarIcon />} />
+        <BottomNavigationAction label={t('logout')} icon={<LogoutIcon />} onClick={handleLogout}/>
       </BottomNavigation>
     </Paper>
   )

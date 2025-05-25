@@ -12,7 +12,9 @@ import {
   IsValidPermitInput,
   IsValid,
   IsValidPolice,
-  PermitsByDay
+  PermitsByDay,
+  LotDetails,
+  Lot,
 } from '../src/permit/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
@@ -166,4 +168,26 @@ test('PermitsByDay schema loads correctly', () => {
   expect(permitsByDay).toBeDefined()
   expect(permitsByDay.date).toBe('2025-05-11')
   expect(permitsByDay.permits).toHaveLength(1)
+})
+
+test('LotDetails schema loads correctly', () => {
+  const lotDetails = new LotDetails()
+  lotDetails.daily = 5
+  lotDetails.quarterly = 100
+  lotDetails.yearly = 300
+
+  expect(lotDetails).toBeDefined()
+  expect(lotDetails.daily).toBe(5)
+  expect(lotDetails.quarterly).toBe(100)
+  expect(lotDetails.yearly).toBe(300)
+})
+
+test('Lot schema loads correctly', () => {
+  const lot = new Lot()
+  lot.price = '5'
+  lot.name = 'A'
+
+  expect(lot).toBeDefined()
+  expect(lot.price).toBe('5')
+  expect(lot.name).toBe('A')
 })

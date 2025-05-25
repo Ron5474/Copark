@@ -333,9 +333,8 @@ test('Admin can get ticket stats grouped by day', async () => {
         date
         permits {
           vehicle
+          type
           area
-          activeDate
-          expireDate
         }
       }
     }

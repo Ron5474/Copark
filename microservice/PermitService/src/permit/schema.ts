@@ -16,7 +16,7 @@ export class Permit {
   purchaseDate?: string
 
   @Field(() => String)
-  activeDate!: string
+  activeDate?: string
 
   @Field(() => String)
   expireDate!: string

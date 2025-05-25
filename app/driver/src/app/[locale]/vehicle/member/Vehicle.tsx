@@ -10,6 +10,7 @@ import { Fragment, useEffect, useState, useContext } from 'react'
 import {
   Box,
   Button,
+  Chip,
   Dialog,
   DialogContent,
   FormControlLabel,
@@ -25,7 +26,7 @@ import AddForm from '../AddForm'
 import Loader from '../../shared/Loader'
 import theme from '../../theme'
 import { Vehicle } from '../../types'
-import { getVehicles } from '../actions'
+import { getVehicles, updateDefaultVehicle } from '../actions'
 
 
 export default function MemberVehicles({ isCheckout = false }: { isCheckout?: boolean }) {
@@ -51,6 +52,15 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
     setLoading(true)
     setVehicles(await getVehicles())
     setLoading(false)
+  }
+
+  const setDefaultVehicle = async (plate: string) => {
+    const vehicle = vehicles.find(v => v.plate === plate)
+    if (vehicle && vehicle.id) {
+      // Assuming you have a function to set the default vehicle
+      await updateDefaultVehicle(vehicle.id)
+      setVehicles(await getVehicles())
+    }
   }
 
   const handleButton = () => {
@@ -170,13 +180,21 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                     value={v.plate}
                     control={<Radio sx={{ transform: 'scale(1.2)' }} />}
                     label={
-                      <Box sx={{ display: 'flex', flexDirection: 'column', ml: 1 }}>
-                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                          {v.plate}{' '}
-                          <Typography component="span" variant="body1" sx={{ fontWeight: 400 }}>
-                            {v.state}
-                          </Typography>
-                        </Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', ml: 1}}>
+                            <Box sx={{ display: 'flex', alignItems: 'center'}}>
+                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                              {v.plate}{' '}
+                              <Typography component="span" variant="body1" sx={{ fontWeight: 400 }}>
+                                {v.state}
+                              </Typography>
+                            </Typography>
+                            {v.default && v.default==true && <Chip label="default" size='small' sx={{
+                              backgroundColor: '#dcfce7',
+                              color: '#166534',
+                              fontWeight: 600,
+                              marginLeft: 5
+                            }}/>}
+                          </Box>
                         {v.nickname && (
                           <Typography variant="body2" sx={{ textAlign: 'left', color: '#666', mt: 0.5 }}>
                             {v.nickname}
@@ -188,6 +206,8 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                       m: 0,
                       px: 2,
                       py: 1.5,
+                      width: '100%',
+                      display: 'flex',
                       borderTop: i !== 0 ? '1px solid #ccc' : 'none',
                       backgroundColor: selectedPlate === v.plate ? '#f5f5f5' : 'white',
                       transition: 'background-color 0.2s',
@@ -221,6 +241,25 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
             >
               {isCheckout ? "Continue" : "Edit"}
             </Button>
+            {!isCheckout && selectedPlate && (
+              vehicles.find(v => v.plate === selectedPlate)?.default !== true
+            ) && (
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => setDefaultVehicle(selectedPlate)}
+                sx={{
+                  width: '100%',
+                  marginTop: '1vh',
+                  fontSize: '1.15rem',
+                  color: theme.palette.primary.main,
+                  border: `solid  ${theme.palette.primary.main} 2px`,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                }}>
+                Set as Default Vehicle
+                </Button>
+            )}
           </Box>
           
           :

@@ -25,10 +25,12 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
         query: `
           query GetVehicles {
             myVehicles {
+              id
               plate
               country
               state
               nickname
+              default
             }
           }
         `,
@@ -36,7 +38,6 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
     })
 
     const result = await response.json()
-
     if (result.errors) {
       console.error('GraphQL errors:', result.errors)
       throw new Error('Failed to fetch vehicles')
@@ -90,6 +91,44 @@ export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
     return result.data.registerVehicle
   } catch (error) {
     console.error('Error adding vehicle:', error)
+    throw error
+  }
+}
+
+export async function updateDefaultVehicle(vehicleId: string): Promise<Vehicle> {
+  try {
+    const token = await getAuthToken()
+
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation UpdateDefaultVehicle($input: setDefaultVehicleInput!) {
+            setDefaultVehicle(input: $input) {
+              id
+            }
+          }
+        `,
+        variables: {
+          input: {id: vehicleId }
+        }
+      }),
+    })
+
+    const result = await response.json()
+
+    if (result.errors) {
+      console.error('GraphQL errors:', result.errors)
+      throw new Error(result.errors[0]?.message || 'Failed to update default vehicle')
+    }
+
+    return result.data.updateDefaultVehicle
+  } catch (error) {
+    console.error('Error updating default vehicle:', error)
     throw error
   }
 }

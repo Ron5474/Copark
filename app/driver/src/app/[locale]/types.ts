@@ -12,9 +12,11 @@ export interface User {
 }
 
 export interface Vehicle {
+  id?: string
   plate: string
   country: string
   state: string
+  default?: boolean
   nickname?: string
 }
 

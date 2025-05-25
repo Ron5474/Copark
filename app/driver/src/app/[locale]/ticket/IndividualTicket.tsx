@@ -13,8 +13,9 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-
 import { useState } from 'react'
+
+import { Payment } from '../shared/actions'
 import { useTicketState } from './TicketContext'
 
 export default function IndividualTicket() {
@@ -23,6 +24,11 @@ export default function IndividualTicket() {
 
   const handleViewChange = (view: string) => {
     setCurrentView(view)
+  }
+
+  const handleTicketPayment = async () => {
+    const amount = parseFloat((currentTicket?.fine || 0).toFixed(2))*100
+    await Payment("ticket", "Ticket Payment", amount, `Payment for Ticket ${currentTicket?.id.substring(0, 5)}`, "USD")
   }
 
   return (
@@ -302,11 +308,12 @@ export default function IndividualTicket() {
         >
           Challenge Ticket
         </Button>
-        <Button 
+        <Button
+          onClick={handleTicketPayment}
           variant="contained"
           size="large"
           fullWidth
-          sx={{ 
+          sx={{
             bgcolor: '#00796b',
             textTransform: 'none',
             fontWeight: 600,

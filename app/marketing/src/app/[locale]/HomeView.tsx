@@ -8,7 +8,7 @@ import { Box, Toolbar, Typography } from "@mui/material";
 import { CssBaseline } from "@mui/material";
 import Topbar from "./components/Topbar";
 import Footer from "./components/Footer";
-import ZoneField from "./components/ZoneField";
+// import ZoneField from "./components/ZoneField";
 import GetStartedButton from "./components/GetStartedButton";
 import HowToUseCard from "./components/UseCard";
 import { useTranslations } from "next-intl";
@@ -46,7 +46,7 @@ function HomeView() {
         paddingLeft: "15px",
       }}>
         <Typography sx={{color: "white", fontSize: "40px", fontWeight: 700}}>{t('card title')}</Typography>
-        <ZoneField text = {t('zone-prompt')}/>
+        {/* <ZoneField text = {t('zone-prompt')}/> */}
       </Box>
       <Box sx={{
         marginTop: "30px",

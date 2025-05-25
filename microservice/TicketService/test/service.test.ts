@@ -305,6 +305,52 @@ test('rejectTicketChallenge errors with an unfound ID', async () => {
     await expect(ticketService.rejectTicketChallenge({ id: await encrypt('00000001-0001-0001-0001-000000000000') })).rejects.toThrow('Ticket not found.');
 });
 
+test('ticket challenge flow - create, challenge, and get challenged tickets', async () => {
+  // 1. Create a new ticket
+  const newTicket: NewTicket = {
+    vehicle: '00000000-0000-0000-0000-000000000000',
+    enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+    fine: 100,
+    violation: 'parking in reserved spot',
+    images: 'image1.jpg',
+  };
+
+  const ticket = await ticketService.createTicket(newTicket);
+  expect(ticket.ticketStatus).toBe('active');
+
+  // 2. Challenge the ticket
+  const challengeReason = "Vehicle had valid permit displayed";
+  const challengedTicket = await ticketService.challengeTicket(
+    { id: ticket.id }, 
+    challengeReason
+  );
+
+  // Verify challenge was successful
+  expect(challengedTicket).toBeDefined();
+  expect(challengedTicket?.ticketStatus).toBe('challenged');
+  expect(challengedTicket?.challengeReason).toBe(challengeReason);
+
+  // 3. Get all challenged tickets
+  const challengedTickets = await ticketService.getChallengedTickets();
+  
+  // Verify we can find our challenged ticket
+  expect(challengedTickets.length).toBeGreaterThan(0);
+  const foundTicket = challengedTickets.find(t => t.id === ticket.id);
+  expect(foundTicket).toBeDefined();
+  expect(foundTicket?.challengeReason).toBe(challengeReason);
+});
+
+test('challengeTicket fails with invalid ticket ID', async () => {
+  const invalidId = await encrypt('00000000-0000-0000-0000-000000000000');
+  
+  await expect(
+    ticketService.challengeTicket(
+      { id: invalidId }, 
+      "Invalid ticket challenge"
+    )
+  ).rejects.toThrow('Ticket not found.');
+});
+
 // test('getTicketsForUserJWT should return tickets for the provided userJWT', async () => {
 //     const userID = '0f99f921-594e-4387-9d05-e6e80d8aa54a'
 

@@ -403,6 +403,30 @@ test('Admin can get all zones', async () => {
 test('Admin can create a new zone', async () => {
   const token = await loginAs("admin");
 
+  // First get existing zones to find an unused number
+  const getZonesQuery = `
+    query GetZones {
+      getZones {
+        zone
+      }
+    }
+  `;
+
+  const existingZonesResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: getZonesQuery });
+
+  const existingZones = existingZonesResponse.body.data.getZones.map((z: { zone: string }) => parseInt(z.zone));
+  
+  // Find first available number not in use
+  let newZoneNumber = 1;
+  while (existingZones.includes(newZoneNumber)) {
+    newZoneNumber++;
+  }
+
+  console.log(`Creating new zone: ${newZoneNumber}`);
+
   const mutation = `
     mutation CreateZone($input: NewZone!) {
       createZone(input: $input)
@@ -411,7 +435,7 @@ test('Admin can create a new zone', async () => {
 
   const variables = {
     input: {
-      zone: 999,
+      zone: newZoneNumber,
       weekday: {
         hourly: 3.50,
         maxDuration: {
@@ -442,6 +466,8 @@ test('Admin can create a new zone', async () => {
   expect(response.body.errors).toBeUndefined();
   expect(response.body.data.createZone).toBe(true);
 
+  console.log("Zone created successfully");
+
   // Verify the zone was created
   const verifyQuery = `
     query GetZones {
@@ -464,9 +490,10 @@ test('Admin can create a new zone', async () => {
     .send({ query: verifyQuery });
 
   const newZone = verifyResponse.body.data.getZones // eslint-disable-next-line
-    .find((z: any) => z.zone === "999");
-  
+    .find((z: any) => z.zone === newZoneNumber.toString());
+
   expect(newZone).toBeDefined();
+
   expect(newZone.hourly).toBe(3.50);
   expect(newZone.maxDuration.hours).toBe(2);
   expect(newZone.maxDuration.minutes).toBe(30);

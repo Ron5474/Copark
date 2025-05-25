@@ -68,5 +68,40 @@
         "details": "Si tiene preguntas sobre esta Política de privacidad o para ejercer sus derechos de privacidad, contáctenos en coparkspace@gmail.com."
       }
     }
+  },
+  "tos": {
+    "title": "Condiciones de servicio",
+    "welcome": "Bienvenido a Copark",
+    "agreement": "Al acceder o utilizar los servicios de administración de estacionamiento de Copark, usted acepta estar sujeto a estos Términos de servicio.",
+    "terms": {
+      "line1": {
+        "point": "Descripción del servicio: ",
+        "description": "Copark brinda servicios de administración y control de estacionamientos a través de nuestra plataforma."
+      },
+      "line2": {
+        "point": "Licencia: ",
+        "description": "Le otorgamos una licencia limitada, no exclusiva e intransferible para utilizar nuestro servicio para sus necesidades de gestión de estacionamiento."
+      },
+      "line3": {
+        "point": "Cuentas de usuario: ",
+        "description": "Usted es responsable de mantener la confidencialidad de las credenciales de su cuenta y de todas las actividades realizadas en su cuenta."
+      },
+      "line4": {
+        "point": "Privacidad: ",
+        "description": "Su uso de nuestros servicios también se rige por nuestra Política de privacidad, que describe cómo recopilamos y utilizamos sus datos."
+      },
+      "line5": {
+        "point": "",
+        "description": ""
+      },
+      "line6": {
+        "point": "",
+        "description": ""
+      },
+      "line7": {
+        "point": "",
+        "description": ""
+      }
+    }
   }
 }

@@ -214,3 +214,9 @@ test('Purchasing wrong lot permit doesn\'t work', async () => {
     paymentMethod: 'paypal'
   })).rejects.toThrow('Incorrect permit option')
 })
+
+test('getZones properly returns zones', async () => {
+  const receipt = await permitService.getZones()
+  expect(receipt).toBeDefined()
+  console.log(receipt)
+})

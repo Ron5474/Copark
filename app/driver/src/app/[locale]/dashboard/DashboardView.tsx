@@ -84,7 +84,7 @@ export default function DashboardView() {
   }
 
   return (
-    <Box sx={{ pt: 3, px: 2, pb: 7 }}>
+    <Box sx={{ pt: 3, px: 2, pb: 7, backgroundColor: '#f8fffe' }}>
       <Typography variant="h5" fontWeight="bold" gutterBottom>
         Available Permits
       </Typography>

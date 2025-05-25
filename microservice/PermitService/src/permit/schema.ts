@@ -208,13 +208,6 @@ export class PurchaseLotInput {
   paymentMethod!: string
 }
 
-@InputType()
-export class IsValidPermitInput {
-
-  @Field(() => ID)
-  vehicle!: string;
-}
-
 @ObjectType()
 export class IsValid {
 

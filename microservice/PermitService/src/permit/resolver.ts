@@ -4,7 +4,6 @@ import {
   Confirmation,
   PurchaseZoneInput,
   IsValid,
-  IsValidPermitInput,
   IsValidPolice,
   MyPermits,
   NewZone,
@@ -182,12 +181,10 @@ export class PermitResolver {
 
   @Authorized('enforcement')
   @Query(() => IsValid)
-  async isValidZonePermit(
-    @Arg("input", () => IsValidPermitInput) input: IsValidPermitInput,
+  async checkPermit(
+    @Arg("plate", () => String) plate: string,
     @Ctx() request: Request
   ): Promise<IsValid> {
-    
-    const plate = input.vehicle
 
     const vehicleQuery = `
       query FindVehicleByPlate($plate: String!) {
@@ -216,7 +213,7 @@ export class PermitResolver {
       return {isValid: false, type: 'Vehicle Not Found', area: 'N/A'}
     }
 
-    return await service.isValidZonePermit({vehicle: vehicleId})
+    return await service.getValidPermit(vehicleId)
   }
 
   @Authorized('police')

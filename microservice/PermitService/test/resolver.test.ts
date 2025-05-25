@@ -129,7 +129,7 @@ async function loginAs(who: string): Promise<string | undefined> {
 //   }
 // }
 
-const isValidZonePermitQuery = `
+const checkPermitQuery = `
 query IsValid($input: IsValidPermitInput!) {
   isValidZonePermit(input: $input) {
     isValid
@@ -138,19 +138,9 @@ query IsValid($input: IsValidPermitInput!) {
   }
 }`
 
-const isValidZonePermitInput = {
-  input: {
-    vehicle: "0000000",
-    zone: "123"
-  }
-}
+const checkPermitInvalidInput = "0000000"
 
-const ValidZonePermitInput = {
-  input: {
-    vehicle: "JCDE544",
-    zone: "123"
-  }
-}
+const checkPermitInput = "JCDE544"
 
 const isValidPermitByPoliceQuery = `
 query IsValidPolice($plate: String!) {
@@ -244,30 +234,29 @@ test('Permit service is running', async () => {
 test('Enforcer gets invalid permit', async () => {
   const token = await loginAs("enforcement")
 
-  const isValid = await supertest(server)
+  const permits = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
     .send({ 
-      query: isValidZonePermitQuery,
-      variables: isValidZonePermitInput
+      query: checkPermitQuery,
+      variables: checkPermitInvalidInput
     })
 
-  expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
+  expect(permits.body.data.checkPermit.isValid).toBe(false)
 })
 
 test('Enforcer gets valid permit', async () => {
   const token = await loginAs("enforcement")
 
-  const isValid = await supertest(server)
+  const permits = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
     .send({ 
-      query: isValidZonePermitQuery,
-      variables: ValidZonePermitInput
+      query: checkPermitQuery,
+      variables: checkPermitInput
     })
 
-  // expect(isValid.body.data.isValidZonePermit.isValid).toBe(false)
-  expect(isValid.body.data.isValidZonePermit.isValid).toBe(true)
+  expect(permits.body.data.isValidZonePermit.isValid).toBe(true)
 
 })
 

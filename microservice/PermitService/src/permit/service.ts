@@ -4,7 +4,6 @@ import {
   Receipt,
   PurchaseZoneInput,
   IsValid,
-  IsValidPermitInput,
   IsValidPolice,
   MyPermits,
   ZoneDetails,
@@ -77,7 +76,7 @@ export class PermitService {
     }
   }
 
-  public async isValidZonePermit(input: IsValidPermitInput): Promise<IsValid> {
+  public async getValidPermit(vid: string): Promise<IsValid> {
     const result = await pool.query(`
       SELECT t.data
       FROM permit p
@@ -85,7 +84,7 @@ export class PermitService {
       WHERE p.vehicle = $1
         AND now() >= (p.data->>'activeDate')::timestamptz
         AND now() <= (p.data->>'expireDate')::timestamptz`,
-      [input.vehicle]
+      [vid]
     )
 
     if (result.rowCount === 0) return { isValid: false, type: 'N/A', area: 'N/A'}
@@ -97,36 +96,6 @@ export class PermitService {
       area: row.data.area,
     }
   }
-
-  // public async isValidZonePermit(input: IsValidPermitInput): Promise<IsValid> {
-  //   const result = await pool.query(`
-  //     SELECT p.data AS permit_data, t.data AS type_data
-  //     FROM permit p
-  //     JOIN type t ON t.id = p.type
-  //     WHERE p.vehicle = $1  
-  //   `, [input.vehicle]);
-
-  //   if (result.rowCount === 0) {
-  //     return {
-  //       isValid: false,
-  //       type: 'N/A',
-  //       area: 'N/A',
-  //     };
-  //   }
-
-  //   const row = result.rows[0];
-
-  //   const permit = typeof row.permit_data === 'string' ? JSON.parse(row.permit_data) : row.permit_data;
-  //   const type = typeof row.type_data === 'string' ? JSON.parse(row.type_data) : row.type_data;
-
-  //   const area = permit?.area ?? type?.area ?? 'N/A';
-
-  //   return {
-  //     isValid: true,
-  //     type: type?.name,
-  //     area,
-  //   };
-  // }
 
   public async isValidPermitPolice(vid: string): Promise<IsValidPolice> {
 

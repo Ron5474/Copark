@@ -182,6 +182,16 @@ INSERT INTO type (id, location, data) VALUES
     )
   );
 
+INSERT INTO type (id, location, data) VALUES
+  (
+    '94dcbb2d-a047-4f00-bba0-3d5c9a4c2887',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
+    jsonb_build_object(
+      'name', 'lot',
+      'area', 'R'
+    )
+  );
+
 INSERT INTO permit (vehicle, type, data) VALUES (
   '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
   'e314f688-d150-411e-aa4f-38e679112e0e',

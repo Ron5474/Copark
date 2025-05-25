@@ -2,6 +2,7 @@ import { test, beforeAll, afterAll, expect, beforeEach } from 'vitest'
 // @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 import * as http from 'http'
+import { SignJWT } from 'jose'
 
 import db from './db'
 import { app, bootstrap } from '../src/app'
@@ -18,6 +19,7 @@ const VEHC_PORT = 4001
 // const VEHC_SERVICE_URL = `http://localhost:${VEHC_PORT}`
 
 // const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 
 beforeAll(async () => {
   // Start your GraphQL server
@@ -50,8 +52,25 @@ afterAll(() => {
   vehcServer.close()
 })
 
+const driver = {
+    "name": "Derik Driver",
+    "email": "derik@copark.space",
+    "picture": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWRzMmJldTdzMWtncDBweGtvM21kYnRyeDk1cHpvNnU5MWVycXEybiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/keyufLabLaJKh3xnVy/giphy.gif",
+    "sub": "1234567890",
+  }
 
-const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
+// async function encrypt(userId: string): Promise<string> {
+//   return new SignJWT({ id: userId })
+//     .setProtectedHeader({ alg: 'HS256' })
+//     .setIssuedAt()
+//     .setExpirationTime('5y')
+//     .sign(encodedKey)
+//   }
+
+// const validDriverJWT = encrypt('b1eab387-1000-4ee3-a746-d59366e44f06');
+
+
+// const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
 
 // const policeJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFiZTQwNWM2LTc0MDAtNGQyMy05Zjg2LTAwZWFkMTU3MjlmNSIsImlhdCI6MTc0NzI2MzIyMSwiZXhwIjoxOTA1MDUxMjIxfQ.UVVWAjg2-asw8gfqoxljHZSVX4Mn_1FzOV85CagVbUQ"
 
@@ -67,16 +86,25 @@ const adminUser = {
 
 async function loginAs(who: string): Promise<string | undefined> {
   if (who === "driver") {
-    const response = await supertest(AUTH_SERVICE_URL)
-      .post('/api/v0/auth/driver/login')
-      .set('Authorization', `Bearer ${nextAuthJWT}`)
-
-    if (response.status !== 200) {
-      throw new Error(`Login failed with status ${response.status}`)
+      const token = new SignJWT(driver)
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('30m')
+        .sign(encodedKey)
+      const response = await supertest(AUTH_SERVICE_URL)
+        .post('/api/v0/auth/driver/login')
+        .set('Authorization', `Bearer ${await token}`)
+  
+      // console.log('Status:', response.status
+      // console.log('Headers:', response.headers)
+      // console.log('Body:', response.body)
+  
+      if (response.status !== 200) {
+        throw new Error(`Login failed with status ${response.status}`)
+      }
+  
+      return token
     }
-
-    return response.body
-  }
 
   else if (who === "enforcement") {
     const response = await supertest(AUTH_SERVICE_URL)
@@ -148,6 +176,20 @@ test('Errors out with wrong permissions', async () => {
   expect(confirmation.body.errors).toBeDefined()
   expect(confirmation.body.errors[0].message)
   .toBe("Access denied! You don't have permission for this action!")
+})
+
+test('Right permissions', async () => {
+  const token = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: purchaseZoneInput
+    })
+
+  expect(confirmation.body.errors).toBeUndefined()
 })
 
 test('Errors out with no auth header', async () => {

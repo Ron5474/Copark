@@ -31,17 +31,23 @@ export function EnforcementProvider({
   children,
   initialPlate = null,
   initialManualInput = '',
+  initialShowSuccess = false,
+  initialIsValidated = false,
+  initialIsIssuingViolation = false,
 }: {
   children: React.ReactNode
   initialPlate?: string | null
   initialManualInput?: string
+  initialShowSuccess?: boolean
+  initialIsValidated?: boolean
+  initialIsIssuingViolation?: boolean
 }) {
   const [plate, setPlate] = useState<string | null>(initialPlate)
   const [manualInput, setManualInput] = useState(initialManualInput)
-  const [isValidated, setIsValidated] = useState(false)
-  const [isIssuingViolation, setIsIssuingViolation] = useState(false)
+  const [isValidated, setIsValidated] = useState(initialIsValidated)
+  const [isIssuingViolation, setIsIssuingViolation] = useState(initialIsIssuingViolation)
   const [permitResult, setPermitResult] = useState<PermitResult>(null)
-  const [showSuccess, setShowSuccess] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(initialShowSuccess)
   const [title, setTitle] = useState('Dashboard')
 
 

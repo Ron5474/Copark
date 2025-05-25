@@ -64,6 +64,7 @@ export async function addPermitDetails(
   let permitQuery = undefined
   let inputData = undefined
   if (addPermitDetails.permitType === "zone") {
+    console.log("Adding Zone Permit Details:", addPermitDetails);
     permitQuery = `
           mutation PurchasePermit($input: PurchaseZoneInput!) {
             purchaseZonePermit(input: $input) {
@@ -82,11 +83,13 @@ export async function addPermitDetails(
           }`
 
     inputData = {
-      vehicle: addPermitDetails.vehicle?.plate,
+      vehicle: JSON.parse(addPermitDetails.vehicle as unknown as string)?.plate,
       zone: addPermitDetails.zone,
       duration: addPermitDetails.duration,
       paymentMethod: payment_method
     }
+
+    console.log("Input Data for Zone Permit:", inputData);
   }
 
   if (addPermitDetails.permitType === "lot") {

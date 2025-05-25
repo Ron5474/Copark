@@ -54,7 +54,53 @@ it('handles successful login', async () => {
     text: async () => JSON.stringify({
       id: '123',
       name: jason.name,
-      email: jason.email
+      email: jason.email,
+      role: '["admin"]'
+    })
+  });
+
+  render(<Page />);
+
+  const emailInput = screen.getByLabelText("Email Address").querySelector('input');
+  const passwordInput = screen.getByLabelText("Password").querySelector('input');
+  const signIn = screen.getByRole('button', { name: "Sign In" });
+
+  if (!emailInput || !passwordInput) {
+    throw new Error('Input elements not found');
+  }
+
+  fireEvent.change(emailInput, {
+    target: { value: jason.email }
+  });
+  fireEvent.change(passwordInput, {
+    target: { value: jason.password }
+  });
+
+  fireEvent.click(signIn);
+
+  // Verify the fetch was called with correct parameters
+  expect(global.fetch).toHaveBeenCalledWith(
+    'http://localhost:3010/api/v0/auth/login',
+    expect.objectContaining({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        email: jason.email, 
+        password: jason.password 
+      })
+    })
+  );
+});
+
+it('handles non-admin login', async () => {
+  // Mock the fetch response instead of the actions
+  global.fetch = vi.fn().mockResolvedValueOnce({
+    ok: true,
+    text: async () => JSON.stringify({
+      id: '123',
+      name: jason.name,
+      email: jason.email,
+      role: '["enforcement"]'
     })
   });
 

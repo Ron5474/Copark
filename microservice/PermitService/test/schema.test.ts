@@ -15,6 +15,8 @@ import {
   PermitsByDay,
   LotDetails,
   Lot,
+  LotGroup,
+  Zone,
 } from '../src/permit/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
@@ -190,4 +192,41 @@ test('Lot schema loads correctly', () => {
   expect(lot).toBeDefined()
   expect(lot.price).toBe('5')
   expect(lot.name).toBe('A')
+})
+
+test('LotGroup schema loads correctly', () => {
+  const lotA = new Lot()
+  lotA.price = '5'
+  lotA.name = 'A'
+
+  const lotGroup = new LotGroup()
+  lotGroup.id = 'id'
+  lotGroup.title = 'A'
+  lotGroup.lots = [lotA]
+
+  expect(lotGroup).toBeDefined()
+  expect(lotGroup.id).toBe('id')
+  expect(lotGroup.title).toBe('A')
+  expect(lotGroup.lots.length).toBe(1)
+  expect(lotGroup.lots[0]).toBe(lotA)
+})
+
+test('Zone schema loads correctly', () => {
+  const duration = new Duration()
+  duration.hours = 2
+  duration.minutes = 0
+
+  const zone = new Zone()
+  zone.zone = '10'
+  zone.hourly = 2.50
+  zone.maxDuration = duration
+  zone.openTime = '07:00'
+  zone.closeTime = '20:00'
+
+  expect(zone).toBeDefined()
+  expect(zone.zone).toBe('10')
+  expect(zone.hourly).toBe(2.50)
+  expect(zone.maxDuration).toBe(duration)
+  expect(zone.openTime).toBe('07:00')
+  expect(zone.closeTime).toBe('20:00')
 })

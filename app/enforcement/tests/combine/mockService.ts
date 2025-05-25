@@ -10,7 +10,7 @@ const authHandlers = {
     const { email, password } = body
 
     if (email === 'officer1@outlook.com' && password === 'password1') {
-      return HttpResponse.json({ id: 'abc123', name: 'Officer Joe' })
+      return HttpResponse.json({ id: 'abc123', name: 'Officer Joe', role: '["enforcement"]' })
     }
 
     return HttpResponse.json({}, { status: 401 })
@@ -19,6 +19,16 @@ const authHandlers = {
   failure: http.post(authURL + '/login', async () => {
     return HttpResponse.json({}, { status: 401 })
   }),
+
+  wrongRole: http.post(authURL + '/login', async ({ request }) => {
+    await request.json()
+    return HttpResponse.json({
+      id: 'abc123',
+      name: 'Super Admin Boss',
+      role: '["admin"]', // not ["enforcement"]
+    })
+  }),
+
 }
 
 

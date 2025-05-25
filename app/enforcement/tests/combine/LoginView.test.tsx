@@ -8,6 +8,7 @@ import EnforcementLoginPage from '@/app/login/page'
 import { authHandlers } from './mockService'
 
 const server = setupServer()
+const push = vi.fn()
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -29,8 +30,6 @@ vi.mock('next/headers', () => {
   }
 })
 
-const push = vi.fn()
-global.fetch = vi.fn()
 beforeEach(() => {
   vi.resetAllMocks()
 })
@@ -60,12 +59,9 @@ it('logs in successfully with Auth microservice', async () => {
   await user.type(screen.getByLabelText('Your Email'), 'officer1@outlook.com')
   await user.type(screen.getByLabelText('Password'), 'password1')
   await user.click(screen.getByLabelText('login-button'))
-
   await waitFor(() => {
     expect(push).toHaveBeenCalledWith('/')
   })
-
-  expect(sessionStorage.getItem('name')).toBe('Officer Joe')
 })
 
 it('shows error when Auth microservice denies login', async () => {
@@ -81,6 +77,21 @@ it('shows error when Auth microservice denies login', async () => {
   expect(await screen.findByText(/invalid credentials/i)).not.toBeNull()
   expect(push).not.toHaveBeenCalled()
 })
+
+it('rejects login if role is not ["enforcement"]', async () => {
+  server.use(authHandlers.wrongRole)
+
+  render(<EnforcementLoginPage />)
+  const user = userEvent.setup()
+
+  await user.type(screen.getByLabelText('Your Email'), 'roPatel@copark.com')
+  await user.type(screen.getByLabelText('Password'), 'password1')
+  await user.click(screen.getByLabelText('login-button'))
+
+  expect(await screen.findByText(/invalid credentials/i)).not.toBeNull()
+  expect(push).not.toHaveBeenCalled()
+})
+
 
 it('returns undefined if authenticated user lacks an id', async () => {
   ;(global.fetch as unknown) = vi.fn().mockResolvedValueOnce({

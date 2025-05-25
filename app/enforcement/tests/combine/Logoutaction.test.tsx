@@ -1,26 +1,11 @@
 import { vi, it, expect, afterEach, beforeAll, afterAll } from 'vitest'
-import {/* render, screen, waitFor, */cleanup } from '@testing-library/react'
-// import userEvent from '@testing-library/user-event'
+import { cleanup } from '@testing-library/react'
 import { setupServer } from 'msw/node'
 
 import { logout } from '../../src/app/login/actions'
-// import EnforcementLoginPage from '@/app/login/page'
-// import EnforcementDashboardView from '@/app/dashboard/Content'
-// import { EnforcementProvider } from '@/app/dashboard/context/Context'
-// import EnforcementNavBar from '@/app/shared/NavBar'
-// import { authHandlers } from './mockService'
 
 const server = setupServer()
 
-// const redirect = vi.fn()
-// const push = vi.fn()
-
-// vi.mock('next/navigation', () => ({
-//   redirect,
-//   useRouter: () => ({
-//     push,
-//   }),
-// }))
 vi.mock('next/navigation', () => {
   return {
     redirect: vi.fn(),
@@ -67,6 +52,6 @@ it('deletes session cookie and redirects to /login', async () => {
 
   await logout()
 
-  expect((await mockCookies).delete).toHaveBeenCalledWith('session')
+  expect((await mockCookies).delete).toHaveBeenCalledWith('sessionEnf')
   expect(redirect).toHaveBeenCalledWith('/login')
 })

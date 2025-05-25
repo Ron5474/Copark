@@ -37,7 +37,6 @@ export async function userLoginAttempt(locale: string): Promise<string|undefined
           locale: locale
           });
       } else {
-        console.log("Unknown onboarding state:", data?.onboardingState);
         cookieStore.delete(process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME as string);
         return await redirect({
           href: '/signup',

@@ -34,7 +34,7 @@ function PaymentConfirmation() {
       } else if (ticketDetails) {
         details = JSON.parse(ticketDetails);
       }
-      console.log("Permit Details:", details);
+    
       if (details.type === "permit") {
         await addPermitDetails(paymentDetails, details);
       } else if (details.type === "ticket") {

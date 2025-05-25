@@ -227,7 +227,6 @@ export class TicketResolver {
       ticketStatus: 'paid'
     }
 
-    console.log("TicketService:", this.ticketService);
 
     return this.ticketService.modifyTicket(updatedInput);
   }

@@ -60,11 +60,10 @@ export async function addPermitDetails(
   details: PaymentDetails,
   addPermitDetails: PermitDetails
 ): Promise<void> {
-  const { id, amount, currency, status, payment_method, type } = details;
+  const { payment_method } = details;
   let permitQuery = undefined
   let inputData = undefined
   if (addPermitDetails.permitType === "zone") {
-    console.log("Adding Zone Permit Details:", addPermitDetails);
     permitQuery = `
           mutation PurchasePermit($input: PurchaseZoneInput!) {
             purchaseZonePermit(input: $input) {
@@ -89,7 +88,6 @@ export async function addPermitDetails(
       paymentMethod: payment_method
     }
 
-    console.log("Input Data for Zone Permit:", inputData);
   }
 
   if (addPermitDetails.permitType === "lot") {
@@ -154,13 +152,10 @@ export async function addPermitDetails(
 
   const result = await res.json();
   
-  console.log("GraphQL response:", result);
 
   if (await result.errors !== undefined) {
     throw new Error("Failed to save permit details");
   }
-
-  console.log("Permit details saved:", { id, amount, currency, status, payment_method, type });
   } else {
     throw new Error("Permit Type not resolved");
   }
@@ -201,7 +196,6 @@ export async function addTicketDetails(
     });
     
     const result = await res.json();
-    console.log("GraphQL response:", result);
 
     if (res.status !== 201 && res.status !== 200 && res.status !== 204) {
       throw new Error("Failed to save ticket details");

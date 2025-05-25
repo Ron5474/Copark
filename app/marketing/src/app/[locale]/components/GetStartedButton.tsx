@@ -20,7 +20,7 @@ function GetStartedButton() {
   const locale = useLocale();
 
   const handleClick = async () => {
-    console.log("URL: ", process.env.NEXT_PUBLIC_DRIVER_APP_URL);
+    // console.log("URL: ", process.env.NEXT_PUBLIC_DRIVER_APP_URL);
     router.push(`${process.env.NEXT_PUBLIC_DRIVER_APP_URL}/${locale}`);
   };
 

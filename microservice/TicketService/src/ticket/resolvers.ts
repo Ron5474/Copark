@@ -224,7 +224,7 @@ export class TicketResolver {
       id: input.id,
       ticketStatus: 'paid'
     }
-    return ticketService.modifyTicket(updatedInput);
+    return this.ticketService.modifyTicket(updatedInput);
   }
 
   @Mutation(() => Ticket, { nullable: true })

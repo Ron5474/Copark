@@ -1,8 +1,12 @@
-import { vi, it, afterEach, expect } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { vi, it, afterEach, expect, } from 'vitest'
+import { render, screen, cleanup, waitFor } from '@testing-library/react'
+import React from 'react'
+import { signOut } from 'next-auth/react';
 
 import Page from '../../src/app/[locale]/login/blank/page'
-import React from 'react'
+import { getUser } from '../../src/app/[locale]/shared/actions'
+import { userLoginAttempt } from '../../src/app/[locale]/dashboard/actions'
+
 
 const push = vi.fn()
 
@@ -108,5 +112,18 @@ afterEach(() => {
 
 it('Renders Page', async () => {
   render(<Page />)
+	await waitFor(() => {
+		expect(signOut).toHaveBeenCalledWith({
+			callbackUrl: `${window.location.origin}/driver/en/signup`,
+		})
+	})
+})
+
+it('Renders Page with correct content', async () => {
+	vi.mocked(getUser).mockResolvedValue(undefined)
+	render(<Page />)
+	await waitFor(() => {
+		expect(push).toHaveBeenCalledWith('/login')
+	})
 })
 

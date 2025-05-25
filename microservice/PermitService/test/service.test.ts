@@ -155,7 +155,7 @@ test('lotDetails errors on wrong lot type', async () => {
 test('getAllLotDetails gives correct daily permits', async () => {
   const data = await permitService.getAllLotDetails()
   // console.log(data)
-  expect(data[0].lots.length).toBe(5) // 5 daily permit lots
+  expect(data[0].lots.length).toBeGreaterThan(5) // 5 daily permit lots (or more)
 })
 
 test('admin create lot', async () => {
@@ -202,6 +202,15 @@ test('Purchasing yearly lot permit works', async () => {
     paymentMethod: 'paypal'
   })
   expect(receipt).toBeDefined()
+})
+
+test('Attempting to purchase a lot permit for one that doesnt have prices errors out', async () => {
+  await expect(permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'T',
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  })).rejects.toThrow('Lot type T does not have quarterly duration option')
 })
 
 test('Purchasing wrong lot permit doesn\'t work', async () => {

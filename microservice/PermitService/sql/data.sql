@@ -188,7 +188,7 @@ INSERT INTO type (id, location, data) VALUES
     'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
       'name', 'lot',
-      'area', 'R'
+      'area', 'T'
     )
   );
 

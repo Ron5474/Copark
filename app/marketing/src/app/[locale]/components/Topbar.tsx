@@ -1,7 +1,11 @@
 'use client'
 
-import { AppBar, Box, IconButton } from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
+import {
+  AppBar,
+  Box, 
+  // IconButton
+} from "@mui/material";
+// import MenuIcon from '@mui/icons-material/Menu';
 import theme from "../theme";
 import { useRouter } from "@/i18n/navigation";
 
@@ -30,9 +34,9 @@ function Topbar() {
         <img src="/assets/logo-noBg.png" alt="Logo" width={52} height={52} aria-label="copark-logo" />
       </picture>
      <Box sx={{display: "flex", gap: "10px", alignItems: "center"}}>
-      <IconButton>
+      {/* <IconButton>
         <MenuIcon sx={{color: "black"}}/>
-      </IconButton>
+      </IconButton> */}
      </Box>
   </AppBar>)
 }

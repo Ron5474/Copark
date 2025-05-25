@@ -4,16 +4,26 @@
  * @description This file contains the Footer component.
  * @author Swayam Shah
  */
-import { Box } from "@mui/material";
-import { useTranslations } from "next-intl";
+import { Box, Button } from "@mui/material";
+import { useLocale, useTranslations } from "next-intl";
 import theme from "../theme";
-import { useRouter } from "@/i18n/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import Typography from '@mui/material/Typography';
 
 
 function Footer() {
   const t = useTranslations("footer");
   const router = useRouter();
+  const locale = useLocale();
+  const pathname = usePathname();
+
+  const SwitchLocale = (newLocale: string) => {
+     router.replace(
+      {pathname},
+      {locale: newLocale}
+    )
+  }
+
   const PrimaryColorLight = theme.palette.primary.light;
   return (
        <Box sx={{
@@ -95,6 +105,15 @@ function Footer() {
             {/* <Button sx={{padding: 0}}>{t("Dark Mode")}</Button> TODO: Change theme and change this text based on current theme */}
             </Box>
          </Box>
+         <Box sx={{
+           display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            gap: "5px",
+         }}>
+          {locale == 'en' && <Button onClick={() => SwitchLocale('es')}>Copark™ in Spanish</Button>}
+          {locale == 'es' && <Button onClick={() => SwitchLocale('en')}>Copark™ en Español</Button>}
+          </Box>
          <p style={{ fontSize: "14px", color: "#000000", fontWeight: 500 }}>{t("Rights Reserved")}</p>
        </Box>
   )

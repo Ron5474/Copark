@@ -1,3 +1,3 @@
-import { TicketResolver } from "./ticket/resolvers";
+import { TicketResolver } from "./ticket/resolver";
 
 export const resolvers = [TicketResolver] as const;

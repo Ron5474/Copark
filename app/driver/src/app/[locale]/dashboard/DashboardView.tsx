@@ -33,11 +33,13 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import CardButton from "./components/cardButton";
+import { useTranslations } from "next-intl";
 import { DashboardContext } from "./context";
 import type { LotGroup } from "../types";
 import { Payment } from "../shared/actions";
 
 export default function DashboardView() {
+  const t = useTranslations("dashboard");
   const context = useContext(DashboardContext);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedLots, setSelectedLots] = useState<Record<string, string>>({});
@@ -92,13 +94,13 @@ export default function DashboardView() {
   };
 
   if (loading) {
-    return <Typography>Loading permits...</Typography>;
+    return <Typography>{t("loading")}</Typography>;
   }
 
   return (
     <Box sx={{ pt: 3, px: 2, pb: 7, backgroundColor: '#f8fffe' }}>
       <Typography variant="h5" fontWeight="bold" gutterBottom>
-        Available Permits
+        {t("title")}
       </Typography>
 
       {permits.map((permit) => (
@@ -110,9 +112,9 @@ export default function DashboardView() {
             icon=""
             badgeText={
               permit.id === "yearly"
-                ? "Best Value"
+                ? t("bestValue")
                 : permit.id === "daily"
-                ? "Quick Access"
+                ? t("quickAccess")
                 : undefined
             }
           >
@@ -123,7 +125,7 @@ export default function DashboardView() {
             >
               {permit.lots.map((lot) => {
                 const formattedName =
-                  lot.name.toLowerCase().includes("any") ? "All Lots Access" : lot.name;
+                  lot.name.toLowerCase().includes("any") ? t("allLotsAccess") : lot.name;
 
                 return (
                   <FormControlLabel
@@ -139,7 +141,7 @@ export default function DashboardView() {
 
             {selectedLots[permit.id] && (
               <Typography variant="body2" sx={{ mt: 1 }}>
-                Selected: <strong>{selectedLots[permit.id]}</strong>
+                {t("selected")}: <strong>{selectedLots[permit.id]}</strong>
               </Typography>
             )}
 
@@ -164,7 +166,7 @@ export default function DashboardView() {
                   : `Purchase ${permit.title} permit enabled`
               }
             >
-              Purchase Permit
+              {t("purchase")}
             </Button>
           </Stack>
         </CardButton>

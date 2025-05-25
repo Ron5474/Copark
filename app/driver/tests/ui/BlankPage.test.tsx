@@ -127,3 +127,18 @@ it('Renders Page with correct content', async () => {
 	})
 })
 
+it('Renders Page with correct content', async () => {
+	vi.mocked(getUser).mockResolvedValue({
+    user: {
+      name: "Test User",
+      email: "test@example.com"
+    },
+    expires: "2025-01-01T00:00:00.000Z"
+  })
+	vi.mocked(userLoginAttempt).mockResolvedValue('success')
+	render(<Page />)
+	await waitFor(() => {
+		expect(push).toHaveBeenCalledWith('/dashboard')
+	})
+})
+

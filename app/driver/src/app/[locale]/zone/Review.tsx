@@ -32,12 +32,19 @@ export default function Review() {
 
   const checkout = async () => {
     const amount: number = parseFloat((price + serviceFee).toFixed(2))*100 // in cents
-    sessionStorage.setItem('zoneNumber', zoneNumber.toString())
-    sessionStorage.setItem('duration', JSON.stringify(duration))
-    sessionStorage.setItem('price', amount.toString())
-    sessionStorage.setItem('vehicle', JSON.stringify(vehicle))
-    sessionStorage.setItem('tempLocation', tempLocation)
-    sessionStorage.setItem('currency', 'USD')
+    const permitDetails = {
+      type: "permit",
+      vehicle: JSON.stringify(vehicle),
+      permitType: "zone",
+      zone: zoneNumber,
+      duration: duration
+    }
+    sessionStorage.setItem('permitDetails', JSON.stringify(permitDetails))
+    const paymentDetails = {
+      price: amount,
+      currency: 'USD',
+    }
+    sessionStorage.setItem('paymentDetails', JSON.stringify(paymentDetails))
    
     // TODO: Get information on the permit style chosen and add the type and itemName accordingly
     await Payment("daily" ,"Daily Parking Permit", amount, `Parking permit for zone #${zoneNumber} in ${tempLocation}`, "USD");

@@ -12,7 +12,11 @@ import {
   IsValidPermitInput,
   IsValid,
   IsValidPolice,
-  PermitsByDay
+  PermitsByDay,
+  LotDetails,
+  Lot,
+  LotGroup,
+  Zone,
 } from '../src/permit/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
@@ -21,33 +25,30 @@ beforeAll(async () => {
   server = http.createServer(app)
   server.listen()
   await bootstrap()
-});
+})
 
 afterAll(() => {
-  server.close();
-});
+  server.close()
+})
   
 test('Permit schema loads correctly', () => {
-    const testPermit = new Permit();
-    testPermit.vehicle = 'vehicle1';
-    testPermit.type = 'temporary';
-    testPermit.zone = '123';
-    testPermit.activeDate = '2025-05-11T12:00:00.000Z';
-    testPermit.expireDate = '2025-05-11T12:00:00.000Z';
+    const testPermit = new Permit()
+    testPermit.vehicle = 'vehicle1'
+    testPermit.type = 'temporary'
+    testPermit.activeDate = '2025-05-11T12:00:00.000Z'
+    testPermit.expireDate = '2025-05-11T12:00:00.000Z'
 
-    expect(testPermit).toBeDefined();
-    expect(testPermit.vehicle).toBe('vehicle1');
-    expect(testPermit.type).toBe('temporary');
-    expect(testPermit.zone).toBe('123');
-    expect(testPermit.activeDate).toBe('2025-05-11T12:00:00.000Z');
-    expect(testPermit.expireDate).toBe('2025-05-11T12:00:00.000Z');
-});
+    expect(testPermit).toBeDefined()
+    expect(testPermit.vehicle).toBe('vehicle1')
+    expect(testPermit.type).toBe('temporary')
+    expect(testPermit.activeDate).toBe('2025-05-11T12:00:00.000Z')
+    expect(testPermit.expireDate).toBe('2025-05-11T12:00:00.000Z')
+})
 
 test('MyPermits schema loads correctly', () => {
   const permit = new Permit()
   permit.vehicle = 'v'
   permit.type = 't'
-  permit.zone = 'z'
   permit.activeDate = 'a'
   permit.expireDate = 'e'
 
@@ -78,14 +79,12 @@ test('ZoneDetails schema loads correctly', () => {
   duration.hours = 1
 
   const zoneDetails = new ZoneDetails()
-  zoneDetails.daily = 10
   zoneDetails.hourly = 2
   zoneDetails.maxDuration = duration
   zoneDetails.openTime = '08:00'
   zoneDetails.closeTime = '18:00'
 
   expect(zoneDetails).toBeDefined()
-  expect(zoneDetails.daily).toBe(10)
   expect(zoneDetails.hourly).toBe(2)
   expect(zoneDetails.maxDuration).toBe(duration)
   expect(zoneDetails.openTime).toBe('08:00')
@@ -112,7 +111,6 @@ test('Confirmation schema loads correctly', () => {
 
   const confirmation = new Confirmation()
   confirmation.type = 'purchase'
-  confirmation.zone = 'A'
   confirmation.purchaseDate = '2025-05-11'
   confirmation.activeDate = '2025-05-12'
   confirmation.expireDate = '2025-05-13'
@@ -121,7 +119,6 @@ test('Confirmation schema loads correctly', () => {
 
   expect(confirmation).toBeDefined()
   expect(confirmation.type).toBe('purchase')
-  expect(confirmation.zone).toBe('A')
   expect(confirmation.purchaseDate).toBe('2025-05-11')
   expect(confirmation.activeDate).toBe('2025-05-12')
   expect(confirmation.expireDate).toBe('2025-05-13')
@@ -142,23 +139,19 @@ test('DurationInput schema loads correctly', () => {
 test('IsValidPermitInput schema loads correctly', () => {
   const isValidPermitInput = new IsValidPermitInput()
   isValidPermitInput.vehicle = 'vehicleZ'
-  isValidPermitInput.zone = 'zoneA'
 
   expect(isValidPermitInput).toBeDefined()
   expect(isValidPermitInput.vehicle).toBe('vehicleZ')
-  expect(isValidPermitInput.zone).toBe('zoneA')
 })
 
 test('IsValid schema loads correctly', () => {
   const isValid = new IsValid()
   isValid.isValid = true
   isValid.type = 'temporary'
-  isValid.zone = 'zoneB'
 
   expect(isValid).toBeDefined()
   expect(isValid.isValid).toBe(true)
   expect(isValid.type).toBe('temporary')
-  expect(isValid.zone).toBe('zoneB')
 })
 
 test('IsValidPolice schema loads correctly', () => {
@@ -177,4 +170,63 @@ test('PermitsByDay schema loads correctly', () => {
   expect(permitsByDay).toBeDefined()
   expect(permitsByDay.date).toBe('2025-05-11')
   expect(permitsByDay.permits).toHaveLength(1)
+})
+
+test('LotDetails schema loads correctly', () => {
+  const lotDetails = new LotDetails()
+  lotDetails.daily = 5
+  lotDetails.quarterly = 100
+  lotDetails.yearly = 300
+
+  expect(lotDetails).toBeDefined()
+  expect(lotDetails.daily).toBe(5)
+  expect(lotDetails.quarterly).toBe(100)
+  expect(lotDetails.yearly).toBe(300)
+})
+
+test('Lot schema loads correctly', () => {
+  const lot = new Lot()
+  lot.price = '5'
+  lot.name = 'A'
+
+  expect(lot).toBeDefined()
+  expect(lot.price).toBe('5')
+  expect(lot.name).toBe('A')
+})
+
+test('LotGroup schema loads correctly', () => {
+  const lotA = new Lot()
+  lotA.price = '5'
+  lotA.name = 'A'
+
+  const lotGroup = new LotGroup()
+  lotGroup.id = 'id'
+  lotGroup.title = 'A'
+  lotGroup.lots = [lotA]
+
+  expect(lotGroup).toBeDefined()
+  expect(lotGroup.id).toBe('id')
+  expect(lotGroup.title).toBe('A')
+  expect(lotGroup.lots.length).toBe(1)
+  expect(lotGroup.lots[0]).toBe(lotA)
+})
+
+test('Zone schema loads correctly', () => {
+  const duration = new Duration()
+  duration.hours = 2
+  duration.minutes = 0
+
+  const zone = new Zone()
+  zone.zone = '10'
+  zone.hourly = 2.50
+  zone.maxDuration = duration
+  zone.openTime = '07:00'
+  zone.closeTime = '20:00'
+
+  expect(zone).toBeDefined()
+  expect(zone.zone).toBe('10')
+  expect(zone.hourly).toBe(2.50)
+  expect(zone.maxDuration).toBe(duration)
+  expect(zone.openTime).toBe('07:00')
+  expect(zone.closeTime).toBe('20:00')
 })

@@ -109,6 +109,16 @@ INSERT INTO type (id, location, data) VALUES
 
 INSERT INTO type (id, location, data) VALUES
   (
+    '7604a7e6-6127-4b48-b24a-25a7f8bb8353',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
+    jsonb_build_object(
+      'name', 'zone',
+      'area', '999'
+    )
+  );
+
+INSERT INTO type (id, location, data) VALUES
+  (
     'e6a7230d-3842-4a11-96e4-6715e1185a25',
     'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
     jsonb_build_object(
@@ -169,6 +179,16 @@ INSERT INTO type (id, location, data) VALUES
       'daily', 6,
       'quarterly', 80,
       'yearly', 200
+    )
+  );
+
+INSERT INTO type (id, location, data) VALUES
+  (
+    '94dcbb2d-a047-4f00-bba0-3d5c9a4c2887',
+    'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5',
+    jsonb_build_object(
+      'name', 'lot',
+      'area', 'T'
     )
   );
 

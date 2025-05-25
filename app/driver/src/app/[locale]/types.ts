@@ -44,9 +44,11 @@ export interface PaymentDetails {
 
 export interface PermitDetails {
   type: string;
-  zoneNumber: string | null;
+  permitType: string;
+  zone?: string;
+  lot?: string;
   vehicle?: Vehicle;
-  duration?: Duration | null; 
+  duration?: Duration | string | null; 
 }
 
 export type TicketContextType = {

@@ -9,7 +9,9 @@ import authApp from '../../AuthService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 
 let server: http.Server
+// eslint-disable-next-line
 let authServer: any
+// eslint-disable-next-line
 let vehcServer: any
 
 const AUTH_PORT = 3010
@@ -386,6 +388,7 @@ test('Admin can get all zones', async () => {
   const zones = response.body.data.getZones;
   expect(Array.isArray(zones)).toBe(true);
   
+  // eslint-disable-next-line
   zones.forEach((zone: any) => {
     expect(zone).toHaveProperty('zone');
     expect(zone).toHaveProperty('hourly');
@@ -460,7 +463,7 @@ test('Admin can create a new zone', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({ query: verifyQuery });
 
-  const newZone = verifyResponse.body.data.getZones
+  const newZone = verifyResponse.body.data.getZones // eslint-disable-next-line
     .find((z: any) => z.zone === "999");
   
   expect(newZone).toBeDefined();

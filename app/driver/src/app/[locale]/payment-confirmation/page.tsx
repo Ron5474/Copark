@@ -26,24 +26,12 @@ function PaymentConfirmation() {
       setTransactionId(details.id);
 
       await addPaymentDetails(details);
-      const vehicle = sessionStorage.getItem("vehicle");
-      const zoneNumber = sessionStorage.getItem("zoneNumber");
-      const duration = sessionStorage.getItem("duration");
-      const d = JSON.parse(duration as string);
-      const v = JSON.parse(vehicle as string);
-      const permitDetails = {
-        type: details.type as string,
-        vehicle: v ? v : undefined,
-        zoneNumber: zoneNumber,
-        duration: d,
-      };
-      await addPermitDetails(details, permitDetails);
-      sessionStorage.removeItem("vehicle");
-      sessionStorage.removeItem("tempLocation");
-      sessionStorage.removeItem("zoneNumber");
-      sessionStorage.removeItem("duration");
-      sessionStorage.removeItem("price");
-      sessionStorage.removeItem("currency");
+      const permitDetails = JSON.parse(sessionStorage.getItem("permitDetails") || "{}");
+      if (permitDetails.type === "permit") {
+        await addPermitDetails(details, permitDetails);
+      }
+      sessionStorage.removeItem("permitDetails");
+      sessionStorage.removeItem("paymentDetails");
     };
     fetchSessionDetails();
   }, [sessionId]);

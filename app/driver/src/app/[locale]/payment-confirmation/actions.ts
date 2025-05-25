@@ -61,15 +61,80 @@ export async function addPermitDetails(
   addPermitDetails: PermitDetails
 ): Promise<void> {
   const { id, amount, currency, status, payment_method, type } = details;
-  const { vehicle, zoneNumber, duration } = addPermitDetails;
+  let permitQuery = undefined
+  let inputData = undefined
+  if (addPermitDetails.permitType === "zone") {
+    permitQuery = `
+          mutation PurchasePermit($input: PurchaseZoneInput!) {
+            purchaseZonePermit(input: $input) {
+              type,
+              area,
+              purchaseDate,
+              activeDate,
+              expireDate,
+              receipt {
+                service,
+                subTotal,
+                total
+              }
+              paymentMethod
+            }
+          }`
 
-  const inputData = {
-    vehicle: vehicle?.plate,
-          zone: zoneNumber,
-          duration: duration,
-          paymentMethod: payment_method
-        }
+    inputData = {
+      vehicle: addPermitDetails.vehicle?.plate,
+      zone: addPermitDetails.zone,
+      duration: addPermitDetails.duration,
+      paymentMethod: payment_method
+    }
+  }
 
+  if (addPermitDetails.permitType === "lot") {
+    const vehicleRes = await fetch("http://localhost:4001/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${await getAuthToken()}`,
+      },
+      body: JSON.stringify({
+        query: `query defaultVehicle {
+                      getDefaultVehicle {
+                        id,
+                        plate
+                      }
+                  }`
+      })
+    })
+
+    const vehicle = await vehicleRes.json();
+    if (await vehicle.errors !== undefined) {
+      throw new Error(`Failed to fetch default Vehicle: ${vehicle.errors[0]}`);
+    }
+
+    permitQuery = `mutation PurchasePermit($input: PurchaseLotInput!) {
+                    purchaseLotPermit(input: $input) {
+                      type,
+                      area,
+                      purchaseDate,
+                      activeDate,
+                      expireDate,
+                      receipt {
+                        service,
+                        subTotal,
+                        total
+                      }
+                      paymentMethod
+                    }
+                  }`
+    inputData = {
+      vehicle: vehicle.data.getDefaultVehicle.plate,
+      lot: addPermitDetails.lot,
+      duration: addPermitDetails.duration,
+      paymentMethod: payment_method
+    }
+  }
+
+  if (permitQuery) {
   const res = await fetch("http://localhost:4003/graphql", {
     method: "POST",
     headers: {
@@ -77,23 +142,7 @@ export async function addPermitDetails(
       Authorization: `Bearer ${await getAuthToken()}`,
     },
     body: JSON.stringify({
-      query: `
-        mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
-          purchaseZonePermit(input: $input) {
-            type,
-            area,
-            purchaseDate,
-            activeDate,
-            expireDate,
-            receipt {
-              service,
-              subTotal,
-              total
-            }
-            paymentMethod
-          }
-        }
-        `,
+      query: permitQuery,
       variables: {
         input: inputData
       }
@@ -109,4 +158,7 @@ export async function addPermitDetails(
   }
 
   console.log("Permit details saved:", { id, amount, currency, status, payment_method, type });
+  } else {
+    throw new Error("Permit Type not resolved");
+  }
 }

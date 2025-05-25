@@ -64,8 +64,7 @@ export default function IssueViolationForm({ onCancel }: { onCancel: () => void 
       })
 
       setShowSuccess(true)
-    } catch (err) {
-      console.error('Ticket issuing failed:', err)
+    } catch {
       alert('Failed to issue ticket.')
     }
 

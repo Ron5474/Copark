@@ -1,29 +1,33 @@
-import { render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, cleanup,  waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { vi, it, expect, afterEach, beforeEach } from 'vitest'
+import { vi, it, expect, beforeEach, beforeAll } from 'vitest'
 
 import IssueViolationForm from '@/app/dashboard/violation/IssueViolationForm'
-import PermitCard from '@/app/dashboard/permit/Card'
 import { EnforcementProvider } from '@/app/dashboard/context/Context'
+import { issueTicket } from '@/app/dashboard/violation/actions'
 
 vi.mock('@/app/dashboard/violation/actions', () => ({
   issueTicket: vi.fn(),
 }))
 
-afterEach(() => cleanup())
-
 const onCancelMock = vi.fn()
 
-const setup = (plate = 'ABC123', zone = 'A1') => {
+const setup = (plate = 'ABC123') => {
   render(
-    <EnforcementProvider initialPlate={plate} initialZone={zone} initialManualInput={plate}>
+    <EnforcementProvider initialPlate={plate} initialManualInput={plate}>
       <IssueViolationForm onCancel={onCancelMock} />
     </EnforcementProvider>
   )
 }
 
+beforeAll(() => {
+  global.URL.createObjectURL = vi.fn(() => 'blob:mock-photo-url')
+  global.URL.revokeObjectURL = vi.fn()
+})
+
 
 beforeEach(() => {
+  cleanup()
   vi.clearAllMocks()
 })
 
@@ -56,38 +60,123 @@ it('shows custom note field when "Other" is selected', async () => {
   expect(screen.getByLabelText(/Custom Note/i)).toBeDefined()
 })
 
-it('allows photo upload and shows file count', async () => {
+it('uploads photo and deletes it via removePhoto', async () => {
   setup()
-
   const file = new File(['dummy content'], 'photo.png', { type: 'image/png' })
-  const input = screen.getByLabelText('Upload Violation Photos')
 
-  fireEvent.change(input, { target: { files: [file] } })
+  const input = screen.getByLabelText('Upload or Take Photo')
+  await userEvent.upload(input, file)
 
-  expect(await screen.findByText(/1 file\(s\) selected/i)).toBeDefined()
+  const deleteBtn = await screen.findByLabelText('Remove photo')
+  await userEvent.click(deleteBtn)
+
+  await waitFor(() => {
+    expect(screen.queryByLabelText('Remove photo')).toBeNull()
+  })
 })
 
-it('calls onCancel when cancel button is clicked', async () => {
+it('converts photo to base64 and submits with image', async () => {
+  setup()
+  const file = new File(['dummy content'], 'photo.png', { type: 'image/png' })
+
+  const input = screen.getByLabelText('Upload or Take Photo')
+  await userEvent.upload(input, file)
+
+  await userEvent.click(screen.getByLabelText('Reason'))
+  await userEvent.click(screen.getByRole('option', { name: 'No Valid Permit' }))
+
+  const submit = screen.getByLabelText('Submit Violation')
+  await userEvent.click(submit)
+
+  await waitFor(() => {
+    expect(issueTicket).toHaveBeenCalled()
+    const calledArgs = vi.mocked(issueTicket).mock.calls[0][0]
+    expect(calledArgs.images).toMatch(/^data:image\/png;base64,/)
+  })
+})
+
+it('includes custom note when reason is "Other"', async () => {
+  setup()
+  const user = userEvent.setup()
+
+  await user.click(screen.getByLabelText('Reason'))
+  await user.click(screen.getByRole('option', { name: 'Other' }))
+
+  const noteField = await screen.findByLabelText('Custom Note')
+  await user.type(noteField, 'Custom explanation')
+
+  const submit = screen.getByLabelText('Submit Violation')
+  await user.click(submit)
+
+  await waitFor(() => {
+    expect(issueTicket).toHaveBeenCalledWith(expect.objectContaining({
+      note: 'Custom explanation',
+    }))
+  })
+})
+
+it('renders with empty plate when none is set', () => {
   render(
-    <EnforcementProvider initialPlate="ABC123">
-      <IssueViolationForm onCancel={onCancelMock} />
-      <PermitCard />
+    <EnforcementProvider initialPlate={undefined}>
+      <IssueViolationForm onCancel={vi.fn()} />
     </EnforcementProvider>
   )
 
+  const input = screen.getByLabelText('License Plate') as HTMLInputElement
+  expect(input.value).toBe('')
+})
+
+
+it('updates note state when user types in custom note field', async () => {
+  setup()
   const user = userEvent.setup()
-  const cancelBtn = screen.getByRole('button', { name: /Cancel/i })
+
+  await user.click(screen.getByLabelText('Reason'))
+  await user.click(screen.getByRole('option', { name: 'Other' }))
+
+  const noteField = await screen.findByLabelText('Custom Note')
+  await user.type(noteField, 'Test Note')
+
+  expect((noteField as HTMLInputElement).value).toBe('Test Note')
+})
+
+
+it('calls onCancel when cancel is clicked', async () => {
+  setup()
+  const user = userEvent.setup()
+
+  const cancelBtn = screen.getByLabelText('Cancel')
   await user.click(cancelBtn)
 
   expect(onCancelMock).toHaveBeenCalled()
+})
+
+it('displays alert when issueTicket throws', async () => {
+  const mockAlert = vi.spyOn(window, 'alert').mockImplementation(() => {})
+  const user = userEvent.setup()
+  setup()
+
+  await user.click(screen.getByLabelText('Reason'))
+  await user.click(screen.getByRole('option', { name: 'No Valid Permit' }))
+
+  vi.mocked(issueTicket).mockRejectedValueOnce(new Error('server broke'))
+
+  const submit = screen.getByLabelText('Submit Violation')
+  await user.click(submit)
+
+  await waitFor(() => {
+    expect(mockAlert).toHaveBeenCalledWith('Failed to issue ticket.')
+  })
+
+  mockAlert.mockRestore()
 })
 
 it('shows validation error if required fields are missing', async () => {
   setup('')
   const user = userEvent.setup()
 
-  const submit = screen.getByRole('button', { name: /Submit Violation/i })
-  await user.click(submit)
+  const submitBtn = screen.getByLabelText('Submit Violation')
+  await user.click(submitBtn)
 
   expect(screen.getByText(/License plate is required/i)).toBeDefined()
   expect(screen.getByText(/Reason is required/i)).toBeDefined()
@@ -97,21 +186,39 @@ it('clears field errors when user fills input', async () => {
   setup('')
   const user = userEvent.setup()
 
-  await user.click(screen.getByRole('button', { name: /Submit Violation/i }))
+  const submitBtn = screen.getByLabelText('Submit Violation')
+  await user.click(submitBtn)
   const plateField = screen.getByLabelText(/License Plate/i)
   await user.type(plateField, 'ZZZ999')
 
   expect(screen.queryByText(/License plate is required/i)).toBeNull()
 })
 
+it('clears reason field error when a reason is selected', async () => {
+  setup('')
+  const user = userEvent.setup()
+
+  const submitBtn = screen.getByLabelText('Submit Violation')
+  await user.click(submitBtn)
+  expect(screen.getByText(/Reason is required/i)).toBeDefined()
+
+  const reasonSelect = screen.getByLabelText('Reason')
+  await user.click(reasonSelect)
+  await user.click(await screen.findByRole('option', { name: 'No Valid Permit' }))
+
+  expect(screen.queryByText(/Reason is required/i)).toBeNull()
+})
+
 it('calls issueTicket on successful submission', async () => {
   setup()
   const user = userEvent.setup()
 
-  await user.click(screen.getByLabelText(/Reason/i))
-  await user.click(screen.getByRole('option', { name: 'No Valid Permit' }))
+  const reasonInput = screen.getByLabelText('Reason')
+  await user.click(reasonInput)
+  await user.click(await screen.findByRole('option', { name: 'No Valid Permit' }))
 
-  await user.click(screen.getByRole('button', { name: /Submit Violation/i }))
+
+  await user.click(screen.getByLabelText('Submit Violation'))
 
   const { issueTicket } = await import('@/app/dashboard/violation/actions')
 
@@ -124,43 +231,3 @@ it('calls issueTicket on successful submission', async () => {
     })
   })
 })
-
-it('clears reason field error when a reason is selected', async () => {
-  setup('')
-  const user = userEvent.setup()
-
-  await user.click(screen.getByRole('button', { name: /Submit Violation/i }))
-  expect(screen.getByText(/Reason is required/i)).toBeDefined()
-
-  await user.click(screen.getByLabelText(/Reason/i))
-  await user.click(screen.getByRole('option', { name: 'Blocking Driveway' }))
-
-  expect(screen.queryByText(/Reason is required/i)).toBeNull()
-})
-
-
-// it('shows alert and logs error when issueTicket fails', async () => {
-//   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-//   const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
-//   const { issueTicket } = await import('@/app/dashboard/violation/actions')
-//   issueTicket.mockRejectedValueOnce(new Error('Mock failure'))
-
-//   setup()
-//   const user = userEvent.setup()
-
-//   await user.click(screen.getByLabelText(/Reason/i))
-//   await user.click(screen.getByRole('option', { name: 'No Valid Permit' }))
-//   await user.click(screen.getByRole('button', { name: /Submit Violation/i }))
-
-//   await waitFor(() => {
-//     expect(alertSpy).toHaveBeenCalledWith('Failed to issue ticket.')
-//     expect(errorSpy).toHaveBeenCalledWith(
-//       'Ticket issuing failed:',
-//       expect.any(Error)
-//     )
-//   })
-
-//   alertSpy.mockRestore()
-//   errorSpy.mockRestore()
-// })
-

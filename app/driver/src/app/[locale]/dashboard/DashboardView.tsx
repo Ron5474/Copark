@@ -72,7 +72,7 @@ export default function DashboardView() {
       type: "permit",
       duration: permit.id,
       permitType: "lot",
-      lot: selectedLot,
+      lot: selectedLot.split(" ")[1],
     };
     sessionStorage.setItem("permitDetails", JSON.stringify(permitDetails));
     const paymentDetails = {

@@ -8,6 +8,7 @@ import { Box } from "@mui/material";
 import { useLocale, useTranslations } from "next-intl";
 import theme from "../theme";
 import { useRouter } from 'next/navigation';
+import Typography from '@mui/material/Typography';
 
 function Footer() {
   const router = useRouter()
@@ -54,10 +55,43 @@ function Footer() {
           color: "#000000",
           fontWeight: 500,
         }}>
+          <Typography
+              component="a"
+              onClick={() => {router.push(`${process.env.NEXT_PUBLIC_MARKETING_URL}/${locale}/privacy`)}} 
+              aria-label="privacy-policy-link"
+              sx={{
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                color: 'primary.main',
+                fontSize: 'inherit',
+                fontWeight: 'inherit',
+                '&:active': {
+                  transform: 'scale(0.98)',
+                }
+              }}
+            >
+              {t("Privacy Policy")}
+            </Typography>
+
+            <Typography
+              component="a"
+              onClick={() => {router.push(`${process.env.NEXT_PUBLIC_MARKETING_URL}/${locale}/tos`)}} 
+              aria-label="service-terms-link"
+              sx={{
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                color: 'primary.main',
+                fontSize: 'inherit',
+                fontWeight: 'inherit',
+                '&:active': {
+                  transform: 'scale(0.98)',
+                }
+              }}
+            >
+              {t("Terms of Service")}
+            </Typography>
           {/* <a aria-label="personal-info-link">{t("Do Not Sell My Personal Info")}</a> */}
-          <a onClick={() => router.push(`${process.env.NEXT_PUBLIC_MARKETING_URL}/${locale}/privacy`)} aria-label="privacy-policy-link">{t("Privacy Policy")}</a>
-          <a onClick={() => router.push(`${process.env.NEXT_PUBLIC_MARKETING_URL}/${locale}/tos`)} aria-label="service-terms-link">{t("Terms of Service")}</a>
-          <a aria-label="contact-us-link">{t("Contact Us")}</a>
+          {/* <a aria-label="contact-us-link">{t("Contact Us")}</a> */}
           {/* <Button sx={{padding: 0}}>{t("Dark Mode")}</Button> TODO: Change theme and change this text based on current theme */}
         </Box>
       </Box>

@@ -47,7 +47,7 @@ const permitHandlers = {
             isValidZonePermit: {
               isValid: true,
               type: 'Residential',
-              zone: 'A1',
+              area: 'A1',
             },
           },
         })
@@ -63,17 +63,42 @@ const permitHandlers = {
       typeof body === 'object' &&
       body !== null &&
       'query' in body &&
-      typeof body.query === 'string'
+      typeof body.query === 'string' &&
+      body.query.includes('IsValidZonePermit')
     ) {
-      if (body.query.includes('IsValidZonePermit')) {
-        return HttpResponse.json({
-          errors: [{ message: 'Zone not permitted' }],
-        }, { status: 200 })
-      }
+      return HttpResponse.json({
+        data: {
+          isValidZonePermit: {
+            isValid: false,
+            type: 'Error',
+            area: 'N/A',
+          },
+        },
+      }, { status: 200 })
     }
 
     return HttpResponse.json({ errors: [{ message: 'Unknown query' }] }, { status: 400 })
   }),
+
+  graphqlError: http.post(permitURL, async ({ request }) => {
+    const body = await request.json()
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'query' in body &&
+      typeof body.query === 'string' &&
+      body.query.includes('IsValidZonePermit')
+    ) {
+      return HttpResponse.json({
+        errors: [
+          { message: 'Zone not permitted' }
+        ]
+      }, { status: 200 })
+    }
+
+    return HttpResponse.json({ errors: [{ message: 'Unknown query' }] }, { status: 400 })
+  }),
+
 }
 
 const ticketHandlers = {

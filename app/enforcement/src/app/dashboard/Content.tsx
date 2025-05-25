@@ -6,7 +6,7 @@ import {
   Typography,
   Paper,
 } from '@mui/material'
-import EditNoteIcon from '@mui/icons-material/Search'
+import SearchIcon from '@mui/icons-material/Search'
 import ManualEntryCard from './plate/ManualEntry'
 import PermitCard from './permit/Card'
 import IssueViolationForm from './violation/IssueViolationForm'
@@ -72,7 +72,7 @@ export default function EnforcementDashboardView() {
               boxShadow: 3,
             }}
           >
-            <EditNoteIcon sx={{ fontSize: 42, color: 'primary.main' }} />
+            <SearchIcon sx={{ fontSize: 42, color: 'primary.main' }} />
           </Box>
 
           <Typography variant="h5" sx={{ mb: 1 }}>

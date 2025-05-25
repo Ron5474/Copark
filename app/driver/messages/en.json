@@ -27,5 +27,21 @@
     "Contact Us": "Contact Us",
     "Dark Mode": "Dark Mode",
     "Rights Reserved": "© 2025 Copark. All rights reserved."
+  },
+  "dashboard": {
+    "title": "Available Permits",
+    "bestValue": "Best Value",
+    "quickAccess": "Quick Access",
+    "allLotsAccess": "All Lots Access",
+    "selected": "Selected",
+    "purchase": "Purchase Permit",
+    "loading": "Loading permits..."
+  },
+  "bottomNav": {
+    "home": "Home",
+    "tickets": "Tickets",
+    "garage": "Garage",
+    "logout": "Logout"
   }
+
 }

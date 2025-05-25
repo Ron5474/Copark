@@ -91,16 +91,16 @@
         "description": "Su uso de nuestros servicios también se rige por nuestra Política de privacidad, que describe cómo recopilamos y utilizamos sus datos."
       },
       "line5": {
-        "point": "",
-        "description": ""
+        "point": "Uso de datos: ",
+        "description": "Recopilamos datos de matrículas e información de estacionamiento únicamente con fines de control. Estos datos se almacenan de forma segura y se utilizan únicamente cuando es necesario para la operación del servicio."
       },
       "line6": {
-        "point": "",
-        "description": ""
+        "point": "Limitaciones: ",
+        "description": "Nuestros servicios se proporcionan \"tal cual\" sin garantías de ningún tipo, ya sean expresas o implícitas."
       },
       "line7": {
-        "point": "",
-        "description": ""
+        "point": "Cambios: ",
+        "description": "Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado después de los cambios constituye la aceptación de los nuevos términos."
       }
     }
   }

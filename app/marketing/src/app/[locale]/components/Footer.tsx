@@ -103,8 +103,20 @@ function Footer() {
             </Typography>
             {/* <a aria-label="contact-us-link">{t("Contact Us")}</a> */}
             {/* <Button sx={{padding: 0}}>{t("Dark Mode")}</Button> TODO: Change theme and change this text based on current theme */}
-            {locale == 'en' && <Button onClick={() => SwitchLocale('es')}>Copark™ in Spanish</Button>}
-            {locale == 'es' && <Button onClick={() => SwitchLocale('en')}>Copark™ en Español</Button>}
+            {locale == 'en' && <Button onClick={() => SwitchLocale('es')} sx={{display: "flex", alignItems: "center", gap: "10px"}}>
+              <picture>
+                <source srcSet="/assets/flags/es.png" type="image/png" />
+                <img src="/assets/flags/es.png" alt="Spanish Flag" width={40} />
+              </picture>
+              Spanish
+              </Button>}
+            {locale == 'es' && <Button onClick={() => SwitchLocale('en')} sx={{display: "flex", alignItems: "center", gap: "10px"}}>
+              <picture>
+                <source srcSet="/assets/flags/en.png" type="image/png" />
+                <img src="/assets/flags/en.png" alt="English Flag" width={40} />
+              </picture>
+                Español
+              </Button>}
             </Box>
          </Box>
           

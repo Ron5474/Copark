@@ -4,16 +4,26 @@
  * @description This file contains the Footer component.
  * @author Swayam Shah
  */
-import { Box } from "@mui/material";
-import { useTranslations } from "next-intl";
+import { Box, Button } from "@mui/material";
+import { useLocale, useTranslations } from "next-intl";
 import theme from "../theme";
-import { useRouter } from "@/i18n/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import Typography from '@mui/material/Typography';
 
 
 function Footer() {
   const t = useTranslations("footer");
   const router = useRouter();
+  const locale = useLocale();
+  const pathname = usePathname();
+
+  const SwitchLocale = (newLocale: string) => {
+     router.replace(
+      {pathname},
+      {locale: newLocale}
+    )
+  }
+
   const PrimaryColorLight = theme.palette.primary.light;
   return (
        <Box sx={{
@@ -93,8 +103,23 @@ function Footer() {
             </Typography>
             {/* <a aria-label="contact-us-link">{t("Contact Us")}</a> */}
             {/* <Button sx={{padding: 0}}>{t("Dark Mode")}</Button> TODO: Change theme and change this text based on current theme */}
+            {locale == 'en' && <Button onClick={() => SwitchLocale('es')} sx={{display: "flex", alignItems: "center", gap: "10px"}}>
+              <picture>
+                <source srcSet="/assets/flags/es.png" type="image/png" />
+                <img src="/assets/flags/es.png" alt="Spanish Flag" width={40} />
+              </picture>
+              Spanish
+              </Button>}
+            {locale == 'es' && <Button onClick={() => SwitchLocale('en')} sx={{display: "flex", alignItems: "center", gap: "10px"}}>
+              <picture>
+                <source srcSet="/assets/flags/en.png" type="image/png" />
+                <img src="/assets/flags/en.png" alt="English Flag" width={40} />
+              </picture>
+                Español
+              </Button>}
             </Box>
          </Box>
+          
          <p style={{ fontSize: "14px", color: "#000000", fontWeight: 500 }}>{t("Rights Reserved")}</p>
        </Box>
   )

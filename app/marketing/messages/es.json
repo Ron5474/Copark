@@ -29,5 +29,79 @@
     "Contact Us": "Contáctenos",
     "Dark Mode": "Modo oscuro",
     "Rights Reserved": "© 2025 Copark. Todos los derechos reservados."
+  },
+  "Privacy Policy": {
+    "title": "Política de privacidad",
+    "content title": "Tu privacidad importa",
+    "policy statement": "Fecha de vigencia: 19 de mayo de 2025. Esta Política de Privacidad describe cómo Copark recopila, usa y comparte tu información personal cuando utilizas nuestros servicios de gestión de estacionamiento.",
+    "policy": {
+      "line1": {
+        "point": "Información que recopilamos: ",
+        "details": "Copark recopila números de matrículas de vehículos, datos de ubicación de estacionamiento, información de pago, detalles de la cuenta, información del dispositivo y estadísticas de uso para brindar nuestros servicios."
+      },
+      "line2": {
+        "point": "Cómo usamos su información: ",
+        "details": "Copark utiliza su información para procesar transacciones de estacionamiento, hacer cumplir las regulaciones de estacionamiento, mejorar nuestros servicios, comunicarnos con usted y mantener la seguridad de nuestra plataforma."
+      },
+      "line3": {
+        "point": "Compartiendo su información: ",
+        "details": "Copark podría compartir información con operadores de estacionamientos, procesadores de pagos y las fuerzas del orden cuando sea necesario. No vendemos su información personal a terceros."
+      },
+      "line4": {
+        "point": "Derechos de privacidad de California: ",
+        "details": "Como residente de California, usted tiene derechos bajo la Ley de Privacidad del Consumidor de California (CCPA), incluido el derecho a saber qué información personal recopilamos, solicitar la eliminación y optar por no vender su información."
+      },
+      "line5": {
+        "point": "Seguridad de datos: ",
+        "details": "Implementamos medidas de seguridad razonables para proteger su información del acceso no autorizado."
+      },
+      "line6": {
+        "point": "Retención de datos: ",
+        "details": "Copark conserva su información el tiempo necesario para prestar nuestros servicios y cumplir con las obligaciones legales. Los registros de estacionamiento suelen conservarse hasta por 3 años."
+      },
+      "line7": {
+        "point": "Cambios en la Política de Privacidad: ",
+        "details": "Copark podrá actualizar esta Política de Privacidad periódicamente. Copark le notificará cualquier cambio sustancial por correo electrónico o a través de nuestra aplicación."
+      },
+      "line8": {
+        "point": "Contáctenos: ",
+        "details": "Si tiene preguntas sobre esta Política de privacidad o para ejercer sus derechos de privacidad, contáctenos en coparkspace@gmail.com."
+      }
+    }
+  },
+  "tos": {
+    "title": "Condiciones de servicio",
+    "welcome": "Bienvenido a Copark",
+    "agreement": "Al acceder o utilizar los servicios de administración de estacionamiento de Copark, usted acepta estar sujeto a estos Términos de servicio.",
+    "terms": {
+      "line1": {
+        "point": "Descripción del servicio: ",
+        "description": "Copark brinda servicios de administración y control de estacionamientos a través de nuestra plataforma."
+      },
+      "line2": {
+        "point": "Licencia: ",
+        "description": "Le otorgamos una licencia limitada, no exclusiva e intransferible para utilizar nuestro servicio para sus necesidades de gestión de estacionamiento."
+      },
+      "line3": {
+        "point": "Cuentas de usuario: ",
+        "description": "Usted es responsable de mantener la confidencialidad de las credenciales de su cuenta y de todas las actividades realizadas en su cuenta."
+      },
+      "line4": {
+        "point": "Privacidad: ",
+        "description": "Su uso de nuestros servicios también se rige por nuestra Política de privacidad, que describe cómo recopilamos y utilizamos sus datos."
+      },
+      "line5": {
+        "point": "Uso de datos: ",
+        "description": "Recopilamos datos de matrículas e información de estacionamiento únicamente con fines de control. Estos datos se almacenan de forma segura y se utilizan únicamente cuando es necesario para la operación del servicio."
+      },
+      "line6": {
+        "point": "Limitaciones: ",
+        "description": "Nuestros servicios se proporcionan \"tal cual\" sin garantías de ningún tipo, ya sean expresas o implícitas."
+      },
+      "line7": {
+        "point": "Cambios: ",
+        "description": "Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado después de los cambios constituye la aceptación de los nuevos términos."
+      }
+    }
   }
 }

@@ -25,7 +25,6 @@ const permitDetails = {
 
 const enforcementDetails = {
   vehicle: permitDetails.vehicle,
-  zone: permitDetails.zone,
 }
 
 const policeDetails = '12345678-1234-1234-1234-567890abcdef'
@@ -59,8 +58,26 @@ test('Purchasing unknown zone', async () => {
 
 test('Vehicle has valid permit', async () => {
   await permitService.purchaseMyZonePermit(permitDetails)
-  const { isValid } = await permitService.isValidZonePermit(enforcementDetails)
+  const { isValid, area, type } = await permitService.isValidZonePermit(enforcementDetails)
   expect(isValid).toBe(true)
+  expect(area).toBe('27')
+  expect(type).toBe('zone')
+})
+
+test('Vehicle has expired permit', async () => {
+  const now = new Date('2025-01-01T12:00:00Z')
+  vi.useFakeTimers()
+  vi.setSystemTime(now)
+
+  await permitService.purchaseMyZonePermit(permitDetails)
+
+  // Simulate time passing (e.g. 31 minutes later)
+  vi.setSystemTime(new Date(now.getTime() + 31 * 60 * 1000))
+
+  const { isValid } = await permitService.isValidZonePermit(enforcementDetails)
+  expect(isValid).toBe(false)
+
+  vi.useRealTimers()
 })
 
 test('Vehicle does not have valid permit', async () => {
@@ -68,13 +85,6 @@ test('Vehicle does not have valid permit', async () => {
   const { isValid } = await permitService.isValidZonePermit({ ...enforcementDetails, vehicle: '11111111-1234-1234-1234-567890abcdef' })
   expect(isValid).toBe(false)
 })
-
-// test('Vehicle has permit, wrong zone', async () => {
-//   await permitService.purchaseMyZonePermit(permitDetails)
-//   const { isValid } = await permitService.isValidZonePermit({...enforcementDetails, zone: '17' })
-//   console.log(isValid)
-//   expect(isValid).toBe(false)
-// })
 
 test('Vehicle has valid permit (Police)', async () => {
   await permitService.purchaseMyZonePermit(permitDetails)
@@ -154,7 +164,6 @@ test('lotDetails errors on wrong lot type', async () => {
 
 test('getAllLotDetails gives correct daily permits', async () => {
   const data = await permitService.getAllLotDetails()
-  // console.log(data)
   expect(data[0].lots.length).toBeGreaterThan(5) // 5 daily permit lots (or more)
 })
 
@@ -227,5 +236,4 @@ test('Purchasing wrong lot permit doesn\'t work', async () => {
 test('getZones properly returns zones', async () => {
   const receipt = await permitService.getZones()
   expect(receipt).toBeDefined()
-  console.log(receipt)
 })

@@ -29,5 +29,79 @@
     "Contact Us": "Contact Us",
     "Dark Mode": "Dark Mode",
     "Rights Reserved": "© 2025 Copark. All rights reserved."
+  },
+  "Privacy Policy": {
+    "title": "Privacy Policy",
+    "content title": "Your Privacy Matters",
+    "policy statement": "Effective Date: May 19, 2025. This Privacy Policy describes how Copark collects, uses, and shares your personal information when you use our parking management services.",
+    "policy": {
+      "line1": {
+        "point": "Information We Collect: ",
+        "details": "Copark collects vehicle license plate numbers, parking location data, payment information, account details, device information, and usage statistics to provide our services."
+      },
+      "line2": {
+        "point": "How We Use Your Information: ",
+        "details": "Copark uses your information to process parking transactions, enforce parking regulations, improve our services, communicate with you, and maintain the security of our platform."
+      },
+      "line3": {
+        "point": "Sharing Your Information: ",
+        "details": "Copark may share information with parking facility operators, payment processors, and law enforcement when required. We do not sell your personal information to third parties."
+      },
+      "line4": {
+        "point": "California Privacy Rights: ",
+        "details": "As a California resident, you have rights under the California Consumer Privacy Act (CCPA), including the right to know what personal information we collect, request deletion, and opt out of sales of your information."
+      },
+      "line5": {
+        "point": "Data Security: ",
+        "details": "We implement reasonable security measures to protect your information from unauthorized access."
+      },
+      "line6": {
+        "point": "Data Retention: ",
+        "details": "Copark retains your information for as long as necessary to provide our services and comply with legal obligations. Parking records are typically kept for up to 3 years."
+      },
+      "line7": {
+        "point": "Changes to Privacy Policy: ",
+        "details": "Copark may update this Privacy Policy periodically. Copark will notify you of any material changes via email or through our application."
+      },
+      "line8": {
+        "point": "Contact Us: ",
+        "details": "If you have questions about this Privacy Policy or to exercise your privacy rights, please contact us at coparkspace@gmail.com."
+      }
+    }
+  },
+  "tos": {
+    "title": "Terms of Service",
+    "welcome": "Welcome to Copark",
+    "agreement": "By accessing or using Copark's parking management services, you agree to be bound by these Terms of Service.",
+    "terms": {
+      "line1": {
+        "point": "Service Description: ",
+        "description": "Copark provides parking lot management and enforcement services through our platform."
+      },
+      "line2": {
+        "point": "License: ",
+        "description": "We grant you a limited, non-exclusive, non-transferable license to use our service for your parking management needs."
+      },
+      "line3": {
+        "point": "User Accounts: ",
+        "description": "You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account."
+      },
+      "line4": {
+        "point": "Privacy: ",
+        "description": "Your use of our services is also governed by our Privacy Policy, which outlines how we collect and use your data."
+      },
+      "line5": {
+        "point": "Data Usage: ",
+        "description": "We collect license plate data and parking information solely for enforcement purposes. This data is stored securely and used only as necessary for service operation."
+      },
+      "line6": {
+        "point": "Limitations: ",
+        "description": "Our services are provided \"as is\" without warranties of any kind, either express or implied."
+      },
+      "line7": {
+        "point": "Changes: ",
+        "description": "We reserve the right to modify these terms at any time. Continued use after changes constitutes acceptance of the new terms."
+      }
+    }
   }
 }

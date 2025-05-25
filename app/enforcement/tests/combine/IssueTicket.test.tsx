@@ -72,3 +72,15 @@ it('throws if no session token is found', async () => {
     })
   ).rejects.toThrow('Unauthorized: No session token found.')
 })
+
+it('throws a GraphQL error from ticket service', async () => {
+  server.use(ticketHandlers.graphqlError)
+
+  await expect(() =>
+    issueTicket({
+      plate: 'ERROR123',
+      reason: 'Expired Permit',
+      images: null,
+    })
+  ).rejects.toThrow('Ticket service internal error')
+})

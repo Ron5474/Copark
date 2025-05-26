@@ -934,3 +934,70 @@ test('Admin can get accepted tickets', async () => {
     expect(ticket).toHaveProperty('note');
   });
 });
+
+test('Admin can reject a ticket challenge', async () => {
+  const enforcementToken = await loginAs("enforcement");
+
+  const createResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "REJECT123",
+          reason: "Fire Lane",
+          note: "Blocking fire lane",
+          images: "reject-photo.jpg"
+        }
+      }
+    });
+
+  const ticket = createResponse.body.data.createNewTicket;
+
+  const challengeMutation = `
+    mutation ChallengeTicket($ticketID: TicketInput!, $reason: String!) {
+      challengeTicket(ticketID: $ticketID, challengeReason: $reason) {
+        id
+        ticketStatus
+      }
+    }
+  `;
+
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + ronakDriverToken)
+    .send({
+      query: challengeMutation,
+      variables: {
+        ticketID: { id: ticket.id },
+        reason: "I was not blocking"
+      }
+    });
+
+  const adminToken = await loginAsAdmin();
+  const rejectMutation = `
+    mutation RejectChallenge($ticketID: TicketInput!) {
+      rejectTicketChallenge(ticketID: $ticketID) {
+        id
+        ticketStatus
+      }
+    }
+  `;
+
+  const rejectResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + adminToken)
+    .send({
+      query: rejectMutation,
+      variables: {
+        ticketID: { id: ticket.id }
+      }
+    });
+
+  expect(rejectResponse.status).toBe(200);
+  expect(rejectResponse.body.errors).toBeUndefined();
+  const rejectedTicket = rejectResponse.body.data.rejectTicketChallenge;
+  expect(rejectedTicket.ticketStatus).toBe("unpaid");
+  expect(rejectedTicket.id).toBe(ticket.id);
+});

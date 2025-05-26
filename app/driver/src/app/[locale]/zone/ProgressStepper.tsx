@@ -7,6 +7,7 @@
 import React from 'react'
 import { Box, Typography } from '@mui/material'
 import theme from '../theme'
+// import { useTranslations } from 'next-intl'
 
 // Props for the stepper
 type CustomStepperProps = {
@@ -15,6 +16,7 @@ type CustomStepperProps = {
 }
 
 export default function CustomStepper({ steps, activeStep }: CustomStepperProps) {
+  // const t = useTranslations('stepper')
   const stepNum = steps.findIndex((step) => step === activeStep)
   return (
     <Box

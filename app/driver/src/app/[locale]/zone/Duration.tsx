@@ -13,19 +13,21 @@ import {
   Select,
   Typography,
 } from '@mui/material'
+import { useTranslations } from "next-intl";
 
 import ZoneContext from './Context'
 import theme from '../theme'
 
 
 export default function Zone() {
+  const t = useTranslations('duration');
   const { next } = useContext(ZoneContext)
   const [isValidSelection, setIsValidSelection] = useState<boolean>(true)
   const [durationOption, setDurationOption] = useState('')
 
   const options = [
-    { label: 'By the hour and the minute', value: 'hourly' },
-    { label: 'Maximum Parking Time', value: 'max' },
+    { label: t('option_hourly'), value: 'hourly' },
+    { label: t('option_max'), value: 'max' },
   ]
 
   const submitDuration = () => {
@@ -45,11 +47,11 @@ export default function Zone() {
       }}
     >
       <Typography variant="h5" gutterBottom sx={{ mt: '1vh' }}>
-        What parking rate works for you?
+        {t("title")}
       </Typography>
 
       <Typography variant="body1" sx={{ marginTop: '1vh', color: '#4b4b4b' }}>
-        This parking operator currently offers multiple parking rate options.
+        {t("description")}
       </Typography>
 
       <RadioGroup
@@ -94,7 +96,7 @@ export default function Zone() {
 
       {!isValidSelection && (
         <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-          Please select a parking rate
+          {t('error_no_selection')}
         </Typography>
       )}
 
@@ -134,6 +136,7 @@ export default function Zone() {
 }
 
 function SelectDuration() {
+  const t = useTranslations('duration')
   const { zoneDetails, setDurationString, setPrice, price, setDuration } = useContext(ZoneContext)
   const [selectedHours, setSelectedHours] = useState(0)
   const [selectedMinutes, setSelectedMinutes] = useState(5)
@@ -209,7 +212,7 @@ function SelectDuration() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', mt: 2 }}>
       <Typography variant="h6" sx={{ mb: 1 }}>
-        Select your parking duration
+        {t('select_duration')}
       </Typography>
       <Box sx={{ display: 'flex', gap: 2 }}>
         <FormControl fullWidth>
@@ -252,20 +255,21 @@ function SelectDuration() {
       </Box>
 
       <Typography variant="h6" sx={{ mt: '2vh' }}>
-        Estimated Price: <Typography color='primary' variant="h5" component="span">{estimatedPriceString}</Typography>
+        {t('estimated_price')} <Typography color='primary' variant="h5" component="span">{estimatedPriceString}</Typography>
       </Typography>
 
       <Typography variant="subtitle2" gutterBottom>
-        {`Transaction fees and taxes may apply in later steps.`}
+        {t('fees_notice')}
       </Typography>
     </Box>
   )
 }
 
 function MaxDuration() {
+  const t = useTranslations('duration')
   const { zoneDetails, durationString, setDurationString, price, setPrice, setDuration } = useContext(ZoneContext)
 
-  const optionString = 'Maximum Parking Time'
+  const optionString = t('option_max')
   const endTimeStringRef = useRef('')
   const estimatedPriceStringRef = useRef(`$${0.0.toFixed(2)}`)
 
@@ -336,15 +340,15 @@ function MaxDuration() {
       }}
     >
       <Typography variant="h6" gutterBottom sx={{ mt: '2vh' }}>
-        Review your duration
+        {t('review_duration')}
       </Typography>
 
       <Typography variant="body1" sx={{ marginTop: '1vh', color: '#4b4b4b' }}>
-        {`This rate (${optionString}) allows you to park here for ${durationString} until ${endTimeStringRef.current}.`}
+        {t('duration_summary', { option: optionString, duration: durationString, endTime: endTimeStringRef.current, })}
       </Typography>
 
       <Typography variant="h6" sx={{ mt: '2vh' }}>
-        Estimated Price: <Typography color='primary' variant="h5" component="span">{estimatedPriceStringRef.current}</Typography>
+        {t('estimated_price')} <Typography color='primary' variant="h5" component="span">{estimatedPriceStringRef.current}</Typography>
       </Typography>
 
       <Typography variant="subtitle2" gutterBottom>

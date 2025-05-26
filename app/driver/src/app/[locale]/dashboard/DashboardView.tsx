@@ -126,7 +126,7 @@ export default function DashboardView() {
             >
               {permit.lots.map((lot) => {
                 const formattedName =
-                  lot.name.toLowerCase().includes("any") ? t("allLotsAccess") : tp(lot.name);
+                  lot.name.toLowerCase().includes("any") ? t("allLotsAccess") : `${tp('lot')}${lot.name.slice(3)}`;
 
                 return (
                   <FormControlLabel
@@ -134,7 +134,7 @@ export default function DashboardView() {
                     value={lot.name}
                     control={<Radio />}
                     label={`${formattedName} - ${lot.price}`}
-                    aria-label={`Select ${formattedName} from ${permit.title}`}
+                    aria-label={`Select ${formattedName} from ${tp(permit.title)}`}
                   />
                 );
               })}

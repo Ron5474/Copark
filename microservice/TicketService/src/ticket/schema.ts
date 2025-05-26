@@ -138,3 +138,28 @@ export class ChallengeTicket extends Ticket {
   @Field(() => String, { nullable: true })
   challengeReason?: string;
 }
+
+@ObjectType()
+export class UnpaidTicketsReturn {
+  @Field(() => String)
+  date!: string;
+
+  @Field(() => [Ticket])
+  tickets!: Ticket[];
+}
+
+
+@ObjectType()
+export class UnpaidTickets {
+  @Field(() => String)
+  date!: string;
+
+  @Field(() => String)
+  violation!: string;
+
+  @Field(() => String)
+  fine!: string;
+
+  @Field(() => String)
+  note!: string;
+}

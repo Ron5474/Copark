@@ -78,11 +78,11 @@ export class TicketResolver {
       }
     })
 
-    // const res = response.status === 200 ? await response.json() : null;
-    const res = await response.json()
-    // if (!res) {
-    //   throw new Error('User not found');
-    // }
+    const res = response.status === 200 ? await response.json() : null;
+    // const res = await response.json()
+    if (!res) {
+      throw new Error('User not found');
+    }
     return {
       id: res.id,
       name: res.name,
@@ -116,7 +116,7 @@ export class TicketResolver {
 
     const ownerJson = await ownerRes.json();
     const driverId = ownerJson?.data?.findOwnerByVehicleID?.id;
-    if (!driverId) return console.info("No driver linked — skipping email.");
+    // if (!driverId) return console.info("No driver linked — skipping email.");
 
     // Step 2: Get driver info from AuthService
     const driverRes = await fetch("http://localhost:3010/api/v0/auth/driver/email", {

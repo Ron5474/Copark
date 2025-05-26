@@ -88,5 +88,13 @@
     "facebook": "Sign In With Facebook",
     "signup prompt": "New to Copark?",
     "signup link": "Sign Up"
+  },
+  "signupPage": {
+    "title": "Sign Up",
+    "google": "Sign Up With Google",
+    "github": "Sign Up With GitHub",
+    "facebook": "Sign Up With Facebook",
+    "login prompt": "Already have an account?",
+    "login link": "Log In"
   }
 }

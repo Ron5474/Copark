@@ -21,11 +21,12 @@ import { signIn } from "next-auth/react"
 import { useEffect } from 'react';
 import { getUser } from '../shared/actions';
 import { Link, useRouter } from '@/i18n/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 
 export default function SignupView() {
   // const { data: session } = useSession()
+  const t = useTranslations("signupPage");
   const router = useRouter()
   const locale = useLocale()
   const handleClick = async (provider: string) => {
@@ -52,7 +53,7 @@ export default function SignupView() {
     >
       <Stack alignItems="center" spacing={2} sx={{ width: '100%', maxWidth: 300, margin: 'auto', paddingTop: 4 }}>
         <Typography component="h1" variant="h3" sx={{mb: 3}}>
-            Sign Up!
+            {t('title')}
         </Typography>
         <Button
           variant="outlined"
@@ -64,7 +65,7 @@ export default function SignupView() {
             handleClick('github')
           }}
         >
-          Sign Up With GitHub
+          {t('github')}
         </Button>
         <Button
           variant="outlined"
@@ -76,7 +77,7 @@ export default function SignupView() {
             handleClick('google')
           }}
         >
-          Sign Up With Google
+          {t('google')}
         </Button>
         <Button
           variant="outlined"
@@ -88,10 +89,10 @@ export default function SignupView() {
             handleClick('facebook')
           }}
         >
-          Sign Up With Facebook
+          {t('facebook')}
         </Button>
          <p style={{ color: 'gray', fontSize: '12px', marginTop: '10px' }}>
-                  Already a Member? <Link href="/login" style={{ textDecoration: "underline" }}>login</Link>
+                  {t('login prompt')} <Link href="/login" style={{ textDecoration: "underline" }}>{t("login link")}</Link>
                 </p>
       </Stack>
     </Container>

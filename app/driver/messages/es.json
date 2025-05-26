@@ -88,5 +88,13 @@
     "facebook": "Iniciar sesión con Facebook",
     "signup prompt": "¿Eres nuevo en Copark?",
     "signup link": "Inscribirse"
+  },
+  "signupPage": {
+    "title": "Inscribirse",
+    "google": "Registrarse con Google",
+    "github": "Registrarse con GitHub",
+    "facebook": "Registrarse con Facebook",
+    "login prompt": "¿Ya tienes una cuenta?",
+    "login link": "Iniciar sesión"
   }
 }

@@ -235,14 +235,14 @@ build:vehicleService:
 #     - npm run build
 
 # Uncomment this @Yaquob
-# test:enforcement:
-#   script:
-#     - cd app/enforcement && npm install && npm test
-#   rules:
-#     - changes: 
-#       - app/enforcement/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+test:enforcement:
+  script:
+    - cd app/enforcement && npm install && npm test
+  rules:
+    - changes: 
+      - app/enforcement/**/*
+      - package.json
+      - .gitlab-ci.yml
 
 # Failing Integration Tests
 

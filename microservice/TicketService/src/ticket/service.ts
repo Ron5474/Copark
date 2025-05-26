@@ -89,7 +89,7 @@ export class TicketService {
     }
 
     const issuedDate = new Date().toISOString();
-    const ticketStatus = 'active';
+    const ticketStatus = 'unpaid';
 
     const insertQuery = `
       INSERT INTO ticket (vehicle, enforcer, data)

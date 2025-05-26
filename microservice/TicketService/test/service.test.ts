@@ -316,7 +316,7 @@ test('ticket challenge flow - create, challenge, and get challenged tickets', as
   };
 
   const ticket = await ticketService.createTicket(newTicket);
-  expect(ticket.ticketStatus).toBe('active');
+  expect(ticket.ticketStatus).toBe('unpaid');
 
   // 2. Challenge the ticket
   const challengeReason = "Vehicle had valid permit displayed";

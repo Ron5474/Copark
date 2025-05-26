@@ -26,7 +26,7 @@ test('Ticket schema loads correctly', () => {
   testTicket.issuedDate = new Date('2025-05-11T12:00:00Z');
   testTicket.violation = 'speeding';
   testTicket.fine = 100;
-  testTicket.ticketStatus = 'active';
+  testTicket.ticketStatus = 'unpaid';
   testTicket.images = 'image1.jpg';
 
   expect(testTicket).toBeDefined();
@@ -36,7 +36,7 @@ test('Ticket schema loads correctly', () => {
   expect(testTicket.issuedDate.toISOString()).toBe('2025-05-11T12:00:00.000Z');
   expect(testTicket.violation).toBe('speeding');
   expect(testTicket.fine).toBe(100);
-  expect(testTicket.ticketStatus).toBe('active');
+  expect(testTicket.ticketStatus).toBe('unpaid');
   expect(testTicket.images).toBe('image1.jpg');
 });
 
@@ -93,7 +93,7 @@ test('ModifyTicketInput schema loads correctly', () => {
   testModifyTicketInput.vehicle = 'vehicle1';
   testModifyTicketInput.violation = 'speeding';
   testModifyTicketInput.fine = 100;
-  testModifyTicketInput.ticketStatus = 'active';
+  testModifyTicketInput.ticketStatus = 'unpaid';
   testModifyTicketInput.images = 'image1.jpg';
 
   expect(testModifyTicketInput).toBeDefined();
@@ -101,7 +101,7 @@ test('ModifyTicketInput schema loads correctly', () => {
   expect(testModifyTicketInput.vehicle).toBe('vehicle1');
   expect(testModifyTicketInput.violation).toBe('speeding');
   expect(testModifyTicketInput.fine).toBe(100);
-  expect(testModifyTicketInput.ticketStatus).toBe('active');
+  expect(testModifyTicketInput.ticketStatus).toBe('unpaid');
   expect(testModifyTicketInput.images).toBe('image1.jpg');
 });
 

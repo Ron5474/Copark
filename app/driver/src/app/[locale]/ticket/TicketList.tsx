@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography'
 
 import TicketCard from './TicketCard'
 import { useTicketState } from './TicketContext'
+import { Toolbar } from '@mui/material'
 
 export default function TicketList() {
   const {tickets} = useTicketState()
@@ -47,6 +48,7 @@ export default function TicketList() {
             No tickets found.
           </Typography>
         )}
+        <Toolbar />
       </Stack>
     </Container>
   );

@@ -42,7 +42,7 @@ export default function IndividualTicketButtons() {
         textAlign: 'center'
       }}
     >
-      <Button
+      {currentTicket?.ticketStatus === 'unpaid'  && <Button
         onClick={() => handleViewChange('ChallengeTicket')}
         variant="contained"
         size="large"
@@ -57,7 +57,7 @@ export default function IndividualTicketButtons() {
         }}
       >
         Challenge Ticket
-      </Button>
+      </Button>}
 
       <Button
         onClick={handleTicketPayment}

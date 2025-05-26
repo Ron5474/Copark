@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import {
   Box,
   Typography,
@@ -8,18 +8,26 @@ import {
   Container,
   Stack,
   Divider
-} from '@mui/material';
+} from '@mui/material'
+
+import { challengeTicket } from './actions'
+import { useTicketState } from './TicketContext'
+
 
 export default function ChallengeTicket() {
-  const [reason, setReason] = useState<string>('');
+  const [reason, setReason] = useState<string>('')
+  const {currentTicket, setCurrentView} = useTicketState()
 
-  const handleSubmit = () => {
-    console.log('Challenge submitted:', { reason });
-  };
+  const handleSubmit = async () => {
+    const challengeRes = await challengeTicket(currentTicket?.id as string, reason)
+    if (challengeRes) {
+      setCurrentView('successChallenge')
+    }
+  }
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Paper 
+      <Paper
         elevation={3} 
         sx={{ 
           p: 4, 
@@ -94,9 +102,27 @@ export default function ChallengeTicket() {
             >
               Submit Challenge
             </Button>
+
+            <Button
+              variant="contained"
+              size="large"
+              fullWidth
+              color="secondary"
+              onClick={() => {setCurrentView('IndividualTicket')}}
+              sx={{
+                mt: 2,
+                py: 1.5,
+                fontSize: '1.1rem',
+                fontWeight: 'bold',
+                borderRadius: 2,
+                textTransform: 'none'
+              }}
+            >
+              Go Back To Ticket
+            </Button>
           </Box>
         </Stack>
       </Paper>
     </Container>
-  );
+  )
 }

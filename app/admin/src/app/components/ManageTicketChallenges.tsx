@@ -10,7 +10,7 @@ import {
   CircularProgress
 } from '@mui/material'
 
-import { getChallengedTickets } from '../../ticket/actions'
+import { getChallengedTickets, acceptTicketChallenge } from '../../ticket/actions'
 import { ChallengedTicket } from '@/types';
 
 const getShortId = (jwt: string) => jwt.slice(-8).toUpperCase();
@@ -201,8 +201,15 @@ export default function ManageTicketChallenges() {
                       bgcolor: theme.palette.primary.dark
                     }
                   }}
-                  onClick={() => {
-                    console.log('Accepting challenge for ticket:', ticket.id)
+                  onClick={async () => {
+                    try {
+                      await acceptTicketChallenge(ticket.id);
+                      // Refresh the list of challenged tickets
+                      const tickets = await getChallengedTickets();
+                      setChallengedTickets(tickets);
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : 'Failed to accept challenge');
+                    }
                   }}
                 >
                   Accept Challenge

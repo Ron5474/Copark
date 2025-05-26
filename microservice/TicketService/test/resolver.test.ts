@@ -1003,7 +1003,6 @@ test('Admin can reject a ticket challenge', async () => {
 });
 
 test('Driver can mark a ticket as paid', async () => {
-  // First, create a ticket as enforcement
   const enforcementToken = await loginAs("enforcement");
   const createResponse = await supertest(server)
     .post('/graphql')
@@ -1024,7 +1023,6 @@ test('Driver can mark a ticket as paid', async () => {
   const ticket = createResponse.body.data.createNewTicket;
   expect(ticket).toBeDefined();
 
-    // Mark the ticket as paid as the driver
   const markPaidMutation = `
     mutation MarkTicketAsPaid($input: PaidTicketInput!) {
       markTicketAsPaid(input: $input) {
@@ -1050,4 +1048,77 @@ test('Driver can mark a ticket as paid', async () => {
   expect(paidTicket).toBeDefined();
   expect(paidTicket.id).toBe(ticket.id);
   expect(paidTicket.ticketStatus).toBe('paid');
+});
+
+test('Admin can get unpaid tickets grouped by day', async () => {
+  const adminToken = await loginAsAdmin();
+
+  // Create two unpaid tickets for today
+  const enforcementToken = await loginAs("enforcement");
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "UNPAID1",
+          reason: "No Permit",
+          note: "No permit displayed",
+          images: "unpaid1.jpg"
+        }
+      }
+    });
+
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "UNPAID2",
+          reason: "Expired Permit",
+          note: "Permit expired",
+          images: "unpaid2.jpg"
+        }
+      }
+    });
+
+  const getUnpaidTicketsQuery = `
+    mutation {
+      getUnpaidTickets {
+        date
+        tickets {
+          vehicle
+          violation
+          fine
+          note
+        }
+      }
+    }
+  `;
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + adminToken)
+    .send({ query: getUnpaidTicketsQuery });
+
+  expect(response.status).toBe(200);
+  expect(response.body.errors).toBeUndefined();
+  const result = response.body.data.getUnpaidTickets;
+  expect(Array.isArray(result)).toBe(true);
+  expect(result.length).toBeGreaterThan(0);
+
+  const today = new Date().toISOString().split('T')[0];
+  const todayEntry = result.find((entry: any) => entry.date === today);
+  expect(todayEntry).toBeDefined();
+  expect(Array.isArray(todayEntry.tickets)).toBe(true);
+  expect(todayEntry.tickets.length).toBeGreaterThanOrEqual(2);
+  todayEntry.tickets.forEach((ticket: any) => {
+    expect(ticket).toHaveProperty('vehicle');
+    expect(ticket).toHaveProperty('violation');
+    expect(ticket).toHaveProperty('fine');
+    expect(ticket).toHaveProperty('note');
+  });
 });

@@ -88,6 +88,32 @@ vi.mock('../../src/ticket/actions', () => ({
         { id: '3', created_at: '2024-05-21T09:00:00Z' }
       ]
     }
+  ]),
+  getChallengedTickets: vi.fn().mockResolvedValue([
+    {
+      id: '1',
+      vehicle: 'ABC-123',
+      enforcer: 'enforcer-1',
+      issuedDate: '2024-05-20T10:00:00Z',
+      violation: 'No Valid Permit',
+      fine: 75.00,
+      ticketStatus: 'challenged',
+      images: 'image1.jpg',
+      note: 'Parked in reserved spot',
+      challengeReason: 'I had a valid permit'
+    },
+    {
+      id: '2',
+      vehicle: 'XYZ-789',
+      enforcer: 'enforcer-2', 
+      issuedDate: '2024-05-21T11:00:00Z',
+      violation: 'Expired Permit',
+      fine: 50.00,
+      ticketStatus: 'challenged',
+      images: 'image2.jpg',
+      note: 'Vehicle in no parking zone',
+      challengeReason: 'My permit was valid but not visible'
+    }
   ])
 }));
 
@@ -225,5 +251,15 @@ it('navigates to Manage Zones section', async () => {
   fireEvent.click(clickableItem!);
   await waitFor(() => {
     expect(screen.getByText(/Zone Count: \d+/i)).toBeDefined();
+  });
+});
+
+it('navigates to Manage Ticket Challenges section', async () => {
+  render(<Page />);
+  const manageChallengesText = screen.getByText('Manage Ticket Challenges');
+  const clickableItem = manageChallengesText.closest('div');
+  fireEvent.click(clickableItem!);
+  await waitFor(() => {
+    expect(screen.getByText(/Active Challenges:/)).toBeDefined();
   });
 });

@@ -130,6 +130,7 @@ it('Garage Displayed when Garage is clicked', async () => {
 
   render(<Page />)
 
+  await user.click(screen.getByText('Settings'))
   await user.click(screen.getByText('Garage'))
   expect(await screen.findByText('+ Add Vehicle'))
 })
@@ -149,6 +150,7 @@ it('Redirects to Dashboard', async () => {
   vi.mocked(userLoginAttempt).mockResolvedValue('Login/SignUp attempt successful')
   render(<Page />)
 
+  await user.click(screen.getByText('Settings'))
   await user.click(screen.getByText('Garage'))
   await user.click(await screen.getByLabelText('back to dashboard'))
   expect(await screen.queryByLabelText('back to dashboard')).toBeNull()

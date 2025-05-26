@@ -78,10 +78,11 @@ export class TicketResolver {
       }
     })
 
-    const res = response.status === 200 ? await response.json() : null;
-    if (!res) {
-      throw new Error('User not found');
-    }
+    // const res = response.status === 200 ? await response.json() : null;
+    const res = await response.json()
+    // if (!res) {
+    //   throw new Error('User not found');
+    // }
     return {
       id: res.id,
       name: res.name,

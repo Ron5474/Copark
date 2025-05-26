@@ -4,7 +4,6 @@ import { SignJWT } from 'jose'
 import { TicketService } from "./service";
 import { 
   Ticket,
-  NewTicket,
   ModifyTicketInput,
   TicketInput,
   hasTicket,
@@ -207,12 +206,6 @@ export class TicketResolver {
     const vehicleIDs: Vehicle[] = await this.getVehicleById(userEncrypted)
 
     return await this.ticketService.getTicketsForVehicleID(vehicleIDs)
-  }
-
-  @Mutation(() => Ticket)
-  @Authorized(["enforcement", "admin"])
-  async createTicket(@Arg("newTicket", () => NewTicket) newTicket: NewTicket): Promise<Ticket> {
-    return this.ticketService.createTicket(newTicket);
   }
 
   @Mutation(() => Ticket, { nullable: true })

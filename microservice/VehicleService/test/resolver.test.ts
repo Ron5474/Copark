@@ -65,23 +65,18 @@ const adminUser = {
   password: 'password1',
 }
 
-async function loginAs(who: string): Promise<string | undefined> {
+async function loginAs(who: string, defaultVehicle=true): Promise<string | undefined> {
   if (who === "driver") {
     const token = await  new SignJWT(driver)
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('30m')
       .sign(encodedKey)
-    // console.log("Driver token:", token)
 
     // Sign up
     await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/driver/signup')
       .send({ authToken: token })
-
-    // console.log('Signup Status:', signupRes.status)
-    // console.log('Signup Headers:', signupRes.headers)
-    // console.log('Signup Body:', signupRes.body)
 
     // Add Vehicle
     const addVehicle = await supertest(server)
@@ -92,17 +87,26 @@ async function loginAs(who: string): Promise<string | undefined> {
         variables: derikVehicleInput
       })
 
-    console.log('Add Vehicle Headers:', addVehicle.headers)
-    console.log('Add Vehicle Body:', addVehicle.body)
+    const id = addVehicle.body.data.registerVehicle.id
+    const setDefaultVehicleInput = {
+      input: {
+        id: id
+      }
+    }
+    if (defaultVehicle) {
+      await supertest(server)
+        .post('/graphql')
+        .set('Authorization', 'Bearer ' + token)
+        .send({ 
+          query: SetDefaultVehicle,
+          variables: setDefaultVehicleInput
+        })
+    }
     
     const response = await supertest(AUTH_SERVICE_URL)
       .put('/api/v0/auth/driver/onboarding')
       .set('Authorization', `Bearer ${token}`)
       .send({newState: 'complete'})
-
-    // console.log('Status:', response.status)
-    // console.log('Headers:', response.headers)
-    // console.log('Body:', response.body)
 
     const validStatuses = [200, 201, 204];
     if (!validStatuses.includes(response.status)) {
@@ -121,22 +125,15 @@ async function loginAs(who: string): Promise<string | undefined> {
     if (response.status !== 200) {
       throw new Error(`Enforcement login failed with status ${response.status}`)
     }
-
     return response.body.id
-
   } else {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
       .send(adminUser)
 
-    // console.log('Status:', response.status)
-    // console.log('Headers:', response.headers)
-    // console.log('Body:', response.body)
-
     if (response.status !== 200) {
       throw new Error(`Login failed with status ${response.status}`)
     }
-
     return response.body?.id
   }
 }
@@ -161,6 +158,23 @@ mutation RegisterVehicle($input: RegisterVehicleInput!) {
     nickname
   }
 }`
+
+const SetDefaultVehicle = `
+mutation SetDefaultVehicle($input: setDefaultVehicleInput!) {
+  setDefaultVehicle(input: $input) {
+    id
+  }
+}`
+
+const getDefaultVehiclequery = `
+  query {
+    getDefaultVehicle {
+      id
+      plate
+    }
+  }
+`
+
 
 const updateVehicleQuery = `
 mutation UpdateVehicle($input: UpdateVehicleInput!) {
@@ -359,6 +373,17 @@ test('Non-Driver cannot get a list of their vehicles', async () => {
   expect(response.body.errors.length).toBeGreaterThan(0)
 })
 
+test('Driver can get a Default Vehicle', async () => {
+  const token = await loginAs("driver")
+    const response = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ query: getDefaultVehiclequery })
+      .expect(200)
+
+    expect(response.body.data.getDefaultVehicle).toBeDefined()
+})
+
 test('Driver can get a list of their vehicles', async () => {
   const token = await loginAs("driver")
     const response = await supertest(server)
@@ -366,7 +391,6 @@ test('Driver can get a list of their vehicles', async () => {
       .set('Authorization', 'Bearer ' + token)
       .send({ query: getVehiclequery })
       .expect(200)
-    console.log(response.body)
 
     expect(response.body.data.myVehicles.length).toBe(1)
   })

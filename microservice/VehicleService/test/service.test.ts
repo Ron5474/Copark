@@ -99,6 +99,15 @@ const update_vehicle1 = {
   "state": "Texas"
 }
 
+test('RegisterVehicle with same plate twice - Throws error', async () => {
+  // // eslint-disable-next-line @typescript-eslint/no-empty-function
+  // vi.spyOn(console, 'error').mockImplementation(() => {})
+  const vehicleService = new VehicleService();
+  await vehicleService.registerVehicle(mock_vehicle1, mock_driver1_ID)
+  await expect(vehicleService.registerVehicle(mock_vehicle1, mock_driver1_ID))
+  .rejects.toThrow('This license plate is already registered')
+})
+
 test('getMyVehicles - Returns Correct Number (0)', async () => {
 
   const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)

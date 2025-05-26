@@ -56,18 +56,41 @@ afterAll(() => {
   authServer.close()
 })
 
-async function generateToken(): Promise<string> {
- return new SignJWT(driver)
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('30m')
-      .sign(encodedKey)
+const invalidDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyMGVjMDYxLTI5NTctNGMzYi1iMTkzLWM4YjQwMTM4ZThmMSIsImlhdCI6MTc0NzA2NzM2NSwiZXhwIjoxOTA0ODU1MzY1fQ.pPIDRd0PtW97OkgD03LqeS9LI9TCRq7CwXpoDdM7K3k"
+
+async function signupAsDriver(): Promise<string> {
+  const token = await  new SignJWT(driver)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('30m')
+    .sign(encodedKey)
+
+  // Sign up
+  await supertest(AUTH_SERVICE_URL)
+    .post('/api/v0/auth/driver/signup')
+    .send({ authToken: token })
+
+  const response = await supertest(AUTH_SERVICE_URL)
+    .put('/api/v0/auth/driver/onboarding')
+    .set('Authorization', `Bearer ${token}`)
+    .send({newState: 'complete'})
+
+  // console.log('Status:', response.status)
+  // console.log('Headers:', response.headers)
+  // console.log('Body:', response.body)
+
+  const validStatuses = [200, 201, 204];
+  if (!validStatuses.includes(response.status)) {
+    throw new Error(`Login failed with status ${response.status}`)
+  }
+
+  return token
 }
 
 async function login(): Promise<string | undefined> {
-    const token = await generateToken()
+    const token = await signupAsDriver()
     const response = await supertest(AUTH_SERVICE_URL)
-      .post('/api/v0/auth/driver/login')
+      .get('/api/v0/auth/driver/login')
       .set('Authorization', `Bearer ${token}`)
 
     // console.log('Status:', response.status)
@@ -111,10 +134,9 @@ test('Post /api/v0/payment/complete - should return 201', async () => {
 })
 
 test('Post /api/v0/payment/complete - by non-existant driver should return 401', async () => {
-  const token = await generateToken()
   const response = await supertest(app)
     .post('/api/v0/payment/complete')
-    .set('Authorization', `Bearer ${token}`)
+    .set('Authorization', `Bearer ${invalidDriverJWT}`)
     .send({
       id: 'pi_123',
       status: 'succeeded',

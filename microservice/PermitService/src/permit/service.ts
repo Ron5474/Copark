@@ -76,25 +76,24 @@ export class PermitService {
     }
   }
 
-  public async getValidPermit(vid: string): Promise<CheckedPermit> {
+  public async getValidPermit(vid: string): Promise<CheckedPermit[]> {
     const result = await pool.query(`
       SELECT t.data
       FROM permit p
       JOIN type t ON t.id = p.type
       WHERE p.vehicle = $1
         AND now() >= (p.data->>'activeDate')::timestamptz
-        AND now() <= (p.data->>'expireDate')::timestamptz`,
-      [vid]
-    )
-
-    if (result.rowCount === 0) return { type: 'N/A', area: 'N/A'}
-
-    const row = result.rows[0]
-    return {
-      type: row.data.name,
-      area: row.data.area,
-    }
+        AND now() <= (p.data->>'expireDate')::timestamptz
+    `, [vid])
+  
+    return result.rows.map(row => {
+      return {
+        type: row.data.name,
+        area: row.data.area,
+      }
+    })
   }
+  
 
   public async isValidPermitPolice(vid: string): Promise<IsValidPolice> {
 

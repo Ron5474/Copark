@@ -54,10 +54,10 @@ test('Purchasing unknown zone', async () => {
 
 test('Vehicle has valid permit', async () => {
   await permitService.purchaseMyZonePermit(permitDetails)
-  const { isValid, area, type } = await permitService.getValidPermit(permitDetails.vehicle)
-  expect(isValid).toBe(true)
-  expect(area).toBe('27')
-  expect(type).toBe('zone')
+  const permits = await permitService.getValidPermit(permitDetails.vehicle)
+  expect(permits.length).toBe(1)
+  expect(permits[0].area).toBe('27')
+  expect(permits[0].type).toBe('zone')
 })
 
 test('Vehicle has expired permit', async () => {
@@ -70,16 +70,16 @@ test('Vehicle has expired permit', async () => {
   // Simulate time passing (e.g. 31 minutes later)
   vi.setSystemTime(new Date(now.getTime() + 31 * 60 * 1000))
 
-  const { isValid } = await permitService.getValidPermit(permitDetails.vehicle)
-  expect(isValid).toBe(false)
+  const permits = await permitService.getValidPermit(permitDetails.vehicle)
+  expect(permits.length).toBe(0)
 
   vi.useRealTimers()
 })
 
 test('Vehicle does not have valid permit', async () => {
   await permitService.purchaseMyZonePermit(permitDetails)
-  const { isValid } = await permitService.getValidPermit( '11111111-1234-1234-1234-567890abcdef' )
-  expect(isValid).toBe(false)
+  const permits = await permitService.getValidPermit( '11111111-1234-1234-1234-567890abcdef' )
+  expect(permits.length).toBe(0)
 })
 
 test('Vehicle has valid permit (Police)', async () => {

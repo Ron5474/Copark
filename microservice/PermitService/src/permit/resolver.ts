@@ -180,11 +180,11 @@ export class PermitResolver {
   }
 
   @Authorized('enforcement')
-  @Query(() => CheckedPermit)
+  @Query(() => [CheckedPermit])
   async checkPermit(
     @Arg("plate", () => String) plate: string,
     @Ctx() request: Request
-  ): Promise<CheckedPermit> {
+  ): Promise<CheckedPermit[]> {
 
     const vehicleQuery = `
       query FindVehicleByPlate($plate: String!) {
@@ -210,7 +210,7 @@ export class PermitResolver {
     const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 
     if (!vehicleId) {
-      return {type: 'Vehicle Not Found', area: 'N/A'}
+      return []
     }
 
     return await service.getValidPermit(vehicleId)

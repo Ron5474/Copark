@@ -3,7 +3,13 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import ViewStatistics from '../../src/app/components/ViewStatistics';
-import { getTicketsByEnforcer, getChallengedTickets, acceptTicketChallenge, rejectTicketChallenge } from '../../src/ticket/actions';
+import { 
+  getTicketsByEnforcer, 
+  getChallengedTickets, 
+  acceptTicketChallenge, 
+  rejectTicketChallenge,
+  getAcceptedTickets 
+} from '../../src/ticket/actions';
 
 const server = setupServer();
 
@@ -246,5 +252,58 @@ it('handles error when rejecting challenge', async () => {
   await expect(rejectTicketChallenge('1')).rejects.toThrow(
     'Failed to reject challenge'
   );
+});
+
+it('successfully fetches accepted tickets', async () => {
+  const mockAcceptedTickets = [
+    {
+      id: '1',
+      vehicle: 'ABC123',
+      enforcer: 'enforcer-1',
+      issuedDate: '2024-01-01T10:00:00Z',
+      violation: 'Invalid Parking',
+      fine: 50.00,
+      ticketStatus: 'accepted',
+      images: 'image1.jpg',
+      note: 'Parked in reserved spot'
+    }
+  ];
+
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.json({
+        data: {
+          getAcceptedTickets: mockAcceptedTickets
+        }
+      });
+    })
+  );
+
+  const result = await getAcceptedTickets();
+  expect(result).toEqual(mockAcceptedTickets);
+});
+
+it('handles error when fetching accepted tickets', async () => {
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.json({
+        errors: [{ message: 'Failed to fetch accepted tickets' }]
+      });
+    })
+  );
+
+  await expect(getAcceptedTickets()).rejects.toThrow(
+    'Failed to fetch accepted tickets'
+  );
+});
+
+it('handles network error when fetching accepted tickets', async () => {
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.error();
+    })
+  );
+
+  await expect(getAcceptedTickets()).rejects.toThrow();
 });
 

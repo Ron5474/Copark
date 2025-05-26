@@ -13,6 +13,7 @@ import {
   TicketsByDay,
   ChallengeTicket,
   PaidTicketInput,
+  UnpaidTicketsReturn
 } from "./schema";
 
 import { SessionUser } from "src";
@@ -345,5 +346,12 @@ export class TicketResolver {
   @Authorized(['admin', 'enforcement'])
   async getAcceptedTickets(): Promise<Ticket[]> {
     return await this.ticketService.getAcceptedTickets();
+  }
+
+  @Mutation(() => UnpaidTicketsReturn)
+  @Authorized(['admin'])
+  async getUnpaidTickets(
+  ): Promise<UnpaidTicketsReturn | null> {
+    return await this.ticketService.getUnpaidTicketsPerDay();
   }
 }

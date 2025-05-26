@@ -1,3 +1,4 @@
+import { Vehicle } from './../../../VehicleService/src/vehicle/schema';
 import { Field, ObjectType, InputType, ID} from "type-graphql";
 
 @ObjectType()
@@ -144,21 +145,20 @@ export class UnpaidTicketsReturn {
   @Field(() => String)
   date!: string;
 
-  @Field(() => [Ticket])
-  tickets!: Ticket[];
+  @Field(() => [UnpaidTickets])
+  tickets!: UnpaidTickets[];
 }
-
 
 @ObjectType()
 export class UnpaidTickets {
   @Field(() => String)
-  date!: string;
+  vehicle!: string;
 
   @Field(() => String)
   violation!: string;
 
-  @Field(() => String)
-  fine!: string;
+  @Field(() => Number)
+  fine!: Number;
 
   @Field(() => String)
   note!: string;

@@ -1,4 +1,4 @@
-import { Ticket, NewTicket, ModifyTicketInput, TicketInput, TicketsByDay, ChallengeTicket } from "./schema";
+import { Ticket, NewTicket, ModifyTicketInput, TicketInput, TicketsByDay, ChallengeTicket, UnpaidTickets, UnpaidTicketsReturn} from "./schema";
 import { pool } from "./db";
 import { SignJWT, jwtVerify } from 'jose'
 import { Vehicle } from "../types/express";
@@ -615,7 +615,7 @@ export class TicketService {
     return tickets;
   }
 
-  public async getUnpaidTicketsPerDay(): Promise<TicketsByDay[]> {
+  public async getUnpaidTicketsPerDay(): Promise<UnpaidTicketsReturn[]> {
     const query = `
       SELECT 
         vehicle,
@@ -630,19 +630,14 @@ export class TicketService {
 
     const result = await pool.query(query);
 
-    const ticketsMap = new Map<string, Ticket[]>();
+    const ticketsMap = new Map<string, UnpaidTickets[]>();
 
     for (const row of result.rows) {
       const date = new Date(row.issueddate).toISOString().split('T')[0]; // YYYY-MM-DD
-      const ticket: Ticket = {
-        id: await this.encrypt(row.id),
+      const ticket: UnpaidTickets = {
         vehicle: row.vehicle,
-        enforcer: await this.encrypt(row.enforcer),
-        issuedDate: new Date(row.issueddate),
         violation: row.violation,
         fine: parseFloat(row.fine),
-        ticketStatus: row.ticketstatus,
-        images: row.images,
         note: row.note
       };
       if (!ticketsMap.has(date)) {
@@ -654,7 +649,7 @@ export class TicketService {
       }
     }
 
-    const resultArr: TicketsByDay[] = [];
+    const resultArr: UnpaidTicketsReturn[] = [];
     for (const [date, tickets] of ticketsMap.entries()) {
       resultArr.push({
         date,

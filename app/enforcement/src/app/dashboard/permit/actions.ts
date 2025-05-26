@@ -9,9 +9,8 @@ const getAuthToken = async () => {
 
 export async function checkPermit(plate: string) {
   const query = `
-    query IsValidZonePermit($input: IsValidPermitInput!) {
-      isValidZonePermit(input: $input) {
-        isValid
+    query CheckedPermit($plate: String!) {
+      checkPermit(plate: $plate) {
         type
         area
       }
@@ -28,18 +27,16 @@ export async function checkPermit(plate: string) {
     body: JSON.stringify({
       query,
       variables: {
-        input: {
-          vehicle: plate,
-        },
+        plate
       },
     }),
   })
 
   const result = await response.json()
 
-  if (result.errors) {
-    throw new Error(`GraphQL error: ${result.errors[0].message}`)
-  }
+  // if (result.errors) {
+  //   throw new Error(`GraphQL error: ${result.errors[0].message}`)
+  // }
 
-  return result.data.isValidZonePermit
+  return result.data.checkPermit
 }

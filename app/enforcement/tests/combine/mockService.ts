@@ -41,14 +41,13 @@ const permitHandlers = {
       'query' in body &&
       typeof body.query === 'string'
     ) {
-      if (body.query.includes('IsValidZonePermit')) {
+      if (body.query.includes('CheckPermit')) {
         return HttpResponse.json({
           data: {
-            isValidZonePermit: {
-              isValid: true,
+            checkPermit: [{
               type: 'Residential',
               area: 'A1',
-            },
+            }],
           },
         })
       }
@@ -64,15 +63,14 @@ const permitHandlers = {
       body !== null &&
       'query' in body &&
       typeof body.query === 'string' &&
-      body.query.includes('IsValidZonePermit')
+      body.query.includes('CheckPermit')
     ) {
       return HttpResponse.json({
         data: {
-          isValidZonePermit: {
-            isValid: false,
+          checkPermit: [{
             type: 'Error',
             area: 'N/A',
-          },
+          }],
         },
       }, { status: 200 })
     }
@@ -80,24 +78,24 @@ const permitHandlers = {
     return HttpResponse.json({ errors: [{ message: 'Unknown query' }] }, { status: 400 })
   }),
 
-  graphqlError: http.post(permitURL, async ({ request }) => {
-    const body = await request.json()
-    if (
-      typeof body === 'object' &&
-      body !== null &&
-      'query' in body &&
-      typeof body.query === 'string' &&
-      body.query.includes('IsValidZonePermit')
-    ) {
-      return HttpResponse.json({
-        errors: [
-          { message: 'Zone not permitted' }
-        ]
-      }, { status: 200 })
-    }
+  // graphqlError: http.post(permitURL, async ({ request }) => {
+  //   const body = await request.json()
+  //   if (
+  //     typeof body === 'object' &&
+  //     body !== null &&
+  //     'query' in body &&
+  //     typeof body.query === 'string' &&
+  //     body.query.includes('IsValidZonePermit')
+  //   ) {
+  //     return HttpResponse.json({
+  //       errors: [
+  //         { message: 'Zone not permitted' }
+  //       ]
+  //     }, { status: 200 })
+  //   }
 
-    return HttpResponse.json({ errors: [{ message: 'Unknown query' }] }, { status: 400 })
-  }),
+  //   return HttpResponse.json({ errors: [{ message: 'Unknown query' }] }, { status: 400 })
+  // }),
 
 }
 

@@ -310,13 +310,13 @@ export class PermitService {
         if (!lotMap[permitType]) {
           lotMap[permitType] = {
             id: permitType,
-            title: permitType.charAt(0).toUpperCase() + permitType.slice(1),
+            title: permitType,
             lots: []
           };
         }
 
         lotMap[permitType].lots.push({
-          name: `Lot ${area}`,
+          name: `lot-${area.toLowerCase()}`,
           price: `$${data[permitType]}`,
         });
       }

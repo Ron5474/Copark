@@ -38,5 +38,6 @@ export async function checkPermit(plate: string) {
   //   throw new Error(`GraphQL error: ${result.errors[0].message}`)
   // }
 
+  console.log("CHECKED PERMITS: ", result)
   return result.data.checkPermit
 }

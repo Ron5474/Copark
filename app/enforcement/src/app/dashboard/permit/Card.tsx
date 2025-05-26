@@ -40,7 +40,7 @@ export default function PermitCard() {
     setIsIssuingViolation(true)
   }
 
-  const permitExists = permitResult && permitResult.area !== 'N/A'
+  const permitExists = permitResult && permitResult.length
 
   return (
     <Box
@@ -117,8 +117,8 @@ export default function PermitCard() {
             </Typography>
             <Chip
               label={
-                permitResult
-                  ? `${permitResult.type} - ${permitResult.area}`
+                permitResult && permitResult[0]
+                  ? `${permitResult[0].type} - ${permitResult[0].area}`
                   : 'N/A'
               }
               color="info"

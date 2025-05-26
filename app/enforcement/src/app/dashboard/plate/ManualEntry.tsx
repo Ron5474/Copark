@@ -46,7 +46,7 @@ export default function ManualEntryCard() {
       setIsValidated(true)
     } catch (err) {
       console.error('Permit check failed:', err)
-      setPermitResult({ isValid: false, type: 'Error', area: 'N/A' })
+      setPermitResult(null)
       setIsValidated(true)
     }
   }

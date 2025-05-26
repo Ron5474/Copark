@@ -368,6 +368,45 @@ test('getAcceptedTickets should return tickets with accepted status', async () =
   });
 });
 
+test('getUnpaidTicketsPerDay should return unpaid tickets grouped by day', async () => {
+  // Create two unpaid tickets for today
+  const today = new Date().toISOString().split('T')[0];
+
+  const newTicket1: NewTicket = {
+    vehicle: '00000000-0000-0000-0000-000000000000',
+    enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+    fine: 50,
+    violation: 'parking',
+    images: 'image1.jpg',
+  };
+  const newTicket2: NewTicket = {
+    vehicle: '00000000-0000-0000-0000-000000000000',
+    enforcer: await encrypt('00000000-0000-0000-0000-000000000000'),
+    fine: 75,
+    violation: 'speeding',
+    images: 'image2.jpg',
+  };
+
+  await ticketService.createTicket(newTicket1);
+  await ticketService.createTicket(newTicket2);
+
+  const unpaidTicketsByDay = await ticketService.getUnpaidTicketsPerDay();
+
+  expect(unpaidTicketsByDay).toBeDefined();
+  // Find today's entry
+  const todayEntry = unpaidTicketsByDay.find(entry => entry.date === today);
+  expect(todayEntry).toBeDefined();
+  expect(Array.isArray(todayEntry!.tickets)).toBe(true);
+  // Should have at least the two tickets we just created
+  expect(todayEntry!.tickets.length).toBeGreaterThanOrEqual(2);
+  todayEntry!.tickets.forEach(ticket => {
+    expect(ticket).toHaveProperty('vehicle');
+    expect(ticket).toHaveProperty('violation');
+    expect(ticket).toHaveProperty('fine');
+    expect(ticket).toHaveProperty('note');
+  });
+});
+
 // test('getTicketsForUserJWT should return tickets for the provided userJWT', async () => {
 //     const userID = '0f99f921-594e-4387-9d05-e6e80d8aa54a'
 

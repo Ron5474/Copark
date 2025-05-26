@@ -160,6 +160,6 @@ export class UnpaidTickets {
   @Field(() => Number)
   fine!: Number;
 
-  @Field(() => String)
-  note!: string;
+  @Field(() => String, { nullable: true })
+  note?: string;
 }

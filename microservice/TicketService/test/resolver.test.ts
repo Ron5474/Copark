@@ -99,6 +99,102 @@ async function loginAsAdmin(): Promise<string> {
   return response.body.id
 }
 
+async function loginAs(who: string): Promise<string | undefined> {
+  if (who === "driver") {
+    const token = await  new SignJWT(driver)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(encodedKey)
+    // console.log("Driver token:", token)
+
+    // Sign up
+    await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/driver/signup')
+      .send({ authToken: token })
+
+    // console.log('Signup Status:', signupRes.status)
+    // console.log('Signup Headers:', signupRes.headers)
+    // console.log('Signup Body:', signupRes.body)
+
+    const regVehicleQuery = `
+    mutation RegisterVehicle($input: RegisterVehicleInput!) {
+      registerVehicle(input: $input) {
+        id
+        plate
+        country
+        state
+        nickname
+      }
+    }`
+
+    const derikVehicleInput = {
+      input: {
+        plate: "DERIK123",
+        country: "US",
+        state: "California",
+        nickname: "Derik's Vehicle"
+      }
+    }
+
+    // Add Vehicle
+    const addVehicle = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ 
+        query: regVehicleQuery,
+        variables: derikVehicleInput
+      })
+
+    // console.log('Add Vehicle Headers:', addVehicle.headers)
+    // console.log('Add Vehicle Body:', addVehicle.body)
+    
+    const response = await supertest(AUTH_SERVICE_URL)
+      .put('/api/v0/auth/driver/onboarding')
+      .set('Authorization', `Bearer ${token}`)
+      .send({newState: 'complete'})
+
+    // console.log('Status:', response.status)
+    // console.log('Headers:', response.headers)
+    // console.log('Body:', response.body)
+
+    const validStatuses = [200, 201, 204];
+    if (!validStatuses.includes(response.status)) {
+      throw new Error(`Login failed with status ${response.status}`)
+    }
+
+    return token
+  } else if (who === "enforcement") {
+    const response = await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/login')
+      .send({
+        email: 'enforcer1@outlook.com',
+        password: 'password1',
+      })
+
+    if (response.status !== 200) {
+      throw new Error(`Enforcement login failed with status ${response.status}`)
+    }
+
+    return response.body.id
+
+  } else {
+    const response = await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/login')
+      .send(adminUser)
+
+    // console.log('Status:', response.status)
+    // console.log('Headers:', response.headers)
+    // console.log('Body:', response.body)
+
+    if (response.status !== 200) {
+      throw new Error(`Login failed with status ${response.status}`)
+    }
+
+    return response.body?.id
+  }
+}
+
 // async function loginAsDriver(): Promise<string> {
 //   const response = await supertest(AUTH_SERVICE_URL)
 //     .post('/api/v0/auth/login')
@@ -111,8 +207,8 @@ async function loginAsAdmin(): Promise<string> {
 //   return response.body.id
 // }
 
-test('Admin can create a ticket with images', async () => {
-  const token = await loginAsAdmin()
+test('Enforcer can create a ticket with images', async () => {
+  const token = await loginAs('enforcement')
 
   const vehicleid = '00000000-0000-0000-0000-000000000000'
   const enforcerid = await encrypt('00000000-0000-0000-0000-000000000000')
@@ -361,25 +457,6 @@ test('Admin can delete a ticket', async () => {
 //   expect(response.body.errors).toBeUndefined()
 //   expect(response.body.data.getMyTickets.length).toBe(3)
 // })
-
-async function loginAs(who: string): Promise<string> {
-  if (who === "enforcement") {
-    const response = await supertest(AUTH_SERVICE_URL)
-      .post('/api/v0/auth/login')
-      .send({
-        email: 'enforcer1@outlook.com',
-        password: 'password1',
-      })
-
-    if (response.status !== 200) {
-      throw new Error(`Enforcement login failed with status ${response.status}`)
-    }
-
-    return response.body.id
-  }
-
-  throw new Error("Unsupported user role")
-}
 
 const createNewTicketMutation = `
 mutation CreateNewTicket($input: NewTicketInput!) {
@@ -1003,7 +1080,6 @@ test('Admin can reject a ticket challenge', async () => {
 });
 
 test('Driver can mark a ticket as paid', async () => {
-  // First, create a ticket as enforcement
   const enforcementToken = await loginAs("enforcement");
   const createResponse = await supertest(server)
     .post('/graphql')
@@ -1024,7 +1100,6 @@ test('Driver can mark a ticket as paid', async () => {
   const ticket = createResponse.body.data.createNewTicket;
   expect(ticket).toBeDefined();
 
-    // Mark the ticket as paid as the driver
   const markPaidMutation = `
     mutation MarkTicketAsPaid($input: PaidTicketInput!) {
       markTicketAsPaid(input: $input) {
@@ -1050,4 +1125,77 @@ test('Driver can mark a ticket as paid', async () => {
   expect(paidTicket).toBeDefined();
   expect(paidTicket.id).toBe(ticket.id);
   expect(paidTicket.ticketStatus).toBe('paid');
+});
+
+test('Admin can get unpaid tickets grouped by day', async () => {
+  const adminToken = await loginAsAdmin();
+
+  // Create two unpaid tickets for today
+  const enforcementToken = await loginAs("enforcement");
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "UNPAID1",
+          reason: "No Permit",
+          note: "No permit displayed",
+          images: "unpaid1.jpg"
+        }
+      }
+    });
+
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "UNPAID2",
+          reason: "Expired Permit",
+          note: "Permit expired",
+          images: "unpaid2.jpg"
+        }
+      }
+    });
+
+  const getUnpaidTicketsQuery = `
+    mutation {
+      getUnpaidTickets {
+        date
+        tickets {
+          vehicle
+          violation
+          fine
+          note
+        }
+      }
+    }
+  `;
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + adminToken)
+    .send({ query: getUnpaidTicketsQuery });
+
+  expect(response.status).toBe(200);
+  expect(response.body.errors).toBeUndefined();
+  const result = response.body.data.getUnpaidTickets;
+  expect(Array.isArray(result)).toBe(true);
+  expect(result.length).toBeGreaterThan(0);
+
+  const today = new Date().toISOString().split('T')[0];
+  const todayEntry = result.find((entry: any) => entry.date === today);
+  expect(todayEntry).toBeDefined();
+  expect(Array.isArray(todayEntry.tickets)).toBe(true);
+  expect(todayEntry.tickets.length).toBeGreaterThanOrEqual(2);
+  todayEntry.tickets.forEach((ticket: any) => {
+    expect(ticket).toHaveProperty('vehicle');
+    expect(ticket).toHaveProperty('violation');
+    expect(ticket).toHaveProperty('fine');
+    expect(ticket).toHaveProperty('note');
+  });
 });

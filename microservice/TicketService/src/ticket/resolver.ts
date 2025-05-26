@@ -4,7 +4,6 @@ import { SignJWT } from 'jose'
 import { TicketService } from "./service";
 import { 
   Ticket,
-  NewTicket,
   ModifyTicketInput,
   TicketInput,
   hasTicket,
@@ -209,12 +208,6 @@ export class TicketResolver {
     return await this.ticketService.getTicketsForVehicleID(vehicleIDs)
   }
 
-  @Mutation(() => Ticket)
-  @Authorized(["enforcement", "admin"])
-  async createTicket(@Arg("newTicket", () => NewTicket) newTicket: NewTicket): Promise<Ticket> {
-    return this.ticketService.createTicket(newTicket);
-  }
-
   @Mutation(() => Ticket, { nullable: true })
   @Authorized(["enforcement", "admin"])
   async modifyTicket(@Arg("input", () => ModifyTicketInput) input: ModifyTicketInput): Promise<Ticket | null> {
@@ -353,5 +346,6 @@ export class TicketResolver {
   async getUnpaidTickets(
   ): Promise<UnpaidTicketsReturn[] | null> {
     return await this.ticketService.getUnpaidTicketsPerDay();
+    // need to add a convertion from the vehicle ID to the plate number
   }
 }

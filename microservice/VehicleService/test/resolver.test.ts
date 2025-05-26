@@ -48,7 +48,7 @@ const driver = {
     "email": "derik@copark.space",
     "picture": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWRzMmJldTdzMWtncDBweGtvM21kYnRyeDk1cHpvNnU5MWVycXEybiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/keyufLabLaJKh3xnVy/giphy.gif",
     "sub": "1234567890",
-  }
+}
 
 async function encrypt(userId: string): Promise<string> {
   return new SignJWT({ id: userId })
@@ -72,7 +72,7 @@ async function loginAs(who: string): Promise<string | undefined> {
       .setIssuedAt()
       .setExpirationTime('30m')
       .sign(encodedKey)
-    console.log("Driver token:", token)
+    // console.log("Driver token:", token)
 
     // Sign up
     await supertest(AUTH_SERVICE_URL)

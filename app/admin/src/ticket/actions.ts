@@ -112,3 +112,40 @@ export async function getChallengedTickets() {
 
   return result.data.getChallengedTickets;
 }
+
+export async function acceptTicketChallenge(ticketId: string) {
+  const token = await getAuthToken();
+  const mutation = `
+    mutation AcceptTicketChallenge($ticketID: TicketInput!) {
+      acceptTicketChallenge(ticketID: $ticketID) {
+        id
+        ticketStatus
+        violation
+        fine
+        issuedDate
+      }
+    }
+  `;
+
+  const response = await fetch('http://localhost:4002/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      query: mutation,
+      variables: {
+        ticketID: { id: ticketId }
+      }
+    })
+  });
+
+  const result = await response.json();
+
+  if (result.errors) {
+    throw new Error(result.errors[0].message);
+  }
+
+  return result.data.acceptTicketChallenge;
+}

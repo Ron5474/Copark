@@ -7,6 +7,7 @@ import {
   Typography,
   TextField,
 } from '@mui/material'
+import { useTranslations } from 'next-intl';
 
 import { getZoneDetails } from './actions'
 import ZoneContext from './Context'
@@ -14,6 +15,7 @@ import theme from '../theme'
 
 
 export default function Zone() {
+  const t = useTranslations('zone');
   const { zoneNumber, setZoneNumber, setZoneDetails, next } = useContext(ZoneContext)
   const [zoneExists, setZoneExists] = useState<boolean>(true)
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
@@ -71,14 +73,14 @@ export default function Zone() {
           marginTop: '1vh',
         }}
       >
-        Where are you parking?
+        {t('title')}
       </Typography>
       <Box sx={{marginTop: '1vh'}}>
         <Typography
           variant="body1"
           sx={{margin: 0}}
         >
-          Zone #
+          {t('label')}
         </Typography>
         <TextField
           required
@@ -99,7 +101,7 @@ export default function Zone() {
         {
           !isValidEntry && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Zone number is required
+              {t('errorRequired')}
             </Typography>
           )
 
@@ -107,7 +109,7 @@ export default function Zone() {
 
           !zoneExists && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              Zone does not exist
+              {t('errorInvalid')}
             </Typography>
           )
         }
@@ -124,7 +126,7 @@ export default function Zone() {
           textTransform: 'none',
         }}
       >
-        Confirm Zone
+        {t('confirm')}
       </Button>
       {isFree && <FreeAlert/>}
     </Box>
@@ -139,6 +141,7 @@ import DialogContent from '@mui/material/DialogContent'
 import { DashboardContext } from "../dashboard/context";
 
 function FreeAlert() {
+  const t = useTranslations('zone');
   const { zoneDetails } = useContext(ZoneContext)
   const { setCurrentPage } = useContext(DashboardContext)
   const [open, setOpen] = useState<boolean>(true)
@@ -158,16 +161,7 @@ function FreeAlert() {
       >
         <DialogContent>
           <Typography variant='body1'>
-            { isFreeDay
-            
-              ?
-
-              `This zone is not charging today. Check back tomorrow!` 
-
-              :
-
-              `This zone is currently closed. No payment is currently necessary. Please check our hours.`
-            }
+            {isFreeDay ? t('freeToday') : t('closedNow')}
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -181,7 +175,7 @@ function FreeAlert() {
               textTransform: 'none'
             }}
           >
-            Okay
+            {t('okay')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -52,7 +52,18 @@
     "lot-b": "Lot B",
     "lot-c": "Lot C",
     "lot-r": "Lot R"
+  },
+  "zone": {
+    "title": "Where are you parking?",
+    "label": "Zone #",
+    "confirm": "Confirm Zone",
+    "errorRequired": "Zone number is required",
+    "errorInvalid": "Zone does not exist",
+    "freeToday": "This zone is not charging today. Check back tomorrow!",
+    "closedNow": "This zone is currently closed. No payment is currently necessary. Please check our hours.",
+    "okay": "Okay"
   }
+
 
 
 }

@@ -52,6 +52,16 @@
     "lot-b": "Lote B",
     "lot-c": "Lote C",
     "lot-r": "Lote R"
+  },
+  "zone": {
+    "title": "¿Dónde estás estacionando?",
+    "label": "Zona #",
+    "confirm": "Confirmar zona",
+    "errorRequired": "Se requiere el número de zona",
+    "errorInvalid": "La zona no existe",
+    "freeToday": "Esta zona no cobra hoy. ¡Vuelve mañana!",
+    "closedNow": "Esta zona está cerrada. No es necesario pagar en este momento. Por favor, revise nuestro horario.",
+    "okay": "Entendido"
   }
 
 }

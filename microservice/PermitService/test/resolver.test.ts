@@ -54,6 +54,7 @@ afterAll(async () => {
 
 const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
 
+// TODO update JWT with new secret
 const policeJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFiZTQwNWM2LTc0MDAtNGQyMy05Zjg2LTAwZWFkMTU3MjlmNSIsImlhdCI6MTc0NzI2MzIyMSwiZXhwIjoxOTA1MDUxMjIxfQ.UVVWAjg2-asw8gfqoxljHZSVX4Mn_1FzOV85CagVbUQ"
 
 const adminUser = {
@@ -130,17 +131,16 @@ async function loginAs(who: string): Promise<string | undefined> {
 // }
 
 const checkPermitQuery = `
-query IsValid($input: IsValidPermitInput!) {
-  isValidZonePermit(input: $input) {
-    isValid
+query CheckedPermit($plate: String!) {
+  checkPermit(plate: $plate) {
     type
     area
   }
 }`
 
-const checkPermitInvalidInput = "0000000"
+const checkPermitInvalidInput = { plate: "0000000" }
 
-const checkPermitInput = "JCDE544"
+const checkPermitInput = { plate: "JCDE544" }
 
 const isValidPermitByPoliceQuery = `
 query IsValidPolice($plate: String!) {
@@ -241,8 +241,8 @@ test('Enforcer gets invalid permit', async () => {
       query: checkPermitQuery,
       variables: checkPermitInvalidInput
     })
-
-  expect(permits.body.data.checkPermit.isValid).toBe(false)
+  
+  expect(permits.body.data.checkPermit.length).toBe(0)
 })
 
 test('Enforcer gets valid permit', async () => {
@@ -256,7 +256,7 @@ test('Enforcer gets valid permit', async () => {
       variables: checkPermitInput
     })
 
-  expect(permits.body.data.isValidZonePermit.isValid).toBe(true)
+  expect(permits.body.data.checkPermit.length).toBe(1)
 
 })
 
@@ -269,6 +269,7 @@ test('Police gets invalid permit', async () => {
       variables: isValidPermitByPoliceInput
     })
 
+    console.log(isValid.body)
   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
 })
 

@@ -3,7 +3,7 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import ViewStatistics from '../../src/app/components/ViewStatistics';
-import { getTicketsByEnforcer } from '../../src/ticket/actions';
+import { getTicketsByEnforcer, getChallengedTickets, acceptTicketChallenge, rejectTicketChallenge } from '../../src/ticket/actions';
 
 const server = setupServer();
 
@@ -128,5 +128,123 @@ it('handles network error when fetching tickets by enforcer', async () => {
   );
 
   await expect(getTicketsByEnforcer('enforcer-123')).rejects.toThrow();
+});
+
+it('successfully fetches challenged tickets', async () => {
+  const mockChallengedTickets = [
+    {
+      id: '1',
+      vehicle: 'ABC123',
+      enforcer: 'enforcer-1',
+      issuedDate: '2024-01-01T10:00:00Z',
+      violation: 'Invalid Parking',
+      fine: 50.00,
+      ticketStatus: 'challenged',
+      images: 'image1.jpg',
+      note: 'Parked in reserved spot',
+      challengeReason: 'I had a valid permit'
+    }
+  ];
+
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.json({
+        data: {
+          getChallengedTickets: mockChallengedTickets
+        }
+      });
+    })
+  );
+
+  const result = await getChallengedTickets();
+  expect(result).toEqual(mockChallengedTickets);
+});
+
+it('successfully accepts a ticket challenge', async () => {
+  const mockUpdatedTicket = {
+    id: '1',
+    ticketStatus: 'accepted',
+    violation: 'Invalid Parking',
+    fine: 50.00,
+    issuedDate: '2024-01-01T10:00:00Z'
+  };
+
+  server.use(
+    http.post('http://localhost:4002/graphql', ({ request }) => {
+      return HttpResponse.json({
+        data: {
+          acceptTicketChallenge: mockUpdatedTicket
+        }
+      });
+    })
+  );
+
+  const result = await acceptTicketChallenge('1');
+  expect(result).toEqual(mockUpdatedTicket);
+});
+
+it('successfully rejects a ticket challenge', async () => {
+  const mockUpdatedTicket = {
+    id: '1',
+    ticketStatus: 'rejected',
+    violation: 'Invalid Parking',
+    fine: 50.00,
+    issuedDate: '2024-01-01T10:00:00Z'
+  };
+
+  server.use(
+    http.post('http://localhost:4002/graphql', ({ request }) => {
+      return HttpResponse.json({
+        data: {
+          rejectTicketChallenge: mockUpdatedTicket
+        }
+      });
+    })
+  );
+
+  const result = await rejectTicketChallenge('1');
+  expect(result).toEqual(mockUpdatedTicket);
+});
+
+it('handles error when fetching challenged tickets', async () => {
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.json({
+        errors: [{ message: 'Failed to fetch challenged tickets' }]
+      });
+    })
+  );
+
+  await expect(getChallengedTickets()).rejects.toThrow(
+    'Failed to fetch challenged tickets'
+  );
+});
+
+it('handles error when accepting challenge', async () => {
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.json({
+        errors: [{ message: 'Failed to accept challenge' }]
+      });
+    })
+  );
+
+  await expect(acceptTicketChallenge('1')).rejects.toThrow(
+    'Failed to accept challenge'
+  );
+});
+
+it('handles error when rejecting challenge', async () => {
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.json({
+        errors: [{ message: 'Failed to reject challenge' }]
+      });
+    })
+  );
+
+  await expect(rejectTicketChallenge('1')).rejects.toThrow(
+    'Failed to reject challenge'
+  );
 });
 

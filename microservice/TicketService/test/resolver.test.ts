@@ -1001,3 +1001,28 @@ test('Admin can reject a ticket challenge', async () => {
   expect(rejectedTicket.ticketStatus).toBe("unpaid");
   expect(rejectedTicket.id).toBe(ticket.id);
 });
+
+test('Driver can mark a ticket as paid', async () => {
+  // First, create a ticket as enforcement
+  const enforcementToken = await loginAs("enforcement");
+  const createResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "PAID123",
+          reason: "Expired Permit",
+          note: "Permit expired last month",
+          images: "paid-photo.jpg"
+        }
+      }
+    });
+
+  expect(createResponse.status).toBe(200);
+  const ticket = createResponse.body.data.createNewTicket;
+  expect(ticket).toBeDefined();
+
+  // need to mark the ticket as paid query
+});

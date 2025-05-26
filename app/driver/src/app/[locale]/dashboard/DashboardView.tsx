@@ -75,7 +75,7 @@ export default function DashboardView() {
       type: "permit",
       duration: permit.id,
       permitType: "lot",
-      lot: selectedLot.split(" ")[1],
+      lot: selectedLot.slice(3), // needs fixing, but currently it works
     };
     sessionStorage.setItem("permitDetails", JSON.stringify(permitDetails));
     const paymentDetails = {
@@ -140,11 +140,11 @@ export default function DashboardView() {
               })}
             </RadioGroup>
 
-            {selectedLots[permit.id] && (
+            {/* {selectedLots[permit.id] && (
               <Typography variant="body2" sx={{ mt: 1 }}>
                 {t("selected")}: <strong>{selectedLots[permit.id]}</strong>
               </Typography>
-            )}
+            )} */}
 
             <Button
               variant="contained"

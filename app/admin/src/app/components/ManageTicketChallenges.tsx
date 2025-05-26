@@ -1,48 +1,57 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   Box, 
   Typography, 
   Stack,
   Button,
-  useTheme
+  useTheme,
+  CircularProgress
 } from '@mui/material'
 
-const mockChallengedTickets = [
-  {
-    id: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMxMTFkMmZmLWJiZmYtNGU5Yy1hZDNhLTgwYWU5YTkxOTI3NSJ9.TNstWQ63-iX-W01hrYZdGy4ErP-8DbRsXrPCdnG7GcA",
-    vehicle: "ABC-1234",
-    enforcer: "enc_5e6f7g8h9i0j1k2l3m4n5o",
-    issuedDate: "2025-03-15",
-    violation: "Parking in no-parking zone",
-    fine: 75.00,
-    ticketStatus: "challenged",
-    images: ["img_front.jpg", "img_side.jpg"],
-    note: "Vehicle was displaying emergency flashers",
-    challengeReason: "Emergency situation - medical emergency required immediate parking"
-  },
-  {
-    id: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcwZDI4OGY2LTJiNzctNDZhZS1iNTc0LWQ5NmJkMzU5ODUxNiJ9.Lx01-yIXjpozcBNobxBJ3mIZGYFSGqTchQyJuIedg60",
-    vehicle: "XYZ-9876",
-    enforcer: "enc_8h9i0j1k2l3m4n5o6p7q8r",
-    issuedDate: "2025-04-02",
-    violation: "Expired meter",
-    fine: 45.50,
-    ticketStatus: "challenged",
-    images: ["img_meter.jpg", "img_vehicle.jpg"],
-    note: "Meter showed time remaining",
-    challengeReason: "Meter was paid and had 15 minutes remaining when ticket was issued"
-  }
-]
+import { getChallengedTickets } from '../../ticket/actions'
+import { ChallengedTicket } from '@/types';
 
 const getShortId = (jwt: string) => jwt.slice(-8).toUpperCase();
 
 export default function ManageTicketChallenges() {
   const theme = useTheme()
-  const [challengedTickets, setChallengedTickets] = useState(mockChallengedTickets)
+  const [challengedTickets, setChallengedTickets] = useState<ChallengedTicket[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  void setChallengedTickets;
+  useEffect(() => {
+    const fetchChallengedTickets = async () => {
+      try {
+        setLoading(true)
+        const tickets = await getChallengedTickets()
+        setChallengedTickets(tickets)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch challenged tickets')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchChallengedTickets()
+  }, [])
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Typography color="error">Error: {error}</Typography>
+      </Box>
+    )
+  }
 
   return (
     <Box sx={{ p: 4, bgcolor: '#ffffff' }}>

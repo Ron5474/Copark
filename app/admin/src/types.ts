@@ -54,6 +54,7 @@ export interface ChallengedTicket {
   issuedDate: string;
   note: string;
   images: string[];
+  challengeReason: string;
 }
 
 export interface Enforcer {

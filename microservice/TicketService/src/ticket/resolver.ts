@@ -316,8 +316,6 @@ export class TicketResolver {
   async challengeTicket(
     @Arg('ticketID', () => TicketInput) ticketID: TicketInput,
     @Arg('challengeReason', () => String) challengeReason: string
-    @Arg('ticketID', () => TicketInput) ticketID: TicketInput,
-    @Arg('challengeReason', () => String) challengeReason: string
   ): Promise<ChallengeTicket | null> {
     return await this.ticketService.challengeTicket(ticketID, challengeReason);
   }
@@ -332,7 +330,6 @@ export class TicketResolver {
   @Authorized(['admin']) 
   async acceptTicketChallenge(
     @Arg('ticketID', () => TicketInput) ticketID: TicketInput
-    @Arg('ticketID', () => TicketInput) ticketID: TicketInput
   ): Promise<Ticket | null> {
     return await this.ticketService.acceptTicketChallenge(ticketID);
   }
@@ -340,7 +337,6 @@ export class TicketResolver {
   @Mutation(() => Ticket)
   @Authorized(['admin'])
   async rejectTicketChallenge(
-    @Arg('ticketID', () => TicketInput) ticketID: TicketInput
     @Arg('ticketID', () => TicketInput) ticketID: TicketInput
   ): Promise<Ticket | null> {
     return await this.ticketService.rejectTicketChallenge(ticketID);

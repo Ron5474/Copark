@@ -27,10 +27,11 @@ export const getTickets = async (): Promise<Ticket[]> => {
             getMyTickets {
                 id
                 vehicle
-                enforcer
                 fine
                 violation
                 images
+                ticketStatus
+                issuedDate
             }
           }
         `,

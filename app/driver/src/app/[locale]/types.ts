@@ -63,12 +63,11 @@ export type TicketContextType = {
 export interface Ticket {
   id: string
   vehicle: string
-  enforcer: string
   violation: string
   ticketStatus: string
-  issueddate: string
+  issuedDate: string
   fine: number
-  images: Array<string>
+  images: string
 }
 
 export interface Lot {

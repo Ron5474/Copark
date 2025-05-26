@@ -7,10 +7,12 @@ import Box from '@mui/material/Box'
 
 import { useTicketState } from './TicketContext'
 import { Ticket } from '../types'
+import { useLocale } from 'next-intl'
 
 export default function TicketCard({ticket}: {ticket: Ticket}) {
   const {setCurrentTicket, setCurrentView} = useTicketState()
-  const  bgColor = (ticket.ticketStatus === 'unpaid') ? 'error' : 'warning'
+  const  bgColor = (ticket.ticketStatus === 'unpaid' || ticket.ticketStatus === 'active') ? 'error' : 'warning'
+  console.log('TicketCard', ticket)
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardActionArea onClick={() => {
@@ -23,7 +25,7 @@ export default function TicketCard({ticket}: {ticket: Ticket}) {
               Ticket #{ticket.id.substring(0, 5)}
             </Typography>
             <Typography>
-              {ticket.issueddate}
+              {new Date(ticket.issuedDate).toLocaleDateString(useLocale(), { year: 'numeric', month: 'long', day: 'numeric' })}
             </Typography>
           </Box>
           <Chip

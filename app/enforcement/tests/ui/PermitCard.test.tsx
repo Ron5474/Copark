@@ -19,10 +19,15 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
+type PermitResult = [{
+  type: string
+  area: string
+}] | [] | null
+
 function TestPermitCardWithResult({
   permitResult,
 }: {
-  permitResult: { isValid: boolean; type: string; area: string }
+  permitResult: PermitResult
 }) {
   const { setPermitResult, setIsValidated } = useEnforcement()
 
@@ -38,7 +43,7 @@ it('Shows permit found', async () => {
   render(
     <EnforcementProvider initialPlate="XYZ123" >
       <TestPermitCardWithResult
-        permitResult={{ isValid: true, type: 'Residential', area: 'A1' }}
+        permitResult={[{ type: 'Residential', area: 'A1' }]}
       />
     </EnforcementProvider>
   )
@@ -53,14 +58,14 @@ it('shows No Permit Found', async () => {
   render(
     <EnforcementProvider initialPlate="XYZ123">
       <TestPermitCardWithResult
-        permitResult={{ isValid: false, type: 'Error', area: 'N/A' }}
+      permitResult={[]}
       />
     </EnforcementProvider>
   )
   expect(await screen.findByText(/No Permit Found/i)).toBeDefined()
   expect(screen.getByText(/License Plate:/i)).toBeDefined()
   expect(screen.getByText(/XYZ123/i)).toBeDefined()
-  expect(screen.getByText(/Error - N\/A/i)).toBeDefined()
+  expect(screen.getByText(/N\/A/i)).toBeDefined()
 })
 
 it('clicking new search redirects you to manual entry', async () => {

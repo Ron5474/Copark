@@ -67,12 +67,12 @@ it('renders No Permit Found', async () => {
   await user.type(screen.getByLabelText('License Plate'), 'BAD999')
   await user.click(screen.getByLabelText('Search License Plate'))
 
-  // await waitFor(() => {
-    expect(await screen.findByText(/No Permit Found/i)).toBeDefined()
-    expect(await screen.findByText(/License Plate:/i)).toBeDefined()
-    expect(await screen.findByText(/BAD999/i)).toBeDefined()
-    expect(await screen.findByText(/Error - N\/A/i)).toBeDefined()
-  // })
+  await waitFor(() => {
+    expect(screen.getByText(/No Permit Found/i)).toBeDefined()
+    expect(screen.getByText(/License Plate:/i)).toBeDefined()
+    expect(screen.getByText(/BAD999/i)).toBeDefined()
+    expect(screen.getByText(/N\/A/i)).toBeDefined()
+  })
 })
 
 // it('throws if GraphQL returns top-level error', async () => {

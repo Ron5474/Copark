@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState } from 'react'
 type PermitResult = [{
   type: string
   area: string
-}] | null
+}] | [] | null
 
 type EnforcementContextType = {
   plate: string | null

@@ -41,7 +41,7 @@ const permitHandlers = {
       'query' in body &&
       typeof body.query === 'string'
     ) {
-      if (body.query.includes('CheckPermit')) {
+      if (body.query.includes('checkPermit')) {
         return HttpResponse.json({
           data: {
             checkPermit: [{
@@ -63,14 +63,11 @@ const permitHandlers = {
       body !== null &&
       'query' in body &&
       typeof body.query === 'string' &&
-      body.query.includes('CheckPermit')
+      body.query.includes('checkPermit')
     ) {
       return HttpResponse.json({
         data: {
-          checkPermit: [{
-            type: 'Error',
-            area: 'N/A',
-          }],
+          checkPermit: [],
         },
       }, { status: 200 })
     }

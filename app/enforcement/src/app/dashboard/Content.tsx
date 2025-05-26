@@ -45,8 +45,6 @@ export default function EnforcementDashboardView() {
     )
   }
 
-  console.log("DETAILS: ", plate, isValidated, isIssuingViolation)
-
   return (
     <Container maxWidth="xs" sx={{ py: 3, mt: 8 }}>
       {!plate && (

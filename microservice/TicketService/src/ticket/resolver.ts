@@ -129,7 +129,7 @@ export class TicketResolver {
     });
 
     if (!driverRes.ok) {
-      console.warn("Failed to fetch driver email.");
+      // console.warn("Failed to fetch driver email.");
       return;
     }
 

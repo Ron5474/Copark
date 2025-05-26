@@ -66,7 +66,7 @@ export default function ManageTicketChallenges() {
       const tickets = await getChallengedTickets()
       setChallengedTickets(tickets)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch challenged tickets')
+      setError('Failed to fetch challenged tickets')
     } finally {
       setLoading(false)
     }
@@ -78,7 +78,7 @@ export default function ManageTicketChallenges() {
       const tickets = await getAcceptedTickets()
       setAcceptedTickets(tickets)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch accepted tickets')
+      setError('Failed to fetch accepted tickets')
     } finally {
       setLoading(false)
     }

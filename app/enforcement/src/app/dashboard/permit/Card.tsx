@@ -106,25 +106,53 @@ export default function PermitCard() {
           <Box
             sx={{
               display: 'flex',
-              justifyContent: 'space-between',
+              alignItems: 'flex-start',
               pb: 1,
               borderBottom: 1,
               borderColor: 'divider',
             }}
           >
-            <Typography variant="body2" color="text.secondary">
-              Permit Type:
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ 
+                minWidth: '100px',  // or whatever width fits your design
+                whiteSpace: 'nowrap',
+                mr: 2,
+                pt: '4px' // align with top of first chip
+              }}
+            >
+              Permit Types:
             </Typography>
-            <Chip
-              label={
-                permitResult && permitResult[0]
-                  ? `${permitResult[0].type} - ${permitResult[0].area}`
-                  : 'N/A'
-              }
-              color="info"
-              size="small"
-              sx={{ fontWeight: 'bold' }}
-            />
+
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'flex-end',
+                gap: 1,
+                flexGrow: 1,
+              }}
+            >
+              {permitResult && permitResult.length > 0 ? (
+                permitResult.map((permit, index) => (
+                  <Chip
+                    key={index}
+                    label={`${permit.type} - ${permit.area}`}
+                    color="info"
+                    size="small"
+                    sx={{ fontWeight: 'bold' }}
+                  />
+                ))
+              ) : (
+                <Chip
+                  label="N/A"
+                  color="default"
+                  size="small"
+                  sx={{ fontWeight: 'bold' }}
+                />
+              )}
+            </Box>
           </Box>
         </Box>
 

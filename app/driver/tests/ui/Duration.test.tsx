@@ -9,6 +9,8 @@ import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '../setup'
 
+import { mockNextIntl } from './mockTranslations'
+mockNextIntl()
 import MemberView from '../../src/app/[locale]/zone/View'
 import Duration from '../../src/app/[locale]/zone/Duration'
 import { ZoneProvider } from '../../src/app/[locale]/zone/Context'
@@ -49,29 +51,6 @@ vi.mock('@/app/api/auth/[...nextauth]/route', () => ({
   handler: vi.fn(),
   GET: vi.fn(),
   POST: vi.fn(),
-}))
-
-vi.mock('next-intl', () => ({
-  useTranslations: () => (
-    vi.fn((x: string) => {
-      switch (x) {
-        case 'Do Not Sell My Personal Info':
-          return 'Do Not Sell My Personal Info';
-        case 'Privacy Policy':
-          return 'Privacy Policy';
-        case 'Terms of Service':
-          return 'Terms of Service';
-        case 'Contact Us':
-          return 'Contact Us';
-        case 'Dark Mode':
-          return 'Dark Mode';
-        case 'Rights Reserved':
-          return '© 2025 Copark. All rights reserved.';
-        default:
-          return x;
-      }
-    })
-  ),
 }))
 
 vi.mock('@/app/[locale]/shared/actions', () => ({

@@ -107,6 +107,9 @@
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi, it, expect, afterEach, beforeEach } from 'vitest'
+
+import { mockNextIntl } from './mockTranslations'
+mockNextIntl()
 import DashboardView from '@/app/[locale]/dashboard/DashboardView'
 import { DashboardContext } from '@/app/[locale]/dashboard/context'
 import { getLotDetails } from '@/app/[locale]/dashboard/permitActions'

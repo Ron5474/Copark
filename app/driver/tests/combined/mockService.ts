@@ -3,6 +3,7 @@ import {http, HttpResponse} from 'msw'
 const authURL = 'http://localhost:3010/api/v0/auth'
 const vehicleURL = 'http://localhost:4001/graphql'
 const permitURL = 'http://localhost:4003/graphql'
+// const ticketURL = 'http://localhost:4002/graphql'
 
 export interface Vehicle {
   plate: string

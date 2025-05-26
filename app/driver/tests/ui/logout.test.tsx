@@ -1,5 +1,8 @@
 import { render, waitFor, cleanup } from '@testing-library/react';
 import { vi, it, expect, afterEach } from 'vitest';
+
+import { mockNextIntl } from './mockTranslations'
+mockNextIntl()
 import Page from '@/app/[locale]/dashboard/page';
 import { getUser } from '@/app/[locale]/shared/actions';
 import { userLoginAttempt } from '@/app/[locale]/dashboard/actions';

@@ -3,6 +3,8 @@ import { render, screen, cleanup, /*waitFor*/ } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 
+import { mockNextIntl } from '../ui/mockTranslations'
+mockNextIntl()
 import { auth, permit } from './mockService'
 import { getZoneDetails } from '../../src/app/[locale]/zone/actions'
 import MemberView from '../../src/app/[locale]/zone/View'

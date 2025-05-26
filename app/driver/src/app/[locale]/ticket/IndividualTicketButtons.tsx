@@ -17,7 +17,7 @@ export default function IndividualTicketButtons() {
   }
 
   const handleTicketPayment = async () => {
-    const amount = parseFloat((currentTicket?.fine || 0).toFixed(2))*100
+    const amount = parseFloat((currentTicket?.fine as number).toFixed(2))*100
     const paymentDetails = {
       price: amount,
       currency: 'USD',

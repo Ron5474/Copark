@@ -99,6 +99,102 @@ async function loginAsAdmin(): Promise<string> {
   return response.body.id
 }
 
+async function loginAs(who: string): Promise<string | undefined> {
+  if (who === "driver") {
+    const token = await  new SignJWT(driver)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(encodedKey)
+    // console.log("Driver token:", token)
+
+    // Sign up
+    await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/driver/signup')
+      .send({ authToken: token })
+
+    // console.log('Signup Status:', signupRes.status)
+    // console.log('Signup Headers:', signupRes.headers)
+    // console.log('Signup Body:', signupRes.body)
+
+    const regVehicleQuery = `
+    mutation RegisterVehicle($input: RegisterVehicleInput!) {
+      registerVehicle(input: $input) {
+        id
+        plate
+        country
+        state
+        nickname
+      }
+    }`
+
+    const derikVehicleInput = {
+      input: {
+        plate: "DERIK123",
+        country: "US",
+        state: "California",
+        nickname: "Derik's Vehicle"
+      }
+    }
+
+    // Add Vehicle
+    const addVehicle = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ 
+        query: regVehicleQuery,
+        variables: derikVehicleInput
+      })
+
+    // console.log('Add Vehicle Headers:', addVehicle.headers)
+    // console.log('Add Vehicle Body:', addVehicle.body)
+    
+    const response = await supertest(AUTH_SERVICE_URL)
+      .put('/api/v0/auth/driver/onboarding')
+      .set('Authorization', `Bearer ${token}`)
+      .send({newState: 'complete'})
+
+    // console.log('Status:', response.status)
+    // console.log('Headers:', response.headers)
+    // console.log('Body:', response.body)
+
+    const validStatuses = [200, 201, 204];
+    if (!validStatuses.includes(response.status)) {
+      throw new Error(`Login failed with status ${response.status}`)
+    }
+
+    return token
+  } else if (who === "enforcement") {
+    const response = await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/login')
+      .send({
+        email: 'enforcer1@outlook.com',
+        password: 'password1',
+      })
+
+    if (response.status !== 200) {
+      throw new Error(`Enforcement login failed with status ${response.status}`)
+    }
+
+    return response.body.id
+
+  } else {
+    const response = await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/login')
+      .send(adminUser)
+
+    // console.log('Status:', response.status)
+    // console.log('Headers:', response.headers)
+    // console.log('Body:', response.body)
+
+    if (response.status !== 200) {
+      throw new Error(`Login failed with status ${response.status}`)
+    }
+
+    return response.body?.id
+  }
+}
+
 // async function loginAsDriver(): Promise<string> {
 //   const response = await supertest(AUTH_SERVICE_URL)
 //     .post('/api/v0/auth/login')
@@ -111,8 +207,8 @@ async function loginAsAdmin(): Promise<string> {
 //   return response.body.id
 // }
 
-test('Admin can create a ticket with images', async () => {
-  const token = await loginAsAdmin()
+test('Enforcer can create a ticket with images', async () => {
+  const token = await loginAs('enforcement')
 
   const vehicleid = '00000000-0000-0000-0000-000000000000'
   const enforcerid = await encrypt('00000000-0000-0000-0000-000000000000')
@@ -361,25 +457,6 @@ test('Admin can delete a ticket', async () => {
 //   expect(response.body.errors).toBeUndefined()
 //   expect(response.body.data.getMyTickets.length).toBe(3)
 // })
-
-async function loginAs(who: string): Promise<string> {
-  if (who === "enforcement") {
-    const response = await supertest(AUTH_SERVICE_URL)
-      .post('/api/v0/auth/login')
-      .send({
-        email: 'enforcer1@outlook.com',
-        password: 'password1',
-      })
-
-    if (response.status !== 200) {
-      throw new Error(`Enforcement login failed with status ${response.status}`)
-    }
-
-    return response.body.id
-  }
-
-  throw new Error("Unsupported user role")
-}
 
 const createNewTicketMutation = `
 mutation CreateNewTicket($input: NewTicketInput!) {

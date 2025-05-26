@@ -351,6 +351,23 @@ test('challengeTicket fails with invalid ticket ID', async () => {
   ).rejects.toThrow('Ticket not found.');
 });
 
+test('getAcceptedTickets should return tickets with accepted status', async () => {
+  // First accept a ticket challenge to have an accepted ticket
+  await ticketService.acceptTicketChallenge({ 
+    id: await encrypt('6b5531a5-5ba9-419b-98bb-eda4b0eb2953') 
+  });
+
+  // Get accepted tickets
+  const acceptedTickets = await ticketService.getAcceptedTickets();
+
+  // Verify results
+  expect(acceptedTickets).toBeDefined();
+  expect(acceptedTickets.length).toBeGreaterThan(0);
+  acceptedTickets.forEach(ticket => {
+    expect(ticket.ticketStatus).toBe('accepted');
+  });
+});
+
 // test('getTicketsForUserJWT should return tickets for the provided userJWT', async () => {
 //     const userID = '0f99f921-594e-4387-9d05-e6e80d8aa54a'
 

@@ -9,8 +9,7 @@ import {
   Receipt,
   Confirmation,
   DurationInput,
-  IsValidPermitInput,
-  IsValid,
+  CheckedPermit,
   IsValidPolice,
   PermitsByDay,
   LotDetails,
@@ -136,22 +135,14 @@ test('DurationInput schema loads correctly', () => {
   expect(durationInput.hours).toBe(3)
 })
 
-test('IsValidPermitInput schema loads correctly', () => {
-  const isValidPermitInput = new IsValidPermitInput()
-  isValidPermitInput.vehicle = 'vehicleZ'
+test('CheckedPermit schema loads correctly', () => {
+  const checkedPermit = new CheckedPermit()
+  checkedPermit.type = 'zone'
+  checkedPermit.area = 'abc'
 
-  expect(isValidPermitInput).toBeDefined()
-  expect(isValidPermitInput.vehicle).toBe('vehicleZ')
-})
-
-test('IsValid schema loads correctly', () => {
-  const isValid = new IsValid()
-  isValid.isValid = true
-  isValid.type = 'temporary'
-
-  expect(isValid).toBeDefined()
-  expect(isValid.isValid).toBe(true)
-  expect(isValid.type).toBe('temporary')
+  expect(checkedPermit).toBeDefined()
+  expect(checkedPermit.type).toBe('zone')
+  expect(checkedPermit.area).toBe('abc')
 })
 
 test('IsValidPolice schema loads correctly', () => {

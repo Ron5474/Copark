@@ -83,7 +83,7 @@ export class VehicleResolver {
   }
 
   @Authorized('driver')
-  @Mutation(() => Vehicle)
+  @Mutation(() => VehicleID)
   async setDefaultVehicle(
     @Arg('input', () => setDefaultVehicleInput) vehicleID: setDefaultVehicleInput,
     @Ctx() request: Request & {user: SessionUser}

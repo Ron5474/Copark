@@ -758,3 +758,179 @@ test('Full ticket challenge flow - create, challenge, and get challenged tickets
   expect(foundTicket.ticketStatus).toBe("challenged");
   expect(foundTicket.challengeReason).toBe("I had a valid permit");
 });
+
+test('Admin can accept a ticket challenge', async () => {
+  // First create and challenge a ticket
+  const enforcementToken = await loginAs("enforcement");
+  
+  // Create ticket
+  const createResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "TEST456",
+          reason: "Invalid Parking",
+          note: "Vehicle in reserved spot",
+          images: "photo.jpg"
+        }
+      }
+    });
+
+  const ticket = createResponse.body.data.createNewTicket;
+  
+  // Challenge the ticket
+  const challengeMutation = `
+    mutation ChallengeTicket($ticketID: TicketInput!, $reason: String!) {
+      challengeTicket(ticketID: $ticketID, challengeReason: $reason) {
+        id
+        ticketStatus
+      }
+    }
+  `;
+
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + ronakDriverToken)
+    .send({
+      query: challengeMutation,
+      variables: {
+        ticketID: { id: ticket.id },
+        reason: "I had a valid permit"
+      }
+    });
+
+  // Accept the challenge
+  const adminToken = await loginAsAdmin();
+  const acceptMutation = `
+    mutation AcceptChallenge($ticketID: TicketInput!) {
+      acceptTicketChallenge(ticketID: $ticketID) {
+        id
+        ticketStatus
+      }
+    }
+  `;
+
+  const acceptResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + adminToken)
+    .send({
+      query: acceptMutation,
+      variables: {
+        ticketID: { id: ticket.id }
+      }
+    });
+
+  expect(acceptResponse.status).toBe(200);
+  expect(acceptResponse.body.errors).toBeUndefined();
+  const acceptedTicket = acceptResponse.body.data.acceptTicketChallenge;
+  expect(acceptedTicket.ticketStatus).toBe("accepted");
+});
+
+test('Admin can get accepted tickets', async () => {
+  // First create and accept a ticket challenge to ensure we have accepted tickets
+  const enforcementToken = await loginAs("enforcement");
+  
+  // Create ticket
+  const createResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "TEST456",
+          reason: "Invalid Parking",
+          note: "Vehicle in reserved spot",
+          images: "photo.jpg"
+        }
+      }
+    });
+
+  const ticket = createResponse.body.data.createNewTicket;
+  
+  // Challenge the ticket
+  const challengeMutation = `
+    mutation ChallengeTicket($ticketID: TicketInput!, $reason: String!) {
+      challengeTicket(ticketID: $ticketID, challengeReason: $reason) {
+        id
+        ticketStatus
+      }
+    }
+  `;
+
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + ronakDriverToken)
+    .send({
+      query: challengeMutation,
+      variables: {
+        ticketID: { id: ticket.id },
+        reason: "I had a valid permit"
+      }
+    });
+
+  // Accept the challenge
+  const adminToken = await loginAsAdmin();
+  const acceptMutation = `
+    mutation AcceptChallenge($ticketID: TicketInput!) {
+      acceptTicketChallenge(ticketID: $ticketID) {
+        id
+        ticketStatus
+      }
+    }
+  `;
+
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + adminToken)
+    .send({
+      query: acceptMutation,
+      variables: {
+        ticketID: { id: ticket.id }
+      }
+    });
+
+  // Get accepted tickets
+  const getAcceptedQuery = `
+    query {
+      getAcceptedTickets {
+        id
+        vehicle
+        enforcer
+        issuedDate
+        violation
+        fine
+        ticketStatus
+        images
+        note
+      }
+    }
+  `;
+
+  const getAcceptedResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + adminToken)
+    .send({ query: getAcceptedQuery });
+
+  expect(getAcceptedResponse.status).toBe(200);
+  expect(getAcceptedResponse.body.errors).toBeUndefined();
+  const acceptedTickets = getAcceptedResponse.body.data.getAcceptedTickets;
+  expect(acceptedTickets).toBeDefined();
+  expect(acceptedTickets.length).toBeGreaterThan(0);
+  
+  // Verify ticket properties
+  acceptedTickets.forEach((ticket: any) => {
+    expect(ticket.ticketStatus).toBe("accepted");
+    expect(ticket).toHaveProperty('id');
+    expect(ticket).toHaveProperty('vehicle');
+    expect(ticket).toHaveProperty('enforcer');
+    expect(ticket).toHaveProperty('issuedDate');
+    expect(ticket).toHaveProperty('violation');
+    expect(ticket).toHaveProperty('fine');
+    expect(ticket).toHaveProperty('images');
+    expect(ticket).toHaveProperty('note');
+  });
+});

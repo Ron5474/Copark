@@ -325,7 +325,7 @@ export class TicketResolver {
   }
 
   @Mutation(() => Ticket)
-  @Authorized(['admin'])
+  @Authorized(['admin']) 
   async acceptTicketChallenge(
     @Arg('ticketID', () => TicketInput) ticketID: TicketInput
   ): Promise<Ticket | null> {
@@ -338,5 +338,11 @@ export class TicketResolver {
     @Arg('ticketID', () => TicketInput) ticketID: TicketInput
   ): Promise<Ticket | null> {
     return await this.ticketService.rejectTicketChallenge(ticketID);
+  }
+
+  @Query(() => [Ticket])
+  @Authorized(['admin', 'enforcement'])
+  async getAcceptedTickets(): Promise<Ticket[]> {
+    return await this.ticketService.getAcceptedTickets();
   }
 }

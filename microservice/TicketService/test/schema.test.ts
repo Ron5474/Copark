@@ -4,7 +4,7 @@ import * as http from 'http'
 import supertest from 'supertest'
 
 import { app, bootstrap } from '../src/app'
-import { Ticket, NewTicket, TicketInput, ModifyTicketInput, hasTicket, TicketsByDay } from '../src/ticket/schema'
+import { Ticket, NewTicket, TicketInput, ModifyTicketInput, hasTicket, TicketsByDay, ChallengeTicketInput} from '../src/ticket/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
@@ -113,6 +113,20 @@ test('User schema loads correctly', () => {
 
   expect(testUser).toBeDefined();
   expect(testUser.date).toBe('2023-10-01');
+});
+
+test('ChallengeTicketInput schema loads correctly', () => {
+  const input = new ChallengeTicketInput();
+  input.ticketID = new TicketInput();
+  input.ticketID.id = 'ticket-123';
+  input.challengeReason = 'I had a valid permit';
+  input.evidence = ['photo1.jpg', 'photo2.jpg'];
+
+  expect(input).toBeDefined();
+  expect(input.ticketID).toBeDefined();
+  expect(input.ticketID.id).toBe('ticket-123');
+  expect(input.challengeReason).toBe('I had a valid permit');
+  expect(input.evidence).toEqual(['photo1.jpg', 'photo2.jpg']);
 });
 
 test('GET playground', async () => {

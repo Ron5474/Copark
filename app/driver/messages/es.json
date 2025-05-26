@@ -35,13 +35,23 @@
     "allLotsAccess": "Acceso a Todos los Estacionamientos",
     "selected": "Seleccionado",
     "purchase": "Comprar Permiso",
-    "loading": "Cargando permisos..."
+    "loading": "Cargando permisos...",
+    "zone": "Zona"
   },
   "bottomNav": {
     "home": "Inicio",
     "tickets": "Multas",
     "garage": "Vehículos",
     "logout": "Cerrar sesión"
+  },
+  "permits": {
+    "daily": "Diario",
+    "quarterly": "Trimestral",
+    "yearly": "Anual",
+    "lot-a": "Lote A",
+    "lot-b": "Lote B",
+    "lot-c": "Lote C",
+    "lot-r": "Lote R"
   }
 
 }

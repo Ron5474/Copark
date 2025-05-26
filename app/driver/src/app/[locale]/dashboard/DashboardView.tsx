@@ -40,6 +40,7 @@ import { Payment } from "../shared/actions";
 
 export default function DashboardView() {
   const t = useTranslations("dashboard");
+  const tp = useTranslations("permits");
   const context = useContext(DashboardContext);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedLots, setSelectedLots] = useState<Record<string, string>>({});
@@ -106,7 +107,7 @@ export default function DashboardView() {
       {permits.map((permit) => (
         <CardButton
             key={permit.id}
-            text={permit.title}
+            text={tp(permit.title)}
             expanded={expandedId === permit.id}
             onToggle={() => toggleExpanded(permit.id)}
             icon=""
@@ -125,7 +126,7 @@ export default function DashboardView() {
             >
               {permit.lots.map((lot) => {
                 const formattedName =
-                  lot.name.toLowerCase().includes("any") ? t("allLotsAccess") : lot.name;
+                  lot.name.toLowerCase().includes("any") ? t("allLotsAccess") : tp(lot.name);
 
                 return (
                   <FormControlLabel
@@ -173,7 +174,7 @@ export default function DashboardView() {
       ))}
 
       <CardButton
-        text="Zone"
+        text={t("zone")}
         onToggle={() => context.setCurrentPage("buy-permit")}
         expanded={false}
         icon=""

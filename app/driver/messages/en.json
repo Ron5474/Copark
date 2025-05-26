@@ -35,13 +35,24 @@
     "allLotsAccess": "All Lots Access",
     "selected": "Selected",
     "purchase": "Purchase Permit",
-    "loading": "Loading permits..."
+    "loading": "Loading permits...",
+    "zone": "Zone"
   },
   "bottomNav": {
     "home": "Home",
     "tickets": "Tickets",
     "garage": "Garage",
     "logout": "Logout"
+  },
+  "permits": {
+    "daily": "Daily",
+    "quarterly": "Quarterly",
+    "yearly": "Yearly",
+    "lot-a": "Lot A",
+    "lot-b": "Lot B",
+    "lot-c": "Lot C",
+    "lot-r": "Lot R"
   }
+
 
 }

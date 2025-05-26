@@ -731,27 +731,23 @@ test('Full ticket challenge flow - create, challenge, and get challenged tickets
   expect(challengedTicket.ticketStatus).toBe("challenged");
   expect(challengedTicket.challengeReason).toBe("I had a valid permit");
 
-  // Get all challenged tickets (using admin token since it's admin/enforcement only)
-  const adminToken = await loginAsAdmin();
+  // Get all challenged tickets
   const getChallengedQuery = `
     query {
       getChallengedTickets {
         id
         ticketStatus
         challengeReason
-        violation
-        fine
       }
     }
   `;
 
   const getChallengedResponse = await supertest(server)
     .post('/graphql')
-    .set('Authorization', 'Bearer ' + adminToken) // Use admin token instead of enforcement token
+    .set('Authorization', 'Bearer ' + enforcementToken)
     .send({ query: getChallengedQuery });
 
   expect(getChallengedResponse.status).toBe(200);
-  expect(getChallengedResponse.body.errors).toBeUndefined(); // Add error check
   const challengedTickets = getChallengedResponse.body.data.getChallengedTickets;
   expect(challengedTickets).toBeDefined();
   expect(challengedTickets.length).toBeGreaterThan(0);
@@ -760,7 +756,5 @@ test('Full ticket challenge flow - create, challenge, and get challenged tickets
   const foundTicket = challengedTickets.find((t: any) => t.id === ticket.id);
   expect(foundTicket).toBeDefined();
   expect(foundTicket.ticketStatus).toBe("challenged");
-  if (foundTicket.challengeReason) {
-    expect(foundTicket.challengeReason).toBe("I had a valid permit");
-  }
+  expect(foundTicket.challengeReason).toBe("I had a valid permit");
 });

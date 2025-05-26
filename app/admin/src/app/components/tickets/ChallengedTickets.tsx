@@ -115,7 +115,7 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                     const tickets = await getChallengedTickets();
                     onTicketsUpdate(tickets);
                   } catch (err) {
-                    onError(err instanceof Error ? err.message : 'Failed to reject challenge');
+                    onError('Failed to reject challenge');
                   }
                 }}
               >
@@ -129,7 +129,7 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                     const tickets = await getChallengedTickets();
                     onTicketsUpdate(tickets);
                   } catch (err) {
-                    onError(err instanceof Error ? err.message : 'Failed to accept challenge');
+                    onError('Failed to accept challenge');
                   }
                 }}
               >

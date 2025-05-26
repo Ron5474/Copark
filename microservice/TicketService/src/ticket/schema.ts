@@ -136,6 +136,7 @@ export class ChallengeTicketInput {
 
 @ObjectType()
 export class ChallengeTicket extends Ticket {
+<<<<<<< Updated upstream
   @Field(() => String, { nullable: true })
   challengeReason?: string;
 }
@@ -162,4 +163,8 @@ export class UnpaidTickets {
 
   @Field(() => String)
   note!: string;
+=======
+  @Field(() => String)
+  challengeReason!: string;
+>>>>>>> Stashed changes
 }

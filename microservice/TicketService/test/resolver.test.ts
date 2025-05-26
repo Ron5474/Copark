@@ -702,7 +702,11 @@ test('Full ticket challenge flow - create, challenge, and get challenged tickets
 
   expect(createResponse.status).toBe(200);
   const ticket = createResponse.body.data.createNewTicket;
+<<<<<<< Updated upstream
   expect(ticket.ticketStatus).toBe("unpaid");
+=======
+  expect(ticket.ticketStatus).toBe("active");
+>>>>>>> Stashed changes
 
   // Challenge the ticket
   const challengeMutation = `
@@ -757,6 +761,7 @@ test('Full ticket challenge flow - create, challenge, and get challenged tickets
   expect(foundTicket).toBeDefined();
   expect(foundTicket.ticketStatus).toBe("challenged");
   expect(foundTicket.challengeReason).toBe("I had a valid permit");
+<<<<<<< Updated upstream
 });
 
 test('Admin can accept a ticket challenge', async () => {
@@ -1050,4 +1055,6 @@ test('Driver can mark a ticket as paid', async () => {
   expect(paidTicket).toBeDefined();
   expect(paidTicket.id).toBe(ticket.id);
   expect(paidTicket.ticketStatus).toBe('paid');
+=======
+>>>>>>> Stashed changes
 });

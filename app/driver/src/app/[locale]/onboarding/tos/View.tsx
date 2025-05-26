@@ -22,12 +22,13 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import { useRouter } from '@/i18n/navigation';
 import { setOnBoardingState } from '../../signup/actions';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 export default function OnboardView() {
   const [accepted, setAccepted] = useState(false);
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations("onboarding.tos");
   
   useEffect(() => {
     const handleSignup = async () => {
@@ -56,7 +57,7 @@ export default function OnboardView() {
     >
       <Stack alignItems="center" spacing={3} sx={{ width: '100%', margin: 'auto', padding: 2 }}>
         <Typography component="h1" variant="h4" align="center">
-          Terms of Service
+          {t('title')}
         </Typography>
         
         <Paper 
@@ -69,39 +70,35 @@ export default function OnboardView() {
           }}
         >
           <Typography variant="h6" gutterBottom>
-            Welcome to Copark
+            {t('welcome')}
           </Typography>
           
           <Typography variant="body2" component="p">
-            By accessing or using Copark&apos;s parking management services, you agree to be bound by these Terms of Service.
+            {t('agreement')}
           </Typography>
           
           <Typography variant="body2" component="p">
-            1. <strong>Service Description:</strong> Copark provides parking lot management and enforcement services through our platform.
+            1. <strong>{t('terms.line1.point')}</strong> {t('terms.line1.description')}
           </Typography>
           
           <Typography variant="body2" component="p">
-            2. <strong>License:</strong> We grant you a limited, non-exclusive, non-transferable license to use our service for your parking management needs.
+            2. <strong>{t('terms.line2.point')}</strong>{t('terms.line2.description')}
           </Typography>
           
           <Typography variant="body2" component="p">
-            3. <strong>User Accounts:</strong> You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.
+            3. <strong>{t('terms.line3.point')}</strong>{t('terms.line3.description')}
           </Typography>
-          
           <Typography variant="body2" component="p">
-            4. <strong>Privacy:</strong> Your use of our services is also governed by our Privacy Policy, which outlines how we collect and use your data.
+            4. <strong>{t('terms.line4.point')}</strong> {t('terms.line4.description')}
           </Typography>
-          
           <Typography variant="body2" component="p">
-            5. <strong>Data Usage:</strong> We collect license plate data and parking information solely for enforcement purposes. This data is stored securely and used only as necessary for service operation.
+            5. <strong>{t('terms.line5.point')}</strong>{t('terms.line5.description')}
           </Typography>
-          
           <Typography variant="body2" component="p">
-            6. <strong>Limitations:</strong> Our services are provided &quot;as is&quot; without warranties of any kind, either express or implied.
+            6. <strong>{t('terms.line6.point')}</strong>{t('terms.line6.description')}
           </Typography>
-          
           <Typography variant="body2" component="p">
-            7. <strong>Changes:</strong> We reserve the right to modify these terms at any time. Continued use after changes constitutes acceptance of the new terms.
+            7. <strong>{t('terms.line7.point')}</strong>{t('terms.line7.description')}
           </Typography>
         </Paper>
         
@@ -114,7 +111,7 @@ export default function OnboardView() {
                 color="primary"
               />
             }
-            label="I have read and agree to the Terms of Service"
+            label={t("acceptTerms")}
           />
         </Box>
         
@@ -127,7 +124,7 @@ export default function OnboardView() {
           disabled={!accepted}
           onClick={handleClick}
         >
-          Continue
+          {t('continue')}
         </Button>
       </Stack>
     </Container>

@@ -348,10 +348,10 @@ export class TicketResolver {
     return await this.ticketService.getAcceptedTickets();
   }
 
-  @Mutation(() => UnpaidTicketsReturn)
+  @Mutation(() => [UnpaidTicketsReturn])
   @Authorized(['admin'])
   async getUnpaidTickets(
-  ): Promise<UnpaidTicketsReturn | null> {
+  ): Promise<UnpaidTicketsReturn[] | null> {
     return await this.ticketService.getUnpaidTicketsPerDay();
   }
 }

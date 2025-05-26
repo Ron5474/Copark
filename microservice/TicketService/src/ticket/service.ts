@@ -614,4 +614,54 @@ export class TicketService {
 
     return tickets;
   }
+
+  public async getUnpaidTicketsPerDay(): Promise<TicketsByDay[]> {
+    const query = `
+      SELECT 
+        vehicle,
+        data->>'issuedDate' AS issueddate,
+        data->>'violation' AS violation,
+        data->>'fine' AS fine,
+        data->>'note' AS note
+      FROM ticket
+      WHERE data->>'ticketStatus' = 'unpaid'
+      ORDER BY data->>'issuedDate' DESC;
+    `;
+
+    const result = await pool.query(query);
+
+    const ticketsMap = new Map<string, Ticket[]>();
+
+    for (const row of result.rows) {
+      const date = new Date(row.issueddate).toISOString().split('T')[0]; // YYYY-MM-DD
+      const ticket: Ticket = {
+        id: await this.encrypt(row.id),
+        vehicle: row.vehicle,
+        enforcer: await this.encrypt(row.enforcer),
+        issuedDate: new Date(row.issueddate),
+        violation: row.violation,
+        fine: parseFloat(row.fine),
+        ticketStatus: row.ticketstatus,
+        images: row.images,
+        note: row.note
+      };
+      if (!ticketsMap.has(date)) {
+        ticketsMap.set(date, []);
+      }
+      const ticketsForDate = ticketsMap.get(date);
+      if (ticketsForDate) {
+        ticketsForDate.push(ticket);
+      }
+    }
+
+    const resultArr: TicketsByDay[] = [];
+    for (const [date, tickets] of ticketsMap.entries()) {
+      resultArr.push({
+        date,
+        tickets,
+      });
+    }
+
+    return resultArr;
+  }
 }

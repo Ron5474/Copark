@@ -458,7 +458,12 @@ export class TicketService {
 
     const query = `
       UPDATE ticket
-      SET data = jsonb_set(data, '{ticketStatus}', '"unpaid"', true)
+      SET data = jsonb_set(
+        data - 'challengeReason',
+        '{ticketStatus}',
+        '"unpaid"',
+        true
+      )
       WHERE id = $1
       RETURNING id, vehicle, enforcer, 
                 data->>'issuedDate' AS issueddate,

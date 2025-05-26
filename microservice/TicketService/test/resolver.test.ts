@@ -422,7 +422,7 @@ test('Enforcer can create a ticket', async () => {
   expect(ticket).toBeDefined()
   expect(ticket.violation).toBe("Blocking Driveway")
   expect(ticket.fine).toBe(50)
-  expect(ticket.ticketStatus).toBe("active")
+  expect(ticket.ticketStatus).toBe("unpaid")
   expect(ticket.images).toBe("https://example.com/photo.jpg")
   expect(ticket.note).toBe("Parked right in front of gate")
 })
@@ -576,7 +576,7 @@ test('Ticket creation sends email to vehicle owner', async () => {
   expect(ticket).toBeDefined();
   expect(ticket.violation).toBe("Invalid Parking");
   expect(ticket.fine).toBe(50);
-  expect(ticket.ticketStatus).toBe("active");
+  expect(ticket.ticketStatus).toBe("unpaid");
   expect(ticket.note).toBe("Test ticket for email notification");
 });
 
@@ -702,7 +702,7 @@ test('Full ticket challenge flow - create, challenge, and get challenged tickets
 
   expect(createResponse.status).toBe(200);
   const ticket = createResponse.body.data.createNewTicket;
-  expect(ticket.ticketStatus).toBe("active");
+  expect(ticket.ticketStatus).toBe("unpaid");
 
   // Challenge the ticket
   const challengeMutation = `

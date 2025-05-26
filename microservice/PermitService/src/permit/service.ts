@@ -316,7 +316,7 @@ export class PermitService {
         }
 
         lotMap[permitType].lots.push({
-          name: `lot-${area.toLowerCase()}`,
+          name: `lot${area}`,
           price: `$${data[permitType]}`,
         });
       }

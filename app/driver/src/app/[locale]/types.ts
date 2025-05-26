@@ -58,6 +58,7 @@ export type TicketContextType = {
   setTickets: React.Dispatch<React.SetStateAction<Ticket[]>>,
   currentTicket: Ticket | undefined,
   setCurrentTicket: React.Dispatch<React.SetStateAction<Ticket | undefined>>,
+  fetchTickets: () => Promise<void>
 }
 
 export interface Ticket {

@@ -4,15 +4,27 @@ import Typography from '@mui/material/Typography'
 import CardActionArea from '@mui/material/CardActionArea'
 import Chip from '@mui/material/Chip'
 import Box from '@mui/material/Box'
+import { useFormatter } from 'next-intl'
 
 import { useTicketState } from './TicketContext'
 import { Ticket } from '../types'
-import { useLocale } from 'next-intl'
 
 export default function TicketCard({ticket}: {ticket: Ticket}) {
   const {setCurrentTicket, setCurrentView} = useTicketState()
   const  bgColor = (ticket.ticketStatus === 'unpaid' || ticket.ticketStatus === 'active') ? 'error' : 'warning'
-  console.log('TicketCard', ticket)
+  const formatter = useFormatter()
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return formatter.dateTime(date, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardActionArea onClick={() => {
@@ -25,7 +37,7 @@ export default function TicketCard({ticket}: {ticket: Ticket}) {
               Ticket #{ticket.id.substring(0, 5)}
             </Typography>
             <Typography>
-              {new Date(ticket.issuedDate).toLocaleDateString(useLocale(), { year: 'numeric', month: 'long', day: 'numeric' })}
+              {formatDate(ticket.issuedDate)}
             </Typography>
           </Box>
           <Chip

@@ -13,12 +13,24 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import { useTicketState } from './TicketContext'
 import TicketEvidence from './TicketEvidence'
 import IndividualTicketButtons from './IndividualTicketButtons'
-import { useLocale } from 'next-intl'
+import { useFormatter } from 'next-intl'
 
 
 export default function IndividualTicket() {
   const { currentTicket } = useTicketState()
+  const formatter = useFormatter()
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return formatter.dateTime(date, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+  
   return (
     <Box 
       sx={{ 
@@ -126,7 +138,7 @@ export default function IndividualTicket() {
               color="text.primary"
               sx={{ ml: 4.5, fontSize: '1rem' }}
             >
-                {new Date(currentTicket?.issuedDate as string).toLocaleString(useLocale(), { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                {formatDate(currentTicket?.issuedDate as string)}
             </Typography>
           </Box>
         </CardContent>

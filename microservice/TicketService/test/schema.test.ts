@@ -4,7 +4,7 @@ import * as http from 'http'
 import supertest from 'supertest'
 
 import { app, bootstrap } from '../src/app'
-import { Ticket, NewTicket, TicketInput, ModifyTicketInput, hasTicket, TicketsByDay, ChallengeTicketInput} from '../src/ticket/schema'
+import { Ticket, NewTicket, TicketInput, ModifyTicketInput, hasTicket, TicketsByDay, ChallengeTicketInput, ChallengeTicket} from '../src/ticket/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
@@ -127,6 +127,30 @@ test('ChallengeTicketInput schema loads correctly', () => {
   expect(input.ticketID.id).toBe('ticket-123');
   expect(input.challengeReason).toBe('I had a valid permit');
   expect(input.evidence).toEqual(['photo1.jpg', 'photo2.jpg']);
+});
+
+test('ChallengeTicket schema loads correctly', () => {
+  const ticket = new ChallengeTicket();
+  ticket.id = 'ticket-123';
+  ticket.vehicle = 'vehicle-1';
+  ticket.enforcer = 'enforcer-1';
+  ticket.issuedDate = new Date('2025-05-11T12:00:00Z');
+  ticket.violation = 'speeding';
+  ticket.fine = 100;
+  ticket.ticketStatus = 'challenged';
+  ticket.images = 'image1.jpg';
+  ticket.challengeReason = 'I had a valid permit';
+
+  expect(ticket).toBeDefined();
+  expect(ticket.id).toBe('ticket-123');
+  expect(ticket.vehicle).toBe('vehicle-1');
+  expect(ticket.enforcer).toBe('enforcer-1');
+  expect(ticket.issuedDate.toISOString()).toBe('2025-05-11T12:00:00.000Z');
+  expect(ticket.violation).toBe('speeding');
+  expect(ticket.fine).toBe(100);
+  expect(ticket.ticketStatus).toBe('challenged');
+  expect(ticket.images).toBe('image1.jpg');
+  expect(ticket.challengeReason).toBe('I had a valid permit');
 });
 
 test('GET playground', async () => {

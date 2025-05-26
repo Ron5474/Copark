@@ -72,7 +72,7 @@ async function loginAs(who: string): Promise<string | undefined> {
       .setIssuedAt()
       .setExpirationTime('30m')
       .sign(encodedKey)
-    console.log("Driver token:", token)
+    // console.log("Driver token:", token)
 
     // Sign up
     await supertest(AUTH_SERVICE_URL)

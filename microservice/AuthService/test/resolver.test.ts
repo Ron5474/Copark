@@ -12,19 +12,53 @@
 import { test, beforeAll, afterAll, expect } from 'vitest'
 import supertest from 'supertest'
 import * as http from 'http'
+import { SignJWT } from 'jose'
 
 import db from './db'
 import app from '../src/app'
 
-
-
+const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 let server: http.Server
 
-const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
-const validJWT = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkcml2ZXItaWQtMTIzIiwiZW1haWwiOiJkcml2ZXJAYm9va3MuY29tIiwicGljdHVyZSI6Imh0dHBzOi8vd3d3Lmdvb2dsZS5jb20vaW1nIiwibmFtZSI6IkZha2UgRHJpdmVyIiwiaWF0IjoxNzQ2ODM2ODUzLCJleHAiOjE5MDQ2MjQ4NTN9.YipxWgvsQIRpjSoIbnNla741EI1klV5Fkf2A5mlhpMY"
-
 const AUTH_PORT = 3010
-// const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
+const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
+
+const driver = {
+  "name": "Derik Driver",
+  "email": "derik@copark.space",
+  "picture": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWRzMmJldTdzMWtncDBweGtvM21kYnRyeDk1cHpvNnU5MWVycXEybiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/keyufLabLaJKh3xnVy/giphy.gif",
+  "sub": "1234567890",
+}
+
+async function signupAsDriver(driver): Promise<string | undefined> {
+    const token = await  new SignJWT(driver)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(encodedKey)
+    // console.log("Driver token:", token)
+
+    // Sign up
+    await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/driver/signup')
+      .send({ authToken: token })
+    
+    const response = await supertest(AUTH_SERVICE_URL)
+      .put('/api/v0/auth/driver/onboarding')
+      .set('Authorization', `Bearer ${token}`)
+      .send({newState: 'complete'})
+
+    // console.log('Status:', response.status)
+    // console.log('Headers:', response.headers)
+    // console.log('Body:', response.body)
+
+    const validStatuses = [200, 201, 204];
+    if (!validStatuses.includes(response.status)) {
+      throw new Error(`Login failed with status ${response.status}`)
+    }
+
+    return token
+}
 
 beforeAll(async () => {
 
@@ -63,10 +97,42 @@ test('Invalid Admin Credentials throws Error', async () => {
     .expect(404)
 })
 
-test('Driver can login successfully', async () => {  
+test('Driver can Signup successfully', async () => {
+  const token = await  new SignJWT(driver)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(encodedKey)
+  
   await supertest(server)
-    .post('/api/v0/auth/driver/login')
-    .set('Authorization', `Bearer ${nextAuthJWT}`)
+    .post('/api/v0/auth/driver/signup')
+    .send({ authToken: token })
+    .expect(201)
+})
+
+test('Driver can Onboard successfully', async () => {
+  const token = await  new SignJWT(driver)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(encodedKey)
+  
+  await supertest(server)
+    .post('/api/v0/auth/driver/signup')
+    .send({ authToken: token })
+  
+  await supertest(AUTH_SERVICE_URL)
+    .put('/api/v0/auth/driver/onboarding')
+    .set('Authorization', `Bearer ${token}`)
+    .send({newState: 'complete'})
+    .expect(204)
+})
+
+test('Driver can login successfully', async () => {
+  const token = await signupAsDriver(driver)
+  await supertest(server)
+    .get('/api/v0/auth/driver/login')
+    .set('Authorization', `Bearer ${token}`)
     .expect(200)
 })
 
@@ -74,7 +140,7 @@ test('Admin can get driver details', async () => {
   const res = await supertest(server)
     .post('/api/v0/auth/login')
     .send({ email: admin.email, password: admin.password })
-
+  
   await supertest(server)
     .post('/api/v0/auth/driver/email')
     .send({id: '39f48f9f-2693-446b-ad98-8e0db1ef14bd'})
@@ -82,17 +148,22 @@ test('Admin can get driver details', async () => {
     .expect(200)
 })
 
-test('getDriverId works successfully', async () => {  
+test('getDriverId works successfully', async () => {
+  const token = await signupAsDriver(driver)
   await supertest(server)
     .get('/api/v0/auth/driver/id')
-    .set('Authorization', `Bearer ${nextAuthJWT}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(200)
 })
 
 test('check admin works successfully', async () => {
+  const res = await supertest(server)
+    .post('/api/v0/auth/login')
+    .send({ email: admin.email, password: admin.password })
+
   await supertest(server)
     .post('/api/v0/auth/check')
-    .set('Authorization', `Bearer ${validJWT}`)
+    .set('Authorization', `Bearer ${res.body.id}`)
     .send(["admin"])
     .expect(200)
 })

@@ -524,7 +524,7 @@ test('Student can check their tickets successful', async () => {
 })
 
 test('Ticket creation sends email to vehicle owner', async () => {
-
+  // First register a vehicle as a driver
   const registerRes = await supertest(vehicleServer)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + ronakDriverToken)
@@ -539,21 +539,20 @@ test('Ticket creation sends email to vehicle owner', async () => {
       `,
       variables: {
         input: {
-          plate: "Coder123",
+          plate: "TESTPLATE123",
           country: "US",
           state: "California",
-          nickname: "Batmobile"
+          nickname: "Test Vehicle"
         }
       }
     });
 
-  expect(registerRes.status).toBe(200);
-
+  expect(registerRes.body.errors).toBeUndefined();
   const vehicleId = registerRes.body.data.registerVehicle.id;
-
   expect(vehicleId).toBeDefined();
 
-  const enforcementToken = await loginAs("enforcement")
+  // Get enforcement token and create ticket
+  const enforcementToken = await loginAs("enforcement");
 
   const response = await supertest(server)
     .post('/graphql')
@@ -562,25 +561,24 @@ test('Ticket creation sends email to vehicle owner', async () => {
       query: createNewTicketMutation,
       variables: {
         input: {
-          plate: "Coder123",
-          reason: "Being Smart",
-          note: "#1 in commits",
-          images: "https://example.com/photo.jpg"
+          plate: "TESTPLATE123", // Use same plate as registered vehicle
+          reason: "Invalid Parking",
+          note: "Test ticket for email notification",
+          images: "test-photo.jpg"
         }
       }
-    })
+    });
 
-  expect(response.status).toBe(200)
+  expect(response.body.errors).toBeUndefined();
+  const ticket = response.body.data.createNewTicket;
 
-  // console.log(response.body)
-  // response is actually that enforcer ID is invalid
-  const ticket = response.body.data.createNewTicket
-
-  expect(ticket).toBeDefined()
-  expect(ticket.violation).toBe("Being Smart")
-  expect(ticket.fine).toBe(50)
-  expect(ticket.note).toBe("#1 in commits")
-})
+  // Verify ticket was created with correct data
+  expect(ticket).toBeDefined();
+  expect(ticket.violation).toBe("Invalid Parking");
+  expect(ticket.fine).toBe(50);
+  expect(ticket.ticketStatus).toBe("active");
+  expect(ticket.note).toBe("Test ticket for email notification");
+});
 
 test('Admin can get ticket stats grouped by day', async () => {
   const token = await loginAsAdmin();
@@ -681,4 +679,88 @@ test('Admin can get tickets issued by a specific enforcer', async () => {
       expect(ticket).toHaveProperty('note');
     });
   });
+});
+
+test('Full ticket challenge flow - create, challenge, and get challenged tickets', async () => {
+  // Setup - create a new ticket
+  const enforcementToken = await loginAs("enforcement");
+  
+  const createResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "TEST123",
+          reason: "Invalid Parking",
+          note: "Vehicle in no parking zone",
+          images: "https://example.com/photo.jpg"
+        }
+      }
+    });
+
+  expect(createResponse.status).toBe(200);
+  const ticket = createResponse.body.data.createNewTicket;
+  expect(ticket.ticketStatus).toBe("active");
+
+  // Challenge the ticket
+  const challengeMutation = `
+    mutation ChallengeTicket($ticketID: TicketInput!, $reason: String!) {
+      challengeTicket(ticketID: $ticketID, challengeReason: $reason) {
+        id
+        ticketStatus
+        challengeReason
+      }
+    }
+  `;
+
+  const challengeResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + ronakDriverToken)
+    .send({
+      query: challengeMutation,
+      variables: {
+        ticketID: { id: ticket.id },
+        reason: "I had a valid permit"
+      }
+    });
+
+  expect(challengeResponse.status).toBe(200);
+  const challengedTicket = challengeResponse.body.data.challengeTicket;
+  expect(challengedTicket.ticketStatus).toBe("challenged");
+  expect(challengedTicket.challengeReason).toBe("I had a valid permit");
+
+  // Get all challenged tickets (using admin token since it's admin/enforcement only)
+  const adminToken = await loginAsAdmin();
+  const getChallengedQuery = `
+    query {
+      getChallengedTickets {
+        id
+        ticketStatus
+        challengeReason
+        violation
+        fine
+      }
+    }
+  `;
+
+  const getChallengedResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + adminToken) // Use admin token instead of enforcement token
+    .send({ query: getChallengedQuery });
+
+  expect(getChallengedResponse.status).toBe(200);
+  expect(getChallengedResponse.body.errors).toBeUndefined(); // Add error check
+  const challengedTickets = getChallengedResponse.body.data.getChallengedTickets;
+  expect(challengedTickets).toBeDefined();
+  expect(challengedTickets.length).toBeGreaterThan(0);
+  
+  // Verify our challenged ticket is in the list
+  const foundTicket = challengedTickets.find((t: any) => t.id === ticket.id);
+  expect(foundTicket).toBeDefined();
+  expect(foundTicket.ticketStatus).toBe("challenged");
+  if (foundTicket.challengeReason) {
+    expect(foundTicket.challengeReason).toBe("I had a valid permit");
+  }
 });

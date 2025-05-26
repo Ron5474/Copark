@@ -75,3 +75,40 @@ export async function getTicketsByEnforcer(enforcerId: string) {
 
   return result.data.getTicketsPerDayFromEnforcer
 }
+
+export async function getChallengedTickets() {
+  const token = await getAuthToken();
+  const query = `
+    query {
+      getChallengedTickets {
+        id
+        vehicle
+        enforcer
+        issuedDate
+        violation
+        fine
+        ticketStatus
+        images
+        note
+        challengeReason
+      }
+    }
+  `;
+
+  const response = await fetch('http://localhost:4002/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ query })
+  });
+
+  const result = await response.json();
+
+  if (result.errors) {
+    throw new Error(result.errors[0].message);
+  }
+
+  return result.data.getChallengedTickets;
+}

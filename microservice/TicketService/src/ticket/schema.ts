@@ -135,6 +135,6 @@ export class ChallengeTicketInput {
 
 @ObjectType()
 export class ChallengeTicket extends Ticket {
-  @Field()
-  challengeReason!: string;
+  @Field(() => String, { nullable: true })
+  challengeReason?: string;
 }

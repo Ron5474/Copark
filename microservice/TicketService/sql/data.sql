@@ -120,7 +120,9 @@ VALUES (
     'violation', 'this is a challenged ticket that will be accepted',
     'fine', 2,
     'ticketStatus', 'challenged',
-    'images', '[]'
+    'images', '[]',
+    'note', 'this is a note for the ticket that will be accepted',
+    'challengeReason', 'this is a reason for the challenge (good reason, will be accepted)'
   )
 );
 
@@ -134,6 +136,8 @@ VALUES (
     'violation', 'this is a challenged ticket that will be rejected',
     'fine', 2,
     'ticketStatus', 'challenged',
-    'images', '[]'
+    'images', '[]',
+    'note', 'this is a note for the ticket that will be rejected',
+    'challengeReason', 'this is a reason for the challenge (bad reason, will be rejected)'
   )
 );

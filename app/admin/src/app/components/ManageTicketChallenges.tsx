@@ -65,7 +65,7 @@ export default function ManageTicketChallenges() {
       setLoading(true)
       const tickets = await getChallengedTickets()
       setChallengedTickets(tickets)
-    } catch (err) {
+    } catch /*(err)*/ {
       setError('Failed to fetch challenged tickets')
     } finally {
       setLoading(false)
@@ -77,7 +77,7 @@ export default function ManageTicketChallenges() {
       setLoading(true)
       const tickets = await getAcceptedTickets()
       setAcceptedTickets(tickets)
-    } catch (err) {
+    } catch /*(err)*/ {
       setError('Failed to fetch accepted tickets')
     } finally {
       setLoading(false)
@@ -108,6 +108,7 @@ export default function ManageTicketChallenges() {
           pb: 2
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/admin/assets/logo-notitle.png"
           alt="CoPark Admin"

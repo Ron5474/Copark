@@ -67,6 +67,7 @@ export default function ManageZones() {
           pb: 2
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/admin/assets/logo-notitle.png"
           alt="CoPark Admin"

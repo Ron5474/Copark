@@ -353,5 +353,6 @@ export class TicketResolver {
   async getUnpaidTickets(
   ): Promise<UnpaidTicketsReturn[] | null> {
     return await this.ticketService.getUnpaidTicketsPerDay();
+    // need to add a convertion from the vehicle ID to the plate number
   }
 }

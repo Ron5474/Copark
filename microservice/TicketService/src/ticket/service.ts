@@ -576,4 +576,42 @@ export class TicketService {
 
     return tickets;
   }
+
+  public async getAcceptedTickets(): Promise<Ticket[]> {
+    const query = `
+      SELECT 
+        id,
+        vehicle,
+        enforcer,
+        data->>'issuedDate' AS issueddate,
+        data->>'violation' AS violation,
+        data->>'fine' AS fine,
+        data->>'ticketStatus' AS ticketstatus,
+        data->>'images' AS images,
+        data->>'note' AS note
+      FROM ticket
+      WHERE data->>'ticketStatus' = 'accepted'
+      ORDER BY data->>'issuedDate' DESC;
+    `;
+
+    const result = await pool.query(query);
+
+    const tickets: Ticket[] = [];
+
+    for (const row of result.rows) {
+      tickets.push({
+        id: await this.encrypt(row.id),
+        vehicle: row.vehicle,
+        enforcer: await this.encrypt(row.enforcer),
+        issuedDate: new Date(row.issueddate),
+        violation: row.violation,
+        fine: parseFloat(row.fine),
+        ticketStatus: row.ticketstatus,
+        images: row.images,
+        note: row.note
+      });
+    }
+
+    return tickets;
+  }
 }

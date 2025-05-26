@@ -48,10 +48,7 @@
     "daily": "Daily",
     "quarterly": "Quarterly",
     "yearly": "Yearly",
-    "lot-a": "Lot A",
-    "lot-b": "Lot B",
-    "lot-c": "Lot C",
-    "lot-r": "Lot R"
+    "lot": "Lot "
   },
   "zone": {
     "title": "Where are you parking?",
@@ -62,8 +59,27 @@
     "freeToday": "This zone is not charging today. Check back tomorrow!",
     "closedNow": "This zone is currently closed. No payment is currently necessary. Please check our hours.",
     "okay": "Okay"
+  },
+  "stepper": {
+    "zone": "Zone",
+    "vehicle": "Vehicle",
+    "payment": "Payment",
+    "confirmation": "Confirmation"
+  },
+  "duration": {
+    "title": "What parking rate works for you?",
+    "description": "This parking operator currently offers multiple parking rate options.",
+    "option_hourly": "By the hour and the minute",
+    "option_max": "Maximum Parking Time",
+    "error_no_selection": "Please select a parking rate",
+    "select_duration": "Select your parking duration",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "estimated_price": "Estimated Price:",
+    "fees_notice": "Transaction fees and taxes may apply in later steps.",
+    "review_duration": "Review your duration",
+    "duration_summary": "This rate ({option}) allows you to park here for {duration} until {endTime}.",
+    "continue": "Continue"
   }
-
-
 
 }

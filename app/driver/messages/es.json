@@ -48,10 +48,7 @@
     "daily": "Diario",
     "quarterly": "Trimestral",
     "yearly": "Anual",
-    "lot-a": "Lote A",
-    "lot-b": "Lote B",
-    "lot-c": "Lote C",
-    "lot-r": "Lote R"
+    "lot": "Lote "
   },
   "zone": {
     "title": "¿Dónde estás estacionando?",
@@ -62,6 +59,27 @@
     "freeToday": "Esta zona no cobra hoy. ¡Vuelve mañana!",
     "closedNow": "Esta zona está cerrada. No es necesario pagar en este momento. Por favor, revise nuestro horario.",
     "okay": "Entendido"
+  },
+  "stepper": {
+    "zone": "Zona",
+    "vehicle": "Vehículo",
+    "payment": "Pago",
+    "confirmation": "Confirmación"
+  },
+  "duration": {
+    "title": "¿Qué tarifa de estacionamiento prefiere?",
+    "description": "Este operador ofrece múltiples opciones de tarifas.",
+    "option_hourly": "Por hora y minuto",
+    "option_max": "Tiempo máximo de estacionamiento",
+    "error_no_selection": "Por favor seleccione una tarifa",
+    "select_duration": "Seleccione la duración de su estacionamiento",
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "estimated_price": "Precio estimado:",
+    "fees_notice": "Pueden aplicarse tarifas de transacción e impuestos.",
+    "review_duration": "Revise su duración",
+    "duration_summary": "Esta tarifa ({option}) le permite estacionar por {duration} hasta las {endTime}.",
+    "continue": "Continuar"
   }
 
 }

@@ -14,6 +14,7 @@ let authServer: http.Server
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
+const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 beforeAll(async () => {
   // Start your GraphQL server
@@ -42,8 +43,6 @@ afterAll(() => {
   authServer.close()
 })
 
-// const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
-
 const driver = {
     "name": "Derik Driver",
     "email": "derik@copark.space",
@@ -56,7 +55,7 @@ async function encrypt(userId: string): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('5y')
-    .sign(encodedKey)
+    .sign(internalKey)
   }
 
 const validDriverJWT = encrypt('b1eab387-1000-4ee3-a746-d59366e44f06');
@@ -68,27 +67,50 @@ const adminUser = {
 
 async function loginAs(who: string): Promise<string | undefined> {
   if (who === "driver") {
-    const token = new SignJWT(driver)
+    const token = await  new SignJWT(driver)
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('30m')
       .sign(encodedKey)
-    const response = await supertest(AUTH_SERVICE_URL)
-      .post('/api/v0/auth/driver/login')
-      .set('Authorization', `Bearer ${await token}`)
+    console.log("Driver token:", token)
 
-    // console.log('Status:', response.status
+    // Sign up
+    await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/driver/signup')
+      .send({ authToken: token })
+
+    // console.log('Signup Status:', signupRes.status)
+    // console.log('Signup Headers:', signupRes.headers)
+    // console.log('Signup Body:', signupRes.body)
+
+    // Add Vehicle
+    const addVehicle = await supertest(server)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ 
+        query: regVehicleQuery,
+        variables: derikVehicleInput
+      })
+
+    console.log('Add Vehicle Headers:', addVehicle.headers)
+    console.log('Add Vehicle Body:', addVehicle.body)
+    
+    const response = await supertest(AUTH_SERVICE_URL)
+      .put('/api/v0/auth/driver/onboarding')
+      .set('Authorization', `Bearer ${token}`)
+      .send({newState: 'complete'})
+
+    // console.log('Status:', response.status)
     // console.log('Headers:', response.headers)
     // console.log('Body:', response.body)
 
-    if (response.status !== 200) {
+    const validStatuses = [200, 201, 204];
+    if (!validStatuses.includes(response.status)) {
       throw new Error(`Login failed with status ${response.status}`)
     }
 
     return token
-  }
-
-  else if (who === "enforcement") {
+  } else if (who === "enforcement") {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
       .send({
@@ -193,6 +215,15 @@ const vehicleInput = {
     country: "US",
     state: "California",
     nickname: "Test Vehicle"
+  }
+}
+
+const derikVehicleInput = {
+  input: {
+    plate: "DERIK123",
+    country: "US",
+    state: "California",
+    nickname: "Derik's Vehicle"
   }
 }
 
@@ -337,7 +368,7 @@ test('Driver can get a list of their vehicles', async () => {
       .expect(200)
     console.log(response.body)
 
-    expect(response.body.data.myVehicles.length).toBe(0)
+    expect(response.body.data.myVehicles.length).toBe(1)
   })
 
   test('Cannot get a list of vehicles without auth', async () => {
@@ -366,7 +397,7 @@ test('Driver can get a list of their vehicles', async () => {
       .set('Authorization', 'Bearer ' + token)
       .send({ query: getVehiclequery })
 
-    expect(listResponse.body.data.myVehicles[0].plate).toBe("TEST123")
+    expect(listResponse.body.data.myVehicles[1].plate).toBe("TEST123")
   })
 
   test('Driver can update a vehicle', async () => {
@@ -401,7 +432,7 @@ test('Driver can get a list of their vehicles', async () => {
       .set('Authorization', 'Bearer ' + token)
       .send({ query: getVehiclequery })
 
-    expect(listResponse.body.data.myVehicles[0].state).toBe("Texas")
+    expect(listResponse.body.data.myVehicles[1].state).toBe("Texas")
   })
 
   test('Admin can find a vehicle using plate', async () => {

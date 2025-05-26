@@ -34,7 +34,7 @@ export class AuthController extends Controller {
 
   @Post("driver/signup")
   public async driverSignup(@Body() token: OauthSignup): Promise<string | undefined> {
-    const oauthUserData = await new AuthService().decryptOauth(token.authToken);
+    const oauthUserData = await new AuthService().decryptOauth(token.authToken)
     if (!oauthUserData) {
       this.setStatus(400)
       return undefined

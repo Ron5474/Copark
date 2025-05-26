@@ -1024,5 +1024,30 @@ test('Driver can mark a ticket as paid', async () => {
   const ticket = createResponse.body.data.createNewTicket;
   expect(ticket).toBeDefined();
 
-  // need to mark the ticket as paid query
+    // Mark the ticket as paid as the driver
+  const markPaidMutation = `
+    mutation MarkTicketAsPaid($input: PaidTicketInput!) {
+      markTicketAsPaid(input: $input) {
+        id
+        ticketStatus
+      }
+    }
+  `;
+
+  const markPaidResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + ronakDriverToken)
+    .send({
+      query: markPaidMutation,
+      variables: {
+        input: { id: ticket.id }
+      }
+    });
+
+  expect(markPaidResponse.status).toBe(200);
+  expect(markPaidResponse.body.errors).toBeUndefined();
+  const paidTicket = markPaidResponse.body.data.markTicketAsPaid;
+  expect(paidTicket).toBeDefined();
+  expect(paidTicket.id).toBe(ticket.id);
+  expect(paidTicket.ticketStatus).toBe('paid');
 });

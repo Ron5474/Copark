@@ -80,6 +80,13 @@
     "review_duration": "Review your duration",
     "duration_summary": "This rate ({option}) allows you to park here for {duration} until {endTime}.",
     "continue": "Continue"
+  },
+  "loginPage": {
+    "title": "Log In",
+    "google": "Sign In With Google",
+    "github": "Sign In With GitHub",
+    "facebook": "Sign In With Facebook",
+    "signup prompt": "New to Copark?",
+    "signup link": "Sign Up"
   }
-
 }

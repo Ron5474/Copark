@@ -18,6 +18,7 @@ function Footer() {
   const pathname = usePathname();
 
   const SwitchLocale = (newLocale: string) => {
+    if (newLocale === locale) return;
      router.replace(
       {pathname},
       {locale: newLocale}
@@ -115,7 +116,7 @@ function Footer() {
                 <source srcSet="/assets/flags/en.png" type="image/png" />
                 <img src="/assets/flags/en.png" alt="English Flag" width={40} />
               </picture>
-                Español
+                Inglés
               </Button>}
             </Box>
          </Box>

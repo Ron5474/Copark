@@ -21,12 +21,13 @@ import { signIn } from "next-auth/react"
 import { useEffect } from 'react';
 import { getUser } from '../shared/actions';
 import { useRouter } from '@/i18n/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 
 
 export default function LoginView() {
   // const { data: session } = useSession()
+  const t = useTranslations("loginPage");
   const router = useRouter()
   const locale = useLocale()
   const handleClick = async (provider: string) => {
@@ -53,7 +54,7 @@ export default function LoginView() {
     >
       <Stack alignItems="center" spacing={2} sx={{ width: '100%', maxWidth: 300, margin: 'auto', paddingTop: 4 }}>
         <Typography component="h1" variant="h3" sx={{mb: 3}}>
-            Log In
+            {t('title')}
         </Typography>
         <Button
           variant="outlined"
@@ -65,7 +66,7 @@ export default function LoginView() {
             handleClick('github')
           }}
         >
-          Sign In With GitHub
+          {t("github")}
         </Button>
         <Button
           variant="outlined"
@@ -77,7 +78,7 @@ export default function LoginView() {
             handleClick('google')
           }}
         >
-          Sign In With Google
+          {t("google")}
         </Button>
         <Button
           variant="outlined"
@@ -89,10 +90,10 @@ export default function LoginView() {
             handleClick('facebook')
           }}
         >
-          Sign In With Facebook
+          {t("facebook")}
         </Button>
         <p style={{ color: 'gray', fontSize: '12px', marginTop: '10px' }}>
-          New to Copark? <Link href="/signup" style={{ textDecoration: "underline" }}>Sign Up</Link>
+          {t("signup prompt")} <Link href="/signup" style={{ textDecoration: "underline" }}>{t("signup link")}</Link>
         </p>
       </Stack>
     </Container>

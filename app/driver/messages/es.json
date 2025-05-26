@@ -80,6 +80,13 @@
     "review_duration": "Revise su duración",
     "duration_summary": "Esta tarifa ({option}) le permite estacionar por {duration} hasta las {endTime}.",
     "continue": "Continuar"
+  },
+  "loginPage": {
+    "title": "Acceso",
+    "google": "Iniciar sesión con Google",
+    "github": "Iniciar sesión con GitHub",
+    "facebook": "Iniciar sesión con Facebook",
+    "signup prompt": "¿Eres nuevo en Copark?",
+    "signup link": "Inscribirse"
   }
-
 }

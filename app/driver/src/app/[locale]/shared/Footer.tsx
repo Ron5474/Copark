@@ -3,18 +3,26 @@
  * @description This file contains the Footer component.
  * @author Swayam Shah
  */
-import { Box } from "@mui/material";
-// import { getTranslations } from "next-intl/server";
+import { Box, Button } from "@mui/material";
 import { useLocale, useTranslations } from "next-intl";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import theme from "../theme";
-import { useRouter } from 'next/navigation';
 import Typography from '@mui/material/Typography';
 
 function Footer() {
   const router = useRouter()
   const locale = useLocale();
   const t = useTranslations("footer");
+  const pathname = usePathname();
   const PrimaryColorLight = theme.palette.primary.light;
+
+  const SwitchLocale = (newLocale: string) => {
+    if (newLocale !== locale) {
+       router.replace(
+      {pathname},
+      {locale: newLocale});
+    }
+  };
   return (
     <Box sx={{
       position: "relative",
@@ -93,6 +101,20 @@ function Footer() {
           {/* <a aria-label="personal-info-link">{t("Do Not Sell My Personal Info")}</a> */}
           {/* <a aria-label="contact-us-link">{t("Contact Us")}</a> */}
           {/* <Button sx={{padding: 0}}>{t("Dark Mode")}</Button> TODO: Change theme and change this text based on current theme */}
+          {locale == 'en' && <Button onClick={() => SwitchLocale('es')} sx={{display: "flex", alignItems: "center", gap: "10px"}}>
+                        <picture>
+                          <source srcSet="/driver/assets/flags/es.png" type="image/png" />
+                          <img src="/driver/assets/flags/es.png" alt="Spanish Flag" width={40} />
+                        </picture>
+                        Spanish
+                        </Button>}
+                      {locale == 'es' && <Button onClick={() => SwitchLocale('en')} sx={{display: "flex", alignItems: "center", gap: "10px"}}>
+                        <picture>
+                          <source srcSet="/driver/assets/flags/en.png" type="image/png" />
+                          <img src="/driver/assets/flags/en.png" alt="English Flag" width={40} />
+                        </picture>
+                          Inglés
+                        </Button>}
         </Box>
       </Box>
       <p style={{ fontSize: "14px", color: "#000000", fontWeight: 500 }}>{t("Rights Reserved")}</p>

@@ -96,7 +96,7 @@ it('clicking "Issue Citation" displays IssueViolationForm', async () => {
     </EnforcementProvider>
   )
 
-  expect(screen.getByText(/Permit Type:/i)).toBeDefined()
+  expect(screen.getByText(/Permit Types:/i)).toBeDefined()
 
   const issueButton = screen.getByLabelText('Issue Citation')
   await user.click(issueButton)

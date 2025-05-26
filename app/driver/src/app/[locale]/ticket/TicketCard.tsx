@@ -19,9 +19,7 @@ export default function TicketCard({ticket}: {ticket: Ticket}) {
     return formatter.dateTime(date, {
       year: 'numeric',
       month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      day: 'numeric'
     })
   }
 
@@ -34,7 +32,7 @@ export default function TicketCard({ticket}: {ticket: Ticket}) {
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography gutterBottom variant="h5" component="div">
-              Ticket #{ticket.id.substring(0, 5)}
+              Ticket #{ticket.id.substring(ticket.id.length - 5, ticket.id.length)}
             </Typography>
             <Typography>
               {formatDate(ticket.issuedDate)}

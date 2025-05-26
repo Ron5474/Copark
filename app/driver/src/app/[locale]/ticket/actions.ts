@@ -51,3 +51,44 @@ export const getTickets = async (): Promise<Ticket[]> => {
     throw error
   }
 }
+
+export const challengeTicket = async (ticketID: string, reason: string): Promise<Ticket[]> => {
+  try {
+    const token = await getAuthToken()
+
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation ChallengeTicket($ticketID: TicketInput!, $reason: String!) {
+            challengeTicket(ticketID: $ticketID, challengeReason: $reason) {
+              id
+              ticketStatus
+              challengeReason
+            }
+          }
+        `,
+        variables: {
+          ticketID: { id: ticketID },
+          reason: reason,
+        },
+      }),
+    })
+
+    const result = await response.json()
+    
+    if (result.errors) {
+      console.error('GraphQL errors:', result.errors)
+      throw new Error(result.errors[0].message)
+    }
+
+    return result.data.challengeTicket
+  } catch (error) {
+    console.error('Error challenging ticket:', error)
+    throw error
+  }
+}

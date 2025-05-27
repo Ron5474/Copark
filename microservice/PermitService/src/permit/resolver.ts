@@ -251,14 +251,47 @@ export class PermitResolver {
     return await service.isValidPermitPolice(vehicleId)
   }
 
+  // @Authorized('driver')
+  // @Query(() => MyPermits)
+  // async myPermits(
+  //   @Arg("vehicleID", () => String) vehicleID: string,
+  // ): Promise<MyPermits> {
+
+  //   return await service.getMyPermits(vehicleID)
+  // }
   @Authorized('driver')
   @Query(() => MyPermits)
-  async myPermits(
-    @Arg("vehicleID", () => String) vehicleID: string,
-  ): Promise<MyPermits> {
+  async myPermits(@Ctx() request: Request): Promise<MyPermits> {
+    const token = request.headers.authorization?.split(' ')[1];
+    await this.getUserData(token);
 
-    return await service.getMyPermits(vehicleID)
+    const vehicleResponse = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          query {
+            getDefaultVehicle {
+              id
+            }
+          }
+        `,
+      }),
+    });
+
+    const json = await vehicleResponse.json();
+    const defaultVehicleId = json.data?.getDefaultVehicle?.id;
+
+    if (!defaultVehicleId) {
+      return { active: [], future: [], expired: [] };
+    }
+
+    return await service.getMyPermits(defaultVehicleId);
   }
+
 
   @Authorized('driver')
   @Query(() => ZoneDetails)

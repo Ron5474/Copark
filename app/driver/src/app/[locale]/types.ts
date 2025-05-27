@@ -81,3 +81,18 @@ export interface LotGroup {
   title: string
   lots: Lot[]
 }
+
+export type Permit = {
+  vehicle: string
+  type: string
+  area: string
+  purchaseDate?: string
+  activeDate?: string
+  expireDate: string
+}
+
+export type MyPermits = {
+  active: Permit[]
+  future: Permit[]
+  expired: Permit[]
+}

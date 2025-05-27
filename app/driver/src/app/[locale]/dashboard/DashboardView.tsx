@@ -37,6 +37,7 @@ import { useTranslations } from "next-intl";
 import { DashboardContext } from "./context";
 import type { LotGroup } from "../types";
 import { Payment } from "../shared/actions";
+import MyPermitsCard from "./components/MyPermitCard";
 
 export default function DashboardView() {
   const t = useTranslations("dashboard");
@@ -75,7 +76,7 @@ export default function DashboardView() {
       type: "permit",
       duration: permit.id,
       permitType: "lot",
-      lot: selectedLot.slice(3), // needs fixing, but currently it works
+      lot: selectedLot.slice(3),
     };
     sessionStorage.setItem("permitDetails", JSON.stringify(permitDetails));
     const paymentDetails = {
@@ -103,7 +104,7 @@ export default function DashboardView() {
       <Typography variant="h5" fontWeight="bold" gutterBottom>
         {t("title")}
       </Typography>
-
+      <MyPermitsCard />
       {permits.map((permit) => (
         <CardButton
             key={permit.id}

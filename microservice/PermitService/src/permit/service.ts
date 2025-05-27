@@ -245,7 +245,18 @@ export class PermitService {
     )
     
     if (result.rowCount == 0) throw new Error(`Lot type ${lot} not found`)
-    return result.rows[0].data
+
+    const data = result.rows[0].data;
+    const excluded = new Set(['name', 'area']);
+    const prices: Record<string, number> = {};
+
+    for (const [key, value] of Object.entries(data)) {
+      if (!excluded.has(key) && value !== null && typeof value === 'object' && 'price' in value) {
+        prices[key] = value.price as number;
+      }
+    }
+  
+    return prices;
   }
 
   // public async getAllLotDetails(): Promise<LotDetails[]> {
@@ -284,7 +295,12 @@ export class PermitService {
 
         lotMap[permitType].lots.push({
           name: `lot${area}`,
-          price: `$${data[permitType]}`,
+          price: `$${data[permitType].price}`,
+          expireDate: new Date(data[permitType].expireDate).toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
         });
       }
     }

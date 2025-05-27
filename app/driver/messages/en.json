@@ -191,6 +191,12 @@
       "description": "Please describe the reason for your challenge... (minimum 25 characters)",
       "submit": "Submit Challenge",
       "back": "Go Back To Ticket"
+    },
+    "successChallenge": {
+      "title": "Ticket Challenged Successfully",
+      "line1": "We have successfully received your challenge request. Our team will review it and get back to you in 2 - 4 weeks.",
+      "line2": "Redirecting back automatically...",
+      "back": "Go Back To Ticket"
     }
   }
 }

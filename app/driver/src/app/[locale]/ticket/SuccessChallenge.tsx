@@ -4,10 +4,12 @@ import {  useEffect, useCallback } from 'react'
 import { Box, Paper, Typography, Button } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useTicketState } from './TicketContext'
+import { useTranslations } from 'next-intl'
 
 
 export default function SuccessMessage() {
   const { setCurrentView } = useTicketState()
+  const t = useTranslations('ticket.successChallenge')
 
   const onButtonClick = useCallback(() => {
     setCurrentView('TicketList')
@@ -56,19 +58,19 @@ export default function SuccessMessage() {
         </Box>
 
         <Typography variant="h5" component="h2" sx={{ mb: 1, fontWeight: 'bold' }}>
-          Ticket Challenged Successfully
+          {t('title')}
         </Typography>
 
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-          We have successfully received your challenge request. Our team will review it and get back to you in 2 - 4 weeks.
+          {t('line1')}
         </Typography>
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Redirecting back automatically...
+          {t('line2')}
         </Typography>
 
         <Button variant="contained" fullWidth onClick={onButtonClick}>
-          Go Back To Ticket
+          {t('back')}
         </Button>
       </Paper>
     </Box>

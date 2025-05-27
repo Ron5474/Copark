@@ -191,6 +191,12 @@
       "description": "Por favor, describa la razón de su impugnación... (mínimo 25 caracteres)",
       "submit": "Enviar impugnación",
       "back": "Volver a la multa"
+    },
+    "successChallenge": {
+      "title": "Boleto impugnado con éxito",
+      "line1": "Hemos recibido correctamente su solicitud de desafío. Nuestro equipo la revisará y se pondrá en contacto con usted en un plazo de 2 a 4 semanas.",
+      "line2": "Redireccionando automáticamente...",
+      "back": "Regresar al ticket"
     }
   }
 }

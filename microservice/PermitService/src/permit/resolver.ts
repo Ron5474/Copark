@@ -9,7 +9,7 @@ import {
   NewZone,
   ZoneDetails,
   PermitsByDay,
-  LotDetails,
+  // LotDetails,
   PurchaseLotInput,
   NewLot,
   LotGroup,
@@ -282,13 +282,13 @@ export class PermitResolver {
     return await service.getAllPermitsByDay();
   }
 
-  @Authorized('driver')
-  @Query(() => LotDetails)
-  async lotDetails(
-    @Arg("lot", () => String) lot: string,
-  ): Promise<LotDetails> {
-    return await service.getLotDetails(lot)
-  }
+  // @Authorized('driver')
+  // @Query(() => LotDetails)
+  // async lotDetails(
+  //   @Arg("lot", () => String) lot: string,
+  // ): Promise<LotDetails> {
+  //   return await service.getLotDetails(lot)
+  // }
 
   // @Authorized('driver')
   // @Query(() => [LotDetails])

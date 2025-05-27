@@ -241,6 +241,9 @@ export class Lot {
 
   @Field(() => String)
   price!: string;
+
+  @Field(() => String)
+  expireDate!: string;
 }
 
 @ObjectType()

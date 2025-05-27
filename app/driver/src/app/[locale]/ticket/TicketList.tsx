@@ -17,9 +17,11 @@ import Typography from '@mui/material/Typography'
 import TicketCard from './TicketCard'
 import { useTicketState } from './TicketContext'
 import { Toolbar } from '@mui/material'
+import { useTranslations } from 'next-intl'
 
 export default function TicketList() {
   const {tickets} = useTicketState()
+  const t = useTranslations('ticket')
   return (
     <Container
       maxWidth="sm"
@@ -31,9 +33,14 @@ export default function TicketList() {
         py: 4
       }}
     >
-      <Stack spacing={4} width="100%">
+      <Stack spacing={4} width="100%" sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
         <Typography variant="h4" component="h1" textAlign="center" gutterBottom>
-          Your Tickets
+          {t('title')}
         </Typography>
         
         {tickets.map((ticket) => (
@@ -45,7 +52,7 @@ export default function TicketList() {
         
         {tickets.length === 0 && (
           <Typography variant="body1" textAlign="center">
-            No tickets found.
+            {t('noTickets')}
           </Typography>
         )}
         <Toolbar />

@@ -169,5 +169,13 @@
         }
       }
     }
+  },
+  "ticket": {
+    "title": "Tus entradas",
+    "noTickets": "No tienes entradas en este momento.",
+    "evidence": {
+      "title": "Evidencia",
+      "photo": "Foto"
+    }
   }
 }

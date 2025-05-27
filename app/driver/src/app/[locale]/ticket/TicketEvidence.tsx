@@ -5,12 +5,14 @@ import Typography from '@mui/material/Typography'
 import Card from '@mui/material/Card'
 import Paper from '@mui/material/Paper'
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
+import { useTranslations } from 'next-intl'
 
 
 import { useTicketState } from './TicketContext'
 
 export default function TicketEvidence() {
   const { currentTicket } = useTicketState()
+  const t = useTranslations('ticket.evidence')
 
   return (
   <Box>
@@ -45,10 +47,10 @@ export default function TicketEvidence() {
                   variant="h6" 
                   fontWeight="600"
                 >
-                  Evidence Photos
+                  {t('title')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  1 photo
+                  1 {t('photo').toLowerCase()}
                 </Typography>
               </Box>
             </Box>
@@ -104,7 +106,7 @@ export default function TicketEvidence() {
                   fontWeight="600"
                   sx={{ fontSize: '0.75rem' }}
                 >
-                  Photo 1
+                  {t('photo')} 1
                 </Typography>
               </Box>
             </Paper>

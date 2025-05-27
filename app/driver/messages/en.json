@@ -169,5 +169,13 @@
         }
       }
     }
+  },
+  "ticket": {
+    "title": "Your Tickets",
+    "noTickets": "You have no tickets at this time.",
+    "evidence": {
+      "title": "Evidence Photos",
+      "photo": "Photo"
+    }
   }
 }

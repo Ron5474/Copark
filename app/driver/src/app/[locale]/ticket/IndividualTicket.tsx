@@ -13,12 +13,13 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import { useTicketState } from './TicketContext'
 import TicketEvidence from './TicketEvidence'
 import IndividualTicketButtons from './IndividualTicketButtons'
-import { useFormatter } from 'next-intl'
+import { useFormatter, useTranslations } from 'next-intl'
 
 
 export default function IndividualTicket() {
   const { currentTicket } = useTicketState()
   const formatter = useFormatter()
+  const t = useTranslations('ticket.ticketDetails')
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -70,7 +71,7 @@ export default function IndividualTicket() {
             </Avatar>
             <Box sx={{ flex: 1 }}>
               <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Parking Violation
+                {t('title')}
               </Typography>
               <Chip 
                 label="ACTIVE" 
@@ -95,7 +96,7 @@ export default function IndividualTicket() {
               fontWeight="600"
               sx={{ mb: 1 }}
             >
-              VIOLATION TYPE
+              {t("type")}
             </Typography>
             <Paper 
               sx={{ 
@@ -130,7 +131,7 @@ export default function IndividualTicket() {
                 }} 
               />
               <Typography variant="subtitle2" color="#00796b" fontWeight="600">
-                ISSUE DATE
+                {t("date")}
               </Typography>
             </Box>
             <Typography 

@@ -171,11 +171,19 @@
     }
   },
   "ticket": {
+    "ticket": "Ticket",
     "title": "Your Tickets",
     "noTickets": "You have no tickets at this time.",
     "evidence": {
       "title": "Evidence Photos",
       "photo": "Photo"
+    },
+    "payTicket": "Pay Ticket",
+    "challengeTicket": "Challenge Ticket",
+    "ticketDetails": {
+      "title": "Parking Violation",
+      "type": "VIOLATION TYPE",
+      "date": "ISSUE DATE"
     }
   }
 }

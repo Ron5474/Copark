@@ -8,9 +8,11 @@ import Paper from '@mui/material/Paper'
 import { Payment } from '../shared/actions'
 import { useTicketState } from './TicketContext'
 import theme from '../theme'
+import { useTranslations } from 'next-intl'
 
 export default function IndividualTicketButtons() {
   const { currentTicket, setCurrentView } = useTicketState()
+  const t = useTranslations('ticket')
 
   const handleViewChange = (view: string) => {
     setCurrentView(view)
@@ -56,7 +58,7 @@ export default function IndividualTicketButtons() {
           borderRadius: 2,
         }}
       >
-        Challenge Ticket
+        {t('challengeTicket')}
       </Button>}
 
       <Button
@@ -74,7 +76,7 @@ export default function IndividualTicketButtons() {
           borderRadius: 2,
         }}
       >
-        Pay Ticket
+        {t('payTicket')}
       </Button>
     </Paper>
   )

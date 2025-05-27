@@ -171,11 +171,19 @@
     }
   },
   "ticket": {
-    "title": "Tus entradas",
+    "ticket": "Multa",
+    "title": "Sus Multas",
     "noTickets": "No tienes entradas en este momento.",
     "evidence": {
       "title": "Evidencia",
       "photo": "Foto"
+    },
+    "payTicket": "Pagar multa",
+    "challengeTicket": "Impugnar multa",
+    "ticketDetails": {
+      "title": "Infracción de estacionamiento",
+      "type": "TIPO DE VIOLACIÓN",
+      "date": "FECHA DE EMISIÓN"
     }
   }
 }

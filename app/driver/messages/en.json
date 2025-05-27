@@ -36,7 +36,13 @@
     "selected": "Selected",
     "purchase": "Purchase Permit",
     "loading": "Loading permits...",
-    "zone": "Zone"
+    "zone": "Zone",
+    "activePermits": "Active Permits",
+    "futurePermits": "Future Permits",
+    "expiredPermits": "Expired Permits",
+    "area": "Area",
+    "active": "Active",
+    "expires": "Expires"
   },
   "bottomNav": {
     "home": "Home",

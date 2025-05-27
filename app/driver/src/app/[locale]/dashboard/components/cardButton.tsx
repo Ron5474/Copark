@@ -52,7 +52,7 @@
 // export default CardButton;
 "use client";
 
-import { Box, Paper, Typography, Collapse, IconButton, Chip } from "@mui/material";
+import { Box, Paper, Typography, Collapse, IconButton, Chip, SxProps } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
@@ -64,6 +64,7 @@ type CardButtonProps = {
   children?: React.ReactNode;
   hideArrow?: boolean;
   badgeText?: string;
+  sx?: SxProps;
 };
 
 function CardButton({

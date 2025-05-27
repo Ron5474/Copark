@@ -36,7 +36,13 @@
     "selected": "Seleccionado",
     "purchase": "Comprar Permiso",
     "loading": "Cargando permisos...",
-    "zone": "Zona"
+    "zone": "Zona",
+    "activePermits": "Permisos Activos",
+    "futurePermits": "Permisos Futuros",
+    "expiredPermits": "Permisos Vencidos",
+    "area": "Área",
+    "active": "Activo",
+    "expires": "Vence"
   },
   "bottomNav": {
     "home": "Inicio",

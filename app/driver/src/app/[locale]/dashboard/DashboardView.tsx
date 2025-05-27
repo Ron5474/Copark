@@ -1,24 +1,24 @@
-// "use client";
-// /**
-//  * @file DashboardView.tsx
-//  * @description This file contains the DashboardView component.
-//  * @author Swayam Shah
-//  */
+// // "use client";
+// // /**
+// //  * @file DashboardView.tsx
+// //  * @description This file contains the DashboardView component.
+// //  * @author Swayam Shah
+// //  */
 
-// import CardButton from "./components/cardButton";
-// import { useContext } from "react";
-// import { DashboardContext } from "./context";
+// // import CardButton from "./components/cardButton";
+// // import { useContext } from "react";
+// // import { DashboardContext } from "./context";
 
-// function DashboardView() {
-//   const context = useContext(DashboardContext)
-//   return (
-//     <>
-//       <CardButton icon="/driver/assets/garage.svg" text="Garage" click={() => {context.setCurrentPage('garage')}}/>
-//       {/* <CardButton icon="/driver/assets/Add_car.svg" text="Add Vehicle" click={() => {context.setCurrentPage('add-vehicle')}}/> */}
-//       <CardButton icon="/driver/assets/permit.svg" text="Buy Permit" click={() => {context.setCurrentPage('buy-permit')}}/>
-//     </>
-//   );
-// }
+// // function DashboardView() {
+// //   const context = useContext(DashboardContext)
+// //   return (
+// //     <>
+// //       <CardButton icon="/driver/assets/garage.svg" text="Garage" click={() => {context.setCurrentPage('garage')}}/>
+// //       {/* <CardButton icon="/driver/assets/Add_car.svg" text="Add Vehicle" click={() => {context.setCurrentPage('add-vehicle')}}/> */}
+// //       <CardButton icon="/driver/assets/permit.svg" text="Buy Permit" click={() => {context.setCurrentPage('buy-permit')}}/>
+// //     </>
+// //   );
+// // }
 
 "use client";
 
@@ -35,27 +35,41 @@ import {
 import CardButton from "./components/cardButton";
 import { useTranslations } from "next-intl";
 import { DashboardContext } from "./context";
-import type { LotGroup } from "../types";
+import type { LotGroup, Permit } from "../types";
 import { Payment } from "../shared/actions";
-import MyPermitsCard from "./components/MyPermitCard";
 
 export default function DashboardView() {
   const t = useTranslations("dashboard");
   const tp = useTranslations("permits");
   const context = useContext(DashboardContext);
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedLots, setSelectedLots] = useState<Record<string, string>>({});
   const [permits, setPermits] = useState<LotGroup[]>([]);
+  const [activePermits, setActivePermits] = useState<Permit[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPermits = async () => {
+    const fetchData = async () => {
       const { getLotDetails } = await import("./permitActions");
-      const data = await getLotDetails();
-      setPermits(data);
-      setLoading(false);
+      const { getMyPermits } = await import("./permitActions");
+
+      try {
+        const [lots, myPermits] = await Promise.all([
+          getLotDetails(),
+          getMyPermits(),
+        ]);
+
+        setPermits(lots);
+        setActivePermits(myPermits.active);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchPermits();
+
+    fetchData();
   }, []);
 
   const toggleExpanded = (id: string) => {
@@ -72,6 +86,7 @@ export default function DashboardView() {
   const checkout = async (permit: LotGroup) => {
     const selectedLot = selectedLots[permit.id];
     const lot = permit.lots.find((lot) => lot.name === selectedLot);
+
     const permitDetails = {
       type: "permit",
       duration: permit.id,
@@ -79,16 +94,18 @@ export default function DashboardView() {
       lot: selectedLot.slice(3),
     };
     sessionStorage.setItem("permitDetails", JSON.stringify(permitDetails));
+
     const paymentDetails = {
-      price: lot ? parseFloat(lot.price.slice(1)) * 100 : 0, // Convert to cents
+      price: lot ? parseFloat(lot.price.slice(1)) * 100 : 0,
       currency: "USD",
     };
     sessionStorage.setItem("paymentDetails", JSON.stringify(paymentDetails));
+
     if (selectedLot) {
       await Payment(
         "permit",
         selectedLot,
-        lot ? parseFloat(lot.price.slice(1))*100 : 0,
+        paymentDetails.price,
         `${permit.id.charAt(0).toUpperCase() + permit.id.slice(1)} Permit for ${selectedLot}`,
         "USD"
       );
@@ -100,34 +117,78 @@ export default function DashboardView() {
   }
 
   return (
-    <Box sx={{ pt: 3, px: 2, pb: 7, backgroundColor: '#f8fffe' }}>
+    <Box sx={{ pt: 3, px: 2, pb: 7, backgroundColor: "#f8fffe" }}>
+      {/* Active Permits */}
+      {activePermits.length > 0 && (
+        <CardButton
+          text={t("activePermits")}
+          expanded={expandedId === "active"}
+          onToggle={() => toggleExpanded("active")}
+          icon=""
+          sx={{
+            backgroundColor: "#d6f5e3",
+            border: "1px solid #a5d6a7",
+          }}
+        >
+          <Stack spacing={2}>
+            {activePermits.map((permit, idx) => (
+              <Box
+                key={idx}
+                sx={{
+                  backgroundColor: "#e0f7e9",
+                  border: "1px solid #b2dfdb",
+                  borderRadius: 2,
+                  px: 2,
+                  py: 1,
+                }}
+              >
+                <Typography fontWeight="bold" color="primary.main">
+                  {tp("lot")}
+                  {permit.type}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {t("active")}: {new Date(permit.activeDate!).toLocaleDateString()}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {t("expires")}: {new Date(permit.expireDate).toLocaleDateString()}
+                </Typography>
+              </Box>
+            ))}
+          </Stack>
+        </CardButton>
+      )}
+
       <Typography variant="h5" fontWeight="bold" gutterBottom>
         {t("title")}
       </Typography>
-      <MyPermitsCard />
+
+      {/* Lot Purchase Cards */}
       {permits.map((permit) => (
         <CardButton
-            key={permit.id}
-            text={tp(permit.title)}
-            expanded={expandedId === permit.id}
-            onToggle={() => toggleExpanded(permit.id)}
-            icon=""
-            badgeText={
-              permit.id === "yearly"
-                ? t("bestValue")
-                : permit.id === "daily"
-                ? t("quickAccess")
-                : undefined
-            }
-          >
+          key={permit.id}
+          text={tp(permit.title)}
+          expanded={expandedId === permit.id}
+          onToggle={() => toggleExpanded(permit.id)}
+          icon=""
+          badgeText={
+            permit.id === "yearly"
+              ? t("bestValue")
+              : permit.id === "daily"
+              ? t("quickAccess")
+              : undefined
+          }
+        >
           <Stack spacing={1}>
             <RadioGroup
               value={selectedLots[permit.id] || ""}
               onChange={(e) => handleLotChange(permit.id, e.target.value)}
             >
               {permit.lots.map((lot) => {
-                const formattedName =
-                  lot.name.toLowerCase().includes("any") ? t("allLotsAccess") : `${tp('lot')}${lot.name.slice(3)}`;
+                const formattedName = lot.name
+                  .toLowerCase()
+                  .includes("any")
+                  ? t("allLotsAccess")
+                  : `${tp("lot")}${lot.name.slice(3)}`;
 
                 return (
                   <FormControlLabel
@@ -140,12 +201,6 @@ export default function DashboardView() {
                 );
               })}
             </RadioGroup>
-
-            {/* {selectedLots[permit.id] && (
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                {t("selected")}: <strong>{selectedLots[permit.id]}</strong>
-              </Typography>
-            )} */}
 
             <Button
               variant="contained"

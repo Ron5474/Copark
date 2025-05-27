@@ -198,5 +198,33 @@
       "line2": "Redirecting back automatically...",
       "back": "Go Back To Ticket"
     }
+  },
+  "garage": {
+    "add": {
+      "add Vehicle": "Add Vehicle",
+      "license": {
+              "label": "License Plate Number",
+              "required": "License plate number is required",
+              "constraint": "Must be 1-10 characters"
+            },
+            "country": "Country",
+            "state": "State",
+            "nickname": "Nickname",
+            "optional": "optional",
+            "continue": "Save"
+      },
+    "checkout": {
+      "title": "Which Vehicle?",
+      "continue": "Continue"
+    },
+    "title": "Your Vehicles",
+    "add vehicle": "Add Vehicle",
+    "subtitle": "Vehicle Preference",
+    "default": "default",
+    "edit": "Edit",
+    "noVehicles": "No vehicles yet",
+    "prompt": "Add your vehicle information to start parking",
+    "setDefault": "Set as Default Vehicle",
+    "selectVehicleError": "Please select a vehicle"
   }
 }

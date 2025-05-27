@@ -26,6 +26,7 @@ import {
 
 import theme from '../theme'
 import { addVehicle } from './actions'
+import { useTranslations } from 'next-intl'
 
 
 export default function AddForm({ isGuest = false, close = () => {} }: { isGuest?: boolean, close?: () => void }) {
@@ -36,6 +37,7 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
   const [nickname, setNickname] = useState<string | undefined>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null) // new
+  const t = useTranslations('garage.add')
 
   // const submitVehicle = async () => {
   //   setIsValidEntry(plateNumber.length > 0)
@@ -94,14 +96,14 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
           marginTop: '1vh',
         }}
       >
-        Add Vehicle
+       {t('add Vehicle')}
       </Typography>
       <Box sx={{marginTop: '1vh'}}>
         <Typography
           variant="body1"
           sx={{margin: 0}}
         >
-          License Plate Number
+          {t('license.label')}
         </Typography>
         {/* <TextField
           required
@@ -120,8 +122,8 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
             errorMessage
               ? errorMessage
               : isValidEntry
-                ? "Must be 1-10 characters"
-                : "License plate number is required"
+                ? t('license.constraint')
+                : t('license.required')
           }
           placeholder="e.g. 1ABC123"
           value={plateNumber}
@@ -144,7 +146,7 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
           variant="body1"
           sx={{margin: 0}}
         >
-          Country
+          {t('country')}
         </Typography>
         <TextField
           select
@@ -172,7 +174,7 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
           variant="body1"
           sx={{margin: 0}}
         >
-          State
+          {t('state')}
         </Typography>
         <TextField
           select
@@ -200,10 +202,10 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
         <Box sx={{marginTop: '2vh'}}>
           <Box sx={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
             <Typography variant="body1" sx={{ margin: 0 }}>
-              Nickname
+              {t('nickname')}
             </Typography>
             <Typography variant="body2" sx={{ margin: 0, fontStyle: 'italic' }}>
-              (optional)
+              ({t('optional')})
             </Typography>
           </Box>
           <TextField
@@ -241,7 +243,7 @@ export default function AddForm({ isGuest = false, close = () => {} }: { isGuest
           textTransform: 'none',
         }}
       >
-        {isGuest ? "Continue" : "Save"}
+        {isGuest ? "Continue" : t('save')}
       </Button>
     </Box>
   )

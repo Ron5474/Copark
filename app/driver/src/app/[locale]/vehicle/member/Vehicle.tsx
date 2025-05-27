@@ -27,6 +27,7 @@ import Loader from '../../shared/Loader'
 import theme from '../../theme'
 import { Vehicle } from '../../types'
 import { getVehicles, updateDefaultVehicle } from '../actions'
+import { useTranslations } from 'next-intl'
 
 
 export default function MemberVehicles({ isCheckout = false }: { isCheckout?: boolean }) {
@@ -36,6 +37,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
   const [selectedPlate, setSelectedPlate] = useState<string | null>(null)
   const [isValidSelection, setIsValidSelection] = useState<boolean>(true)
   const [loading, setLoading] = useState(true)
+  const t = useTranslations('garage')
 
   useEffect(() => {
     (async () => {
@@ -90,13 +92,13 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
           variant="h5"
           gutterBottom
         >
-          {isCheckout ? "Which Vehicle?" : "Your Vehicles"}
+          {isCheckout ? t("checkout.title") : t("title") }
         </Typography>
         <Button
           onClick={handleOpen}
           aria-label='Add a vehicle'
           sx={{
-            width: '150px',
+            padding: '8px 16px',
             alignSelf: 'end',
             fontSize: '1.15rem',
             color: theme.palette.primary.dark,
@@ -105,7 +107,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
             borderRadius: '25px',
           }}
         >
-          + Add Vehicle
+          + {t("add vehicle")}
         </Button>
         {open && (
           <Dialog
@@ -155,7 +157,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
 
           <Box sx={{ mt: 2 }}>
             <Typography sx={{ textAlign: 'left', mb: 1, color: '#4b4b4b' }}>
-              Vehicle Preference
+              {t("subtitle")}
             </Typography>
 
             <Box
@@ -188,11 +190,11 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                                 {v.state}
                               </Typography>
                             </Typography>
-                            {v.default && v.default==true && <Chip label="default" size='small' sx={{
+                            {v.default && v.default==true && <Chip label={t("default")} size='small' sx={{
                               backgroundColor: '#dcfce7',
                               color: '#166534',
                               fontWeight: 600,
-                              marginLeft: 5
+                              marginLeft: 4
                             }}/>}
                           </Box>
                         {v.nickname && (
@@ -222,7 +224,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
 
             {!isValidSelection && (
               <Typography color="error" variant="body2" sx={{ mt: 1, textAlign: 'left' }}>
-                Please select a vehicle
+                {t("selectVehicleError")}
               </Typography>
             )}
 
@@ -239,7 +241,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                 textTransform: 'none',
               }}
             >
-              {isCheckout ? "Continue" : "Edit"}
+              {isCheckout ? t("checkout.continue") : t("edit")}
             </Button>
             {!isCheckout && selectedPlate && (
               vehicles.find(v => v.plate === selectedPlate)?.default !== true
@@ -257,7 +259,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                   fontWeight: 600,
                   textTransform: 'none',
                 }}>
-                Set as Default Vehicle
+                {t("setDefault")}
                 </Button>
             )}
           </Box>
@@ -266,10 +268,10 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
 
           <Fragment>
             <Typography gutterBottom sx={{fontWeight: '600', color: '#6a6a6a', mt: '8vh'}}>
-              No vehicles yet
+              {t("noVehicles")}
             </Typography>
             <Typography gutterBottom sx={{color: '#6a6a6a'}}>
-              Add your vehicle information to start parking
+              {t("prompt")}
             </Typography>
             <Button
               onClick={handleOpen}
@@ -283,7 +285,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                 textTransform: 'none',
               }}
             >
-              Add Vehicle
+              {t("add vehicle")}
             </Button>
           </Fragment>
 

@@ -226,5 +226,14 @@
     "prompt": "Añade la información de tu vehículo para comenzar a estacionar",
     "setDefault": "Establecer como vehículo predeterminado",
     "selectVehicleError": "Por favor seleccione un vehículo"
+  },
+  "paymentConfirmation": {
+    "title": "Pago confirmado",
+    "transaction": "Identificación de la transacción:",
+    "description": {
+      "line1": "Su pago se ha procesado correctamente. ¡Gracias por su pedido!",
+      "line2": "Recibirá un correo electrónico de confirmación en breve."
+    },
+    "continue": "Continuar al panel de control"
   }
 }

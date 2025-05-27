@@ -226,5 +226,14 @@
     "prompt": "Add your vehicle information to start parking",
     "setDefault": "Set as Default Vehicle",
     "selectVehicleError": "Please select a vehicle"
+  },
+  "paymentConfirmation": {
+    "title": "Payment Confirmed",
+    "transaction": "Transaction Id:",
+    "description": {
+      "line1": "Your payment has been successfully processed. Thank you for your order!",
+      "line2": "You will receive a confirmation email shortly."
+    },
+    "continue": "Continue to Dashboard"
   }
 }

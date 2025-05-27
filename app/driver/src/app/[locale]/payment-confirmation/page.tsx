@@ -8,11 +8,15 @@ import { getTransactionDetails, addPaymentDetails, addPermitDetails, addTicketDe
 import { Box, Button, Toolbar, Typography } from "@mui/material";
 import theme from "../theme";
 import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 function PaymentConfirmation() {
   const sessionId = useSearchParams().get("session_id");
   const [transactionId, setTransactionId] = useState<string | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
   const router = useRouter();
+  const t = useTranslations("paymentConfirmation");
+
   const handleClick = () => {
     router.push("/dashboard");
   };
@@ -42,6 +46,7 @@ function PaymentConfirmation() {
       }
       sessionStorage.removeItem("permitDetails");
       sessionStorage.removeItem("paymentDetails");
+      setConfirmed(true);
     };
     fetchSessionDetails();
   }, [sessionId]);
@@ -51,19 +56,24 @@ function PaymentConfirmation() {
       <Topbar />
       <Toolbar />
       <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", marginTop: "10vh", textAlign: "center"}}>
-      <picture>
-        <source srcSet="/driver/assets/tick.svg" type="image/svg+xml" />
-        <img src="/driver/assets/tick.svg" alt="payment confirmed" width={200} height={200} aria-label="tick" />
-      </picture>
-      <Typography variant="h5" sx={{ fontWeight: 600, color: "green" }}>Payment Confirmed</Typography>
-      {transactionId && (
-      <Typography variant="body1" sx={{ fontWeight: 600, color: "gray" }}>
-        Transaction Id: {transactionId}</Typography>)}
-      <Typography variant="body1" sx={{ fontWeight: 400, color: "black", marginTop: "1rem" }}>
-        Your payment has been successfully processed. Thank you for your order!</Typography>
-      <Typography variant="body1" sx={{ fontWeight: 400, color: "black" }}>
-        You will receive a confirmation email shortly.</Typography>
-        <Button sx={{marginTop: "20%", backgroundColor: theme.palette.primary.main, color: "white", padding: '18px'}} onClick={() => handleClick()}>Continue to Dashboard</Button>
+        <picture>
+          <source srcSet="/driver/assets/tick.svg" type="image/svg+xml" />
+          <img src="/driver/assets/tick.svg" alt="payment confirmed" width={200} height={200} aria-label="tick" />
+        </picture>
+        <Typography variant="h5" sx={{ fontWeight: 600, color: "green" }}>
+          {t("title")}
+        </Typography>
+        {transactionId && (
+        <Typography variant="body1" sx={{ fontWeight: 600, color: "gray" }}>
+          {t("transaction")} {transactionId}
+        </Typography>)}
+        <Typography variant="body1" sx={{ fontWeight: 400, color: "black", marginTop: "1rem" }}>
+          {t("description.line1")}
+        </Typography>
+        <Typography variant="body1" sx={{ fontWeight: 400, color: "black" }}>
+          {t("description.line2")}
+        </Typography>
+        {confirmed && <Button sx={{marginTop: "20%", backgroundColor: theme.palette.primary.main, color: "white", padding: '18px'}} onClick={() => handleClick()}>{t("continue")}</Button>}
       </Box>
     </>
   );

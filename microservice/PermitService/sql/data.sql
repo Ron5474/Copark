@@ -125,8 +125,14 @@ INSERT INTO type (id, location, data) VALUES
       'name', 'lot',
       'area', 'ANY',
       'daily', 15,
-      'quarterly', 200,
-      'yearly', 500
+      'quarterly', jsonb_build_object(
+        'price', 200,
+        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+      ),
+      'yearly', jsonb_build_object(
+        'price', 500,
+        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+      )
     )
   );
 
@@ -138,8 +144,14 @@ INSERT INTO type (id, location, data) VALUES
       'name', 'lot',
       'area', 'A',
       'daily', 12,
-      'quarterly', 150,
-      'yearly', 350
+      'quarterly', jsonb_build_object(
+        'price', 150,
+        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+      ),
+      'yearly', jsonb_build_object(
+        'price', 350,
+        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+      )
     )
   );
 
@@ -151,8 +163,14 @@ INSERT INTO type (id, location, data) VALUES
       'name', 'lot',
       'area', 'B',
       'daily', 10,
-      'quarterly', 120,
-      'yearly', 300
+      'quarterly', jsonb_build_object(
+        'price', 120,
+        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+      ),
+      'yearly', jsonb_build_object(
+        'price', 300,
+        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+      )
     )
   );
 
@@ -164,8 +182,14 @@ INSERT INTO type (id, location, data) VALUES
       'name', 'lot',
       'area', 'C',
       'daily', 8,
-      'quarterly', 100,
-      'yearly', 250
+      'quarterly', jsonb_build_object(
+        'price', 100,
+        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+      ),
+      'yearly', jsonb_build_object(
+        'price', 250,
+        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+      )
     )
   );
 
@@ -177,8 +201,14 @@ INSERT INTO type (id, location, data) VALUES
       'name', 'lot',
       'area', 'R',
       'daily', 6,
-      'quarterly', 80,
-      'yearly', 200
+      'quarterly', jsonb_build_object(
+        'price', 80,
+        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+      ),
+      'yearly', jsonb_build_object(
+        'price', 200,
+        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+      )
     )
   );
 

@@ -25,12 +25,12 @@ const reasons = [
 ]
 
 export default function IssueViolationForm({ onCancel }: { onCancel: () => void }) {
-  const { plate, setShowSuccess, setPlate, setTitle } = useEnforcement()
+  const { plate, setShowSuccess, setTitle } = useEnforcement()
   const [reason, setReason] = useState('')
   const [note, setNote] = useState('')
   const [photo, setPhoto] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState({ plate: false, reason: false })
+  const [errors, setErrors] = useState({ reason: false, photo: false })
 
   useEffect(() => {
       setTitle('Issue Violation')
@@ -39,17 +39,22 @@ export default function IssueViolationForm({ onCancel }: { onCancel: () => void 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setPhoto(e.target.files[0])
+      setErrors((prev) => ({ ...prev, photo: false }))
     }
   }
 
   const removePhoto = () => {
     setPhoto(null)
+    const input = document.getElementById('violation-photo') as HTMLInputElement | null
+    if (input) {
+      input.value = ''
+    }
   }
 
   const handleSubmit = async () => {
-    const newErrors = { plate: !plate, reason: !reason }
+    const newErrors = { reason: !reason , photo: !photo}
     setErrors(newErrors)
-    if (newErrors.plate || newErrors.reason) return
+    if (newErrors.photo || newErrors.reason) return
 
     setLoading(true)
 
@@ -83,14 +88,15 @@ export default function IssueViolationForm({ onCancel }: { onCancel: () => void 
           name="plate"
           label="License Plate"
           value={plate ?? ''}
-          onChange={(e) => {
-            const value = e.target.value
-            setPlate(value)
-            if (errors.plate && value) setErrors((prev) => ({ ...prev, plate: false }))
+          slotProps={{
+            input: {
+              inputProps: {
+                readOnly: true,
+              },
+            },
           }}
           fullWidth
-          error={errors.plate}
-          helperText={errors.plate ? 'License plate is required.' : ''}
+          disabled
         />
 
         <TextField
@@ -139,6 +145,12 @@ export default function IssueViolationForm({ onCancel }: { onCancel: () => void 
             onChange={handlePhotoUpload}
           />
         </Button>
+
+        {errors.photo && (
+          <Typography color="error" variant="body2">
+            A photo is required.
+          </Typography>
+        )}
 
         {photo && (
           <Paper

@@ -7,9 +7,11 @@
 
 import { Box, Typography } from '@mui/material';
 import VehicleForm from './onBoardingVehicleForm';
+import { useTranslations } from 'next-intl';
 
 
 export default function AddVehicleView() {
+  const t = useTranslations("onboarding.vehicle.page2");
   return (<Box
       sx={{
         minHeight: "100vh",
@@ -33,10 +35,10 @@ export default function AddVehicleView() {
         }}
       >
         <Typography variant="h5" component="h1" fontWeight="bold" color="white" gutterBottom align="center">
-          Add Your First Vehicle
+          {t("prompt")}
         </Typography>
         <Typography variant="body2" color="white" textAlign="center" sx={{ mb: 3 }}>
-          Let&apos;s get started by adding your vehicle details
+          {t("subline")}
         </Typography>
         <picture>
           <source media="(max-width: 600px)" srcSet="/driver/assets/onboardingCar.svg" />

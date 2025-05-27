@@ -151,7 +151,23 @@
         "prompt": "Add Your First Vehicle",
         "secure": "Your data is secure • Add unlimited vehicles later"
       },
-      "page2": {}
+      "page2": {
+        "prompt": "Add Your First Vehicle",
+        "subline": "Let's get started by adding your vehicle details.",
+        "form": {
+          "title": "Add Vehicle",
+          "license": {
+            "label": "License Plate Number",
+            "required": "License plate number is required",
+            "constraint": "Must be 1-10 characters"
+          },
+          "country": "Country",
+          "state": "State",
+          "nickname": "Nickname",
+          "optional": "optional",
+          "continue": "Continue to Dashboard"
+        }
+      }
     }
   }
 }

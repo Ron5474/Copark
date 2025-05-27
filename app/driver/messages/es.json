@@ -151,7 +151,23 @@
         "prompt": "Añade tu primer vehículo",
         "secure": "Sus datos están seguros • Agregue vehículos ilimitados más tarde"
       },
-      "page2": {}
+      "page2": {
+        "prompt": "Añade tu primer vehículo",
+        "subline": "Comencemos agregando los detalles de su vehículo.",
+        "form": {
+          "title": "Agregar vehículo",
+          "license": {
+            "label": "Número de matrícula",
+            "required": "Se requiere el número de matrícula",
+            "constraint": "Debe tener entre 1 y 10 caracteres"
+          },
+          "country": "País",
+          "state": "Estado",
+          "nickname": "Apodo del vehículo",
+          "optional": "opcional",
+          "continue": "Continuar al panel de control"
+        }
+      }
     }
   }
 }

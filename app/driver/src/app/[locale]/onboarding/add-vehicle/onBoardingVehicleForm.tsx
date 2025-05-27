@@ -28,6 +28,7 @@ import theme from '../../theme'
 import { addVehicle } from '../../vehicle/actions'
 import { setOnBoardingState } from '../../signup/actions'
 import { useRouter } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 
 
 export default function AddForm() {
@@ -37,6 +38,7 @@ export default function AddForm() {
   const [state, setState] = useState<string>(Object.values(locations)[0][0])
   const [nickname, setNickname] = useState<string | undefined>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const t = useTranslations("onboarding.vehicle.page2.form")
 
   const router = useRouter()
 
@@ -82,14 +84,14 @@ export default function AddForm() {
           marginTop: '1vh',
         }}
       >
-        Add Vehicle
+        {t("title")}
       </Typography>
       <Box sx={{marginTop: '1vh'}}>
         <Typography
           variant="body1"
           sx={{margin: 0}}
         >
-          License Plate Number
+          {t("license.label")}
         </Typography>
         <TextField
           required
@@ -97,8 +99,8 @@ export default function AddForm() {
           error={!isValidEntry}
           helperText={
             isValidEntry ?
-            "Must be 1-10 characters" :
-            "License plate number is required"
+            t("license.constraint") :
+            t("license.required")
           }
           placeholder="e.g. 1ABC123"
           value={plateNumber}
@@ -121,7 +123,7 @@ export default function AddForm() {
           variant="body1"
           sx={{margin: 0}}
         >
-          Country
+          {t("country")}
         </Typography>
         <TextField
           select
@@ -149,7 +151,7 @@ export default function AddForm() {
           variant="body1"
           sx={{margin: 0}}
         >
-          State
+          {t("state")}
         </Typography>
         <TextField
           select
@@ -176,10 +178,10 @@ export default function AddForm() {
         <Box sx={{marginTop: '2vh'}}>
           <Box sx={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
             <Typography variant="body1" sx={{ margin: 0 }}>
-              Nickname
+              {t("nickname")}
             </Typography>
             <Typography variant="body2" sx={{ margin: 0, fontStyle: 'italic' }}>
-              (optional)
+              ({t("optional")})
             </Typography>
           </Box>
           <TextField
@@ -216,7 +218,7 @@ export default function AddForm() {
           textTransform: 'none',
         }}
       >
-        Continue to Dashboard
+        {t("continue")}
       </Button>
     </Box>
   )

@@ -345,8 +345,8 @@ export class PermitService {
       default:
         throw new Error('Incorrect permit option')
     }
-    if (subTotal === undefined) throw new Error(`Lot type ${input.lot} does not have ${input.duration} duration option`)
-    const total = service + subTotal
+    // if (subTotal === undefined) throw new Error(`Lot type ${input.lot} does not have ${input.duration} duration option`)
+    const total = service + (subTotal as number)
     const receipt = {
       service,
       subTotal,

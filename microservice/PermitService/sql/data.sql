@@ -124,7 +124,9 @@ INSERT INTO type (id, location, data) VALUES
     jsonb_build_object(
       'name', 'lot',
       'area', 'ANY',
-      'daily', 15,
+      'daily', jsonb_build_object(
+        'price', 15
+      ),
       'quarterly', jsonb_build_object(
         'price', 200,
         'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
@@ -143,7 +145,9 @@ INSERT INTO type (id, location, data) VALUES
     jsonb_build_object(
       'name', 'lot',
       'area', 'A',
-      'daily', 12,
+      'daily', jsonb_build_object(
+        'price', 12
+      ),
       'quarterly', jsonb_build_object(
         'price', 150,
         'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
@@ -162,7 +166,9 @@ INSERT INTO type (id, location, data) VALUES
     jsonb_build_object(
       'name', 'lot',
       'area', 'B',
-      'daily', 10,
+      'daily', jsonb_build_object(
+        'price', 10
+      ),
       'quarterly', jsonb_build_object(
         'price', 120,
         'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
@@ -181,7 +187,9 @@ INSERT INTO type (id, location, data) VALUES
     jsonb_build_object(
       'name', 'lot',
       'area', 'C',
-      'daily', 8,
+      'daily', jsonb_build_object(
+        'price', 8
+      ),
       'quarterly', jsonb_build_object(
         'price', 100,
         'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
@@ -200,7 +208,9 @@ INSERT INTO type (id, location, data) VALUES
     jsonb_build_object(
       'name', 'lot',
       'area', 'R',
-      'daily', 6,
+      'daily', jsonb_build_object(
+        'price', 6
+      ),
       'quarterly', jsonb_build_object(
         'price', 80,
         'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz

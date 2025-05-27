@@ -74,6 +74,7 @@ function CardButton({
   children,
   hideArrow = false,
   badgeText,
+  sx = {}
 }: CardButtonProps) {
   return (
     <Paper
@@ -86,6 +87,7 @@ function CardButton({
         background: "linear-gradient(135deg, #e0f7f7 0%, #b2dfdb 100%)",
         border: "1px solid #80cbc4",
         boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.05)",
+        ...sx,
       }}
     >
       <Box

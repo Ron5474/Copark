@@ -118,7 +118,6 @@ export default function DashboardView() {
 
   return (
     <Box sx={{ pt: 3, px: 2, pb: 7, backgroundColor: "#f8fffe" }}>
-      {/* Active Permits */}
       {activePermits.length > 0 && (
         <CardButton
           text={t("activePermits")}
@@ -126,8 +125,8 @@ export default function DashboardView() {
           onToggle={() => toggleExpanded("active")}
           icon=""
           sx={{
-            backgroundColor: "#d6f5e3",
-            border: "1px solid #a5d6a7",
+            background: "#e3fcef",
+            border: "1px solid #66bb6a",
           }}
         >
           <Stack spacing={2}>
@@ -135,8 +134,8 @@ export default function DashboardView() {
               <Box
                 key={idx}
                 sx={{
-                  backgroundColor: "#e0f7e9",
-                  border: "1px solid #b2dfdb",
+                  backgroundColor: "#f1f8e9",
+                  border: "1px solid #c5e1a5",
                   borderRadius: 2,
                   px: 2,
                   py: 1,

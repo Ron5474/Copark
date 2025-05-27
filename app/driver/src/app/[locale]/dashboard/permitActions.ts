@@ -54,18 +54,21 @@ export const getMyPermits = async (): Promise<MyPermits> => {
             active {
               vehicle
               type
+              area
               activeDate
               expireDate
             }
             future {
               vehicle
               type
+              area
               activeDate
               expireDate
             }
             expired {
               vehicle
               type
+              area
               activeDate
               expireDate
             }

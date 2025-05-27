@@ -143,8 +143,8 @@ export default function DashboardView() {
                 }}
               >
                 <Typography fontWeight="bold" color="primary.main">
-                  {tp("lot")}
-                  {permit.type}
+                  {permit.type.charAt(0).toUpperCase() + permit.type.slice(1) + " "}
+                  {permit.area}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {t("active")}: {new Date(permit.activeDate!).toLocaleDateString()}

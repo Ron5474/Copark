@@ -116,32 +116,41 @@ export class PermitService {
 
     const result = await pool.query(`
         WITH future AS (
-          SELECT vehicle,
-            type,
-            data->>'activeDate' AS "activeDate",
-            data->>'expireDate' AS "expireDate"
-          FROM permit
-          WHERE vehicle = ANY($1::uuid[])
-          AND now() <= (data->>'activeDate')::timestamptz
+          SELECT DISTINCT ON (p.id) p.vehicle,
+            p.id AS id,
+            t.data->>'name' AS type,
+            t.data->>'area' AS area,
+            p.data->>'activeDate' AS "activeDate",
+            p.data->>'expireDate' AS "expireDate"
+          FROM permit p, type t 
+          WHERE p.vehicle = ANY($1::uuid[]) AND 
+          t.id = p.type 
+          AND now() <= (p.data->>'activeDate')::timestamptz
         ),
         active AS (
-          SELECT vehicle,
-            type,
-            data->>'activeDate' AS "activeDate",
-            data->>'expireDate' AS "expireDate"
-          FROM permit
-          WHERE vehicle = ANY($1::uuid[])
-          AND now() >= (data->>'activeDate')::timestamptz
-          AND now() <= (data->>'expireDate')::timestamptz
+          SELECT DISTINCT ON (p.id) p.vehicle,
+            p.id AS id,
+            t.data->>'name' AS type,
+            t.data->>'area' AS area,
+            p.data->>'activeDate' AS "activeDate",
+            p.data->>'expireDate' AS "expireDate"
+          FROM permit p, type t 
+          WHERE p.vehicle = ANY($1::uuid[]) AND 
+          t.id = p.type 
+          AND now() >= (p.data->>'activeDate')::timestamptz
+          AND now() <= (p.data->>'expireDate')::timestamptz
         ),
         expired AS (
-          SELECT vehicle,
-            type,
-            data->>'activeDate' AS "activeDate",
-            data->>'expireDate' AS "expireDate"
-          FROM permit
-          WHERE vehicle = ANY($1::uuid[])
-          AND now() >= (data->>'expireDate')::timestamptz
+          SELECT DISTINCT ON (p.id) p.vehicle,
+            p.id AS id,
+            t.data->>'name' AS type,
+            t.data->>'area' AS area,
+            p.data->>'activeDate' AS "activeDate",
+            p.data->>'expireDate' AS "expireDate"
+          FROM permit p, type t 
+          WHERE p.vehicle = ANY($1::uuid[]) AND 
+          t.id = p.type 
+          AND now() >= (p.data->>'expireDate')::timestamptz
         )
         SELECT
           COALESCE((SELECT json_agg(future) FROM future), '[]') AS future,

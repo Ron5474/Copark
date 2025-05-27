@@ -116,16 +116,25 @@ export class NewLot {
 }
 
 @ObjectType()
+export class LotTypeDetails {
+  @Field(() => Number)
+  price!: number
+
+  @Field(() => String, { nullable: true })
+  expireDate?: string
+}
+
+@ObjectType()
 export class LotDetails {
 
-  @Field(() => Number, { nullable: true })
-  daily?: number
+  @Field(() => LotTypeDetails, { nullable: true })
+  daily?: LotTypeDetails
 
-  @Field(() => Number, { nullable: true })
-  quarterly?: number
+  @Field(() => LotTypeDetails, { nullable: true })
+  quarterly?: LotTypeDetails
 
-  @Field(() => Number, { nullable: true })
-  yearly?: number
+  @Field(() => LotTypeDetails, { nullable: true })
+  yearly?: LotTypeDetails
 }
 
 @ObjectType()

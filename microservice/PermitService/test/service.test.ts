@@ -151,7 +151,7 @@ test('admin creates zone that already exists', async () => {
 
 test('lotDetails gives correct A daily permit', async () => {
   const { daily } = await permitService.getLotDetails('A')
-  expect(daily).toBe(12)
+  expect(daily.price).toBe(12)
 })
 
 test('lotDetails errors on wrong lot type', async () => {

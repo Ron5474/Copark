@@ -245,18 +245,7 @@ export class PermitService {
     )
     
     if (result.rowCount == 0) throw new Error(`Lot type ${lot} not found`)
-
-    const data = result.rows[0].data;
-    const excluded = new Set(['name', 'area']);
-    const prices: Record<string, number> = {};
-
-    for (const [key, value] of Object.entries(data)) {
-      if (!excluded.has(key) && value !== null && typeof value === 'object' && 'price' in value) {
-        prices[key] = value.price as number;
-      }
-    }
-  
-    return prices;
+    return result.rows[0].data
   }
 
   // public async getAllLotDetails(): Promise<LotDetails[]> {
@@ -334,13 +323,13 @@ export class PermitService {
     let subTotal
     switch (input.duration) {
       case 'daily':
-        subTotal = details.daily
+        subTotal = details.daily?.price
         break
       case 'quarterly':
-        subTotal = details.quarterly
+        subTotal = details.quarterly?.price
         break
       case 'yearly':
-        subTotal = details.yearly
+        subTotal = details.yearly?.price
         break
       default:
         throw new Error('Incorrect permit option')
@@ -361,7 +350,7 @@ export class PermitService {
     const purchaseDate = today.toISOString()
     const activeDate = today.toISOString() // TODO allow purchases in advance
     
-    const expireDate = new Date().toISOString() // TODO this needs to be a specific date/time based on lot details somehow
+    const expireDate = details[input.duration] ?? new Date().toISOString()
 
     const data = {
       purchaseDate,

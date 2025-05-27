@@ -1,5 +1,7 @@
 import { Resolver, Query,  Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { Request } from 'express'
+import { SignJWT } from 'jose'
+
 import {
   Confirmation,
   PurchaseZoneInput,
@@ -17,11 +19,20 @@ import {
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
+import { Vehicle } from '../types/express'
 
 const service = new PermitService()
+const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 @Resolver()
 export class PermitResolver {
+  private async encrypt(userId: string, key=internalKey): Promise<string> {
+    return new SignJWT({ id: userId })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('1h')
+      .sign(key) // used to be internalKey
+  }
 
   private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[], email: string }> {
     if (!token) {
@@ -263,7 +274,8 @@ export class PermitResolver {
   @Query(() => MyPermits)
   async myPermits(@Ctx() request: Request): Promise<MyPermits> {
     const token = request.headers.authorization?.split(' ')[1];
-    await this.getUserData(token);
+    const userData = await this.getUserData(token);
+    const userID = await this.encrypt(userData.id);
 
     const vehicleResponse = await fetch('http://localhost:4001/graphql', {
       method: 'POST',
@@ -273,23 +285,24 @@ export class PermitResolver {
       },
       body: JSON.stringify({
         query: `
-          query {
-            getDefaultVehicle {
+          query GetVehicleByUserId($userID: String!) {
+            getVehicleByUserId(userID: $userID) {
               id
             }
-          }
-        `,
+          }`,
+        variables: { userID },
       }),
     });
 
-    const json = await vehicleResponse.json();
-    const defaultVehicleId = json.data?.getDefaultVehicle?.id;
+    const vehicleResult = await vehicleResponse.json();
+    const vehicleIDs: Vehicle[] =
+      vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id);
 
-    if (!defaultVehicleId) {
+    if (!vehicleIDs) {
       return { active: [], future: [], expired: [] };
     }
 
-    return await service.getMyPermits(defaultVehicleId);
+    return await service.getMyPermits(vehicleIDs);
   }
 
 

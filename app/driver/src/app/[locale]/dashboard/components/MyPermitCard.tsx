@@ -8,7 +8,7 @@ import type { MyPermits, Permit } from "../../types";
 import { getMyPermits } from "../permitActions"
 
 export default function MyPermitsCard() {
-  const tp = useTranslations("permits");
+  const tp = useTranslations("mypermits");
   const [data, setData] = useState<MyPermits | null>(null);
   const [expanded, setExpanded] = useState(false);
 
@@ -28,9 +28,6 @@ export default function MyPermitsCard() {
 
     return (
       <>
-        <Typography fontWeight="bold" variant="body2" sx={{ mt: 1 }}>
-          {title}
-        </Typography>
         {permits.map((p, idx) => (
           <Typography key={idx} variant="body2">
             {tp(p.type)} - {tp("area")}: {p.area}<br />

@@ -235,5 +235,14 @@
       "line2": "Recibirá un correo electrónico de confirmación en breve."
     },
     "continue": "Continuar al panel de control"
+  },
+  "mypermits": {
+    "myPermits": "Mis Permisos",
+    "activePermits": "Permisos Activos",
+    "futurePermits": "Permisos Futuros",
+    "expiredPermits": "Permisos Vencidos",
+    "area": "Zona",
+    "active": "Activo Desde",
+    "expires": "Vence"
   }
 }

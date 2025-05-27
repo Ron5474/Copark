@@ -1,3 +1,4 @@
+import { Vehicle } from 'src/types/express'
 import { pool } from './db'
 import {
   Confirmation,
@@ -111,35 +112,35 @@ export class PermitService {
     return { isValid: true }
   }
 
-  public async getMyPermits(vid: string): Promise<MyPermits> {
+  public async getMyPermits(vid: Vehicle[]): Promise<MyPermits> {
 
     const result = await pool.query(`
         WITH future AS (
-          SELECT data->>'vehicle' AS vehicle,
+          SELECT vehicle,
             type,
-            data->>'activeDate' AS activeDate,
-            data->>'expireDate' AS expireDate
+            data->>'activeDate' AS "activeDate",
+            data->>'expireDate' AS "expireDate"
           FROM permit
-          WHERE vehicle = $1
+          WHERE vehicle = ANY($1::uuid[])
           AND now() <= (data->>'activeDate')::timestamptz
         ),
         active AS (
-          SELECT data->>'vehicle' AS vehicle,
+          SELECT vehicle,
             type,
-            data->>'activeDate' AS activeDate,
-            data->>'expireDate' AS expireDate
+            data->>'activeDate' AS "activeDate",
+            data->>'expireDate' AS "expireDate"
           FROM permit
-          WHERE vehicle = $1
+          WHERE vehicle = ANY($1::uuid[])
           AND now() >= (data->>'activeDate')::timestamptz
           AND now() <= (data->>'expireDate')::timestamptz
         ),
         expired AS (
-          SELECT data->>'vehicle' AS vehicle,
+          SELECT vehicle,
             type,
-            data->>'activeDate' AS activeDate,
-            data->>'expireDate' AS expireDate
+            data->>'activeDate' AS "activeDate",
+            data->>'expireDate' AS "expireDate"
           FROM permit
-          WHERE vehicle = $1
+          WHERE vehicle = ANY($1::uuid[])
           AND now() >= (data->>'expireDate')::timestamptz
         )
         SELECT
@@ -149,6 +150,7 @@ export class PermitService {
       `,
       [vid]
     )
+    console.log(result.rows[0])
 
     return result.rows[0]
   }

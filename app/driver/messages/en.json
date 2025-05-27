@@ -235,5 +235,14 @@
       "line2": "You will receive a confirmation email shortly."
     },
     "continue": "Continue to Dashboard"
+  },
+  "mypermits": {
+    "myPermits": "My Permits",
+    "activePermits": "Active Permits",
+    "futurePermits": "Future Permits",
+    "expiredPermits": "Expired Permits",
+    "area": "Area",
+    "active": "Active",
+    "expires": "Expires"
   }
 }

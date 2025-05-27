@@ -84,29 +84,56 @@ const adminUser = {
 //   password: 'password1',
 // }
 
-async function loginAs(who: string): Promise<string | undefined> {
+async function loginAs(who: string, defaultVehicle=true): Promise<{token: string, vid: string} | undefined> {
   if (who === "driver") {
-      const token = new SignJWT(driver)
-        .setProtectedHeader({ alg: 'HS256' })
-        .setIssuedAt()
-        .setExpirationTime('30m')
-        .sign(encodedKey)
-      const response = await supertest(AUTH_SERVICE_URL)
-        .post('/api/v0/auth/driver/login')
-        .set('Authorization', `Bearer ${await token}`)
-  
-      // console.log('Status:', response.status
-      // console.log('Headers:', response.headers)
-      // console.log('Body:', response.body)
-  
-      if (response.status !== 200) {
-        throw new Error(`Login failed with status ${response.status}`)
+    const token = await  new SignJWT(driver)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(encodedKey)
+
+    // Sign up
+    await supertest(AUTH_SERVICE_URL)
+      .post('/api/v0/auth/driver/signup')
+      .send({ authToken: token })
+
+    // Add Vehicle
+    const addVehicle = await supertest(vehcServer)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ 
+        query: regVehicleQuery,
+        variables: derikVehicleInput
+      })
+
+    const vid = addVehicle.body.data.registerVehicle.id
+    const setDefaultVehicleInput = {
+      input: {
+        id: vid
       }
-  
-      return token
+    }
+    if (defaultVehicle) {
+      await supertest(server)
+        .post('/graphql')
+        .set('Authorization', 'Bearer ' + token)
+        .send({ 
+          query: SetDefaultVehicle,
+          variables: setDefaultVehicleInput
+        })
+    }
+    
+    const response = await supertest(AUTH_SERVICE_URL)
+      .put('/api/v0/auth/driver/onboarding')
+      .set('Authorization', `Bearer ${token}`)
+      .send({newState: 'complete'})
+
+    const validStatuses = [200, 201, 204];
+    if (!validStatuses.includes(response.status)) {
+      throw new Error(`Login failed with status ${response.status}`)
     }
 
-  else if (who === "enforcement") {
+    return { token, vid }
+  } else if (who === "enforcement") {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
       .send({
@@ -117,12 +144,8 @@ async function loginAs(who: string): Promise<string | undefined> {
     if (response.status !== 200) {
       throw new Error(`Enforcement login failed with status ${response.status}`)
     }
-
     return response.body.id
-
-  } 
-  
-  else {
+  } else {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
       .send(adminUser)
@@ -130,8 +153,34 @@ async function loginAs(who: string): Promise<string | undefined> {
     if (response.status !== 200) {
       throw new Error(`Login failed with status ${response.status}`)
     }
-
     return response.body?.id
+  }
+}
+
+const regVehicleQuery = `
+mutation RegisterVehicle($input: RegisterVehicleInput!) {
+  registerVehicle(input: $input) {
+    id
+    plate
+    country
+    state
+    nickname
+  }
+}`
+
+const SetDefaultVehicle = `
+mutation SetDefaultVehicle($input: setDefaultVehicleInput!) {
+  setDefaultVehicle(input: $input) {
+    id
+  }
+}`
+
+const derikVehicleInput = {
+  input: {
+    plate: "DERIK123",
+    country: "US",
+    state: "California",
+    nickname: "Derik's Vehicle"
   }
 }
 
@@ -163,7 +212,7 @@ const purchaseZoneInput = {
 }
 
 test('Errors out with wrong permissions', async () => {
-  const token = await loginAs("enforcement")
+  const { token } = await loginAs("enforcement")
 
   const confirmation = await supertest(server)
     .post('/graphql')
@@ -179,14 +228,14 @@ test('Errors out with wrong permissions', async () => {
 })
 
 test('Right permissions', async () => {
-  const token = await loginAs("driver")
+  const { token, vid } = await loginAs("driver")
 
   const confirmation = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
     .send({ 
       query: purchaseZonePermitQuery,
-      variables: purchaseZoneInput
+      variables: {...purchaseZoneInput, vehicle: vid}
     })
 
   expect(confirmation.body.errors).toBeUndefined()

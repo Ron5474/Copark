@@ -6,6 +6,7 @@ import { beforeEach, expect, it, vi } from 'vitest'
 const mockRedirect = vi.spyOn(NextResponse, 'redirect')
 
 beforeEach(() => {
+  global.fetch = vi.fn()
   vi.clearAllMocks()
 })
 
@@ -30,6 +31,10 @@ it('allows access to enforcement login page without session', async () => {
 })
 
 it('allows access to protected routes with valid session', async () => {
+  vi.mocked(global.fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ role: 'enforcement' }),
+  } as Response)
   const request = new NextRequest(new URL('http://localhost:3001/enforcement'), {
     headers: new Headers({ cookie: 'sessionEnf=valid-session-id' }),
   })
@@ -39,6 +44,10 @@ it('allows access to protected routes with valid session', async () => {
 })
 
 it('redirects to /enforcement if logged in and accesses login page', async () => {
+  vi.mocked(global.fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ role: 'enforcement' }),
+  } as Response)
   const request = new NextRequest(new URL('http://localhost:3001/enforcement/login'), {
     headers: new Headers({ cookie: 'sessionEnf=valid-session-id' }),
   })
@@ -56,4 +65,21 @@ it('bypasses middleware for static files', async () => {
 
   await middleware(request)
   expect(mockRedirect).not.toHaveBeenCalled()
+})
+
+it('redirects to login if fetch to check endpoint fails', async () => {
+  vi.mocked(global.fetch).mockResolvedValueOnce({
+    ok: false,
+    json: async () => ({}),
+  } as Response)
+
+  const request = new NextRequest(new URL('http://localhost:3001/enforcement'), {
+    headers: new Headers({ cookie: 'sessionEnf=invalid' }),
+  })
+
+  await middleware(request)
+
+  expect(mockRedirect).toHaveBeenCalledWith(
+    new URL('/enforcement/login', 'http://localhost:3001')
+  )
 })

@@ -184,7 +184,7 @@ test('getVehicleById - Returns null if Vehicle not found', async () => {
   const vehicleService = new VehicleService();
 
   // Attempt to retrieve a vehicle with a non-existent ID
-  const retrievedVehicle = await vehicleService.getVehicleById({ id: 'non-existent-id' });
+  const retrievedVehicle = await vehicleService.getVehicleById({ id: 'd0578d50-76ee-4db6-a402-4b2614b161ce' });
 
   // Validate that the result is null
   expect(retrievedVehicle).toBeNull();

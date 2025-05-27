@@ -425,7 +425,7 @@ test('Driver can get a list of their vehicles', async () => {
   })
 
   test('Driver can update a vehicle', async () => {
-    const token = await loginAs("driver")
+    const token = await loginAs("driver", false)
 
     const veh = await supertest(server)
       .post('/graphql')
@@ -434,6 +434,7 @@ test('Driver can get a list of their vehicles', async () => {
         query: regVehicleQuery,
         variables: vehicleInput
       })
+
     const vID = veh.body.data.registerVehicle.id
     const newUpdate = {
       input: {
@@ -443,6 +444,7 @@ test('Driver can get a list of their vehicles', async () => {
         "nickname": "Test Vehicle"
       }
     }
+    
     await supertest(server)
       .post('/graphql')
       .set('Authorization', 'Bearer ' + token)
@@ -493,13 +495,14 @@ test('Driver can get a list of their vehicles', async () => {
         variables: vehicleInput
       })
     const vID = res.body.data.registerVehicle.id
+
     const listResponse = await supertest(server)
       .post('/graphql')
       .set('Authorization', 'Bearer ' + token)
       .send({ query: checkVehicleIDQuery,
         variables: {vehicleID: vID}
        })
-       
+
     expect(listResponse.body.data.checkForVehicleID.plate).toBe("TEST123")
   })
 

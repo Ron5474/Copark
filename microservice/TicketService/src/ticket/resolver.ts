@@ -36,10 +36,6 @@ export class TicketResolver {
   }
 
   private async getVehicleById(userID: string): Promise<Vehicle[]> {
-    // if (!userID) {
-    //   throw new Error('User ID not provided')
-    // }
-
     const vehicleQuery = {
       query: `
         query {
@@ -194,13 +190,8 @@ export class TicketResolver {
   @Query(() => [Ticket])
   @Authorized(["driver"])
   async getMyTickets(@Ctx() request: Request & {user: SessionUser}): Promise<Ticket[]> {
-    // eslint-disable-next-line
-    // @ts-ignore
-    // const userJWT = request.headers.authorization?.split(' ')[1];
-    // console.log('User: ', userJWT)
     const token = request.headers.authorization?.split(' ')[1]
     const userId = (await this.getUserData(token)).id
-
     const userEncrypted = await encrypt(userId, emailEncodedKey)
     
     const vehicleIDs: Vehicle[] = await this.getVehicleById(userEncrypted)
@@ -296,7 +287,6 @@ export class TicketResolver {
     }
 
     const vehicleIDs: Vehicle[] = await this.getVehicleById(userID.id)
-
     const tickets = await this.ticketService.getTicketsForVehicleID(vehicleIDs)
 
     if (tickets?.length > 0) {

@@ -8,7 +8,7 @@ import { SignJWT, jwtVerify } from 'jose'
 
 // console.log('JWT Secret', process.env.JWT_SECRET)
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
-// const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class AuthService {
   public async authenticate(credentials: Credentials): Promise<User|undefined> {
@@ -74,12 +74,12 @@ export class AuthService {
     return this.getUserById(driverID)
   }
 
-  public async encrypt(userId: string): Promise<string> {
+  public async encrypt(userId: string, key=encodedKey): Promise<string> {
     return new SignJWT({ id: userId })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('1h')
-      .sign(encodedKey) // used to be internalKey
+      .sign(key) // used to be internalKey
   }
 
   // public async encryptNum(userId: number): Promise<string> {
@@ -123,7 +123,7 @@ export class AuthService {
       return null;
     } else {
       const userId = res.rows[0].id;
-      return this.encrypt(userId);
+      return this.encrypt(userId, internalKey);
     }
   }
 

@@ -80,10 +80,8 @@ export class TicketService {
   }
 
   public async createTicket(newTicket: NewTicket): Promise<Ticket> {
-    const enforcerToken = newTicket.enforcer;
-    const enforcerId = await this.decryptUser(enforcerToken);
+    const enforcerId = await this.decryptUser(newTicket.enforcer);
     const vehicleId = newTicket.vehicle;
-
     if (!enforcerId || !vehicleId) {
       throw new Error("Invalid enforcer or vehicle ID.");
     }

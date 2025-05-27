@@ -1,4 +1,3 @@
-import { Vehicle } from './../../../VehicleService/src/vehicle/schema';
 import { Field, ObjectType, InputType, ID} from "type-graphql";
 
 @ObjectType()
@@ -158,7 +157,7 @@ export class UnpaidTickets {
   violation!: string;
 
   @Field(() => Number)
-  fine!: Number;
+  fine!: number;
 
   @Field(() => String, { nullable: true })
   note?: string;

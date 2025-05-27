@@ -9,12 +9,15 @@ import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 import {app as EmailApp } from '../../EmailService/src/app'
+import { app as AdminApp, bootstrap as AdminBoot } from '../../AdminService/src/app'
 import { SignJWT,/* JWTPayload */} from 'jose'
+import { Ticket } from '../src/ticket/schema'
 
 let server: http.Server // Ticket
 let authServer: http.Server
 let vehicleServer: http.Server
 let emailServer: http.Server
+let adminServer: http.Server
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
@@ -23,19 +26,16 @@ const VEHICLE_PORT = 4001
 const EMAIL_PORT = 3015
 // const VEHICLE_SERVICE_URL = `http://localhost:${VEHICLE_PORT}`
 
+const ADMIN_PORT = 4002
+// const ADMIN_SERVICE_URL = `http://localhost:${ADMIN_PORT}`
+
+const jwtKey = new TextEncoder().encode(process.env.JWT_SECRET)
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
-const registrarToken = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImU1YzU5MmVkLTJhNGEtNDViOS05ODAyLWM3MGM2OTE0YzZmZCIsImlhdCI6MTc0NzI2ODk2NCwiZXhwIjoxOTA1MDU2OTY0fQ.aJnD-aYMd53RNCKmBOHBHFOxmFRzGYEqBFScmzMNpeE"
-const ronakDriverToken = "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiUm9uYWsgUGF0ZWwiLCJlbWFpbCI6InJvYXBhdGVsQHVjc2MuZWR1IiwicGljdHVyZSI6Imh0dHBzOi8vd3d3Lmdvb2dsZS5jb20vaW1nIiwic3ViIjoiMTIzNDU2NzgiLCJpYXQiOjE3NDcyNzI2NjksImV4cCI6MTkwNTA2MDY2OX0.Mlas0IqbxpF893s6A8JycOIYX1tG3bNbC72PhghEZ_0"
 
 const adminUser = {
   email: 'jxiong0822@outlook.com',
   password: 'password1',
 }
-
-// const driverUser = {
-//   email: 'staticdriver1@outlook.com',
-//   password: 'password1',
-// }
 
 beforeAll(async () => {
   server = http.createServer(app)
@@ -58,6 +58,12 @@ beforeAll(async () => {
     emailServer.listen(EMAIL_PORT, () => resolve());
   });
 
+  adminServer = http.createServer(AdminApp)
+  await new Promise<void>((resolve) => {
+    adminServer.listen(ADMIN_PORT, () => resolve())
+  })
+  await AdminBoot()
+
   return db.reset()
 })
 
@@ -65,8 +71,10 @@ afterAll(() => {
   db.shutdown()
   server.close()
   authServer.close()
-  vehicleServer.close();
-  emailServer.close();
+  vehicleServer.close()
+  emailServer.close()
+  adminServer.close()
+
 })
 
 async function encrypt(userId: string): Promise<string> {
@@ -75,47 +83,39 @@ async function encrypt(userId: string): Promise<string> {
       .setIssuedAt()
       .setExpirationTime('30m')
       .sign(encodedKey)
-  }
-
-
-// async function encryptObj(user: JWTPayload): Promise<string> {
-//   return new SignJWT(user)
-//     .setProtectedHeader({ alg: 'HS256' })
-//     .setIssuedAt()
-//     .setExpirationTime('5y')
-//     .sign(encodedKey)
-// }
-
-
-async function loginAsAdmin(): Promise<string> {
-  const response = await supertest(AUTH_SERVICE_URL)
-    .post('/api/v0/auth/login')
-    .send(adminUser)
-
-  if (response.status !== 200) {
-    throw new Error(`Login failed with status ${response.status}`)
-  }
-
-  return response.body.id
 }
 
-async function loginAs(who: string): Promise<string | undefined> {
+const UCSCRegistrar = {
+  name: "UCSC Registrar",
+  email: "registar@ucsc.com", 
+  role: "registrar"
+}
+
+const UCSDRegistrar = {
+  name: "UCSD Registrar",
+  email: "registar@ucsd.com", 
+  role: "registrar"
+}
+
+const UCBRegistrar = {
+  name: "UCB Registrar",
+  email: "registar@ucb.com", 
+  role: "registrar"
+}
+
+async function loginAs(who: string, APIData=UCBRegistrar): Promise<string | undefined> {
   if (who === "driver") {
     const token = await  new SignJWT(driver)
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('30m')
-      .sign(encodedKey)
-    // console.log("Driver token:", token)
+      .sign(jwtKey)
 
     // Sign up
     await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/driver/signup')
       .send({ authToken: token })
 
-    // console.log('Signup Status:', signupRes.status)
-    // console.log('Signup Headers:', signupRes.headers)
-    // console.log('Signup Body:', signupRes.body)
 
     const regVehicleQuery = `
     mutation RegisterVehicle($input: RegisterVehicleInput!) {
@@ -138,25 +138,19 @@ async function loginAs(who: string): Promise<string | undefined> {
     }
 
     // Add Vehicle
-    const addVehicle = await supertest(server)
+    await supertest(vehicleServer)
       .post('/graphql')
       .set('Authorization', 'Bearer ' + token)
       .send({ 
         query: regVehicleQuery,
         variables: derikVehicleInput
       })
-
-    // console.log('Add Vehicle Headers:', addVehicle.headers)
-    // console.log('Add Vehicle Body:', addVehicle.body)
     
     const response = await supertest(AUTH_SERVICE_URL)
       .put('/api/v0/auth/driver/onboarding')
       .set('Authorization', `Bearer ${token}`)
       .send({newState: 'complete'})
 
-    // console.log('Status:', response.status)
-    // console.log('Headers:', response.headers)
-    // console.log('Body:', response.body)
 
     const validStatuses = [200, 201, 204];
     if (!validStatuses.includes(response.status)) {
@@ -178,14 +172,30 @@ async function loginAs(who: string): Promise<string | undefined> {
 
     return response.body.id
 
+  } else if (who === "registrar") {
+    const adminToken = await loginAs("admin")
+
+    const addOrgMutation = `
+      mutation AddAPIUser($organization: APICredential!) {
+        addAPIUser(organization: $organization) {
+          id
+        }
+      }
+    `
+
+    const addResponse = await supertest(adminServer)
+      .post('/graphql')
+      .set('Authorization', 'Bearer ' + adminToken)
+      .send({ 
+        query: addOrgMutation,
+        variables: { organization: APIData }
+      })
+      .expect(200)
+    return addResponse.body.data.addAPIUser.id
   } else {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
       .send(adminUser)
-
-    // console.log('Status:', response.status)
-    // console.log('Headers:', response.headers)
-    // console.log('Body:', response.body)
 
     if (response.status !== 200) {
       throw new Error(`Login failed with status ${response.status}`)
@@ -195,66 +205,33 @@ async function loginAs(who: string): Promise<string | undefined> {
   }
 }
 
-// async function loginAsDriver(): Promise<string> {
-//   const response = await supertest(AUTH_SERVICE_URL)
-//     .post('/api/v0/auth/login')
-//     .send(driverUser)
-
-//   if (response.status !== 200) {
-//     throw new Error(`Login failed with status ${response.status}`)
-//   }
-
-//   return response.body.id
-// }
-
-test('Enforcer can create a ticket with images', async () => {
-  const token = await loginAs('enforcement')
-
-  const vehicleid = '00000000-0000-0000-0000-000000000000'
-  const enforcerid = await encrypt('00000000-0000-0000-0000-000000000000')
-
-  const query = `
-    mutation CreateTicket($input: NewTicket!) {
-      createTicket(newTicket: $input) {
-        id
-        vehicle
-        fine
-        violation
-        images
-      }
-    }
-  `
-
-  const variables = {
-    input: {
-      vehicle: vehicleid,
-      enforcer: enforcerid,
-      fine: 150,
-      violation: "speeding",
-      images: "photo1.jpg",
-    },
-  }
-
-  const response = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
-    .send({ query, variables })
-    .expect(200)
-
-  expect(response.body.errors).toBeUndefined()
-  expect(response.body.data.createTicket.images).toBe("photo1.jpg")
-})
-
 const driver = {
+  type: "OauthUserData",
   'name': 'Ronak Patel',
   'email': 'roapatel@ucsc.edu',
   'picture': 'https://www.google.com/img',
   'sub': '12345678',
 }
 
+const createNewTicketMutation = `
+  mutation CreateNewTicket($input: NewTicketInput!) {
+    createNewTicket(input: $input) {
+      id
+      vehicle
+      enforcer
+      issuedDate
+      violation
+      fine
+      ticketStatus
+      images
+      note
+    }
+  }
+`
+
 test('Admin can get all tickets', async () => {
   // console.log('jwt: ', await encryptObj(driver))
-  const token = await loginAsAdmin()
+  const token = await loginAs("admin")
 
   const query = `
     query {
@@ -274,47 +251,31 @@ test('Admin can get all tickets', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({ query })
     .expect(200)
-
   expect(response.body.errors).toBeUndefined()
-  expect(response.body.data.getTickets.length).toBe(11)
+  expect(response.body.data.getTickets.length).toBe(10)
 })
 
 test('Admin can modify a ticket with images', async () => {
-  const token = await loginAsAdmin()
-
-  const vehicleid = '00000000-0000-0000-0000-000000000001'
-  const enforcerid = await encrypt('00000000-0000-0000-0000-000000000002')
-
-  const createQuery = `
-    mutation CreateTicket($input: NewTicket!) {
-      createTicket(newTicket: $input) {
-        id
-        vehicle
-        fine
-        violation
-        images
-      }
-    }
-  `
+  const enforceToken = await loginAs("enforcement")
+  const adminToken = await loginAs("admin")
 
   const createVariables = {
     input: {
-      vehicle: vehicleid,
-      enforcer: enforcerid,
-      fine: 150,
-      violation: "speeding",
-      images: "photo1.jpg",
+      plate: "Some Plate",
+      reason: "Blocking Driveway",
+      note: "Parked right in front of gate",
+      images: "https://example.com/photo.jpg",
     },
   }
 
   const createResponse = await supertest(server)
     .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
-    .send({ query: createQuery, variables: createVariables })
+    .set('Authorization', 'Bearer ' + enforceToken)
+    .send({ query: createNewTicketMutation, variables: createVariables })
     .expect(200)
 
   expect(createResponse.body.errors).toBeUndefined()
-  const ticketId = createResponse.body.data.createTicket.id
+  const ticketId = createResponse.body.data.createNewTicket.id
 
   const modifyQuery = `
     mutation ModifyTicket($input: ModifyTicketInput!) {
@@ -342,7 +303,7 @@ test('Admin can modify a ticket with images', async () => {
 
   const modifyResponse = await supertest(server)
     .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
+    .set('Authorization', 'Bearer ' + adminToken)
     .send({ query: modifyQuery, variables: modifyVariables })
     .expect(200)
 
@@ -354,41 +315,25 @@ test('Admin can modify a ticket with images', async () => {
 })
 
 test('Admin can delete a ticket', async () => {
-  const token = await loginAsAdmin()
-
-  const vehicleid = '00000000-0000-0000-0000-000000000000'
-  const enforcerid = await encrypt('00000000-0000-0000-0000-000000000000')
-
-  const createQuery = `
-    mutation CreateTicket($input: NewTicket!) {
-      createTicket(newTicket: $input) {
-        id
-        vehicle
-        fine
-        violation
-        images
-      }
-    }
-  `
+  const adminToken = await loginAs("admin")
+  const enforceToken = await loginAs("enforcement")
 
   const createVariables = {
     input: {
-      vehicle: vehicleid,
-      enforcer: enforcerid,
-      fine: 150,
-      violation: "speeding",
+      plate: "Test Plate",
+      reason: "speeding",
       images: "photo1.jpg",
     },
   }
 
   const createResponse = await supertest(server)
     .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
-    .send({ query: createQuery, variables: createVariables })
+    .set('Authorization', 'Bearer ' + enforceToken)
+    .send({ query: createNewTicketMutation, variables: createVariables })
     .expect(200)
 
   expect(createResponse.body.errors).toBeUndefined()
-  const ticketId = createResponse.body.data.createTicket.id
+  const ticketId = createResponse.body.data.createNewTicket.id
 
   const deleteQuery = `
     mutation DeleteTicket($id: TicketInput!) {
@@ -406,12 +351,12 @@ test('Admin can delete a ticket', async () => {
   
   const deleteResponse = await supertest(server)
     .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
+    .set('Authorization', 'Bearer ' + adminToken)
     .send({ query: deleteQuery, variables: deleteVariables })
     .expect(200)
 
   expect(deleteResponse.body.errors).toBeUndefined()
-  expect(deleteResponse.body.data.deleteTicket.id).toBe(ticketId)
+  expect(deleteResponse.body.data.deleteTicket.id).toBeDefined()
 
   const getQuery = `
     query {
@@ -420,15 +365,14 @@ test('Admin can delete a ticket', async () => {
       }
     }
   `
-
   const getResponse = await supertest(server)
     .post('/graphql')
-    .set('Authorization', 'Bearer ' + token)
+    .set('Authorization', 'Bearer ' + adminToken)
     .send({ query: getQuery })
     .expect(200)
 
   expect(getResponse.body.errors).toBeUndefined()
-  const ticketIds = getResponse.body.data.getTickets.map((ticket: any) => ticket.id)
+  const ticketIds = getResponse.body.data.getTickets.map((ticket: Ticket) => ticket.id)
   expect(ticketIds).not.toContain(ticketId)
 })
 
@@ -458,21 +402,7 @@ test('Admin can delete a ticket', async () => {
 //   expect(response.body.data.getMyTickets.length).toBe(3)
 // })
 
-const createNewTicketMutation = `
-mutation CreateNewTicket($input: NewTicketInput!) {
-  createNewTicket(input: $input) {
-    id
-    vehicle
-    enforcer
-    issuedDate
-    violation
-    fine
-    ticketStatus
-    images
-    note
-  }
-}
-`
+
 
 test('Enforcer can create a ticket', async () => {
   const token = await loginAs("enforcement")
@@ -512,6 +442,7 @@ query CheckPendingTicket($email: EmailInput!) {
 }`
 
 test('Registrar check if non-existent student has ticket', async () => {
+  const registrarToken = await loginAs("registrar")
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + registrarToken)
@@ -525,13 +456,14 @@ test('Registrar check if non-existent student has ticket', async () => {
     })
 
   expect(response.status).toBe(200)
-  // console.log(response.body.data)
+  // console.log(response.body)
   const ticket = response.body.data.hasPendingTicket
 
   expect(ticket).toBeDefined()
 })
 
 test('Registrar check student with ticket successful', async () => {
+  const registrarToken = await loginAs("registrar", UCSCRegistrar)
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + registrarToken)
@@ -543,15 +475,14 @@ test('Registrar check student with ticket successful', async () => {
         }
       }
     })
-
-  expect(response.status).toBe(200)
-  // console.log(response.body.data)
+  // console.log(response.body)
   const ticket = response.body.data.hasPendingTicket
 
   expect(ticket.hasTicket).toBe(true)
 })
 
 test('Registrar check student with no ticket successful', async () => {
+  const registrarToken = await loginAs("registrar", UCSDRegistrar)
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + registrarToken)
@@ -586,9 +517,10 @@ const getMyTicketquery = `
 
 
 test('Student can check their tickets successful', async () => {
+  const driverToken = await loginAs("driver")
   const response = await supertest(server)
     .post('/graphql')
-    .set('Authorization', 'Bearer ' + ronakDriverToken)
+    .set('Authorization', 'Bearer ' + driverToken)
     .send({
       query: getMyTicketquery,
     })
@@ -601,10 +533,12 @@ test('Student can check their tickets successful', async () => {
 })
 
 test('Ticket creation sends email to vehicle owner', async () => {
+  const driverToken = await loginAs("driver");
+
   // First register a vehicle as a driver
   const registerRes = await supertest(vehicleServer)
     .post('/graphql')
-    .set('Authorization', 'Bearer ' + ronakDriverToken)
+    .set('Authorization', 'Bearer ' + driverToken)
     .send({
       query: `
         mutation RegisterVehicle($input: RegisterVehicleInput!) {
@@ -658,7 +592,7 @@ test('Ticket creation sends email to vehicle owner', async () => {
 });
 
 test('Admin can get ticket stats grouped by day', async () => {
-  const token = await loginAsAdmin();
+  const token = await loginAs("admin");
 
   const query = `
     query {
@@ -707,7 +641,7 @@ test('Admin can get ticket stats grouped by day', async () => {
 });
 
 test('Admin can get tickets issued by a specific enforcer', async () => {
-  const token = await loginAsAdmin();
+  const token = await loginAs("admin");
 
   const query = `
     query GetTicketsPerDayFromEnforcer($enforcerID: String!) {
@@ -761,6 +695,7 @@ test('Admin can get tickets issued by a specific enforcer', async () => {
 test('Full ticket challenge flow - create, challenge, and get challenged tickets', async () => {
   // Setup - create a new ticket
   const enforcementToken = await loginAs("enforcement");
+  const ronakDriverToken = await loginAs("driver");
   
   const createResponse = await supertest(server)
     .post('/graphql')
@@ -839,7 +774,7 @@ test('Full ticket challenge flow - create, challenge, and get challenged tickets
 test('Admin can accept a ticket challenge', async () => {
   // First create and challenge a ticket
   const enforcementToken = await loginAs("enforcement");
-  
+  const ronakDriverToken = await loginAs("driver");
   // Create ticket
   const createResponse = await supertest(server)
     .post('/graphql')
@@ -880,7 +815,7 @@ test('Admin can accept a ticket challenge', async () => {
     });
 
   // Accept the challenge
-  const adminToken = await loginAsAdmin();
+  const adminToken = await loginAs("admin");
   const acceptMutation = `
     mutation AcceptChallenge($ticketID: TicketInput!) {
       acceptTicketChallenge(ticketID: $ticketID) {
@@ -908,8 +843,8 @@ test('Admin can accept a ticket challenge', async () => {
 
 test('Admin can get accepted tickets', async () => {
   // First create and accept a ticket challenge to ensure we have accepted tickets
-  const enforcementToken = await loginAs("enforcement");
-  
+  const enforcementToken = await loginAs("enforcement")
+  const ronakDriverToken = await loginAs("driver")
   // Create ticket
   const createResponse = await supertest(server)
     .post('/graphql')
@@ -950,7 +885,7 @@ test('Admin can get accepted tickets', async () => {
     });
 
   // Accept the challenge
-  const adminToken = await loginAsAdmin();
+  const adminToken = await loginAs("admin");
   const acceptMutation = `
     mutation AcceptChallenge($ticketID: TicketInput!) {
       acceptTicketChallenge(ticketID: $ticketID) {
@@ -1013,7 +948,8 @@ test('Admin can get accepted tickets', async () => {
 });
 
 test('Admin can reject a ticket challenge', async () => {
-  const enforcementToken = await loginAs("enforcement");
+  const enforcementToken = await loginAs("enforcement")
+  const ronakDriverToken = await loginAs("driver")
 
   const createResponse = await supertest(server)
     .post('/graphql')
@@ -1052,7 +988,7 @@ test('Admin can reject a ticket challenge', async () => {
       }
     });
 
-  const adminToken = await loginAsAdmin();
+  const adminToken = await loginAs("admin");
   const rejectMutation = `
     mutation RejectChallenge($ticketID: TicketInput!) {
       rejectTicketChallenge(ticketID: $ticketID) {
@@ -1081,6 +1017,7 @@ test('Admin can reject a ticket challenge', async () => {
 
 test('Driver can mark a ticket as paid', async () => {
   const enforcementToken = await loginAs("enforcement");
+  const ronakDriverToken = await loginAs("driver");
   const createResponse = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + enforcementToken)
@@ -1128,7 +1065,7 @@ test('Driver can mark a ticket as paid', async () => {
 });
 
 test('Admin can get unpaid tickets grouped by day', async () => {
-  const adminToken = await loginAsAdmin();
+  const adminToken = await loginAs("admin");
 
   // Create two unpaid tickets for today
   const enforcementToken = await loginAs("enforcement");

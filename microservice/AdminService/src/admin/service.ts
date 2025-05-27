@@ -4,14 +4,15 @@ import { SignJWT, jwtVerify } from 'jose'
 // import { Ticket } from "../../../TicketService/src/ticket/schema";
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+const jwtKey = new TextEncoder().encode(process.env.JWT_SECRET)
 
 export class AdminService {
-  private async encrypt(userId: string, expr = '30m'): Promise<string> {
+  private async encrypt(userId: string, expr = '30m', key=encodedKey): Promise<string> {
     return new SignJWT({ id: userId })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime(expr)
-      .sign(encodedKey)
+      .sign(key)
   }
 
   private async decrypt(token: string): Promise<string | undefined> {
@@ -149,7 +150,7 @@ export class AdminService {
 
     if (rows.length > 0) {
       const userId = rows[0].id
-      const retid = await this.encrypt(userId, '5y')
+      const retid = await this.encrypt(userId, '5y', jwtKey)
       return { id: retid }
     } else {
       return undefined
@@ -176,7 +177,7 @@ export class AdminService {
 
     for (const row of apiUsersResult.rows) {
       apiUsers.push({
-        id: await this.encrypt(row.id, '5y'),
+        id: await this.encrypt(row.id),
         name: row.name,
         email: row.email,
         role: row.role,

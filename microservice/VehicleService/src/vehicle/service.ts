@@ -1,19 +1,11 @@
 import { pool } from './db'
 import { Vehicle, RegisterVehicleInput, UpdateVehicleInput, VehicleID, createdVehicleInput, CreatedVehicle, OwnerID } from './schema'
-import { SignJWT, jwtVerify } from 'jose'
+import { jwtVerify } from 'jose'
 
 const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 // const emailEncodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
 export class VehicleService {
-
-  private async encrypt(userId: string, key=encodedKey): Promise<string> {
-    return new SignJWT({ id: userId })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('30m')
-      .sign(key)
-  }
 
   private async decrypt(token: string, key=encodedKey): Promise<string | undefined> {
     try {
@@ -41,7 +33,7 @@ export class VehicleService {
     const defaultVehicle = await this.getDefaultVehicleId(userId)
 
     return Promise.all(result.rows.map(async row => ({
-      id: await this.encrypt(row.id),
+      id: row.id,
       default: defaultVehicle == null ? false : defaultVehicle.id == row.id,
       plate: row.data.plate,
       country: row.data.country,
@@ -69,18 +61,16 @@ export class VehicleService {
   
   public async getVehicleById(vehicleId: VehicleID): Promise<Vehicle | null> {
 
-    const vehicleDecrypted = await this.decrypt(vehicleId.id)
-
     const result = await pool.query(
-      `SELECT data FROM vehicle WHERE id = $1`,
-      [vehicleDecrypted]
+      `SELECT id, data FROM vehicle WHERE id = $1`,
+      [vehicleId.id]
     )
 
     if (result.rowCount === 0) return null
 
     const row = result.rows[0]
     return {
-      id: await this.encrypt(row.id),
+      id: row.id,
       plate: row.data.plate,
       country: row.data.country,
       state: row.data.state,
@@ -89,8 +79,7 @@ export class VehicleService {
   }
 
   public async getVehicleByUserId(userID: string): Promise<VehicleID[]> {
-
-    const userDecrypted = await this.decrypt(userID, encodedKey)
+    const userDecrypted = await this.decrypt(userID)
 
     // const userDecrypted = await this.decrypt(userID, encodedKey)
     const result = await pool.query(
@@ -110,17 +99,6 @@ export class VehicleService {
     })))
   }
 
-  // public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
-  //   const result = await pool.query(
-  //     `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
-  //     [userId, input]
-  //   )
-
-  //   return {
-  //     id: await this.encrypt(result.rows[0].id),
-  //     ...input
-  //   }
-  // }
   public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
     const existing = await pool.query(
       `SELECT id FROM vehicle WHERE LOWER(data->>'plate') = LOWER($1)`,
@@ -147,11 +125,11 @@ export class VehicleService {
       [userId]
     )
     if (parseInt(vehicles.rows[0].count) == 1) {
-      await this.setDefaultVehicle({ id:  await this.encrypt(result.rows[0].id) }, userId)
+      await this.setDefaultVehicle({ id:  result.rows[0].id }, userId)
     }
     const defaultVehicle = await this.getDefaultVehicleId(userId)
     return {
-      id: await this.encrypt(result.rows[0].id),
+      id: result.rows[0].id,
       default: defaultVehicle == null ? false : defaultVehicle.id == result.rows[0].id,
       ...input
     }
@@ -161,7 +139,7 @@ export class VehicleService {
   public async updateVehicle(input: UpdateVehicleInput, userId: string): Promise<Vehicle> {
     const { id, ...patch } = input
 
-    const vehicleID = await this.decrypt(id)
+    const vehicleID = id
     // const userIdDecrypted = await this.decrypt(userId)
 
     const existing = await pool.query(
@@ -198,7 +176,7 @@ export class VehicleService {
 
     const row = result.rows[0]
     return {
-      id: await this.encrypt(row.vehicle),
+      id: row.vehicle,
       plate: row.plate
     }
   }
@@ -222,7 +200,7 @@ export class VehicleService {
   }
 
   public async setDefaultVehicle(vehicleID: VehicleID, userId: string): Promise<VehicleID> {
-    const vehicleDecrypted = await this.decrypt(vehicleID.id)
+    const vehicleDecrypted = vehicleID.id
 
     const existing = await pool.query(
       `SELECT * FROM defaultVehicle WHERE driver = $1`,
@@ -235,7 +213,7 @@ export class VehicleService {
         [userId, vehicleDecrypted]
       )
 
-      return { id: await this.encrypt(vehicleID.id) }
+      return { id: vehicleID.id }
     }
 
     await pool.query(
@@ -243,7 +221,7 @@ export class VehicleService {
       [vehicleDecrypted, userId]
     )
 
-    return {id: await this.encrypt(vehicleID.id)}
+    return {id: vehicleID.id}
   }
 
   public async findVehicleByPlate(plate: string): Promise<Vehicle | null> {
@@ -276,5 +254,4 @@ export class VehicleService {
       ...input,
     };
   }
-
 }

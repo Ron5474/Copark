@@ -136,7 +136,21 @@
       "continue": "Continue"
     },
     "vehicle": {
-      "page1": {},
+      "page1": {
+        "title1": "Welcome to Your",
+        "title2": "Digital Garage",
+        "subline": "Start your journey by adding your first vehicle and get your permits with a tap.",
+        "f1": {
+          "title": "Single Click permits",
+          "description": "Purchase permits with a single click"
+        },
+        "f2": {
+          "title": "Check and Pay for Tickets",
+          "description": "Check for tickets on your vehicle and pay instantly"
+        },
+        "prompt": "Add Your First Vehicle",
+        "secure": "Your data is secure • Add unlimited vehicles later"
+      },
       "page2": {}
     }
   }

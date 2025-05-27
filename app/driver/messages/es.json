@@ -136,7 +136,21 @@
     "continue": "Continuar"
     },
     "vehicle": {
-      "page1": {},
+      "page1": {
+        "title1": "Bienvenido a tu",
+        "title2": "Garaje Digital",
+        "subline": "Comienza tu viaje agregando tu primer vehículo y obtén tus permisos con un toque.",
+        "f1": {
+          "title": "Permisos de un solo clic",
+          "description": "Compra de permisos con un solo clic"
+        },
+        "f2": {
+          "title": "Consultar y pagar entradas",
+          "description": "Consulta las multas de tu vehículo y paga al instante"
+        },
+        "prompt": "Añade tu primer vehículo",
+        "secure": "Sus datos están seguros • Agregue vehículos ilimitados más tarde"
+      },
       "page2": {}
     }
   }

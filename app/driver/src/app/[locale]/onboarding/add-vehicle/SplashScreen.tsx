@@ -11,9 +11,11 @@ import { OnboardingContext } from './context';
 import { Box, Button, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Feature from './Feature';
+import { useTranslations } from 'next-intl';
 
 export default function SplashScreen() {
   const context = useContext(OnboardingContext);
+  const t = useTranslations("onboarding.vehicle.page1")
 
   const handleNext = () => {
     context.setCurrentPage(1);
@@ -41,13 +43,13 @@ export default function SplashScreen() {
       </picture>
     </Box>
       <Typography variant="h5" sx={{ marginTop: 2, color: (theme) => theme.palette.primary.dark }}>
-        <strong>Welcome to Your<br />
-        Digital Garage</strong>
+        <strong>{t("title1")}<br />
+        {t("title2")}</strong>
       </Typography>
       <Typography variant="body1" sx={{
         color: "gray"
       }}>
-        Start your journey by adding your first vehicle and get your permits with a tap.
+        {t("subline")}
       </Typography>
     <Box sx={{
       display: 'flex',
@@ -58,8 +60,8 @@ export default function SplashScreen() {
       padding: 2,
       marginTop: 2,
     }}>
-      <Feature icon = "/driver/assets/feature1-onboarding.svg" title="Single Click permits" desc="Purchase permits with a single click" />
-      <Feature icon = "/driver/assets/feature2-onboarding.svg" title="Check and Pay for Tickets" desc="Check for tickets on your vehicle and pay instantly" />
+      <Feature icon = "/driver/assets/feature1-onboarding.svg" title={t("f1.title")} desc={t("f1.description")} />
+      <Feature icon = "/driver/assets/feature2-onboarding.svg" title={t("f2.title")} desc={t("f2.description")} />
     </Box>
     <Box
       sx={{
@@ -81,13 +83,13 @@ export default function SplashScreen() {
         padding: 2,
       }} onClick={handleNext}>
         <AddIcon />
-        Add Your First Vehicle
+        {t("prompt")}
       </Button>
       <Typography variant="body2" sx={{
         color: "gray",
         marginTop: 2,
       }}>
-       Your data is secure • Add unlimited vehicles later
+       {t("secure")}
       </Typography>
     </Box>
    </Box>

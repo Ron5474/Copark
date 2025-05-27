@@ -350,7 +350,9 @@ export class PermitService {
     const purchaseDate = today.toISOString()
     const activeDate = today.toISOString() // TODO allow purchases in advance
     
-    const expireDate = details[input.duration]?.expireDate ?? new Date().toISOString()
+    const now = new Date()
+    const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
+    const expireDate = details[input.duration]?.expireDate ?? localMidnight
 
     const data = {
       purchaseDate,

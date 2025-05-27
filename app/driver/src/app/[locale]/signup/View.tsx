@@ -30,13 +30,13 @@ export default function SignupView() {
   const router = useRouter()
   const locale = useLocale()
   const handleClick = async (provider: string) => {
-    await signIn(provider, { callbackUrl: `/driver/${locale}/signup/blank`, basePath: '/driver' })
+    await signIn(provider, { callbackUrl: `/driver/${locale}/signup/blank` })
   }
 
   useEffect(() => {
       getUser().then((res) => {
         if (res) {
-          router.push('/dashboard')
+          router.push('/signup/blank')
         }
       });
   }, [router])

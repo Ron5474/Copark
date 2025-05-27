@@ -13,10 +13,11 @@ function Blank() {
   const locale = useLocale();
   useEffect(() => {
     const loggedIn = async () => {
+      console.log('Checking user login status...');
       if (!await getUser()) {
         router.push(`/login`);
       } else if (!await userLoginAttempt(locale)) {
-        signOut({ callbackUrl: new URL(`/driver/${locale}/signup`, window.location.origin).toString() });
+        signOut({ callbackUrl: `/${locale}/signup` });
       } else {
         router.push('/dashboard');
       }

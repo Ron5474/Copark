@@ -31,13 +31,13 @@ export default function LoginView() {
   const router = useRouter()
   const locale = useLocale()
   const handleClick = async (provider: string) => {
-    await signIn(provider, { callbackUrl: `/driver/${locale}/login/blank`, basePath: '/driver' })
+    await signIn(provider, { callbackUrl: `/driver/${locale}/login/blank` })
   }
 
   useEffect(() => {
       getUser().then((res) => {
         if (res) {
-          router.push('/blank')
+          router.push('/login/blank')
         }
       });
   }, [router])

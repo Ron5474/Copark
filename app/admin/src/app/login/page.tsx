@@ -11,6 +11,7 @@ import {
   InputAdornment,
   IconButton,
   CircularProgress,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
@@ -23,16 +24,20 @@ export default function Page() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(false);
 
     const authenticated = await login({ email, password })
     if (authenticated) {
       window.sessionStorage.setItem('name', authenticated.name);
       router.push('/');
+    } else {
+      setError(true);
     }
     
     setIsLoading(false);
@@ -72,6 +77,11 @@ export default function Page() {
             Sign in
           </Typography>
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: "100%" }}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                Invalid email or password
+              </Alert>
+            )}
             <TextField
               margin="normal"
               required

@@ -284,3 +284,21 @@ export class Zone {
   @Field(() => String)
   closeTime!: string
 }
+
+@ObjectType()
+export class ZoneStats {
+  @Field(() => String)
+  area!: string
+
+  @Field(() => Number)
+  totalPermits!: number
+}
+
+@ObjectType()
+export class LotStats {
+  @Field(() => String)
+  area!: string
+
+  @Field(() => Number)
+  totalPermits!: number
+}

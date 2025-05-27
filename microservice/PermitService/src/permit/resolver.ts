@@ -16,6 +16,9 @@ import {
   NewLot,
   LotGroup,
   Zone,
+  Permit,
+  ZoneStats,
+  LotStats,
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
@@ -487,5 +490,29 @@ export class PermitResolver {
   @Authorized('admin')
   async getZones(): Promise<Zone[]> {
     return await service.getZones()
+  }
+
+  @Authorized('admin')
+  @Query(() => [Permit])
+  async allPermits(
+    @Arg("activeOnly", () => Boolean, { defaultValue: true }) activeOnly: boolean
+  ): Promise<Permit[]> {
+    return await service.getAllPermits(activeOnly)
+  }
+
+  @Authorized('admin')
+  @Query(() => [ZoneStats])
+  async allZoneStats(
+    @Arg("activeOnly", () => Boolean, { defaultValue: true }) activeOnly: boolean
+  ): Promise<ZoneStats[]> {
+    return await service.getPermitStatsByZone(activeOnly)
+  }
+
+  @Authorized('admin')
+  @Query(() => [LotStats])
+  async allLotStats(
+    @Arg("activeOnly", () => Boolean, { defaultValue: true }) activeOnly: boolean
+  ): Promise<LotStats[]> {
+    return await service.getPermitStatsByLot(activeOnly)
   }
 }

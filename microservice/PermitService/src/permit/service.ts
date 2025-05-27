@@ -421,4 +421,121 @@ export class PermitService {
       }
     })
   }
+
+  // public async getAllPermits(activeOnly = true): Promise<Permit[]> {
+  //   const now = new Date().toISOString();
+
+  //   const result = await pool.query(`
+  //     SELECT p.vehicle, p.type, p.data->>'area' AS area,
+  //           p.data->>'purchaseDate' AS "purchaseDate",
+  //           p.data->>'activeDate' AS "activeDate",
+  //           p.data->>'expireDate' AS "expireDate"
+  //     FROM permit p
+  //     WHERE ($1::boolean IS FALSE 
+  //           OR (p.data->>'activeDate')::timestamptz <= $2 
+  //           AND (p.data->>'expireDate')::timestamptz >= $2)
+  //   `, [!activeOnly, now]);
+
+  //   return result.rows;
+  // }
+  public async getAllPermits(activeOnly = true): Promise<Permit[]> {
+    const now = new Date().toISOString();
+
+    const result = await pool.query(`
+      SELECT p.vehicle, p.type, p.data->>'area' AS area,
+            p.data->>'purchaseDate' AS "purchaseDate",
+            p.data->>'activeDate' AS "activeDate",
+            p.data->>'expireDate' AS "expireDate"
+      FROM permit p
+      ${activeOnly ? `
+        WHERE (p.data->>'activeDate')::timestamptz <= $1
+        AND (p.data->>'expireDate')::timestamptz >= $1
+      ` : ''}
+    `, activeOnly ? [now] : []);
+
+    return result.rows;
+  }
+
+  
+  // public async getPermitStatsByZone(activeOnly = true): Promise<{ area: string; totalPermits: number }[]> {
+  //   const now = new Date().toISOString();
+
+  //   const result = await pool.query(`
+  //     SELECT t.data->>'area' AS area, COUNT(*) AS total
+  //     FROM permit p
+  //     JOIN type t ON t.id = p.type
+  //     WHERE t.data->>'name' = 'zone'
+  //       AND ($1::boolean IS FALSE 
+  //           OR (p.data->>'activeDate')::timestamptz <= $2 
+  //           AND (p.data->>'expireDate')::timestamptz >= $2)
+  //     GROUP BY t.data->>'area'
+  //   `, [!activeOnly, now]);
+
+  //   return result.rows.map(row => ({
+  //     area: row.area,
+  //     totalPermits: parseInt(row.total),
+  //   }));
+  // }
+  public async getPermitStatsByZone(activeOnly = true): Promise<{ area: string; totalPermits: number }[]> {
+    const now = new Date().toISOString()
+
+    const result = await pool.query(`
+      SELECT t.data->>'area' AS area, COUNT(*) AS total
+      FROM permit p
+      JOIN type t ON t.id = p.type
+      WHERE t.data->>'name' = 'zone'
+        ${activeOnly ? `
+          AND (p.data->>'activeDate')::timestamptz <= $1
+          AND (p.data->>'expireDate')::timestamptz >= $1
+        ` : ''}
+      GROUP BY t.data->>'area'
+    `, activeOnly ? [now] : [])
+
+    return result.rows.map(row => ({
+      area: row.area,
+      totalPermits: parseInt(row.total),
+    }))
+  }
+
+
+  // public async getPermitStatsByLot(activeOnly = true): Promise<{ area: string; totalPermits: number }[]> {
+  //   const now = new Date().toISOString();
+
+  //   const result = await pool.query(`
+  //     SELECT t.data->>'area' AS area, COUNT(*) AS total
+  //     FROM permit p
+  //     JOIN type t ON t.id = p.type
+  //     WHERE t.data->>'name' = 'lot'
+  //       AND ($1::boolean IS FALSE 
+  //           OR (p.data->>'activeDate')::timestamptz <= $2 
+  //           AND (p.data->>'expireDate')::timestamptz >= $2)
+  //     GROUP BY t.data->>'area'
+  //   `, [!activeOnly, now]);
+
+  //   return result.rows.map(row => ({
+  //     area: row.area,
+  //     totalPermits: parseInt(row.total),
+  //   }));
+  // }
+  public async getPermitStatsByLot(activeOnly = true): Promise<{ area: string; totalPermits: number }[]> {
+    const now = new Date().toISOString();
+
+    const result = await pool.query(`
+      SELECT t.data->>'area' AS area, COUNT(*) AS total
+      FROM permit p
+      JOIN type t ON t.id = p.type
+      WHERE t.data->>'name' = 'lot'
+      ${activeOnly ? `
+        AND (p.data->>'activeDate')::timestamptz <= $1
+        AND (p.data->>'expireDate')::timestamptz >= $1
+      ` : ''}
+      GROUP BY t.data->>'area'
+    `, activeOnly ? [now] : []);
+
+    return result.rows.map(row => ({
+      area: row.area,
+      totalPermits: parseInt(row.total),
+    }));
+  }
+
 }

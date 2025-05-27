@@ -184,6 +184,13 @@
       "title": "Infracción de estacionamiento",
       "type": "TIPO DE VIOLACIÓN",
       "date": "FECHA DE EMISIÓN"
+    },
+    "challengeTicketPage": {
+      "title": "Impugnar Multa",
+      "reason": "Razón",
+      "description": "Por favor, describa la razón de su impugnación... (mínimo 25 caracteres)",
+      "submit": "Enviar impugnación",
+      "back": "Volver a la multa"
     }
   }
 }

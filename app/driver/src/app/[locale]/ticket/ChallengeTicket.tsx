@@ -12,11 +12,13 @@ import {
 
 import { challengeTicket } from './actions'
 import { useTicketState } from './TicketContext'
+import { useTranslations } from 'next-intl'
 
 
 export default function ChallengeTicket() {
   const [reason, setReason] = useState<string>('')
   const {currentTicket, setCurrentView} = useTicketState()
+  const t = useTranslations('ticket.challengeTicketPage');
 
   const handleSubmit = async () => {
     const challengeRes = await challengeTicket(currentTicket?.id as string, reason)
@@ -48,7 +50,7 @@ export default function ChallengeTicket() {
             mb: 3
           }}
         >
-          Challenge Ticket
+          {t('title')}
         </Typography>
 
         <Divider sx={{ mb: 4 }} />
@@ -61,13 +63,13 @@ export default function ChallengeTicket() {
               gutterBottom
               sx={{ fontWeight: 'semibold', mb: 2 }}
             >
-              Reason
+              {t('reason')}
             </Typography>
             <TextField
               fullWidth
               multiline
               rows={4}
-              placeholder="Please describe the reason for your challenge... (minimum 25 characters)"
+              placeholder={t('description')}
               slotProps={{
                 htmlInput: {
                   maxLength: 500,
@@ -100,7 +102,7 @@ export default function ChallengeTicket() {
                 textTransform: 'none'
               }}
             >
-              Submit Challenge
+              {t('submit')}
             </Button>
 
             <Button
@@ -118,7 +120,7 @@ export default function ChallengeTicket() {
                 textTransform: 'none'
               }}
             >
-              Go Back To Ticket
+              {t('back')}
             </Button>
           </Box>
         </Stack>

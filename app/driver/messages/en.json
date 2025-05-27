@@ -184,6 +184,13 @@
       "title": "Parking Violation",
       "type": "VIOLATION TYPE",
       "date": "ISSUE DATE"
+    },
+    "challengeTicketPage": {
+      "title": "Challenge Ticket",
+      "reason": "Reason",
+      "description": "Please describe the reason for your challenge... (minimum 25 characters)",
+      "submit": "Submit Challenge",
+      "back": "Go Back To Ticket"
     }
   }
 }

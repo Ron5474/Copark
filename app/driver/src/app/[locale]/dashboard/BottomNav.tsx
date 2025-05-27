@@ -104,14 +104,14 @@ import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber"
 import SettingsIcon from "@mui/icons-material/Settings"
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar"
 import LogoutIcon from "@mui/icons-material/Logout"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useContext, useEffect, useState } from "react"
 import { signOut } from 'next-auth/react'
 import { Session } from 'next-auth'
-import { useRouter } from 'next/navigation'
 
 import { DashboardContext } from "./context"
 import { getUser } from '../shared/actions'
+import { usePathname, useRouter } from "@/i18n/navigation"
 
 export default function MobileNavBar() {
   const t = useTranslations('bottomNav')
@@ -119,9 +119,19 @@ export default function MobileNavBar() {
   const { currentPage, setCurrentPage } = useContext(DashboardContext)
   const [value, setValue] = useState(0)
   const router = useRouter()
+  const locale = useLocale();
+  const pathname = usePathname()
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
+
+  const handleLanguageChange = (newLocale: string) => {
+    if (newLocale !== locale) {
+       router.replace(
+      {pathname},
+      {locale: newLocale});
+    }
+  }
 
   const handleSettingsClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -216,6 +226,23 @@ const handleChange = (event: React.SyntheticEvent, newValue: number) => {
           horizontal: 'center',
         }}
       >
+        <MenuItem onClick={() => handleLanguageChange(locale === 'en' ? 'es' : 'en')}>
+          {locale === 'en' ? (
+            <>
+            <picture>
+              <source srcSet="/driver/assets/language/es.svg" type="image/svg+xml" />
+              <img src="/driver/assets/language/es.svg" alt="Spanish Flag" style={{ width: 24, height: 24, marginRight: 8 }} />
+            </picture>
+            Spanish
+            </>
+          ) : (<>
+           <picture>
+              <source srcSet="/driver/assets/language/en.svg" type="image/svg+xml" />
+              <img src="/driver/assets/language/en.svg" alt="Spanish Flag" style={{ width: 24, height: 24, marginRight: 8 }} />
+            </picture>
+            Inglés
+          </>)}
+        </MenuItem>
         <MenuItem onClick={handleGarage}>
           <DirectionsCarIcon sx={{ mr: 1 }} />
           {t('garage')}

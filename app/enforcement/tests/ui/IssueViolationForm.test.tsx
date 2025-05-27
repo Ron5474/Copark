@@ -104,6 +104,10 @@ it('includes custom note when reason is "Other"', async () => {
 
   const noteField = await screen.findByLabelText('Custom Note')
   await user.type(noteField, 'Custom explanation')
+  const file = new File(['dummy content'], 'photo.png', { type: 'image/png' })
+
+  const input = screen.getByLabelText('Upload or Take Photo')
+  await userEvent.upload(input, file)
 
   const submit = screen.getByLabelText('Submit Violation')
   await user.click(submit)
@@ -158,6 +162,10 @@ it('displays alert when issueTicket throws', async () => {
 
   await user.click(screen.getByLabelText('Reason'))
   await user.click(screen.getByRole('option', { name: 'No Valid Permit' }))
+  const file = new File(['dummy content'], 'photo.png', { type: 'image/png' })
+
+  const input = screen.getByLabelText('Upload or Take Photo')
+  await userEvent.upload(input, file)
 
   vi.mocked(issueTicket).mockRejectedValueOnce(new Error('server broke'))
 
@@ -178,7 +186,7 @@ it('shows validation error if required fields are missing', async () => {
   const submitBtn = screen.getByLabelText('Submit Violation')
   await user.click(submitBtn)
 
-  expect(screen.getByText(/License plate is required/i)).toBeDefined()
+  expect(screen.getByText(/A photo is required./i)).toBeDefined()
   expect(screen.getByText(/Reason is required/i)).toBeDefined()
 })
 
@@ -188,10 +196,12 @@ it('clears field errors when user fills input', async () => {
 
   const submitBtn = screen.getByLabelText('Submit Violation')
   await user.click(submitBtn)
-  const plateField = screen.getByLabelText(/License Plate/i)
-  await user.type(plateField, 'ZZZ999')
+  const file = new File(['dummy content'], 'photo.png', { type: 'image/png' })
 
-  expect(screen.queryByText(/License plate is required/i)).toBeNull()
+  const input = screen.getByLabelText('Upload or Take Photo')
+  await userEvent.upload(input, file)
+
+  expect(screen.queryByText(/A photo is required./i)).toBeNull()
 })
 
 it('clears reason field error when a reason is selected', async () => {
@@ -216,6 +226,10 @@ it('calls issueTicket on successful submission', async () => {
   const reasonInput = screen.getByLabelText('Reason')
   await user.click(reasonInput)
   await user.click(await screen.findByRole('option', { name: 'No Valid Permit' }))
+  const file = new File(['dummy content'], 'photo.png', { type: 'image/png' })
+
+  const input = screen.getByLabelText('Upload or Take Photo')
+  await userEvent.upload(input, file)
 
 
   await user.click(screen.getByLabelText('Submit Violation'))
@@ -227,7 +241,7 @@ it('calls issueTicket on successful submission', async () => {
       plate: 'ABC123',
       reason: 'No Valid Permit',
       note: '',
-      images: null,
+      images: expect.any(String),
     })
   })
 })

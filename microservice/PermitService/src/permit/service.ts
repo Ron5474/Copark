@@ -16,6 +16,7 @@ import {
   NewLot,
   LotGroup,
   Zone,
+  ZoneInput
 } from './schema'
 
 export class PermitService {
@@ -421,4 +422,8 @@ export class PermitService {
       }
     })
   }
+
+  // public async updateZonePrice(zone: ZoneInput): Promise<Zone[]> {
+
+  // }
 }

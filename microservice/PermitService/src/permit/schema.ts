@@ -293,3 +293,21 @@ export class Zone {
   @Field(() => String)
   closeTime!: string
 }
+
+@InputType()
+export class ZoneInput {
+  @Field(() => String)
+  zone!: string
+
+  @Field(() => Float)
+  hourly?: number
+
+  @Field(() => DurationInput)
+  maxDuration?: DurationInput
+
+  @Field(() => String)
+  openTime?: string
+
+  @Field(() => String)
+  closeTime?: string
+}

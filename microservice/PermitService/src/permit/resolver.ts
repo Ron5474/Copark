@@ -62,11 +62,11 @@ export class PermitResolver {
     };
   }
 
-  @Query(() => String)
-  permitServiceStatus(): string {
-    return "Permit service is running"
-  }
-  
+  /*
+  **********************************************************************************
+  * Driver
+  * ********************************************************************************
+  */
   @Authorized('driver')
   @Mutation(() => Confirmation)
   async purchaseZonePermit(
@@ -194,78 +194,6 @@ export class PermitResolver {
     return purchaseMyZonePermit
   }
 
-  @Authorized('enforcement')
-  @Query(() => [CheckedPermit])
-  async checkPermit(
-    @Arg("plate", () => String) plate: string,
-    @Ctx() request: Request
-  ): Promise<CheckedPermit[]> {
-
-    const vehicleQuery = `
-      query FindVehicleByPlate($plate: String!) {
-        findVehicleByPlate(plate: $plate) {
-          id
-        }
-      }
-    `
-    const vehicleRes = await fetch('http://localhost:4001/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${request.headers.authorization}`,
-      },
-      body: JSON.stringify({
-        query: vehicleQuery,
-        variables: { plate },
-      }),
-    })
-
-    const vehicleJson = await vehicleRes.json()
-
-    const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
-
-    if (!vehicleId) {
-      return []
-    }
-
-    return await service.getValidPermit(vehicleId)
-  }
-
-  @Authorized('police')
-  @Query(() => IsValidPolice)
-  async isValidPermitByPolice (
-    @Arg("plate", () => String) plate: string,
-    @Ctx() request: Request
-  ): Promise<IsValidPolice> {
-    const vehicleQuery = `
-      query FindVehicleByPlate($plate: String!) {
-        findVehicleByPlate(plate: $plate) {
-          id
-        }
-      }
-    `
-    const vehicleRes = await fetch('http://localhost:4001/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${request.headers.authorization}`,
-      },
-      body: JSON.stringify({
-        query: vehicleQuery,
-        variables: { plate },
-      }),
-    })
-
-    const vehicleJson = await vehicleRes.json()
-    const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
-
-    if (!vehicleId) {
-      return {isValid: false}
-    }
-
-    return await service.isValidPermitPolice(vehicleId)
-  }
-
   // @Authorized('driver')
   // @Query(() => MyPermits)
   // async myPermits(
@@ -318,20 +246,6 @@ export class PermitResolver {
     return await service.getZoneDetails(zone)
   }
 
-  @Authorized('admin')
-  @Mutation(() => Boolean)
-  async createZone(
-    @Arg("input", () => NewZone) input: NewZone,
-  ): Promise<boolean> {
-    return await service.createNewZone(input)
-  }
-
-  @Authorized(["admin"])
-  @Query(() => [PermitsByDay])
-  async getPermitStats(): Promise<PermitsByDay[]> {
-    return await service.getAllPermitsByDay();
-  }
-
   // @Authorized('driver')
   // @Query(() => LotDetails)
   // async lotDetails(
@@ -349,23 +263,6 @@ export class PermitResolver {
   @Query(() => [LotGroup])
   async allLotDetails(): Promise<LotGroup[]> {
     return await service.getAllLotDetails();
-  }
-
-
-  @Authorized('admin')
-  @Mutation(() => Boolean)
-  async createLot(
-    @Arg("input", () => NewLot) input: NewLot,
-  ): Promise<boolean> {
-    return await service.createNewLot(input)
-  }
-
-  @Authorized('admin')
-  @Mutation(() => Boolean)
-  async updateLot(
-    @Arg("input", () => NewLot) input: NewLot,
-  ): Promise<boolean> {
-    return await service.updateLot(input)
   }
 
   @Authorized('driver')
@@ -495,10 +392,88 @@ export class PermitResolver {
     return purchaseMyZonePermit
   }
 
+  /*
+  **********************************************************************************
+  * Enforcement
+  * ********************************************************************************
+  */
+  @Authorized('enforcement')
+  @Query(() => [CheckedPermit])
+  async checkPermit(
+    @Arg("plate", () => String) plate: string,
+    @Ctx() request: Request
+  ): Promise<CheckedPermit[]> {
+
+    const vehicleQuery = `
+      query FindVehicleByPlate($plate: String!) {
+        findVehicleByPlate(plate: $plate) {
+          id
+        }
+      }
+    `
+    const vehicleRes = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${request.headers.authorization}`,
+      },
+      body: JSON.stringify({
+        query: vehicleQuery,
+        variables: { plate },
+      }),
+    })
+
+    const vehicleJson = await vehicleRes.json()
+
+    const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
+
+    if (!vehicleId) {
+      return []
+    }
+
+    return await service.getValidPermit(vehicleId)
+  }
+
+  /*
+  **********************************************************************************
+  * Admin
+  * ********************************************************************************
+  */
+
+  @Authorized('admin')
+  @Mutation(() => Boolean)
+  async createLot(
+    @Arg("input", () => NewLot) input: NewLot,
+  ): Promise<boolean> {
+    return await service.createNewLot(input)
+  }
+
+  @Authorized('admin')
+  @Mutation(() => Boolean)
+  async createZone(
+    @Arg("input", () => NewZone) input: NewZone,
+  ): Promise<boolean> {
+    return await service.createNewZone(input)
+  }
+
+  @Authorized('admin')
+  @Mutation(() => Boolean)
+  async updateLot(
+    @Arg("input", () => NewLot) input: NewLot,
+  ): Promise<boolean> {
+    return await service.updateLot(input)
+  }
+
   @Query(() => [Zone])
   @Authorized('admin')
   async getZones(): Promise<Zone[]> {
     return await service.getZones()
+  }
+
+  @Authorized(["admin"])
+  @Query(() => [PermitsByDay])
+  async getPermitStats(): Promise<PermitsByDay[]> {
+    return await service.getAllPermitsByDay();
   }
 
   @Authorized('admin')
@@ -529,5 +504,45 @@ export class PermitResolver {
   @Query(() => PermitReport)
   async adminPermitReport(): Promise<PermitReport> {
     return await service.generatePermitReport();
+  }
+
+  /*
+  **********************************************************************************
+  * Police
+  * ********************************************************************************
+  */
+  @Authorized('police')
+  @Query(() => IsValidPolice)
+  async isValidPermitByPolice (
+    @Arg("plate", () => String) plate: string,
+    @Ctx() request: Request
+  ): Promise<IsValidPolice> {
+    const vehicleQuery = `
+      query FindVehicleByPlate($plate: String!) {
+        findVehicleByPlate(plate: $plate) {
+          id
+        }
+      }
+    `
+    const vehicleRes = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${request.headers.authorization}`,
+      },
+      body: JSON.stringify({
+        query: vehicleQuery,
+        variables: { plate },
+      }),
+    })
+
+    const vehicleJson = await vehicleRes.json()
+    const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
+
+    if (!vehicleId) {
+      return {isValid: false}
+    }
+
+    return await service.isValidPermitPolice(vehicleId)
   }
 }

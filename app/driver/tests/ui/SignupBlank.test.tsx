@@ -1,5 +1,5 @@
 import { vi, it, afterEach, expect, } from 'vitest'
-import { render, screen, cleanup, waitFor } from '@testing-library/react'
+import { render, cleanup, waitFor } from '@testing-library/react'
 import React from 'react'
 
 import Page from '../../src/app/[locale]/signup/blank/page'

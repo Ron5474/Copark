@@ -3,42 +3,14 @@ import { render, screen, cleanup } from '@testing-library/react'
 // import userEvent from '@testing-library/user-event'
 import { signIn } from 'next-auth/react'
 
-
+import { mockNextIntl } from './mockTranslations'
+mockNextIntl()
 import View from '../../src/app/[locale]/signup/View'
 import Page from '../../src/app/[locale]/signup/page'
 import React from 'react'
 
 const push = vi.fn()
 
-vi.mock('next-intl', () => ({
-  useLocale: () => 'en',
-  useTranslations: () => ((key: string) => {
-    switch (key) {
-      case 'Do Not Sell My Personal Info':
-        return 'Do Not Sell My Personal Info';
-      case 'Privacy Policy':
-        return 'Privacy Policy';
-      case 'Terms of Service':
-        return 'Terms of Service';
-      case 'Contact Us':
-        return 'Contact Us';
-      case 'Dark Mode':
-        return 'Dark Mode';
-      case 'Rights Reserved':
-        return '© 2025 Copark. All rights reserved.';
-      default:
-        return key;
-    }
-  }),
-  NextIntlClientProvider: ({ children }: {children: React.ReactNode}) => children,
-  createSharedPathnamesNavigation: () => ({
-    useRouter: () => ({
-      push: vi.fn(),
-      replace: vi.fn(),
-    }),
-    usePathname: () => '/test',
-  })
-}))
 
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({
@@ -46,7 +18,8 @@ vi.mock('@/i18n/navigation', () => ({
   }),
   Link: ({ children, href, ...props }: { children: React.ReactNode, href: string, [key: string]: any }) => (
     <a href={href} {...props}>{children}</a>
-  )
+  ),
+  usePathname: () => '/test',
 }))
 
 vi.mock('next/navigation', () => ({
@@ -84,7 +57,7 @@ afterEach(() => {
 
 it('Renders', async () => {
   render(<View />)
-  await screen.findByText('Sign Up!')
+  await screen.findByText('Sign Up')
 })
 
 it('Click Github', async () => {
@@ -93,8 +66,7 @@ it('Click Github', async () => {
   githubButton.click()
   const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('github', {
-    callbackUrl: '/driver/en/signup/blank',
-    basePath: '/driver'
+    callbackUrl: '/driver/en/signup/blank'
   })
 })
 
@@ -104,8 +76,7 @@ it('Click Google', async () => {
   githubButton.click()
   const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('google', {
-    callbackUrl: '/driver/en/signup/blank',
-    basePath: '/driver'
+    callbackUrl: '/driver/en/signup/blank'
   })
 })
 
@@ -115,13 +86,12 @@ it('Click Facebook', async () => {
   githubButton.click()
   const signInMock = vi.mocked(signIn)
   expect(signInMock).toHaveBeenCalledWith('facebook', {
-    callbackUrl: '/driver/en/signup/blank',
-    basePath: '/driver'
+    callbackUrl: '/driver/en/signup/blank'
   })
 })
 
 it('Renders Page', async () => {
   render(<Page />)
-  await screen.findByText('Sign Up!')
+  await screen.findByText('Sign Up')
 })
 

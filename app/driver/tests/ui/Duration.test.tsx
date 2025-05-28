@@ -38,7 +38,8 @@ vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
     state: 'California',
   }]),
   addVehicle: vi.fn().mockImplementation((vehicle) =>
-    Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174000', ...vehicle }))
+    Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174000', ...vehicle })),
+  getDefaultVehicle: vi.fn().mockResolvedValue({ plate: 'C0P4RK' }),
 }))
 
 vi.mock('next/navigation', () => ({

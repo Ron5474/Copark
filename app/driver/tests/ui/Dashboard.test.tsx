@@ -11,7 +11,7 @@ import { getLotDetails, getMyPermits } from '@/app/[locale]/dashboard/permitActi
 // Mock permitActions
 vi.mock('@/app/[locale]/dashboard/permitActions', () => ({
   getLotDetails: vi.fn(),
-  getMyPermits: vi.fn()
+  getMyPermits: vi.fn(),
 }))
 
 const setCurrentPage = vi.fn()

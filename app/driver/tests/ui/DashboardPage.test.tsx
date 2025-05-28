@@ -36,7 +36,8 @@ vi.mock('@/app/[locale]/dashboard/permitActions', () => ({
 vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
   getVehicles: vi.fn(),
   addVehicle: vi.fn().mockImplementation((vehicle) =>
-    Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174000', ...vehicle }))
+    Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174000', ...vehicle })),
+  getDefaultVehicle: vi.fn().mockResolvedValue({ plate: 'ABC123' }),
 }))
 
 vi.mock('next/navigation', () => ({

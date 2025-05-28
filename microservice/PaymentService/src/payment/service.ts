@@ -6,6 +6,7 @@ export class PaymentService {
   public async payment(
     checkoutDetails: Checkout,
     id?: string,
+    email?: string,
   ): Promise<string|null> {
     if (!id) {
       throw new Error("User ID is required");
@@ -28,6 +29,7 @@ export class PaymentService {
         },
       ],
       mode: "payment",
+      customer_email: email || undefined,
       success_url: `${process.env.FRONTEND_URL}/${checkoutDetails.locale}/payment-confirmation?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/${checkoutDetails.locale}`,
       metadata: {

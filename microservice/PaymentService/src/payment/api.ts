@@ -39,7 +39,7 @@ export class PaymentController extends Controller {
     @Request() request: express.Request,
     @Body() checkoutProps: Checkout
   ): Promise<{url: string}> {
-    const session = await new PaymentService().payment(checkoutProps, request.user?.id);
+    const session = await new PaymentService().payment(checkoutProps, request.user?.id, request.user?.email);
     if (!session) {
       this.setStatus(500);
       throw new Error("Failed to create payment session");

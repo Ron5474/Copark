@@ -71,63 +71,63 @@ export class APIUser {
   accountStatus!: string
 }
 
-@ObjectType()
-export class Ticket {
-  @Field(() => ID)
-  id!: string;
+// @ObjectType()
+// export class Ticket {
+//   @Field(() => ID)
+//   id!: string;
 
-  @Field(() => String)  
-  vehicle!: string;
+//   @Field(() => String)  
+//   vehicle!: string;
 
-  @Field(() => String)  
-  enforcer!: string;
+//   @Field(() => String)  
+//   enforcer!: string;
 
-  @Field(() => Date)  
-  issuedDate!: Date;
+//   @Field(() => Date)  
+//   issuedDate!: Date;
 
-  @Field(() => String)  
-  violation!: string;
+//   @Field(() => String)  
+//   violation!: string;
 
-  @Field(() => Number)  
-  fine!: number;
+//   @Field(() => Number)  
+//   fine!: number;
 
-  @Field(() => String)  
-  ticketStatus!: string;
+//   @Field(() => String)  
+//   ticketStatus!: string;
 
-  @Field(() => String, { nullable: true })  
-  images?: string;
+//   @Field(() => String, { nullable: true })  
+//   images?: string;
 
-  @Field(() => String, { nullable: true })
-  note?: string;
-}
+//   @Field(() => String, { nullable: true })
+//   note?: string;
+// }
 
-@ObjectType()
-export class Permit {
+// @ObjectType()
+// export class Permit {
 
-  @Field(() => String)
-  vehicle!: string
+//   @Field(() => String)
+//   vehicle!: string
 
-  @Field(() => String)
-  type!: string
+//   @Field(() => String)
+//   type!: string
 
-  @Field(() => String)
-  area!: string
+//   @Field(() => String)
+//   area!: string
 
-  @Field(() => String)
-  activeDate!: string
+//   @Field(() => String)
+//   activeDate!: string
 
-  @Field(() => String)
-  expireDate!: string
-}
+//   @Field(() => String)
+//   expireDate!: string
+// }
 
-@ObjectType()
-export class ReportDay {
-  @Field(() => String)
-  date!: string;
+// @ObjectType()
+// export class ReportDay {
+//   @Field(() => String)
+//   date!: string;
 
-  @Field(() => [Ticket])
-  tickets?: Ticket[];
+//   @Field(() => [Ticket])
+//   tickets?: Ticket[];
 
-  @Field(() => [Permit])
-  permits?: Permit[];
-}
+//   @Field(() => [Permit])
+//   permits?: Permit[];
+// }

@@ -357,8 +357,15 @@ test('Driver has no permits', async () => {
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
     .send({ 
-      query: myPermitsQuery,
-      variables: myPermitsInput
+      query: `
+        query {
+          myPermits {
+            future { vehicle type area activeDate expireDate }
+            active { vehicle type area activeDate expireDate }
+            expired { vehicle type area activeDate expireDate }
+          }
+        }
+      `
     })
 
   expect(permits.body.data.myPermits.active.length).toBe(0)

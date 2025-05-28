@@ -17,13 +17,13 @@ import {PermitService} from '../src/permit/service'
 vi.mock('server-only', () => ({}))
 
 const permitDetails = {
-  vehicle: '12345678-1234-1234-1234-567890abcdef',
+  vehicle: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
   zone: '27',
   duration: {'minutes': 30, 'hours': 0},
   paymentMethod: 'paypal'
 }
 
-const policeDetails = '12345678-1234-1234-1234-567890abcdef'
+const policeDetails = 'f2d7800e-67ce-41aa-b1fe-38e679112e0e'
 
 beforeEach( async () => {
   return db.reset()
@@ -95,19 +95,24 @@ test('Vehicle does not have valid permit (Police)', async () => {
 })
 
 test('getMyPermits returns empty', async () => {
-  const { active } = await permitService.getMyPermits(permitDetails.vehicle)
+  const { active } = await permitService.getMyPermits([permitDetails.vehicle])
   expect(active.length).toBe(0)
 })
 
 test('getMyPermits returns active permit', async () => {
   await permitService.purchaseMyZonePermit(permitDetails)
-  const { active } = await permitService.getMyPermits(permitDetails.vehicle)
+  const { active } = await permitService.getMyPermits([permitDetails.vehicle])
   expect(active.length).toBe(1)
 })
 
 test('zoneDetails gives correct hourly on weekday', async () => {
   const { hourly } = await permitService.getZoneDetails('123', 3) // Wednesday
   expect(hourly).toBe(2.45)
+})
+
+test('zoneDetails gives correct hourly on weekday', async () => {
+  const { hourly } = await permitService.getZoneDetails('123', 0) // Sunday
+  expect(hourly).toBe(2.95)
 })
 
 test('zoneDetails errors on wrong zone', async () => {
@@ -165,7 +170,7 @@ test('getAllLotDetails gives correct daily permits', async () => {
 
 test('admin create lot', async () => {
   expect(await permitService.createNewLot({
-    lot: 'F',
+    lot: 'O',
     daily: {price: 10},
     quarterly: {price: 50, expireDate: '2025-06-12T23:59:59-07:00'},
     yearly: {price: 200, expireDate: '2025-06-12T23:59:59-07:00'}
@@ -175,6 +180,22 @@ test('admin create lot', async () => {
 test('admin creates lot that already exists', async () => {
   expect(await permitService.createNewLot({
     lot: 'ANY',
+    daily: {price: 15}
+  })).toBeFalsy()
+})
+
+test('admin updates lot', async () => {
+  expect(await permitService.updateLot({
+    lot: 'ANY',
+    daily: {price: 100},
+    quarterly: {price: 500, expireDate: '2025-06-12T23:59:59-07:00'},
+    yearly: {price: 2000, expireDate: '2025-06-12T23:59:59-07:00'}
+  }))
+})
+
+test('admin updates lot that doesn\'t exist', async () => {
+  expect(await permitService.updateLot({
+    lot: 'O',
     daily: {price: 15}
   })).toBeFalsy()
 })
@@ -233,3 +254,48 @@ test('getZones properly returns zones', async () => {
   const receipt = await permitService.getZones()
   expect(receipt).toBeDefined()
 })
+
+test('updateZonePrice updates the zone hourly price and returns updated zone', async () => {
+  const updatedZone = {
+    zone: '27',
+    hourly: 9.99,
+    maxDuration: { hours: 2, minutes: 30 },
+    openTime: '06:00',
+    closeTime: '22:00'
+  };
+
+  const result = await permitService.updateZonePrice(updatedZone);
+
+  expect(result).toBeDefined();
+  expect(Array.isArray(result)).toBe(true);
+  expect(result[0].zone).toBe('27');
+  expect(result[0].hourly).toBe(9.99);
+  expect(result[0].maxDuration).toEqual({ hours: 2, minutes: 30 });
+  expect(result[0].openTime).toBe('06:00');
+  expect(result[0].closeTime).toBe('22:00');
+});
+
+test('updateZonePrice updates the zone hourly price and returns updated zone', async () => {
+  const updatedZone = {
+    zone: '999',
+  };
+
+  const result = await permitService.updateZonePrice(updatedZone);
+
+  expect(result).toBeDefined();
+  expect(Array.isArray(result)).toBe(true);
+  expect(result[0].zone).toBe('999');
+  expect(result[0].hourly).toBe(0);
+  expect(result[0].maxDuration).toEqual({ hours: 0, minutes: 0 });
+  expect(result[0].openTime).toBe('00:00');
+  expect(result[0].closeTime).toBe('23:59');
+});
+
+test('updateZonePrice throws if zone does not exist', async () => {
+  await expect(
+    permitService.updateZonePrice({
+      zone: '999999',
+      hourly: 5.55
+    })
+  ).rejects.toThrow('Zone 999999 not found');
+});

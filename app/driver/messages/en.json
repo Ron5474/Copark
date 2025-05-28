@@ -217,7 +217,7 @@
             "state": "State",
             "nickname": "Nickname",
             "optional": "optional",
-            "continue": "Save"
+            "save": "Save"
       },
     "checkout": {
       "title": "Which Vehicle?",

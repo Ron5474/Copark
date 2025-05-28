@@ -8,7 +8,7 @@ import Page from '@/app/[locale]/dashboard/page'
 import { getVehicles } from '../../src/app/[locale]/vehicle/actions'
 import { userLoginAttempt } from '@/app/[locale]/dashboard/actions'
 import { getUser } from '@/app/[locale]/shared/actions'
-import { getLotDetails } from '@/app/[locale]/dashboard/permitActions'
+import { getLotDetails, getMyPermits } from '@/app/[locale]/dashboard/permitActions'
 
 vi.mock('next-auth/react', () => ({
   signOut: vi.fn(),
@@ -17,16 +17,20 @@ vi.mock('next-auth/react', () => ({
 
 const pushMock = vi.fn()
 
-
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({
     push: pushMock,
     replace: vi.fn(),
   }),
-}));
+  Link: ({ children, href, ...props }: { children: React.ReactNode, href: string, [key: string]: any }) => (
+    <a href={href} {...props}>{children}</a>
+  ),
+  usePathname: () => '/test',
+}))
 
 vi.mock('@/app/[locale]/dashboard/permitActions', () => ({
-  getLotDetails: vi.fn()
+  getLotDetails: vi.fn(),
+  getMyPermits: vi.fn()
 }))
 
 vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
@@ -112,6 +116,35 @@ beforeEach(() => {
       ],
     },
   ])
+  vi.mocked(getMyPermits).mockResolvedValue({
+    active: [
+      {
+        vehicle: "ABC123",
+        type: "Daily", 
+        area: "Zone 5",
+        activeDate: "2025-05-27T08:00:00Z",
+        expireDate: "2025-05-27T18:00:00Z"
+      }
+    ],
+    future: [
+      {
+        vehicle: "ABC123",
+        type: "Yearly",
+        area: "All Lots Access", 
+        activeDate: "2025-06-01T00:00:00Z",
+        expireDate: "2026-05-31T23:59:59Z"
+      }
+    ],
+    expired: [
+      {
+        vehicle: "JKL654",
+        type: "Daily",
+        area: "Zone 3",
+        activeDate: "2025-05-26T08:00:00Z", 
+        expireDate: "2025-05-26T17:00:00Z"
+      }
+    ]
+  })
 })
 
 it('calls setCurrentPage with "buy-permit" when Buy Permit is clicked', async () => {

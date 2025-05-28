@@ -3,6 +3,8 @@ import { render, cleanup, waitFor } from '@testing-library/react'
 import React from 'react'
 import { signOut } from 'next-auth/react';
 
+import { mockNextIntl } from './mockTranslations'
+mockNextIntl()
 import Page from '../../src/app/[locale]/login/blank/page'
 import { getUser } from '../../src/app/[locale]/shared/actions'
 import { userLoginAttempt } from '../../src/app/[locale]/dashboard/actions'
@@ -22,43 +24,14 @@ vi.mock('@/app/[locale]/dashboard/actions', () => ({
     userLoginAttempt: vi.fn(),
   }))
 
-vi.mock('next-intl', () => ({
-  useLocale: () => 'en',
-  useTranslations: () => ((key: string) => {
-    switch (key) {
-      case 'Do Not Sell My Personal Info':
-        return 'Do Not Sell My Personal Info';
-      case 'Privacy Policy':
-        return 'Privacy Policy';
-      case 'Terms of Service':
-        return 'Terms of Service';
-      case 'Contact Us':
-        return 'Contact Us';
-      case 'Dark Mode':
-        return 'Dark Mode';
-      case 'Rights Reserved':
-        return '© 2025 Copark. All rights reserved.';
-      default:
-        return key;
-    }
-  }),
-  NextIntlClientProvider: ({ children }: {children: React.ReactNode}) => children,
-  createSharedPathnamesNavigation: () => ({
-    useRouter: () => ({
-      push: vi.fn(),
-      replace: vi.fn(),
-    }),
-    usePathname: () => '/test',
-  })
-}))
-
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({
     push
   }),
   Link: ({ children, href, ...props }: { children: React.ReactNode, href: string, [key: string]: any }) => (
     <a href={href} {...props}>{children}</a>
-  )
+  ),
+  usePathname: () => '/test',
 }))
 
 vi.mock('next/navigation', () => ({
@@ -114,7 +87,7 @@ it('Renders Page', async () => {
   render(<Page />)
 	await waitFor(() => {
 		expect(signOut).toHaveBeenCalledWith({
-			callbackUrl: `${window.location.origin}/driver/en/signup`,
+			callbackUrl: `/en/signup`,
 		})
 	})
 })

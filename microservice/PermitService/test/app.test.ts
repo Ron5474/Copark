@@ -235,7 +235,7 @@ test('Right permissions', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({ 
       query: purchaseZonePermitQuery,
-      variables: {...purchaseZoneInput, vehicle: vid}
+      variables: { input: { ...purchaseZoneInput.input, vehicle: vid } }
     })
 
   expect(confirmation.body.errors).toBeUndefined()

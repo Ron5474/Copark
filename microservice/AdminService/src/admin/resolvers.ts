@@ -36,7 +36,7 @@ export class AdminResolver {
   @Authorized(["admin"])
   async addEnforcer(
     @Arg("enforcer", () => NewUser) enforcer: NewUser
-  ): Promise<User[]> {
+  ): Promise<User[] | undefined> {
     return adminService.addEnforcer(enforcer);
   }
 

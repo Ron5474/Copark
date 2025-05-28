@@ -360,6 +360,14 @@ export class PermitResolver {
     return await service.createNewLot(input)
   }
 
+  @Authorized('admin')
+  @Mutation(() => Boolean)
+  async updateLot(
+    @Arg("input", () => NewLot) input: NewLot,
+  ): Promise<boolean> {
+    return await service.updateLot(input)
+  }
+
   @Authorized('driver')
   @Mutation(() => Confirmation)
   async purchaseLotPermit(

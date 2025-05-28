@@ -9,7 +9,8 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  useTheme
+  useTheme,
+  Alert
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GavelIcon from '@mui/icons-material/Gavel';
@@ -21,6 +22,7 @@ export default function ManageEnforcement({ onNavigate }) {
   const theme = useTheme();
   const [enforcers, setEnforcers] = useState([]);
   const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [addError, setAddError] = useState('');
   const [newEnforcer, setNewEnforcer] = useState({
     name: '',
     email: ''
@@ -50,7 +52,12 @@ export default function ManageEnforcement({ onNavigate }) {
   };
 
   const handleAddEnforcer = async () => {
-    await addEnforcer(newEnforcer);
+    setAddError(''); // Clear any previous error
+    const result = await addEnforcer(newEnforcer);
+    if (!result) {
+      setAddError('An enforcer with this email already exists');
+      return;
+    }
     setOpenAddDialog(false);
     setNewEnforcer({ name: '', email: '' });
     fetchEnforcers();
@@ -223,6 +230,11 @@ export default function ManageEnforcement({ onNavigate }) {
           Add New Enforcer
         </DialogTitle>
         <DialogContent>
+          {addError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {addError}
+            </Alert>
+          )}
           <TextField
             autoFocus
             margin="dense"

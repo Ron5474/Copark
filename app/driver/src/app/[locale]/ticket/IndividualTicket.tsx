@@ -23,12 +23,14 @@ export default function IndividualTicket() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return formatter.dateTime(date, {
+    const correctedDate = new Date(date.getTime() - (7 * 60 * 60 * 1000))
+  
+    return formatter.dateTime(correctedDate, {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit',
+      minute: '2-digit'
     })
   }
   

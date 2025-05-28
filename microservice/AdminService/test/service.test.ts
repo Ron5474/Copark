@@ -41,6 +41,12 @@ test('AddEnforcer should add an enforcer', async () => {
     expect(enforcers[2].accountStatus).toBe('active');
 });
 
+test('AddEnforcer should return undefined on attempting to add an already existing enforcer', async () => {
+    const enforcer: NewUser = { name: 'Enforcer 3', email: 'enforcer3@outlook.com' };
+    const result = await adminService.addEnforcer(enforcer);
+    expect(result).toBeUndefined();
+});
+
 test('suspendUser should suspend an enforcer', async () => {
     const enforcer: NewUser = { name: 'Michelle Obama', email: 'michelle.obama@example.com' };
     const addedEnforcers = await adminService.addEnforcer(enforcer);
@@ -54,7 +60,7 @@ test('suspendUser should suspend an enforcer', async () => {
 });
   
 test('suspendUser should not work with a bad jwt input', async () => {
-    const enforcer: NewUser = { name: 'Michelle Obama', email: 'michelle.obama@example.com' };
+    const enforcer: NewUser = { name: 'Michelle Obama', email: 'michelle.obamas@example.com' };
     const addedEnforcers = await adminService.addEnforcer(enforcer);
   
     const enforcerInput: UserInput = { id: addedEnforcers[0].id + 'extra text' };

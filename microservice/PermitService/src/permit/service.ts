@@ -16,6 +16,7 @@ import {
   NewLot,
   LotGroup,
   Zone,
+  ZoneInput,
   PermitReport,
 } from './schema'
 
@@ -160,7 +161,7 @@ export class PermitService {
       `,
       [vid]
     )
-    console.log(result.rows[0])
+    // console.log(result.rows[0])
 
     return result.rows[0]
   }
@@ -312,8 +313,8 @@ export class PermitService {
 
 
   public async createNewLot(input: NewLot): Promise<boolean> {
-    const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO Don't hardcode this
-    const { rows } = await pool.query(`
+    const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
+    const { rowCount } = await pool.query(`
       INSERT INTO type (location, data)
       SELECT $2, $1
       WHERE NOT EXISTS (
@@ -325,7 +326,21 @@ export class PermitService {
       RETURNING id, data
     `, [input, location, input.lot])
   
-    return (rows.length !== 0)
+    return (rowCount as number) > 0
+  }
+
+  public async updateLot(input: NewLot): Promise<boolean> {
+    const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
+  
+    const { rowCount } = await pool.query(`
+      UPDATE type
+      SET data = $1
+      WHERE location = $2
+      AND data->>'area' = $3
+      AND data->>'name' = 'lot'
+    `, [input, location, input.lot])
+  
+    return (rowCount as number) > 0
   }
 
   public async purchaseMyLotPermit(input: PurchaseLotInput): Promise<Confirmation> {
@@ -520,4 +535,58 @@ export class PermitService {
   }
 
 
+
+  public async updateZonePrice(zone: ZoneInput): Promise<Zone[]> {
+    // Fetch the existing zone data
+    const result = await pool.query(
+      `
+      SELECT id, data
+      FROM type
+      WHERE data->>'name' = 'zone'
+      AND data->>'area' = $1
+      LIMIT 1
+      `,
+      [zone.zone]
+    );
+
+    if (result.rowCount === 0) {
+      throw new Error(`Zone ${zone.zone} not found`);
+    }
+
+    const row = result.rows[0];
+    const data = row.data;
+    const weekday = data.weekday || {};
+
+    if (zone.hourly !== undefined) {
+      weekday.hourly = zone.hourly;
+    }
+    if (zone.maxDuration !== undefined) {
+      weekday.maxDuration = zone.maxDuration;
+    }
+    if (zone.openTime !== undefined) {
+      weekday.openTime = zone.openTime;
+    }
+    if (zone.closeTime !== undefined) {
+      weekday.closeTime = zone.closeTime;
+    }
+
+    data.weekday = weekday;
+
+    await pool.query(
+      `
+      UPDATE type
+      SET data = $1
+      WHERE id = $2
+      `,
+      [data, row.id]
+    );
+
+    return [{
+      zone: data.area,
+      hourly: data.weekday?.hourly || 0,
+      maxDuration: data.weekday?.maxDuration || { hours: 0, minutes: 0 },
+      openTime: data.weekday?.openTime || '00:00',
+      closeTime: data.weekday?.closeTime || '23:59'
+    }];
+  }
 }

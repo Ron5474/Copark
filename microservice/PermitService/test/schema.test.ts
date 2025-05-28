@@ -12,6 +12,7 @@ import {
   CheckedPermit,
   IsValidPolice,
   PermitsByDay,
+  LotTypeDetails,
   LotDetails,
   Lot,
   LotGroup,
@@ -164,15 +165,38 @@ test('PermitsByDay schema loads correctly', () => {
 })
 
 test('LotDetails schema loads correctly', () => {
+  const dailyLotDetails = new LotTypeDetails()
+  dailyLotDetails.price = 5
+  
+  const quarterlyLotDetails = new LotTypeDetails()
+  quarterlyLotDetails.expireDate = '2025-06-12T23:59:59-07:00'
+  quarterlyLotDetails.price = 100
+  
+  const yearlyLotDetails = new LotTypeDetails()
+  yearlyLotDetails.expireDate = '2025-06-12T23:59:59-07:00'
+  yearlyLotDetails.price = 300
+
   const lotDetails = new LotDetails()
-  lotDetails.daily = 5
-  lotDetails.quarterly = 100
-  lotDetails.yearly = 300
+  lotDetails.daily = dailyLotDetails
+  lotDetails.quarterly = quarterlyLotDetails
+  lotDetails.yearly = yearlyLotDetails
 
   expect(lotDetails).toBeDefined()
-  expect(lotDetails.daily).toBe(5)
-  expect(lotDetails.quarterly).toBe(100)
-  expect(lotDetails.yearly).toBe(300)
+  expect(lotDetails.daily.price).toBe(5)
+  expect(lotDetails.daily.expireDate).toBeUndefined()
+  expect(lotDetails.quarterly.price).toBe(100)
+  expect(lotDetails.quarterly.expireDate).toBe('2025-06-12T23:59:59-07:00')
+  expect(lotDetails.yearly.price).toBe(300)
+  expect(lotDetails.yearly.expireDate).toBe('2025-06-12T23:59:59-07:00')
+})
+
+test('Empty LotDetails (under construction) schema loads correctly', () => {
+  const lotDetails = new LotDetails()
+
+  expect(lotDetails).toBeDefined()
+  expect(lotDetails.daily).toBeUndefined()
+  expect(lotDetails.quarterly).toBeUndefined()
+  expect(lotDetails.yearly).toBeUndefined()
 })
 
 test('Lot schema loads correctly', () => {

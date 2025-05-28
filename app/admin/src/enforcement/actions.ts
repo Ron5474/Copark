@@ -36,7 +36,7 @@ export const getEnforcers = async (): Promise<User[]> => {
   return result.data.getEnforcers;
 };
 
-export const addEnforcer = async (enforcer: NewUser): Promise<User[]> => {
+export const addEnforcer = async (enforcer: NewUser): Promise<User[] | undefined> => {
   const token = await getAuthToken();
   const response = await fetch(API_URL, {
     method: 'POST',
@@ -52,6 +52,7 @@ export const addEnforcer = async (enforcer: NewUser): Promise<User[]> => {
               name
               email
               accountStatus
+              password
             }
           }
         `,
@@ -62,7 +63,46 @@ export const addEnforcer = async (enforcer: NewUser): Promise<User[]> => {
   });
 
   const result = await response.json();
-  return result.data.addEnforcer;
+
+  if (result.data) {
+    const newEnforcer = result.data.addEnforcer[0];
+  
+    await fetch('http://localhost:3015/email/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: newEnforcer.email,
+        subject: 'Welcome to Copark Enforcement Team',
+        html: `
+          <div style="font-family: Roboto, sans-serif; max-width: 600px; margin: auto; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <img src="https://copark.space/enforcement/assets/copark-enforce-logo.png" alt="Copark Logo" width="100" style="margin: auto;">
+            </div>
+            <h2>Welcome to the Copark Enforcement Team!</h2>
+            
+            <p>Dear ${newEnforcer.name},</p>
+            
+            <p>Welcome aboard! We're excited to have you join the Copark Enforcement team. You've been granted access to our enforcement platform where you'll be able to manage parking operations efficiently.</p>
+            
+            <h3>Your Login Credentials:</h3>
+            <p><strong>Email:</strong> ${newEnforcer.email}</p>
+            <p><strong>Password:</strong> ${newEnforcer.password}</p>
+            
+            <p>You can access the enforcement platform at: <a href="https://copark.space/enforcement/login">Copark Enforcement Portal</a></p>
+            
+            <p>If you have any questions or need assistance, please don't hesitate to contact the admin team.</p>
+            
+            <p>Best regards,<br>Copark Administration</p>
+          </div>
+        `
+      })
+    });
+    
+    return result.data.addEnforcer;
+  }
+  return undefined;
 };
 
 export const suspendUser = async (id: string): Promise<User[]> => {

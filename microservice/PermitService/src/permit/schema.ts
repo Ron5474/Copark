@@ -100,19 +100,28 @@ export class NewZone {
 }
 
 @InputType()
+export class LotInputDetails {
+  @Field(() => Number)
+  price!: number
+
+  @Field(() => String, { nullable: true })
+  expireDate?: string
+}
+
+@InputType()
 export class NewLot {
 
   @Field(() => String)
   lot!: string
 
-  @Field(() => Number, { nullable: true })
-  daily?: number
+  @Field(() => LotInputDetails, { nullable: true })
+  daily?: LotInputDetails
 
-  @Field(() => Number, { nullable: true })
-  quarterly?: number
+  @Field(() => LotInputDetails, { nullable: true })
+  quarterly?: LotInputDetails
 
-  @Field(() => Number, { nullable: true })
-  yearly?: number
+  @Field(() => LotInputDetails, { nullable: true })
+  yearly?: LotInputDetails
 }
 
 @ObjectType()
@@ -322,4 +331,21 @@ export class PermitReport {
 
   @Field(() => [LotStats])
   lotBreakdown!: LotStats[];
+}
+@InputType()
+export class ZoneInput {
+  @Field(() => String)
+  zone!: string
+
+  @Field(() => Float)
+  hourly?: number
+
+  @Field(() => DurationInput)
+  maxDuration?: DurationInput
+
+  @Field(() => String)
+  openTime?: string
+
+  @Field(() => String)
+  closeTime?: string
 }

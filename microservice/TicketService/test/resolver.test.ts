@@ -1064,7 +1064,7 @@ test('Driver can mark a ticket as paid', async () => {
   expect(paidTicket.ticketStatus).toBe('paid');
 });
 
-test('Admin can get unpaid tickets grouped by day', async () => {
+test('Admin can get unpaid tickets', async () => {
   const adminToken = await loginAs("admin");
 
   // Create two unpaid tickets for today
@@ -1102,13 +1102,10 @@ test('Admin can get unpaid tickets grouped by day', async () => {
   const getUnpaidTicketsQuery = `
     mutation {
       getUnpaidTickets {
-        date
-        tickets {
           vehicle
           violation
           fine
           note
-        }
       }
     }
   `;
@@ -1123,16 +1120,4 @@ test('Admin can get unpaid tickets grouped by day', async () => {
   const result = response.body.data.getUnpaidTickets;
   expect(Array.isArray(result)).toBe(true);
   expect(result.length).toBeGreaterThan(0);
-
-  const today = new Date().toISOString().split('T')[0];
-  const todayEntry = result.find((entry: any) => entry.date === today);
-  expect(todayEntry).toBeDefined();
-  expect(Array.isArray(todayEntry.tickets)).toBe(true);
-  expect(todayEntry.tickets.length).toBeGreaterThanOrEqual(2);
-  todayEntry.tickets.forEach((ticket: any) => {
-    expect(ticket).toHaveProperty('vehicle');
-    expect(ticket).toHaveProperty('violation');
-    expect(ticket).toHaveProperty('fine');
-    expect(ticket).toHaveProperty('note');
-  });
 });

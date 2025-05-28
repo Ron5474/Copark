@@ -19,6 +19,7 @@ import {
   Permit,
   ZoneStats,
   LotStats,
+  PermitReport,
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
@@ -514,5 +515,11 @@ export class PermitResolver {
     @Arg("activeOnly", () => Boolean, { defaultValue: true }) activeOnly: boolean
   ): Promise<LotStats[]> {
     return await service.getPermitStatsByLot(activeOnly)
+  }
+
+  @Authorized('admin')
+  @Query(() => PermitReport)
+  async adminPermitReport(): Promise<PermitReport> {
+    return await service.generatePermitReport();
   }
 }

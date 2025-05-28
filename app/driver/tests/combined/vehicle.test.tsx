@@ -3,6 +3,8 @@ import { render, screen, cleanup, /*waitFor*/ } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 
+import { mockNextIntl } from '../ui/mockTranslations'
+mockNextIntl()
 import { auth, vehicle } from './mockService'
 import { getVehicles, addVehicle } from '../../src/app/[locale]/vehicle/actions'
 import VehicleList from '../../src/app/[locale]/vehicle/member/Vehicle'
@@ -38,29 +40,6 @@ vi.mock('next/headers', () => {
     headers: () => new Headers(),
   }
 })
-
-vi.mock('next-intl', () => ({
-  useTranslations: () => (
-    vi.fn((x: string) => {
-      switch (x) {
-        case 'Do Not Sell My Personal Info':
-          return 'Do Not Sell My Personal Info'
-        case 'Privacy Policy':
-          return 'Privacy Policy'
-        case 'Terms of Service':
-          return 'Terms of Service'
-        case 'Contact Us':
-          return 'Contact Us'
-        case 'Dark Mode':
-          return 'Dark Mode'
-        case 'Rights Reserved':
-          return '© 2025 Copark. All rights reserved.'
-        default:
-          return x
-      }
-    })
-  ),
-}))
 
 
 

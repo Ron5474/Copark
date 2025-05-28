@@ -62,14 +62,14 @@ const driver = {
 
 
 // TODO update JWT with new secret
-const policeJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFiZTQwNWM2LTc0MDAtNGQyMy05Zjg2LTAwZWFkMTU3MjlmNSIsImlhdCI6MTc0NzI2MzIyMSwiZXhwIjoxOTA1MDUxMjIxfQ.UVVWAjg2-asw8gfqoxljHZSVX4Mn_1FzOV85CagVbUQ"
+// const policeJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFiZTQwNWM2LTc0MDAtNGQyMy05Zjg2LTAwZWFkMTU3MjlmNSIsImlhdCI6MTc0NzI2MzIyMSwiZXhwIjoxOTA1MDUxMjIxfQ.UVVWAjg2-asw8gfqoxljHZSVX4Mn_1FzOV85CagVbUQ"
 
 const adminUser = {
   email: 'jxiong0822@outlook.com',
   password: 'password1',
 }
 
-async function loginAs(who: string, defaultVehicle=true): Promise<string | undefined> {
+async function loginAs(who: string, defaultVehicle=true): Promise<{vid?: string, token: string} | undefined> {
   if (who === "driver") {
     const token = await  new SignJWT(driver)
       .setProtectedHeader({ alg: 'HS256' })
@@ -91,10 +91,10 @@ async function loginAs(who: string, defaultVehicle=true): Promise<string | undef
         variables: derikVehicleInput
       })
 
-    const id = addVehicle.body.data.registerVehicle.id
+    const vid = addVehicle.body.data.registerVehicle.id
     const setDefaultVehicleInput = {
       input: {
-        id: id
+        id: vid
       }
     }
     if (defaultVehicle) {
@@ -117,7 +117,7 @@ async function loginAs(who: string, defaultVehicle=true): Promise<string | undef
       throw new Error(`Login failed with status ${response.status}`)
     }
 
-    return token
+    return {token, vid}
   } else if (who === "enforcement") {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
@@ -129,7 +129,7 @@ async function loginAs(who: string, defaultVehicle=true): Promise<string | undef
     if (response.status !== 200) {
       throw new Error(`Enforcement login failed with status ${response.status}`)
     }
-    return response.body.id
+    return {token: response.body.id}
   } else {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
@@ -138,7 +138,7 @@ async function loginAs(who: string, defaultVehicle=true): Promise<string | undef
     if (response.status !== 200) {
       throw new Error(`Login failed with status ${response.status}`)
     }
-    return response.body?.id
+    return {token: response.body?.id}
   }
 }
 
@@ -169,31 +169,31 @@ const derikVehicleInput = {
   }
 }
 
-// const purchaseZonePermitQuery = `
-// mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
-//   purchaseZonePermit(input: $input) {
-//     type
-//     area
-//     purchaseDate
-//     activeDate
-//     expireDate
-//     receipt {
-//       service
-//       subTotal
-//       total
-//     }
-//     paymentMethod
-//   }
-// }`
+const purchaseZonePermitQuery = `
+mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
+  purchaseZonePermit(input: $input) {
+    type
+    area
+    purchaseDate
+    activeDate
+    expireDate
+    receipt {
+      service
+      subTotal
+      total
+    }
+    paymentMethod
+  }
+}`
 
-// const purchaseZoneInput = {
-//   input: {
-//     vehicle: "12345678-1234-1234-1234-567890abcdef",
-//     zone: "123",
-//     duration: {'minutes': 30, 'hours': 0},
-//     paymentMethod: "paypal"
-//   }
-// }
+const purchaseZoneInput = {
+  input: {
+    vehicle: "replace with derik's vid",
+    zone: "123",
+    duration: {'minutes': 30, 'hours': 0},
+    paymentMethod: "paypal"
+  }
+}
 
 const checkPermitQuery = `
 query CheckedPermit($plate: String!) {
@@ -207,51 +207,51 @@ const checkPermitInvalidInput = { plate: "0000000" }
 
 const checkPermitInput = { plate: "JCDE544" }
 
-const isValidPermitByPoliceQuery = `
-query IsValidPolice($plate: String!) {
-  isValidPermitByPolice(plate: $plate) {
-    isValid
-  }
-}`
+// const isValidPermitByPoliceQuery = `
+// query IsValidPolice($plate: String!) {
+//   isValidPermitByPolice(plate: $plate) {
+//     isValid
+//   }
+// }`
 
-const isValidPermitByPoliceInput = {
-  plate: "7RON123",
-}
+// const isValidPermitByPoliceInput = {
+//   plate: "7RON123",
+// }
 
-const nonExistentPlateInput = {
-  plate: "1AAA111",
-}
+// const nonExistentPlateInput = {
+//   plate: "1AAA111",
+// }
 
-const myPermitsQuery = `
-query MyPermits($vehicleID: String!) {
-  myPermits(vehicleID: $vehicleID) {
-    future {
-      vehicle
-      type
-      area
-      activeDate
-      expireDate
-    }
-    active {
-      vehicle
-      type
-      area
-      activeDate
-      expireDate
-    }
-    expired {
-      vehicle
-      type
-      area
-      activeDate
-      expireDate
-    }
-  }
-}`
+// const myPermitsQuery = `
+// query MyPermits($vehicleID: String!) {
+//   myPermits(vehicleID: $vehicleID) {
+//     future {
+//       vehicle
+//       type
+//       area
+//       activeDate
+//       expireDate
+//     }
+//     active {
+//       vehicle
+//       type
+//       area
+//       activeDate
+//       expireDate
+//     }
+//     expired {
+//       vehicle
+//       type
+//       area
+//       activeDate
+//       expireDate
+//     }
+//   }
+// }`
 
-const myPermitsInput = {
-  vehicleID: "12345678-1234-1234-1234-567890abcdef"
-}
+// const myPermitsInput = {
+//   vehicleID: "12345678-1234-1234-1234-567890abcdef"
+// }
 
 const zoneDetailsQuery = `
 query ZoneDetails($zone: String!) {
@@ -282,22 +282,22 @@ test('Permit service is running', async () => {
   expect(status.body.data.permitServiceStatus).toBe("Permit service is running")
 })
 
-// test('Driver can purchase a zone permit', async () => {
-//   const token = await loginAs("driver")
+test('Driver can purchase a zone permit', async () => {
+  const driver = await loginAs("driver")
 
-//   const confirmation = await supertest(server)
-//     .post('/graphql')
-//     .set('Authorization', 'Bearer ' + token)
-//     .send({ 
-//       query: purchaseZonePermitQuery,
-//       variables: purchaseZoneInput
-//     })
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: {input: {...purchaseZoneInput.input, vehicle: derikVehicleInput.input.plate}}
+    })
 
-//   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
-// })
+  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+})
 
 test('Enforcer gets invalid permit', async () => {
-  const token = await loginAs("enforcement")
+  const { token } = await loginAs("enforcement")
 
   const permits = await supertest(server)
     .post('/graphql')
@@ -311,7 +311,7 @@ test('Enforcer gets invalid permit', async () => {
 })
 
 test('Enforcer gets valid permit', async () => {
-  const token = await loginAs("enforcement")
+  const { token } = await loginAs("enforcement")
 
   const permits = await supertest(server)
     .post('/graphql')
@@ -325,33 +325,33 @@ test('Enforcer gets valid permit', async () => {
 
 })
 
-test('Police gets invalid permit', async () => {
-  const isValid = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + policeJWT)
-    .send({ 
-      query: isValidPermitByPoliceQuery,
-      variables: isValidPermitByPoliceInput
-    })
+// test('Police gets invalid permit', async () => {
+//   const isValid = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + policeJWT)
+//     .send({ 
+//       query: isValidPermitByPoliceQuery,
+//       variables: isValidPermitByPoliceInput
+//     })
 
-    // console.log(isValid.body)
-  expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
-})
+//     // console.log(isValid.body)
+//   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
+// })
 
-test('Police gets invalid for nonexistent plate', async () => {
-  const isValid = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + policeJWT)
-    .send({ 
-      query: isValidPermitByPoliceQuery,
-      variables: nonExistentPlateInput
-    })
+// test('Police gets invalid for nonexistent plate', async () => {
+//   const isValid = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + policeJWT)
+//     .send({ 
+//       query: isValidPermitByPoliceQuery,
+//       variables: nonExistentPlateInput
+//     })
     
-  expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
-})
+//   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
+// })
 
 test('Driver has no permits', async () => {
-  const token = await loginAs("driver")
+  const { token } = await loginAs("driver")
 
   const permits = await supertest(server)
     .post('/graphql')
@@ -372,7 +372,7 @@ test('Driver has no permits', async () => {
 })
 
 test('Zone details', async () => {
-  const token = await loginAs("driver")
+  const { token } = await loginAs("driver")
 
   const details = await supertest(server)
     .post('/graphql')
@@ -386,7 +386,7 @@ test('Zone details', async () => {
 })
 
 test('Admin can get ticket stats grouped by day', async () => {
-  const token = await loginAs("admin");
+  const { token } = await loginAs("admin");
 
   const query = `
     query GetPermitStats {
@@ -421,7 +421,7 @@ test('Admin can get ticket stats grouped by day', async () => {
 });
 
 test('Admin can get all zones', async () => {
-  const token = await loginAs("admin");
+  const { token } = await loginAs("admin");
 
   const query = `
     query GetZones {
@@ -461,7 +461,7 @@ test('Admin can get all zones', async () => {
 });
 
 test('Admin can create a new zone', async () => {
-  const token = await loginAs("admin");
+  const { token } = await loginAs("admin");
 
   // First get existing zones to find an unused number
   const getZonesQuery = `

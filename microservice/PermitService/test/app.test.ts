@@ -84,7 +84,7 @@ const adminUser = {
 //   password: 'password1',
 // }
 
-async function loginAs(who: string, defaultVehicle=true): Promise<{token: string, vid: string} | undefined> {
+async function loginAs(who: string, defaultVehicle=true): Promise<{token: string, vid?: string} | undefined> {
   if (who === "driver") {
     const token = await  new SignJWT(driver)
       .setProtectedHeader({ alg: 'HS256' })
@@ -144,7 +144,7 @@ async function loginAs(who: string, defaultVehicle=true): Promise<{token: string
     if (response.status !== 200) {
       throw new Error(`Enforcement login failed with status ${response.status}`)
     }
-    return response.body.id
+    return { token: response.body.id }
   } else {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
@@ -153,7 +153,7 @@ async function loginAs(who: string, defaultVehicle=true): Promise<{token: string
     if (response.status !== 200) {
       throw new Error(`Login failed with status ${response.status}`)
     }
-    return response.body?.id
+    return { token: response.body?.id }
   }
 }
 

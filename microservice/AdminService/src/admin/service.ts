@@ -83,7 +83,33 @@ export class AdminService {
     return drivers;
   }
 
-  public async addEnforcer(enforcer: NewUser): Promise<User[]> {
+    // // Check if email already exists
+    // const checkQuery = `
+    //   SELECT 1 FROM account
+    //   WHERE data->>'email' = $1
+    //   AND data->>'role' = '["enforcement"]'
+    //   AND data->>'accountStatus' != 'deleted'
+    //   LIMIT 1;
+    // `;
+    // const checkResult = await pool.query(checkQuery, [enforcer.email]);
+    // if (checkResult.rowCount > 0) {
+    //   return undefined;
+    // }
+
+  public async addEnforcer(enforcer: NewUser): Promise<User[] | undefined> {
+
+    const checkQuery = `
+      SELECT 1 FROM account
+      WHERE data->>'email' = $1
+      AND data->>'role' = '["enforcement"]'
+      AND data->>'accountStatus' != 'deleted'
+      LIMIT 1;
+    `;
+    const checkResult = await pool.query(checkQuery, [enforcer.email]);
+    if ((checkResult.rowCount ?? 0) > 0) {
+      return undefined;
+    }
+
     const insertQuery = `
     INSERT INTO account (data)
     VALUES (

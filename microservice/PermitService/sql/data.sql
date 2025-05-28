@@ -129,11 +129,11 @@ INSERT INTO type (id, location, data) VALUES
       ),
       'quarterly', jsonb_build_object(
         'price', 200,
-        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+        'expireDate', '2025-06-12T23:59:59-07:00'
       ),
       'yearly', jsonb_build_object(
         'price', 500,
-        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+        'expireDate', '2025-06-12T23:59:59-07:00'
       )
     )
   );
@@ -150,11 +150,11 @@ INSERT INTO type (id, location, data) VALUES
       ),
       'quarterly', jsonb_build_object(
         'price', 150,
-        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+        'expireDate', '2025-06-12T23:59:59-07:00'
       ),
       'yearly', jsonb_build_object(
         'price', 350,
-        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+        'expireDate', '2025-06-12T23:59:59-07:00'
       )
     )
   );
@@ -171,11 +171,11 @@ INSERT INTO type (id, location, data) VALUES
       ),
       'quarterly', jsonb_build_object(
         'price', 120,
-        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+        'expireDate', '2025-06-12T23:59:59-07:00'
       ),
       'yearly', jsonb_build_object(
         'price', 300,
-        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+        'expireDate', '2025-06-12T23:59:59-07:00'
       )
     )
   );
@@ -192,11 +192,11 @@ INSERT INTO type (id, location, data) VALUES
       ),
       'quarterly', jsonb_build_object(
         'price', 100,
-        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+        'expireDate', '2025-06-12T23:59:59-07:00'
       ),
       'yearly', jsonb_build_object(
         'price', 250,
-        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+        'expireDate', '2025-06-12T23:59:59-07:00'
       )
     )
   );
@@ -213,11 +213,11 @@ INSERT INTO type (id, location, data) VALUES
       ),
       'quarterly', jsonb_build_object(
         'price', 80,
-        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+        'expireDate', '2025-06-12T23:59:59-07:00'
       ),
       'yearly', jsonb_build_object(
         'price', 200,
-        'expireDate', '2025-06-12T23:59:59-07:00'::timestamptz
+        'expireDate', '2025-06-12T23:59:59-07:00'
       )
     )
   );

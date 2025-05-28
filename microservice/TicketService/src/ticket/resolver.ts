@@ -12,7 +12,6 @@ import {
   TicketsByDay,
   ChallengeTicket,
   PaidTicketInput,
-  UnpaidTicketsReturn
 } from "./schema";
 
 import { SessionUser } from "src";
@@ -331,10 +330,10 @@ export class TicketResolver {
     return await this.ticketService.getAcceptedTickets();
   }
 
-  @Mutation(() => [UnpaidTicketsReturn])
+  @Mutation(() => [Ticket])
   @Authorized(['admin'])
   async getUnpaidTickets(
-  ): Promise<UnpaidTicketsReturn[] | null> {
+  ): Promise<Ticket[] | null> {
     return await this.ticketService.getUnpaidTicketsPerDay();
     // need to add a convertion from the vehicle ID to the plate number
   }

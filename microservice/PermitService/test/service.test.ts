@@ -254,6 +254,22 @@ test('updateZonePrice updates the zone hourly price and returns updated zone', a
   expect(result[0].closeTime).toBe('22:00');
 });
 
+test('updateZonePrice updates the zone hourly price and returns updated zone', async () => {
+  const updatedZone = {
+    zone: '999',
+  };
+
+  const result = await permitService.updateZonePrice(updatedZone);
+
+  expect(result).toBeDefined();
+  expect(Array.isArray(result)).toBe(true);
+  expect(result[0].zone).toBe('999');
+  expect(result[0].hourly).toBe(0);
+  expect(result[0].maxDuration).toEqual({ hours: 0, minutes: 0 });
+  expect(result[0].openTime).toBe('00:00');
+  expect(result[0].closeTime).toBe('23:59');
+});
+
 test('updateZonePrice throws if zone does not exist', async () => {
   await expect(
     permitService.updateZonePrice({

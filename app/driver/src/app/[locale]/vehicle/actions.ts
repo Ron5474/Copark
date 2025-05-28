@@ -132,3 +132,34 @@ export async function updateDefaultVehicle(vehicleId: string): Promise<Vehicle> 
     throw error
   }
 }
+
+export async function getDefaultVehicle(): Promise<Vehicle | null> {
+  const vehicleRes = await fetch("http://localhost:4001/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${await getAuthToken()}`,
+      },
+      body: JSON.stringify({
+        query: `query defaultVehicle {
+                      getDefaultVehicle {
+                        id,
+                        plate
+                      }
+                  }`
+      })
+    })
+
+    const vehicle = await vehicleRes.json();
+
+    if (vehicle.errors) {
+      console.error('GraphQL errors:', vehicle.errors)
+      return null
+    }
+
+    if (vehicle.data.getDefaultVehicle) {
+      return vehicle.data.getDefaultVehicle
+    } else {
+      return null
+    }
+}

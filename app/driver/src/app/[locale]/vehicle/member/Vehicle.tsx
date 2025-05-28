@@ -26,7 +26,7 @@ import AddForm from '../AddForm'
 import Loader from '../../shared/Loader'
 import theme from '../../theme'
 import { Vehicle } from '../../types'
-import { getVehicles, updateDefaultVehicle } from '../actions'
+import { getDefaultVehicle, getVehicles, updateDefaultVehicle } from '../actions'
 import { useTranslations } from 'next-intl'
 
 
@@ -45,7 +45,19 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
       setVehicles(fetchedVehicles)
       setLoading(false)
     })()
-  }, [])
+    let plate: string | null = null;
+    (async () => {
+      const res = await getDefaultVehicle()
+      if (res && res.plate) {
+        plate = res.plate
+        if (isCheckout) {
+          setSelectedPlate(plate)
+        }
+      } else {
+        plate = null
+      }
+    })()
+  }, [setSelectedPlate, isCheckout])
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)

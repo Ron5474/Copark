@@ -33,12 +33,17 @@ beforeAll(() => {
         const newEnforcer = {
           id: String(enforcersData.length + 1),
           ...body.variables.enforcer,
-          accountStatus: 'active'
+          accountStatus: 'active',
+          password: 'generated-password' // Add password to match actual response
         };
         enforcersData.push(newEnforcer);
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ data: { addEnforcer: enforcersData } })
+          json: () => Promise.resolve({ 
+            data: { 
+              addEnforcer: [newEnforcer] // Return array with single enforcer
+            } 
+          })
         });
       }
 
@@ -69,6 +74,13 @@ beforeAll(() => {
           json: () => Promise.resolve({ data: { deleteUser: enforcersData } })
         });
       }
+    }
+
+    if (url === 'http://localhost:3015/email/send') {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ success: true })
+      });
     }
 
     return Promise.reject(new Error(`Unhandled fetch to ${url}`));
@@ -127,6 +139,22 @@ it('should add a new enforcer', async () => {
   fireEvent.click(submitButton);
 
   await waitFor(() => {
+    // Verify the API was called with correct parameters
+    expect(mockFetch).toHaveBeenCalledWith(
+      'http://localhost:4000/graphql',
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.stringContaining('addEnforcer'),
+      })
+    );
+
+    // Verify the email service was called
+    expect(mockFetch).toHaveBeenCalledWith(
+      'http://localhost:3015/email/send',
+      expect.any(Object)
+    );
+
+    // Verify the UI updated
     const enforcerElement = screen.getByText('New Test Enforcer');
     expect(enforcerElement).toBeDefined();
     const statusElement = enforcerElement.parentElement?.querySelector('p:last-child');

@@ -1,4 +1,4 @@
-import { test, beforeAll, afterAll, expect, beforeEach } from 'vitest'
+import { vi, test, beforeAll, afterAll, expect, beforeEach } from 'vitest'
 // @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 import * as http from 'http'
@@ -6,6 +6,7 @@ import { SignJWT } from 'jose'
 
 import db from './db'
 import { app, bootstrap } from '../src/app'
+// import { PermitResolver } from '../src/permit/resolver'
 import authApp from '../../AuthService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 
@@ -190,8 +191,8 @@ const purchaseZoneInput = {
   input: {
     vehicle: "replace with derik's vid",
     zone: "123",
-    duration: {'minutes': 30, 'hours': 0},
-    paymentMethod: "paypal"
+    duration: {'minutes': 30, 'hours': 2},
+    paymentMethod: 'paypal'
   }
 }
 
@@ -270,6 +271,8 @@ const zoneDetailsInput = {
   zone: "123"
 }
 
+// const permitResolver = new PermitResolver()
+
 test('Permit service is running', async () => {
   const status = await supertest(server)
     .post('/graphql')
@@ -282,7 +285,27 @@ test('Permit service is running', async () => {
   expect(status.body.data.permitServiceStatus).toBe("Permit service is running")
 })
 
+test('Driver can\'t purchase a zone permit for wrong car', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: purchaseZoneInput
+    })
+
+  expect(confirmation.body.errors[0].message).toBe("Vehicle not found")
+  
+  vi.useRealTimers()
+})
+
 test('Driver can purchase a zone permit', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
   const driver = await loginAs("driver")
 
   const confirmation = await supertest(server)
@@ -294,7 +317,150 @@ test('Driver can purchase a zone permit', async () => {
     })
 
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+  
+  vi.useRealTimers()
 })
+
+test('Driver can purchase a zone permit with different duration 1', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: {input: {...purchaseZoneInput.input,duration: {hours: 1, minutes: 1},
+        paymentMethod: 'mastercard', vehicle: derikVehicleInput.input.plate
+      }}
+    })
+
+  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a zone permit with different duration 2', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: {input: {...purchaseZoneInput.input,duration: {hours: 2},
+        paymentMethod: 'amex', vehicle: derikVehicleInput.input.plate
+      }}
+    })
+
+  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a zone permit with different duration 3', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: {input: {...purchaseZoneInput.input,duration: {hours: 1},
+        paymentMethod: 'discover', vehicle: derikVehicleInput.input.plate
+      }}
+    })
+
+  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a zone permit with different duration 4', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: {input: {...purchaseZoneInput.input,duration: {hours: 2},
+       paymentMethod: 'visa', vehicle: derikVehicleInput.input.plate
+      }}
+    })
+
+  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a zone permit with different duration 5', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: {input: {...purchaseZoneInput.input,duration: {hours: 1}, vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+  
+  vi.useRealTimers()
+})
+
+
+test('Driver can purchase a zone permit with different duration 6', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: {input: {...purchaseZoneInput.input,duration: {minutes: 30}, vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a zone permit with different duration 7', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseZonePermitQuery,
+      variables: {input: {...purchaseZoneInput.input,duration: {minutes: 1}, vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
+  
+  vi.useRealTimers()
+})
+
+
+// test('No token to getUserData', async () => {
+//   const receipt = await permitResolver.getUserData(permitDetails)
+//   expect(receipt).toBeDefined()
+// })
 
 test('Enforcer gets invalid permit', async () => {
   const { token } = await loginAs("enforcement")

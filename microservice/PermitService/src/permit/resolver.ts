@@ -39,9 +39,9 @@ export class PermitResolver {
   }
 
   private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[], email: string }> {
-    if (!token) {
-      throw new Error('Token not provided');
-    }
+    // if (!token) {
+    //   throw new Error('Token not provided');
+    // }
     const response = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
       method: 'GET',
       headers: {

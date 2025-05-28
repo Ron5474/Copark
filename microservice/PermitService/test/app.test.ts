@@ -211,6 +211,14 @@ const purchaseZoneInput = {
   }
 }
 
+const allLotDetailsQuery = `
+  query {
+      allLotDetails {
+        title
+      }
+    }
+`
+
 test('Errors out with wrong permissions', async () => {
   const { token } = await loginAs("enforcement")
 
@@ -228,14 +236,13 @@ test('Errors out with wrong permissions', async () => {
 })
 
 test('Right permissions', async () => {
-  const { token, vid } = await loginAs("driver")
+  const { token } = await loginAs("driver")
 
   const confirmation = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
     .send({ 
-      query: purchaseZonePermitQuery,
-      variables: { input: { ...purchaseZoneInput.input, vehicle: vid } }
+      query: allLotDetailsQuery,
     })
 
   expect(confirmation.body.errors).toBeUndefined()

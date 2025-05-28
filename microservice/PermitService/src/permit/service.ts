@@ -312,8 +312,8 @@ export class PermitService {
 
 
   public async createNewLot(input: NewLot): Promise<boolean> {
-    const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO Don't hardcode this
-    const { rows } = await pool.query(`
+    const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
+    const { rowCount } = await pool.query(`
       INSERT INTO type (location, data)
       SELECT $2, $1
       WHERE NOT EXISTS (
@@ -325,7 +325,21 @@ export class PermitService {
       RETURNING id, data
     `, [input, location, input.lot])
   
-    return (rows.length !== 0)
+    return (rowCount as number) > 0
+  }
+
+  public async updateLot(input: NewLot): Promise<boolean> {
+    const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
+  
+    const { rowCount } = await pool.query(`
+      UPDATE type
+      SET data = $1
+      WHERE location = $2
+      AND data->>'area' = $3
+      AND data->>'name' = 'lot'
+    `, [input, location, input.lot])
+  
+    return (rowCount as number) > 0
   }
 
   public async purchaseMyLotPermit(input: PurchaseLotInput): Promise<Confirmation> {

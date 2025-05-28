@@ -11,7 +11,7 @@ import {
   NewZone,
   Permit,
   PermitsByDay,
-  LotDetails,
+  // LotDetails,
   PurchaseLotInput,
   NewLot,
   LotGroup,
@@ -19,6 +19,18 @@ import {
   ZoneInput,
   PermitReport,
 } from './schema'
+
+
+interface LotTypeDetails {
+  price: number
+  expireDate?: string
+}
+
+interface LotDetails {
+  daily?: LotTypeDetails
+  quarterly?: LotTypeDetails
+  yearly?: LotTypeDetails
+}
 
 export class PermitService {
   public async purchaseMyZonePermit(input: PurchaseZoneInput): Promise<Confirmation> {

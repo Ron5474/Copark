@@ -122,7 +122,7 @@ export default function ManageTicketChallenges() {
             fontSize: '32px'
           }}
         >
-          Manage Ticket Challenges
+          Manage Tickets
         </Typography>
       </Box>
 

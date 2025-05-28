@@ -254,9 +254,9 @@ it('navigates to Manage Zones section', async () => {
   });
 });
 
-it('navigates to Manage Ticket Challenges section', async () => {
+it('navigates to Manage Tickets section', async () => {
   render(<Page />);
-  const manageChallengesText = screen.getByText('Manage Ticket Challenges');
+  const manageChallengesText = screen.getByText('Manage Tickets');
   const clickableItem = manageChallengesText.closest('div');
   fireEvent.click(clickableItem!);
   await waitFor(() => {

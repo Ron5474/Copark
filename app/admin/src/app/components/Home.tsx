@@ -12,11 +12,11 @@ interface HomeProps {
 export default function Home({ onNavigate, children }: HomeProps) {
   const buttons = [
     { label: 'Manage Enforcement', component: 'enforcement' },
-    { label: 'Manage Ticket Challenges', component: 'tickets' },
+    { label: 'Manage API Users', component: 'api_users' },
+    { label: 'Manage Tickets', component: 'tickets' },
+    { label: 'Manage Zones', component: 'zones' },
     { label: 'View Statistics', component: 'statistics' },
     { label: 'Generate Reports', component: 'reports' },
-    { label: 'Manage API Users', component: 'api_users' },
-    { label: 'Manage Zones', component: 'zones' },
   ];
 
   const drawerWidth = 240;

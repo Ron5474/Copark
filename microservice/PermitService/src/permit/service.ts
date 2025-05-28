@@ -423,7 +423,57 @@ export class PermitService {
     })
   }
 
-  // public async updateZonePrice(zone: ZoneInput): Promise<Zone[]> {
+  public async updateZonePrice(zone: ZoneInput): Promise<Zone[]> {
+    // Fetch the existing zone data
+    const result = await pool.query(
+      `
+      SELECT id, data
+      FROM type
+      WHERE data->>'name' = 'zone'
+      AND data->>'area' = $1
+      LIMIT 1
+      `,
+      [zone.zone]
+    );
 
-  // }
+    if (result.rowCount === 0) {
+      throw new Error(`Zone ${zone.zone} not found`);
+    }
+
+    const row = result.rows[0];
+    const data = row.data;
+    const weekday = data.weekday || {};
+
+    if (zone.hourly !== undefined) {
+      weekday.hourly = zone.hourly;
+    }
+    if (zone.maxDuration !== undefined) {
+      weekday.maxDuration = zone.maxDuration;
+    }
+    if (zone.openTime !== undefined) {
+      weekday.openTime = zone.openTime;
+    }
+    if (zone.closeTime !== undefined) {
+      weekday.closeTime = zone.closeTime;
+    }
+
+    data.weekday = weekday;
+
+    await pool.query(
+      `
+      UPDATE type
+      SET data = $1
+      WHERE id = $2
+      `,
+      [data, row.id]
+    );
+
+    return [{
+      zone: data.area,
+      hourly: data.weekday?.hourly || 0,
+      maxDuration: data.weekday?.maxDuration || { hours: 0, minutes: 0 },
+      openTime: data.weekday?.openTime || '00:00',
+      closeTime: data.weekday?.closeTime || '23:59'
+    }];
+  }
 }

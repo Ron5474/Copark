@@ -54,7 +54,7 @@ test('suspendUser should suspend an enforcer', async () => {
 });
   
 test('suspendUser should not work with a bad jwt input', async () => {
-    const enforcer: NewUser = { name: 'Michelle Obama', email: 'michelle.obama@example.com' };
+    const enforcer: NewUser = { name: 'Michelle Obama', email: 'michelle.obamas@example.com' };
     const addedEnforcers = await adminService.addEnforcer(enforcer);
   
     const enforcerInput: UserInput = { id: addedEnforcers[0].id + 'extra text' };

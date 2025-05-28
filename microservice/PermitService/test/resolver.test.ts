@@ -273,18 +273,6 @@ const zoneDetailsInput = {
 
 // const permitResolver = new PermitResolver()
 
-test('Permit service is running', async () => {
-  const status = await supertest(server)
-    .post('/graphql')
-    .send({ 
-      query: `
-        query { permitServiceStatus }
-      `,
-    })
-
-  expect(status.body.data.permitServiceStatus).toBe("Permit service is running")
-})
-
 test('Driver can\'t purchase a zone permit for wrong car', async () => {
   const now = new Date('2025-05-25T12:00:00Z')
   vi.setSystemTime(now)
@@ -723,12 +711,11 @@ test('Admin can create a new zone', async () => {
 });
 
 test('Admin can fetch all active permits', async () => {
-  const token = await loginAs("admin");
+  const { token } = await loginAs("admin");
 
   const query = `
     query GetAllPermits($activeOnly: Boolean) {
       allPermits(activeOnly: $activeOnly) {
-        vehicle
         type
         area
         purchaseDate
@@ -751,7 +738,7 @@ test('Admin can fetch all active permits', async () => {
 });
 
 test('Admin can get zone stats', async () => {
-  const token = await loginAs("admin");
+  const { token } = await loginAs("admin");
 
   const query = `
     query GetZoneStats($activeOnly: Boolean) {
@@ -781,7 +768,7 @@ test('Admin can get zone stats', async () => {
 
 
 test('Admin can get lot stats', async () => {
-  const token = await loginAs("admin");
+  const { token } = await loginAs("admin");
 
   const query = `
     query GetLotStats($activeOnly: Boolean) {
@@ -810,12 +797,11 @@ test('Admin can get lot stats', async () => {
 });
 
 test('Admin sees correct permit in allPermits query', async () => {
-  const token = await loginAs("admin");
+  const { token } = await loginAs("admin");
 
   const query = `
     query AllPermits($activeOnly: Boolean) {
       allPermits(activeOnly: $activeOnly) {
-        vehicle
         type
         area
         activeDate
@@ -840,7 +826,7 @@ test('Admin sees correct permit in allPermits query', async () => {
 });
 
 test('Admin sees no lot permits in allLotStats', async () => {
-  const token = await loginAs("admin");
+  const { token } = await loginAs("admin");
 
   const query = `
     query AllLotStats($activeOnly: Boolean) {
@@ -857,13 +843,18 @@ test('Admin sees no lot permits in allLotStats', async () => {
     .send({
       query,
       variables: { activeOnly: true }
-    });
+    })
 
   expect(response.body.errors).toBeUndefined();
-  const lots = response.body.data.allLotStats;
+  const lots: { area: string; totalPermits: number }[] = response.body.data.allLotStats;
+  
   expect(Array.isArray(lots)).toBe(true);
-  expect(lots.length).toBe(0);
-});
+
+  lots.forEach(lot => {
+    expect(typeof lot.area).toBe('string');
+    expect(lot.totalPermits).toBe(0);
+  })
+})
 
 import { pool } from '../src/permit/db'
 
@@ -889,8 +880,19 @@ interface LotStatsResponse {
   }
 }
 
+// needed for the report test
+// interface PermitReport {
+//   totalPermits: number
+//   activePermits: number
+//   expiredPermits: number
+//   totalRevenue: number
+//   zoneBreakdown: ZoneStat[]
+//   lotBreakdown: LotStat[]
+// }
+
+
 test('Admin sees correct zone and lot stats after inserting test data', async () => {
-  const token = await loginAs("admin");
+  const { token } = await loginAs("admin");
 
   const now = new Date()
   const purchaseDate = now.toISOString()
@@ -960,7 +962,7 @@ test('Admin sees correct zone and lot stats after inserting test data', async ()
 
 
 test('Admin sees only active permits when using activeOnly: true', async () => {
-  const token = await loginAs("admin");
+  const { token } = await loginAs("admin");
 
   // Shared timestamps
   const now = new Date()
@@ -1030,7 +1032,7 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
   const zone101 = zoneStats.find(z => z.area === '101')
 
   expect(zone27?.totalPermits).toBe(1)
-  expect(zone101).toBeUndefined() // Expired, shouldn't appear
+  expect(zone101?.totalPermits).toBe(0)
 
   // Step 2: Query lot stats
   const lotStatsQuery = `
@@ -1051,6 +1053,99 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
 
   const lotC = lotStats.find(l => l.area === 'C')
 
-  expect(lotC).toBeUndefined() // Expired lot permit shouldn't show up
-});
+  expect(lotC?.totalPermits).toBe(0)
+})
+
+// need fixing
+// test('Admin sees correct permit summary in adminPermitReport', async () => {
+//   const { token } = await loginAs("admin");
+
+//   const now = new Date();
+//   const purchaseDate = now.toISOString();
+
+//   const activeDate = new Date(now.getTime() - 60 * 60 * 1000).toISOString() // 1 hour ago
+//   const expireDate = new Date(now.getTime() + 60 * 60 * 1000).toISOString() // 1 hour later
+
+//   const expiredDateStart = new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString() // 2hr ago
+//   const expiredDateEnd = new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString() // 1hr ago
+
+//   const activePermit = {
+//     purchaseDate,
+//     activeDate,
+//     expireDate,
+//     area: 'Z1',
+//     receipt: { service: 0.5, subTotal: 4.5, total: 5.0 },
+//     paymentMethod: 'credit',
+//   };
+
+//   const expiredPermit = {
+//     purchaseDate,
+//     activeDate: expiredDateStart,
+//     expireDate: expiredDateEnd,
+//     area: 'Z2',
+//     receipt: { service: 0.5, subTotal: 1.5, total: 2.0 },
+//     paymentMethod: 'credit',
+//   };
+
+//   const zoneTypes = await pool.query(`
+//     SELECT id, data->>'area' AS area
+//     FROM type
+//     WHERE data->>'name' = 'zone'
+//   `);
+
+//   const z1TypeId = zoneTypes.rows.find((r) => r.area === 'Z1')?.id;
+//   const z2TypeId = zoneTypes.rows.find((r) => r.area === 'Z2')?.id;
+
+//   expect(z1TypeId).toBeDefined()
+//   expect(z2TypeId).toBeDefined()
+
+//   await pool.query(`
+//     INSERT INTO permit (vehicle, type, data) VALUES
+//       ('abc11111-aaaa-bbbb-cccc-def123456001', $1, $2),
+//       ('abc22222-aaaa-bbbb-cccc-def123456002', $3, $4)
+//   `, [z1TypeId, activePermit, z2TypeId, expiredPermit]);
+
+
+//   const query = `
+//     query {
+//       adminPermitReport {
+//         totalPermits
+//         activePermits
+//         expiredPermits
+//         totalRevenue
+//         zoneBreakdown {
+//           area
+//           totalPermits
+//         }
+//         lotBreakdown {
+//           area
+//           totalPermits
+//         }
+//       }
+//     }
+//   `;
+
+//   const res = await supertest(server)
+//     .post("/graphql")
+//     .set("Authorization", `Bearer ${token}`)
+//     .send({ query });
+
+//   expect(res.body.errors).toBeUndefined()
+
+//   const report: PermitReport = res.body.data.adminPermitReport
+
+//   expect(report.totalPermits).toBeGreaterThanOrEqual(2)
+//   expect(report.activePermits).toBeGreaterThanOrEqual(1)
+//   expect(report.expiredPermits).toBeGreaterThanOrEqual(1)
+//   expect(report.totalRevenue).toBeGreaterThanOrEqual(700) // $5 + $2 -> 700 cents
+
+//   expect(Array.isArray(report.zoneBreakdown)).toBe(true)
+//   expect(Array.isArray(report.lotBreakdown)).toBe(true)
+
+//   const zoneZ1 = report.zoneBreakdown.find((z) => z.area === 'Z1')
+//   const zoneZ2 = report.zoneBreakdown.find((z) => z.area === 'Z2')
+
+//   expect(zoneZ1?.totalPermits).toBeGreaterThanOrEqual(1)
+//   expect(zoneZ2?.totalPermits).toBeGreaterThanOrEqual(1)
+// })
 

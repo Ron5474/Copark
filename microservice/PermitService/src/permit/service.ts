@@ -517,6 +517,7 @@ export class PermitService {
       totalPermits: parseInt(row.total),
     }));
   }
+  
   public async generatePermitReport(): Promise<PermitReport> {
     const now = new Date().toISOString();
 

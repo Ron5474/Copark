@@ -440,7 +440,7 @@ export class PermitResolver {
   * ********************************************************************************
   */
 
-  @Authorized('admin')
+  @Authorized(['admin'])
   @Mutation(() => Boolean)
   async createLot(
     @Arg("input", () => NewLot) input: NewLot,
@@ -448,7 +448,7 @@ export class PermitResolver {
     return await service.createNewLot(input)
   }
 
-  @Authorized('admin')
+  @Authorized(['admin'])
   @Mutation(() => Boolean)
   async createZone(
     @Arg("input", () => NewZone) input: NewZone,
@@ -456,7 +456,7 @@ export class PermitResolver {
     return await service.createNewZone(input)
   }
 
-  @Authorized('admin')
+  @Authorized(['admin'])
   @Mutation(() => Boolean)
   async updateLot(
     @Arg("input", () => NewLot) input: NewLot,
@@ -465,18 +465,18 @@ export class PermitResolver {
   }
 
   @Query(() => [Zone])
-  @Authorized('admin')
+  @Authorized(['admin'])
   async getZones(): Promise<Zone[]> {
     return await service.getZones()
   }
 
-  @Authorized(["admin"])
+  @Authorized(['admin'])
   @Query(() => [PermitsByDay])
   async getPermitStats(): Promise<PermitsByDay[]> {
     return await service.getAllPermitsByDay();
   }
 
-  @Authorized('admin')
+  @Authorized(['admin'])
   @Query(() => [Permit])
   async allPermits(
     @Arg("activeOnly", () => Boolean, { defaultValue: true }) activeOnly: boolean
@@ -484,7 +484,7 @@ export class PermitResolver {
     return await service.getAllPermits(activeOnly)
   }
 
-  @Authorized('admin')
+  @Authorized(['admin'])
   @Query(() => [ZoneStats])
   async allZoneStats(
     @Arg("activeOnly", () => Boolean, { defaultValue: true }) activeOnly: boolean
@@ -492,7 +492,7 @@ export class PermitResolver {
     return await service.getPermitStatsByZone(activeOnly)
   }
 
-  @Authorized('admin')
+  @Authorized(['admin'])
   @Query(() => [LotStats])
   async allLotStats(
     @Arg("activeOnly", () => Boolean, { defaultValue: true }) activeOnly: boolean
@@ -500,7 +500,7 @@ export class PermitResolver {
     return await service.getPermitStatsByLot(activeOnly)
   }
 
-  @Authorized('admin')
+  @Authorized(['admin'])
   @Query(() => PermitReport)
   async adminPermitReport(): Promise<PermitReport> {
     return await service.generatePermitReport();

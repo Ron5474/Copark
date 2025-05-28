@@ -73,24 +73,27 @@ export const addEnforcer = async (enforcer: NewUser): Promise<User[]> => {
     },
     body: JSON.stringify({
       to: newEnforcer.email,
-      subject: 'Welcome to CoPark Enforcement Team',
+      subject: 'Welcome to Copark Enforcement Team',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px;">
-          <h2>Welcome to the CoPark Enforcement Team!</h2>
+        <div style="font-family: Roboto, sans-serif; max-width: 600px; margin: auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="https://copark.space/enforcement/assets/copark-enforce-logo.png" alt="Copark Logo" width="100" style="margin: auto;">
+          </div>
+          <h2>Welcome to the Copark Enforcement Team!</h2>
           
           <p>Dear ${newEnforcer.name},</p>
           
-          <p>Welcome aboard! We're excited to have you join the CoPark Enforcement team. You've been granted access to our enforcement platform where you'll be able to manage parking operations efficiently.</p>
+          <p>Welcome aboard! We're excited to have you join the Copark Enforcement team. You've been granted access to our enforcement platform where you'll be able to manage parking operations efficiently.</p>
           
           <h3>Your Login Credentials:</h3>
           <p><strong>Email:</strong> ${newEnforcer.email}</p>
           <p><strong>Password:</strong> ${newEnforcer.password}</p>
           
-          <p>You can access the enforcement platform at: <a href="https://copark.space/enforcement/login">CoPark Enforcement Portal</a></p>
+          <p>You can access the enforcement platform at: <a href="https://copark.space/enforcement/login">Copark Enforcement Portal</a></p>
           
           <p>If you have any questions or need assistance, please don't hesitate to contact the admin team.</p>
           
-          <p>Best regards,<br>CoPark Administration</p>
+          <p>Best regards,<br>Copark Administration</p>
         </div>
       `
     })

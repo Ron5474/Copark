@@ -40,7 +40,7 @@ export class PermitResolver {
 
   private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[], email: string }> {
     // if (!token) {
-    //   throw new Error('Token not provided');
+    //   throw new Error('Token not provided')
     // }
     const response = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
       method: 'GET',
@@ -50,16 +50,16 @@ export class PermitResolver {
       }
     })
 
-    const res = response.status === 200 ? await response.json() : null;
+    const res = response.status === 200 ? await response.json() : null
     if (!res) {
-      throw new Error('User not found');
+      throw new Error('User not found')
     }
     return {
       id: res.id,
       name: res.name,
       role: res.role,
       email:res.email
-    };
+    }
   }
 
   /*
@@ -109,9 +109,9 @@ export class PermitResolver {
       paymentMethod: input.paymentMethod
     })
 
-    const token = request.headers.authorization?.replace('Bearer ', '');
-    const user = await this.getUserData(token);
-    let durationString = "";
+    const token = request.headers.authorization?.replace('Bearer ', '')
+    const user = await this.getUserData(token)
+    let durationString = ""
     if (input.duration?.hours && input.duration?.minutes) {
       if (input.duration.hours > 1) {
       durationString += `${input.duration.hours} hours`
@@ -133,7 +133,7 @@ export class PermitResolver {
       durationString = `${input.duration.minutes} minutes`
     }
 
-    let brand;
+    let brand
     switch (input.paymentMethod.split(" ")[0]) {
       case 'visa':
         brand = 'https://cdn.visa.com/v2/assets/images/logos/visa/blue/logo.png'
@@ -159,37 +159,37 @@ export class PermitResolver {
       to: user.email,
       subject: 'Your CoPark Permit Confirmation',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; border: 1px solid #eee; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-          <div style="text-align: center;">
-            <h2 style="color: #2c3e50;">Permit Purchase Confirmation</h2>
+        <div style="font-family: Arial, sans-serif max-width: 600px margin: auto padding: 24px border: 1px solid #eee border-radius: 10px box-shadow: 0 4px 12px rgba(0,0,0,0.1)">
+          <div style="text-align: center">
+            <h2 style="color: #2c3e50">Permit Purchase Confirmation</h2>
           </div>
-          <p style="font-size: 16px; color: #34495e;">Hi <strong>${user.name}</strong>,</p>
-          <p style="font-size: 16px; color: #34495e;">
+          <p style="font-size: 16px color: #34495e">Hi <strong>${user.name}</strong>,</p>
+          <p style="font-size: 16px color: #34495e">
             We're happy to let you know that your permit purchase was successful!
           </p>
 
-          <div style="background-color: #f9f9f9; padding: 16px; border-radius: 8px; margin: 20px 0;">
+          <div style="background-color: #f9f9f9 padding: 16px border-radius: 8px margin: 20px 0">
             <p><strong>Zone:</strong> ${input.zone}</p>
             <p><strong>Duration:</strong> ${durationString}</p>
             <p><strong>Vehicle Plate:</strong> ${plate}</p>
-            <p><strong>Payment Method: ${!showLogo ? brand: `<img src=${brand} alt="${b}" style="height: 1em; vertical-align: middle;" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
+            <p><strong>Payment Method: ${!showLogo ? brand: `<img src=${brand} alt="${b}" style="height: 1em vertical-align: middle" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
           </div>
 
-          <p style="font-size: 15px; color: #7f8c8d;">
+          <p style="font-size: 15px color: #7f8c8d">
             If you have any questions, feel free to contact our support team.
           </p>
 
-          <p style="font-size: 15px; color: #7f8c8d;">
+          <p style="font-size: 15px color: #7f8c8d">
             Thanks for using <strong>CoPark</strong>
           </p>
 
-          <hr style="margin: 24px 0; border: none; border-top: 1px solid #ddd;" />
-          <p style="text-align: center; font-size: 12px; color: #95a5a6;">
+          <hr style="margin: 24px 0 border: none border-top: 1px solid #ddd" />
+          <p style="text-align: center font-size: 12px color: #95a5a6">
             This is an automated message. Please do not reply.
           </p>
         </div>
       `,
-    });
+    })
 
     return purchaseMyZonePermit
   }
@@ -205,9 +205,9 @@ export class PermitResolver {
   @Authorized('driver')
   @Query(() => MyPermits)
   async myPermits(@Ctx() request: Request): Promise<MyPermits> {
-    const token = request.headers.authorization?.split(' ')[1];
-    const userData = await this.getUserData(token);
-    const userID = await this.encrypt(userData.id);
+    const token = request.headers.authorization?.split(' ')[1]
+    const userData = await this.getUserData(token)
+    const userID = await this.encrypt(userData.id)
 
     const vehicleResponse = await fetch('http://localhost:4001/graphql', {
       method: 'POST',
@@ -224,17 +224,17 @@ export class PermitResolver {
           }`,
         variables: { userID },
       }),
-    });
+    })
 
-    const vehicleResult = await vehicleResponse.json();
+    const vehicleResult = await vehicleResponse.json()
     const vehicleIDs: Vehicle[] =
-      vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id);
+      vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id)
 
     if (!vehicleIDs) {
-      return { active: [], future: [], expired: [] };
+      return { active: [], future: [], expired: [] }
     }
 
-    return await service.getMyPermits(vehicleIDs);
+    return await service.getMyPermits(vehicleIDs)
   }
 
 
@@ -262,7 +262,7 @@ export class PermitResolver {
   @Authorized('driver')
   @Query(() => [LotGroup])
   async allLotDetails(): Promise<LotGroup[]> {
-    return await service.getAllLotDetails();
+    return await service.getAllLotDetails()
   }
 
   @Authorized('driver')
@@ -307,9 +307,9 @@ export class PermitResolver {
       paymentMethod: input.paymentMethod
     })
 
-    const token = request.headers.authorization?.replace('Bearer ', '');
-    const user = await this.getUserData(token);
-    const durationString = "";
+    const token = request.headers.authorization?.replace('Bearer ', '')
+    const user = await this.getUserData(token)
+    const durationString = ""
     // if (input.duration?.hours && input.duration?.minutes) {
     //   if (input.duration.hours > 1) {
     //   durationString += `${input.duration.hours} hours`
@@ -331,7 +331,7 @@ export class PermitResolver {
     //   durationString = `${input.duration.minutes} minutes`
     // }
 
-    let brand;
+    let brand
     switch (input.paymentMethod.split(" ")[0]) {
       case 'visa':
         brand = 'https://cdn.visa.com/v2/assets/images/logos/visa/blue/logo.png'
@@ -357,37 +357,37 @@ export class PermitResolver {
       to: user.email,
       subject: 'Your CoPark Permit Confirmation',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; border: 1px solid #eee; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-          <div style="text-align: center;">
-            <h2 style="color: #2c3e50;">Permit Purchase Confirmation</h2>
+        <div style="font-family: Arial, sans-serif max-width: 600px margin: auto padding: 24px border: 1px solid #eee border-radius: 10px box-shadow: 0 4px 12px rgba(0,0,0,0.1)">
+          <div style="text-align: center">
+            <h2 style="color: #2c3e50">Permit Purchase Confirmation</h2>
           </div>
-          <p style="font-size: 16px; color: #34495e;">Hi <strong>${user.name}</strong>,</p>
-          <p style="font-size: 16px; color: #34495e;">
+          <p style="font-size: 16px color: #34495e">Hi <strong>${user.name}</strong>,</p>
+          <p style="font-size: 16px color: #34495e">
             We're happy to let you know that your permit purchase was successful!
           </p>
 
-          <div style="background-color: #f9f9f9; padding: 16px; border-radius: 8px; margin: 20px 0;">
+          <div style="background-color: #f9f9f9 padding: 16px border-radius: 8px margin: 20px 0">
             <p><strong>Lot:</strong> ${input.lot}</p>
             <p><strong>Duration:</strong> ${durationString}</p>
             <p><strong>Vehicle Plate:</strong> ${plate}</p>
-            <p><strong>Payment Method: ${!showLogo ? brand: `<img src=${brand} alt="${b}" style="height: 1em; vertical-align: middle;" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
+            <p><strong>Payment Method: ${!showLogo ? brand: `<img src=${brand} alt="${b}" style="height: 1em vertical-align: middle" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
           </div>
 
-          <p style="font-size: 15px; color: #7f8c8d;">
+          <p style="font-size: 15px color: #7f8c8d">
             If you have any questions, feel free to contact our support team.
           </p>
 
-          <p style="font-size: 15px; color: #7f8c8d;">
+          <p style="font-size: 15px color: #7f8c8d">
             Thanks for using <strong>CoPark</strong>
           </p>
 
-          <hr style="margin: 24px 0; border: none; border-top: 1px solid #ddd;" />
-          <p style="text-align: center; font-size: 12px; color: #95a5a6;">
+          <hr style="margin: 24px 0 border: none border-top: 1px solid #ddd" />
+          <p style="text-align: center font-size: 12px color: #95a5a6">
             This is an automated message. Please do not reply.
           </p>
         </div>
       `,
-    });
+    })
 
     return purchaseMyZonePermit
   }
@@ -473,7 +473,7 @@ export class PermitResolver {
   @Authorized(['admin'])
   @Query(() => [PermitsByDay])
   async getPermitStats(): Promise<PermitsByDay[]> {
-    return await service.getAllPermitsByDay();
+    return await service.getAllPermitsByDay()
   }
 
   @Authorized(['admin'])
@@ -503,7 +503,7 @@ export class PermitResolver {
   @Authorized(['admin'])
   @Query(() => PermitReport)
   async adminPermitReport(): Promise<PermitReport> {
-    return await service.generatePermitReport();
+    return await service.generatePermitReport()
   }
 
   /*

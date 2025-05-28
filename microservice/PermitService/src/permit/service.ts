@@ -169,7 +169,7 @@ export class PermitService {
         SELECT
           COALESCE((SELECT json_agg(future) FROM future), '[]') AS future,
           COALESCE((SELECT json_agg(active) FROM active), '[]') AS active,
-          COALESCE((SELECT json_agg(expired) FROM expired), '[]') AS expired;
+          COALESCE((SELECT json_agg(expired) FROM expired), '[]') AS expired
       `,
       [vid]
     )
@@ -207,34 +207,34 @@ export class PermitService {
         data->>'paymentMethod' AS paymentMethod,
         data->>'area' AS area
       FROM permit
-      ORDER BY data->>'activedate';
-    `;
+      ORDER BY data->>'activedate'
+    `
 
-    const permitResults = await pool.query(permitQuery);
-    const permitsByDayMap: Record<string, Permit[]> = {};
+    const permitResults = await pool.query(permitQuery)
+    const permitsByDayMap: Record<string, Permit[]> = {}
 
     for (const row of permitResults.rows) {
-      const date = row.purchasedate.split('T')[0];
+      const date = row.purchasedate.split('T')[0]
       const permit: Permit = {
         vehicle: row.vehicle,
         type: row.type,
         area: row.area,
         activeDate: row.activeDate,
         expireDate: row.expireDate,
-      };
+      }
 
       if (!permitsByDayMap[date]) {
-        permitsByDayMap[date] = [];
+        permitsByDayMap[date] = []
       }
-      permitsByDayMap[date].push(permit);
+      permitsByDayMap[date].push(permit)
     }
 
     const permitsByDay: PermitsByDay[] = Object.entries(permitsByDayMap).map(([date, permits]) => ({
       date,
       permits
-    }));
+    }))
 
-    return permitsByDay;
+    return permitsByDay
   }
 
   public async createNewZone(input: NewZone): Promise<boolean> {
@@ -289,14 +289,14 @@ export class PermitService {
       SELECT data
       FROM type
       WHERE data->>'name' = 'lot'
-    `;
+    `
 
-    const result = await pool.query(query);
-    const lotMap: Record<string, LotGroup> = {};
+    const result = await pool.query(query)
+    const lotMap: Record<string, LotGroup> = {}
 
     for (const row of result.rows) {
-      const data = row.data;
-      const area = data.area;
+      const data = row.data
+      const area = data.area
 
       for (const permitType of ['daily', 'quarterly', 'yearly'] as const) {
         if (!lotMap[permitType]) {
@@ -304,7 +304,7 @@ export class PermitService {
             id: permitType,
             title: permitType,
             lots: []
-          };
+          }
         }
 
         lotMap[permitType].lots.push({
@@ -315,11 +315,11 @@ export class PermitService {
             month: 'long',
             day: 'numeric'
           })
-        });
+        })
       }
     }
 
-    return Object.values(lotMap);
+    return Object.values(lotMap)
   }
 
 
@@ -451,7 +451,7 @@ export class PermitService {
   }
 
   public async getAllPermits(activeOnly = true): Promise<Permit[]> {
-    const now = new Date().toISOString();
+    const now = new Date().toISOString()
 
     const result = await pool.query(`
       SELECT 
@@ -467,13 +467,13 @@ export class PermitService {
         AND (p.data->>'expireDate')::timestamptz >= $1
       ` : ''}
       ORDER BY (p.data->>'activeDate')::timestamptz ASC
-    `, activeOnly ? [now] : []);
+    `, activeOnly ? [now] : [])
 
-    return result.rows;
+    return result.rows
   }
 
   public async getPermitStatsByZone(activeOnly = true): Promise<{ area: string; totalPermits: number }[]> {
-    const now = new Date().toISOString();
+    const now = new Date().toISOString()
 
     const result = await pool.query(`
       SELECT 
@@ -487,16 +487,16 @@ export class PermitService {
       WHERE t.data->>'name' = 'zone'
       GROUP BY t.data->>'area'
       ORDER BY (t.data->>'area')::int
-    `, [activeOnly, now]);
+    `, [activeOnly, now])
 
     return result.rows.map(row => ({
       area: row.area,
       totalPermits: parseInt(row.total),
-    }));
+    }))
   }
 
   public async getPermitStatsByLot(activeOnly = true): Promise<{ area: string; totalPermits: number }[]> {
-    const now = new Date().toISOString();
+    const now = new Date().toISOString()
 
     const result = await pool.query(`
       SELECT 
@@ -510,16 +510,16 @@ export class PermitService {
       WHERE t.data->>'name' = 'lot'
       GROUP BY t.data->>'area'
       ORDER BY t.data->>'area'
-    `, [activeOnly, now]);
+    `, [activeOnly, now])
 
     return result.rows.map(row => ({
       area: row.area,
       totalPermits: parseInt(row.total),
-    }));
+    }))
   }
   
   public async generatePermitReport(): Promise<PermitReport> {
-    const now = new Date().toISOString();
+    const now = new Date().toISOString()
 
     const totalQuery = `
       SELECT 
@@ -528,13 +528,13 @@ export class PermitService {
         COUNT(*) AS total,
         COALESCE(SUM((p.data->'receipt'->>'total')::float), 0) AS revenue
       FROM permit p
-    `;
+    `
 
-    const result = await pool.query(totalQuery, [now]);
-    const row = result.rows[0];
+    const result = await pool.query(totalQuery, [now])
+    const row = result.rows[0]
 
-    const zoneBreakdown = await this.getPermitStatsByZone(false);
-    const lotBreakdown = await this.getPermitStatsByLot(false);
+    const zoneBreakdown = await this.getPermitStatsByZone(false)
+    const lotBreakdown = await this.getPermitStatsByLot(false)
     console.log("Revenue debug:", row.revenue, typeof row.revenue)
 
     return {
@@ -544,7 +544,7 @@ export class PermitService {
       totalRevenue: Math.round(parseFloat(row.revenue) * 100),
       zoneBreakdown,
       lotBreakdown
-    };
+    }
   }
 
 
@@ -560,30 +560,30 @@ export class PermitService {
       LIMIT 1
       `,
       [zone.zone]
-    );
+    )
 
     if (result.rowCount === 0) {
-      throw new Error(`Zone ${zone.zone} not found`);
+      throw new Error(`Zone ${zone.zone} not found`)
     }
 
-    const row = result.rows[0];
-    const data = row.data;
-    const weekday = data.weekday || {};
+    const row = result.rows[0]
+    const data = row.data
+    const weekday = data.weekday || {}
 
     if (zone.hourly !== undefined) {
-      weekday.hourly = zone.hourly;
+      weekday.hourly = zone.hourly
     }
     if (zone.maxDuration !== undefined) {
-      weekday.maxDuration = zone.maxDuration;
+      weekday.maxDuration = zone.maxDuration
     }
     if (zone.openTime !== undefined) {
-      weekday.openTime = zone.openTime;
+      weekday.openTime = zone.openTime
     }
     if (zone.closeTime !== undefined) {
-      weekday.closeTime = zone.closeTime;
+      weekday.closeTime = zone.closeTime
     }
 
-    data.weekday = weekday;
+    data.weekday = weekday
 
     await pool.query(
       `
@@ -592,7 +592,7 @@ export class PermitService {
       WHERE id = $2
       `,
       [data, row.id]
-    );
+    )
 
     return [{
       zone: data.area,
@@ -600,6 +600,6 @@ export class PermitService {
       maxDuration: data.weekday?.maxDuration || { hours: 0, minutes: 0 },
       openTime: data.weekday?.openTime || '00:00',
       closeTime: data.weekday?.closeTime || '23:59'
-    }];
+    }]
   }
 }

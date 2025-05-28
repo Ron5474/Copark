@@ -224,34 +224,34 @@ export class IsValidPolice {
 @ObjectType()
 export class PermitsByDay {
   @Field(() => String)
-  date!: string;
+  date!: string
 
   @Field(() => [Permit])
-  permits!: Permit[];
+  permits!: Permit[]
 }
 
 @ObjectType()
 export class Lot {
   @Field(() => String)
-  name!: string;
+  name!: string
 
   @Field(() => String)
-  price!: string;
+  price!: string
 
   @Field(() => String)
-  expireDate!: string;
+  expireDate!: string
 }
 
 @ObjectType()
 export class LotGroup {
   @Field(() => String)
-  id!: string;
+  id!: string
 
   @Field(() => String)
-  title!: string;
+  title!: string
 
   @Field(() => [Lot])
-  lots!: Lot[];
+  lots!: Lot[]
 }
 
 @ObjectType()
@@ -293,23 +293,24 @@ export class LotStats {
 @ObjectType()
 export class PermitReport {
   @Field(() => Float)
-  totalPermits!: number;
+  totalPermits!: number
 
   @Field(() => Float)
-  activePermits!: number;
+  activePermits!: number
 
   @Field(() => Float)
-  expiredPermits!: number;
+  expiredPermits!: number
 
   @Field(() => Float)
-  totalRevenue!: number;
+  totalRevenue!: number
 
   @Field(() => [ZoneStats])
-  zoneBreakdown!: ZoneStats[];
+  zoneBreakdown!: ZoneStats[]
 
   @Field(() => [LotStats])
-  lotBreakdown!: LotStats[];
+  lotBreakdown!: LotStats[]
 }
+
 @InputType()
 export class ZoneInput {
   @Field(() => String)

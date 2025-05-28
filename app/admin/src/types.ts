@@ -79,3 +79,30 @@ export interface Zone {
   openTime: string
   closeTime: string
 }
+
+export interface ZoneStat {
+  area: string;
+  totalPermits: number;
+}
+
+export interface LotStat {
+  area: string;
+  totalPermits: number;
+}
+
+export interface Permit {
+  type: string;
+  area: string;
+  purchaseDate: string;
+  activeDate: string;
+  expireDate: string;
+}
+
+export interface PermitReport {
+  totalPermits: number;
+  activePermits: number;
+  expiredPermits: number;
+  totalRevenue: number;
+  zoneBreakdown: ZoneStat[];
+  lotBreakdown: LotStat[];
+}

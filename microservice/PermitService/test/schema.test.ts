@@ -17,6 +17,9 @@ import {
   Lot,
   LotGroup,
   Zone,
+  ZoneStats,
+  LotStats,
+  PermitReport
 } from '../src/permit/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
@@ -244,4 +247,50 @@ test('Zone schema loads correctly', () => {
   expect(zone.maxDuration).toBe(duration)
   expect(zone.openTime).toBe('07:00')
   expect(zone.closeTime).toBe('20:00')
+})
+
+test('ZoneStats schema loads correctly', () => {
+  const zoneStats = new ZoneStats()
+  zoneStats.area = 'North Zone'
+  zoneStats.totalPermits = 42
+
+  expect(zoneStats).toBeDefined()
+  expect(zoneStats.area).toBe('North Zone')
+  expect(zoneStats.totalPermits).toBe(42)
+})
+
+test('LotStats schema loads correctly', () => {
+  const lotStats = new LotStats()
+  lotStats.area = 'Lot A'
+  lotStats.totalPermits = 17
+
+  expect(lotStats).toBeDefined()
+  expect(lotStats.area).toBe('Lot A')
+  expect(lotStats.totalPermits).toBe(17)
+})
+
+test('PermitReport schema loads correctly', () => {
+  const zone = new ZoneStats()
+  zone.area = 'East Zone'
+  zone.totalPermits = 15
+
+  const lot = new LotStats()
+  lot.area = 'Lot B'
+  lot.totalPermits = 10
+
+  const report = new PermitReport()
+  report.totalPermits = 100
+  report.activePermits = 60
+  report.expiredPermits = 40
+  report.totalRevenue = 1234.56
+  report.zoneBreakdown = [zone]
+  report.lotBreakdown = [lot]
+
+  expect(report).toBeDefined()
+  expect(report.totalPermits).toBe(100)
+  expect(report.activePermits).toBe(60)
+  expect(report.expiredPermits).toBe(40)
+  expect(report.totalRevenue).toBe(1234.56)
+  expect(report.zoneBreakdown[0]).toBe(zone)
+  expect(report.lotBreakdown[0]).toBe(lot)
 })

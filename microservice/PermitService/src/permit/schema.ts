@@ -292,16 +292,16 @@ export class LotStats {
 
 @ObjectType()
 export class PermitReport {
-  @Field()
+  @Field(() => Float)
   totalPermits!: number;
 
-  @Field()
+  @Field(() => Float)
   activePermits!: number;
 
-  @Field()
+  @Field(() => Float)
   expiredPermits!: number;
 
-  @Field()
+  @Field(() => Float)
   totalRevenue!: number;
 
   @Field(() => [ZoneStats])

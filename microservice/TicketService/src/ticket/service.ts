@@ -616,10 +616,14 @@ export class TicketService {
   public async getUnpaidTicketsPerDay(): Promise<Ticket[]> {
     const query = `
       SELECT 
+        id,
         vehicle,
+        enforcer,
         data->>'issuedDate' AS issueddate,
         data->>'violation' AS violation,
         data->>'fine' AS fine,
+        data->>'ticketStatus' AS ticketstatus,
+        data->>'images' AS images,
         data->>'note' AS note
       FROM ticket
       WHERE data->>'ticketStatus' = 'unpaid'

@@ -22,6 +22,7 @@ export default function IndividualTicket() {
   const t = useTranslations('ticket.ticketDetails')
 
   const formatDate = (dateString: string) => {
+    console.log('Date Time String: ', dateString)
     const date = new Date(dateString)
     return formatter.dateTime(date, {
       year: 'numeric',

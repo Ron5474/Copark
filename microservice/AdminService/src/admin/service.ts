@@ -106,7 +106,8 @@ export class AdminService {
       LIMIT 1;
     `;
     const checkResult = await pool.query(checkQuery, [enforcer.email]);
-    if ((checkResult.rowCount ?? 0) > 0) {
+    // console.log('checkResult', checkResult.rowCount);
+    if (checkResult.rowCount && checkResult.rowCount > 0) {
       return undefined;
     }
 

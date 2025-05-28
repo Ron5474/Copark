@@ -257,3 +257,33 @@ it('closes the dialog when clicking the backdrop', async () => {
   });
 });
 
+it('shows error alert when adding enforcer with duplicate email', async () => {
+  (addEnforcer as Mock).mockResolvedValue(undefined); // Simulate duplicate email response
+
+  render(<ManageEnforcement onNavigate={() => { }} />);
+
+  // Open dialog
+  fireEvent.click(screen.getByText('Add Enforcer'));
+
+  // Fill form
+  await waitFor(() => {
+    const nameWrapper = screen.getByLabelText('Input Name');
+    const nameInput = nameWrapper.querySelector('input');
+
+    const emailWrapper = screen.getByLabelText('Input Email');
+    const emailInput = emailWrapper.querySelector('input');
+
+    fireEvent.change(nameInput!, { target: { value: 'Another Enforcer' } });
+    fireEvent.change(emailInput!, { target: { value: 'test@example.com' } });
+  });
+
+  // Submit form
+  fireEvent.click(screen.getByText('Add'));
+
+  // Verify error message is shown
+  await waitFor(() => {
+    expect(screen.getByText('An enforcer with this email already exists')).toBeDefined();
+    expect(screen.getByRole('dialog')).toBeDefined(); // Dialog should stay open
+  });
+});
+

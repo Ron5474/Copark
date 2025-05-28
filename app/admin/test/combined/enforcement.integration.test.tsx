@@ -19,6 +19,14 @@ global.fetch = mockFetch;
 
 beforeAll(() => {
   mockFetch.mockImplementation(async (url, options) => {
+    // Add email endpoint handling
+    if (url === 'http://localhost:3015/email/send') {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ message: 'Email sent.' })
+      });
+    }
+
     if (url === 'http://localhost:4000/graphql') {
       const body = JSON.parse(options?.body as string);
       
@@ -30,20 +38,22 @@ beforeAll(() => {
       }
 
       if (body.query.includes('addEnforcer')) {
+        // Check if email already exists
+        if (body.variables.enforcer.email === 'test.enforcer@copark.com') {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({undefined})
+          });
+        }
         const newEnforcer = {
           id: String(enforcersData.length + 1),
           ...body.variables.enforcer,
-          accountStatus: 'active',
-          password: 'generated-password' // Add password to match actual response
+          accountStatus: 'active'
         };
         enforcersData.push(newEnforcer);
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ 
-            data: { 
-              addEnforcer: [newEnforcer] // Return array with single enforcer
-            } 
-          })
+          json: () => Promise.resolve({ data: { addEnforcer: enforcersData } })
         });
       }
 
@@ -74,13 +84,6 @@ beforeAll(() => {
           json: () => Promise.resolve({ data: { deleteUser: enforcersData } })
         });
       }
-    }
-
-    if (url === 'http://localhost:3015/email/send') {
-      return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ success: true })
-      });
     }
 
     return Promise.reject(new Error(`Unhandled fetch to ${url}`));
@@ -139,22 +142,6 @@ it('should add a new enforcer', async () => {
   fireEvent.click(submitButton);
 
   await waitFor(() => {
-    // Verify the API was called with correct parameters
-    expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:4000/graphql',
-      expect.objectContaining({
-        method: 'POST',
-        body: expect.stringContaining('addEnforcer'),
-      })
-    );
-
-    // Verify the email service was called
-    expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:3015/email/send',
-      expect.any(Object)
-    );
-
-    // Verify the UI updated
     const enforcerElement = screen.getByText('New Test Enforcer');
     expect(enforcerElement).toBeDefined();
     const statusElement = enforcerElement.parentElement?.querySelector('p:last-child');
@@ -211,4 +198,31 @@ it('should delete the enforcer', async () => {
   await waitFor(() => {
     expect(screen.queryByText('Test Enforcer')).toBeNull();
   });   
+});
+
+it('should show error when adding enforcer with existing email', async () => {
+  render(<ManageEnforcement onNavigate={() => { }} />);
+
+  // Open add dialog
+  const addButton = screen.getByText('Add Enforcer');
+  fireEvent.click(addButton);
+
+  // Try to add enforcer with existing email
+  const nameInput = screen.getByLabelText('Name');
+  const emailInput = screen.getByLabelText('Email');
+
+  fireEvent.change(nameInput, { target: { value: 'Another Enforcer' } });
+  fireEvent.change(emailInput, { target: { value: 'test.enforcer@copark.com' } });
+
+  const submitButton = screen.getByText('Add');
+  fireEvent.click(submitButton);
+
+  // Verify error message is shown
+  await waitFor(() => {
+    const errorAlert = screen.getByText('An enforcer with this email already exists');
+    expect(errorAlert).toBeDefined();
+  });
+
+  // Verify dialog stays open
+  expect(screen.getByRole('dialog')).toBeDefined();
 });

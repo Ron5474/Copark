@@ -52,6 +52,7 @@ export const addEnforcer = async (enforcer: NewUser): Promise<User[]> => {
               name
               email
               accountStatus
+              password
             }
           }
         `,
@@ -62,6 +63,39 @@ export const addEnforcer = async (enforcer: NewUser): Promise<User[]> => {
   });
 
   const result = await response.json();
+  const newEnforcer = result.data.addEnforcer[0];
+
+  // Send welcome email with credentials
+  await fetch('http://localhost:3015/email/send', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      to: newEnforcer.email,
+      subject: 'Welcome to CoPark Enforcement Team',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px;">
+          <h2>Welcome to the CoPark Enforcement Team!</h2>
+          
+          <p>Dear ${newEnforcer.name},</p>
+          
+          <p>Welcome aboard! We're excited to have you join the CoPark Enforcement team. You've been granted access to our enforcement platform where you'll be able to manage parking operations efficiently.</p>
+          
+          <h3>Your Login Credentials:</h3>
+          <p><strong>Email:</strong> ${newEnforcer.email}</p>
+          <p><strong>Password:</strong> ${newEnforcer.password}</p>
+          
+          <p>You can access the enforcement platform at: <a href="https://copark.space/enforcement/login">CoPark Enforcement Portal</a></p>
+          
+          <p>If you have any questions or need assistance, please don't hesitate to contact the admin team.</p>
+          
+          <p>Best regards,<br>CoPark Administration</p>
+        </div>
+      `
+    })
+  });
+
   return result.data.addEnforcer;
 };
 

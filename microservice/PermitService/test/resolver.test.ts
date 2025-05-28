@@ -8,16 +8,17 @@ import db from './db'
 import { app, bootstrap } from '../src/app'
 // import { PermitResolver } from '../src/permit/resolver'
 import authApp from '../../AuthService/src/app'
+import { app as emailApp } from '../../EmailService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 
 let server: http.Server
-// eslint-disable-next-line
-let authServer: any
-// eslint-disable-next-line
-let vehcServer: any
+let authServer: http.Server
+let emailServer: http.Server
+let vehcServer: http.Server
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
+const EMAIL_PORT = 3015
 const VEHC_PORT = 4001
 // const VEHC_SERVICE_URL = `http://localhost:${VEHC_PORT}`
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
@@ -32,6 +33,11 @@ beforeAll(async () => {
   authServer = http.createServer(authApp)
   await new Promise<void>((resolve) => {
     authServer.listen(AUTH_PORT, () => resolve())
+  })
+    
+  emailServer = http.createServer(emailApp)
+  await new Promise<void>((resolve) => {
+    emailServer.listen(EMAIL_PORT, () => resolve())
   })
 
   vehcServer = http.createServer(VehicleApp)
@@ -113,7 +119,7 @@ async function loginAs(who: string, defaultVehicle=true): Promise<{vid?: string,
       .set('Authorization', `Bearer ${token}`)
       .send({newState: 'complete'})
 
-    const validStatuses = [200, 201, 204];
+    const validStatuses = [200, 201, 204]
     if (!validStatuses.includes(response.status)) {
       throw new Error(`Login failed with status ${response.status}`)
     }
@@ -487,7 +493,6 @@ test('Enforcer gets valid permit', async () => {
 //       query: isValidPermitByPoliceQuery,
 //       variables: isValidPermitByPoliceInput
 //     })
-
 //     // console.log(isValid.body)
 //   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
 // })
@@ -540,7 +545,7 @@ test('Zone details', async () => {
 })
 
 test('Admin can get ticket stats grouped by day', async () => {
-  const { token } = await loginAs("admin");
+  const { token } = await loginAs("admin")
 
   const query = `
     query GetPermitStats {
@@ -553,29 +558,29 @@ test('Admin can get ticket stats grouped by day', async () => {
         }
       }
     }
-  `;
+  `
 
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
     .send({ query })
-    .expect(200);
+    .expect(200)
 
-  expect(response.body.errors).toBeUndefined();
-  const stats = response.body.data.getPermitStats;
-  expect(Array.isArray(stats)).toBe(true);
-  expect(stats.length).toBeGreaterThan(0);
+  expect(response.body.errors).toBeUndefined()
+  const stats = response.body.data.getPermitStats
+  expect(Array.isArray(stats)).toBe(true)
+  expect(stats.length).toBeGreaterThan(0)
   stats.forEach((dayStat: { date: string; permits: { vehicle: string; area: string; activeDate: string; expireDate: string }[] }) => {
-    expect(dayStat).toHaveProperty('date');
-    expect(Array.isArray(dayStat.permits)).toBe(true);
+    expect(dayStat).toHaveProperty('date')
+    expect(Array.isArray(dayStat.permits)).toBe(true)
     dayStat.permits.forEach((permit: { vehicle: string; area: string; activeDate: string; expireDate: string }) => {
-      expect(permit).toHaveProperty('vehicle');
-    });
-  });
-});
+      expect(permit).toHaveProperty('vehicle')
+    })
+  })
+})
 
 test('Admin can get all zones', async () => {
-  const { token } = await loginAs("admin");
+  const { token } = await loginAs("admin")
 
   const query = `
     query GetZones {
@@ -590,32 +595,32 @@ test('Admin can get all zones', async () => {
         closeTime
       }
     }
-  `;
+  `
 
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
     .send({ query })
-    .expect(200);
+    .expect(200)
 
-  expect(response.body.errors).toBeUndefined();
-  const zones = response.body.data.getZones;
-  expect(Array.isArray(zones)).toBe(true);
+  expect(response.body.errors).toBeUndefined()
+  const zones = response.body.data.getZones
+  expect(Array.isArray(zones)).toBe(true)
   
   // eslint-disable-next-line
   zones.forEach((zone: any) => {
-    expect(zone).toHaveProperty('zone');
-    expect(zone).toHaveProperty('hourly');
-    expect(zone).toHaveProperty('maxDuration');
-    expect(zone.maxDuration).toHaveProperty('hours');
-    expect(zone.maxDuration).toHaveProperty('minutes');
-    expect(zone).toHaveProperty('openTime');
-    expect(zone).toHaveProperty('closeTime');
-  });
-});
+    expect(zone).toHaveProperty('zone')
+    expect(zone).toHaveProperty('hourly')
+    expect(zone).toHaveProperty('maxDuration')
+    expect(zone.maxDuration).toHaveProperty('hours')
+    expect(zone.maxDuration).toHaveProperty('minutes')
+    expect(zone).toHaveProperty('openTime')
+    expect(zone).toHaveProperty('closeTime')
+  })
+})
 
 test('Admin can create a new zone', async () => {
-  const { token } = await loginAs("admin");
+  const { token } = await loginAs("admin")
 
   // First get existing zones to find an unused number
   const getZonesQuery = `
@@ -624,26 +629,26 @@ test('Admin can create a new zone', async () => {
         zone
       }
     }
-  `;
+  `
 
   const existingZonesResponse = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query: getZonesQuery });
+    .send({ query: getZonesQuery })
 
-  const existingZones = existingZonesResponse.body.data.getZones.map((z: { zone: string }) => parseInt(z.zone));
+  const existingZones = existingZonesResponse.body.data.getZones.map((z: { zone: string }) => parseInt(z.zone))
   
   // Find first available number not in use
-  let newZoneNumber = 1;
+  let newZoneNumber = 1
   while (existingZones.includes(newZoneNumber)) {
-    newZoneNumber++;
+    newZoneNumber++
   }
 
   const mutation = `
     mutation CreateZone($input: NewZone!) {
       createZone(input: $input)
     }
-  `;
+  `
 
   const variables = {
     input: {
@@ -667,16 +672,16 @@ test('Admin can create a new zone', async () => {
         closeTime: "18:00"
       }
     }
-  };
+  }
 
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
     .send({ query: mutation, variables })
-    .expect(200);
+    .expect(200)
 
-  expect(response.body.errors).toBeUndefined();
-  expect(response.body.data.createZone).toBe(true);
+  expect(response.body.errors).toBeUndefined()
+  expect(response.body.data.createZone).toBe(true)
 
   // Verify the zone was created
   const verifyQuery = `
@@ -692,26 +697,26 @@ test('Admin can create a new zone', async () => {
         closeTime
       }
     }
-  `;
+  `
 
   const verifyResponse = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query: verifyQuery });
+    .send({ query: verifyQuery })
 
   const newZone = verifyResponse.body.data.getZones // eslint-disable-next-line
-    .find((z: any) => z.zone === newZoneNumber.toString());
+    .find((z: any) => z.zone === newZoneNumber.toString())
 
-  expect(newZone).toBeDefined();
-  expect(newZone.hourly).toBe(3.50);
-  expect(newZone.maxDuration.hours).toBe(2);
-  expect(newZone.maxDuration.minutes).toBe(30);
-  expect(newZone.openTime).toBe("08:00");
-  expect(newZone.closeTime).toBe("18:00");
-});
+  expect(newZone).toBeDefined()
+  expect(newZone.hourly).toBe(3.50)
+  expect(newZone.maxDuration.hours).toBe(2)
+  expect(newZone.maxDuration.minutes).toBe(30)
+  expect(newZone.openTime).toBe("08:00")
+  expect(newZone.closeTime).toBe("18:00")
+})
 
 test('Admin can fetch all active permits', async () => {
-  const { token } = await loginAs("admin");
+  const { token } = await loginAs("admin")
 
   const query = `
     query GetAllPermits($activeOnly: Boolean) {
@@ -723,7 +728,7 @@ test('Admin can fetch all active permits', async () => {
         expireDate
       }
     }
-  `;
+  `
 
   const response = await supertest(server)
     .post('/graphql')
@@ -731,14 +736,14 @@ test('Admin can fetch all active permits', async () => {
     .send({
       query,
       variables: { activeOnly: true },
-    });
+    })
 
-  expect(response.body.errors).toBeUndefined();
-  expect(Array.isArray(response.body.data.allPermits)).toBe(true);
-});
+  expect(response.body.errors).toBeUndefined()
+  expect(Array.isArray(response.body.data.allPermits)).toBe(true)
+})
 
 test('Admin can get zone stats', async () => {
-  const { token } = await loginAs("admin");
+  const { token } = await loginAs("admin")
 
   const query = `
     query GetZoneStats($activeOnly: Boolean) {
@@ -747,7 +752,7 @@ test('Admin can get zone stats', async () => {
         totalPermits
       }
     }
-  `;
+  `
 
   const response = await supertest(server)
     .post('/graphql')
@@ -755,20 +760,20 @@ test('Admin can get zone stats', async () => {
     .send({
       query,
       variables: { activeOnly: true },
-    });
+    })
 
-  expect(response.body.errors).toBeUndefined();
-  const zones = response.body.data.allZoneStats;
-  expect(Array.isArray(zones)).toBe(true);
+  expect(response.body.errors).toBeUndefined()
+  const zones = response.body.data.allZoneStats
+  expect(Array.isArray(zones)).toBe(true)
   zones.forEach((zone: { area: string; totalPermits: number }) => {
-    expect(typeof zone.area).toBe('string');
-    expect(typeof zone.totalPermits).toBe('number');
-  });
-});
+    expect(typeof zone.area).toBe('string')
+    expect(typeof zone.totalPermits).toBe('number')
+  })
+})
 
 
 test('Admin can get lot stats', async () => {
-  const { token } = await loginAs("admin");
+  const { token } = await loginAs("admin")
 
   const query = `
     query GetLotStats($activeOnly: Boolean) {
@@ -777,7 +782,7 @@ test('Admin can get lot stats', async () => {
         totalPermits
       }
     }
-  `;
+  `
 
   const response = await supertest(server)
     .post('/graphql')
@@ -785,19 +790,19 @@ test('Admin can get lot stats', async () => {
     .send({
       query,
       variables: { activeOnly: true },
-    });
+    })
 
-  expect(response.body.errors).toBeUndefined();
-  const lots = response.body.data.allLotStats;
-  expect(Array.isArray(lots)).toBe(true);
+  expect(response.body.errors).toBeUndefined()
+  const lots = response.body.data.allLotStats
+  expect(Array.isArray(lots)).toBe(true)
   lots.forEach((lot: { area: string; totalPermits: number }) => {
-    expect(typeof lot.area).toBe('string');
-    expect(typeof lot.totalPermits).toBe('number');
-  });
-});
+    expect(typeof lot.area).toBe('string')
+    expect(typeof lot.totalPermits).toBe('number')
+  })
+})
 
 test('Admin sees correct permit in allPermits query', async () => {
-  const { token } = await loginAs("admin");
+  const { token } = await loginAs("admin")
 
   const query = `
     query AllPermits($activeOnly: Boolean) {
@@ -808,34 +813,7 @@ test('Admin sees correct permit in allPermits query', async () => {
         expireDate
       }
     }
-  `;
-
-  const response = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', `Bearer ${token}`)
-    .send({
-      query,
-      variables: { activeOnly: true }
-    });
-
-  expect(response.body.errors).toBeUndefined();
-  const permits = response.body.data.allPermits;
-  expect(Array.isArray(permits)).toBe(true);
-  expect(permits.length).toBe(1);
-  expect(permits[0].area).toBe("123");
-});
-
-test('Admin sees no lot permits in allLotStats', async () => {
-  const { token } = await loginAs("admin");
-
-  const query = `
-    query AllLotStats($activeOnly: Boolean) {
-      allLotStats(activeOnly: $activeOnly) {
-        area
-        totalPermits
-      }
-    }
-  `;
+  `
 
   const response = await supertest(server)
     .post('/graphql')
@@ -845,14 +823,41 @@ test('Admin sees no lot permits in allLotStats', async () => {
       variables: { activeOnly: true }
     })
 
-  expect(response.body.errors).toBeUndefined();
-  const lots: { area: string; totalPermits: number }[] = response.body.data.allLotStats;
+  expect(response.body.errors).toBeUndefined()
+  const permits = response.body.data.allPermits
+  expect(Array.isArray(permits)).toBe(true)
+  expect(permits.length).toBe(1)
+  expect(permits[0].area).toBe("123")
+})
+
+test('Admin sees no lot permits in allLotStats', async () => {
+  const { token } = await loginAs("admin")
+
+  const query = `
+    query AllLotStats($activeOnly: Boolean) {
+      allLotStats(activeOnly: $activeOnly) {
+        area
+        totalPermits
+      }
+    }
+  `
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      query,
+      variables: { activeOnly: true }
+    })
+
+  expect(response.body.errors).toBeUndefined()
+  const lots: { area: string; totalPermits: number }[] = response.body.data.allLotStats
   
-  expect(Array.isArray(lots)).toBe(true);
+  expect(Array.isArray(lots)).toBe(true)
 
   lots.forEach(lot => {
-    expect(typeof lot.area).toBe('string');
-    expect(lot.totalPermits).toBe(0);
+    expect(typeof lot.area).toBe('string')
+    expect(lot.totalPermits).toBe(0)
   })
 })
 
@@ -892,7 +897,7 @@ interface LotStatsResponse {
 
 
 test('Admin sees correct zone and lot stats after inserting test data', async () => {
-  const { token } = await loginAs("admin");
+  const { token } = await loginAs("admin")
 
   const now = new Date()
   const purchaseDate = now.toISOString()
@@ -962,7 +967,7 @@ test('Admin sees correct zone and lot stats after inserting test data', async ()
 
 
 test('Admin sees only active permits when using activeOnly: true', async () => {
-  const { token } = await loginAs("admin");
+  const { token } = await loginAs("admin")
 
   // Shared timestamps
   const now = new Date()
@@ -1009,7 +1014,7 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
       ('55555555-5555-5555-5555-555555555555', 'f26adf21-f967-4283-8417-8e0db1ef14bd', $1),
       ('66666666-6666-6666-6666-666666666666', '1d603a73-4b75-48d8-b677-48b81b7fa3f4', $2),
       ('77777777-7777-7777-7777-777777777777', '1a6fc438-e678-426a-a5fd-44cd6740ffb2', $3)
-  `, [activeZoneData, inactiveZoneData, inactiveLotData]);
+  `, [activeZoneData, inactiveZoneData, inactiveLotData])
 
   // Step 1: Query zone stats
   const zoneStatsQuery = `
@@ -1058,10 +1063,10 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
 
 // need fixing
 // test('Admin sees correct permit summary in adminPermitReport', async () => {
-//   const { token } = await loginAs("admin");
+//   const { token } = await loginAs("admin")
 
-//   const now = new Date();
-//   const purchaseDate = now.toISOString();
+//   const now = new Date()
+//   const purchaseDate = now.toISOString()
 
 //   const activeDate = new Date(now.getTime() - 60 * 60 * 1000).toISOString() // 1 hour ago
 //   const expireDate = new Date(now.getTime() + 60 * 60 * 1000).toISOString() // 1 hour later
@@ -1076,7 +1081,7 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
 //     area: 'Z1',
 //     receipt: { service: 0.5, subTotal: 4.5, total: 5.0 },
 //     paymentMethod: 'credit',
-//   };
+//   }
 
 //   const expiredPermit = {
 //     purchaseDate,
@@ -1085,16 +1090,16 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
 //     area: 'Z2',
 //     receipt: { service: 0.5, subTotal: 1.5, total: 2.0 },
 //     paymentMethod: 'credit',
-//   };
+//   }
 
 //   const zoneTypes = await pool.query(`
 //     SELECT id, data->>'area' AS area
 //     FROM type
 //     WHERE data->>'name' = 'zone'
-//   `);
+//   `)
 
-//   const z1TypeId = zoneTypes.rows.find((r) => r.area === 'Z1')?.id;
-//   const z2TypeId = zoneTypes.rows.find((r) => r.area === 'Z2')?.id;
+//   const z1TypeId = zoneTypes.rows.find((r) => r.area === 'Z1')?.id
+//   const z2TypeId = zoneTypes.rows.find((r) => r.area === 'Z2')?.id
 
 //   expect(z1TypeId).toBeDefined()
 //   expect(z2TypeId).toBeDefined()
@@ -1103,7 +1108,7 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
 //     INSERT INTO permit (vehicle, type, data) VALUES
 //       ('abc11111-aaaa-bbbb-cccc-def123456001', $1, $2),
 //       ('abc22222-aaaa-bbbb-cccc-def123456002', $3, $4)
-//   `, [z1TypeId, activePermit, z2TypeId, expiredPermit]);
+//   `, [z1TypeId, activePermit, z2TypeId, expiredPermit])
 
 
 //   const query = `
@@ -1123,12 +1128,12 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
 //         }
 //       }
 //     }
-//   `;
+//   `
 
 //   const res = await supertest(server)
 //     .post("/graphql")
 //     .set("Authorization", `Bearer ${token}`)
-//     .send({ query });
+//     .send({ query })
 
 //   expect(res.body.errors).toBeUndefined()
 

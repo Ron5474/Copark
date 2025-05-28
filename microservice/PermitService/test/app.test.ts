@@ -7,14 +7,18 @@ import { SignJWT } from 'jose'
 import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
+import { app as emailApp } from '../../EmailService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 
 let server: http.Server
 let authServer: http.Server
+let emailServer: http.Server
 let vehcServer: http.Server
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
+const EMAIL_PORT = 3015
+// const EMAIL_SERVICE_URL = `http://localhost:${EMAIL_PORT}`
 const VEHC_PORT = 4001
 // const VEHC_SERVICE_URL = `http://localhost:${VEHC_PORT}`
 
@@ -30,6 +34,11 @@ beforeAll(async () => {
   authServer = http.createServer(authApp)
   await new Promise<void>((resolve) => {
     authServer.listen(AUTH_PORT, () => resolve())
+  })
+  
+  emailServer = http.createServer(emailApp)
+  await new Promise<void>((resolve) => {
+    emailServer.listen(EMAIL_PORT, () => resolve())
   })
 
   vehcServer = http.createServer(VehicleApp)
@@ -67,7 +76,7 @@ const driver = {
 //     .sign(encodedKey)
 //   }
 
-// const validDriverJWT = encrypt('b1eab387-1000-4ee3-a746-d59366e44f06');
+// const validDriverJWT = encrypt('b1eab387-1000-4ee3-a746-d59366e44f06')
 
 
 // const nextAuthJWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3NDY3Njg5MjMsImV4cCI6MTg0MTQ2MzQ0MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiMTA5MTY0MjQwOTk2MDEyNTE1NiIsImVtYWlsIjoiZGVyaWtAY29wYXJrLnNwYWNlIiwicGljdHVyZSI6IlwiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS2JTT2M0MFc3ZEpJd1VkanNZQzNVSmdwUzdRSjBSR2Yyb3ZKSXF6S3ZzbW1NUFBnPXM5Ni1jIiwibmFtZSI6IkRlcmlrIERyaXZlciJ9.D23uY9TRN-3UKSK8NxdgSP208iaCc8TuzWIYgYMfhwE"
@@ -127,7 +136,7 @@ async function loginAs(who: string, defaultVehicle=true): Promise<{token: string
       .set('Authorization', `Bearer ${token}`)
       .send({newState: 'complete'})
 
-    const validStatuses = [200, 201, 204];
+    const validStatuses = [200, 201, 204]
     if (!validStatuses.includes(response.status)) {
       throw new Error(`Login failed with status ${response.status}`)
     }
@@ -264,7 +273,7 @@ test('Errors out with no auth header', async () => {
 test('GET /playground returns the GraphQL Playground HTML', async () => {
     const response = await supertest(server)
         .get('/playground')
-        .expect(200);
+        .expect(200)
 
-    expect(response.text).toContain('<title>GraphQL Playground</title>');
-});
+    expect(response.text).toContain('<title>GraphQL Playground</title>')
+})

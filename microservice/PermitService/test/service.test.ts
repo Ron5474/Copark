@@ -122,7 +122,7 @@ test('zoneDetails errors on wrong zone', async () => {
 test('getPermitsByDay retusn permits by day bought', async () => {
   const permits = await permitService.getAllPermitsByDay()
   expect(permits.length).toBe(1)
-});
+})
 
 test('admin create zone', async () => {
   expect(await permitService.createNewZone({
@@ -262,34 +262,34 @@ test('updateZonePrice updates the zone hourly price and returns updated zone', a
     maxDuration: { hours: 2, minutes: 30 },
     openTime: '06:00',
     closeTime: '22:00'
-  };
+  }
 
-  const result = await permitService.updateZonePrice(updatedZone);
+  const result = await permitService.updateZonePrice(updatedZone)
 
-  expect(result).toBeDefined();
-  expect(Array.isArray(result)).toBe(true);
-  expect(result[0].zone).toBe('27');
-  expect(result[0].hourly).toBe(9.99);
-  expect(result[0].maxDuration).toEqual({ hours: 2, minutes: 30 });
-  expect(result[0].openTime).toBe('06:00');
-  expect(result[0].closeTime).toBe('22:00');
-});
+  expect(result).toBeDefined()
+  expect(Array.isArray(result)).toBe(true)
+  expect(result[0].zone).toBe('27')
+  expect(result[0].hourly).toBe(9.99)
+  expect(result[0].maxDuration).toEqual({ hours: 2, minutes: 30 })
+  expect(result[0].openTime).toBe('06:00')
+  expect(result[0].closeTime).toBe('22:00')
+})
 
 test('updateZonePrice updates the zone hourly price and returns updated zone', async () => {
   const updatedZone = {
     zone: '999',
-  };
+  }
 
-  const result = await permitService.updateZonePrice(updatedZone);
+  const result = await permitService.updateZonePrice(updatedZone)
 
-  expect(result).toBeDefined();
-  expect(Array.isArray(result)).toBe(true);
-  expect(result[0].zone).toBe('999');
-  expect(result[0].hourly).toBe(0);
-  expect(result[0].maxDuration).toEqual({ hours: 0, minutes: 0 });
-  expect(result[0].openTime).toBe('00:00');
-  expect(result[0].closeTime).toBe('23:59');
-});
+  expect(result).toBeDefined()
+  expect(Array.isArray(result)).toBe(true)
+  expect(result[0].zone).toBe('999')
+  expect(result[0].hourly).toBe(0)
+  expect(result[0].maxDuration).toEqual({ hours: 0, minutes: 0 })
+  expect(result[0].openTime).toBe('00:00')
+  expect(result[0].closeTime).toBe('23:59')
+})
 
 test('updateZonePrice throws if zone does not exist', async () => {
   await expect(
@@ -297,5 +297,5 @@ test('updateZonePrice throws if zone does not exist', async () => {
       zone: '999999',
       hourly: 5.55
     })
-  ).rejects.toThrow('Zone 999999 not found');
-});
+  ).rejects.toThrow('Zone 999999 not found')
+})

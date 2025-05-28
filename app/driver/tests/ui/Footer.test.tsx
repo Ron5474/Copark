@@ -30,7 +30,11 @@ beforeEach(() => {
   vi.mock('@/i18n/navigation', () => ({
     useRouter: () => ({
       push
-    })
+    }),
+    Link: ({ children, href, ...props }: { children: React.ReactNode, href: string, [key: string]: any }) => (
+      <a href={href} {...props}>{children}</a>
+    ),
+    usePathname: () => '/test',
   }))
 
 })

@@ -17,13 +17,13 @@ import {PermitService} from '../src/permit/service'
 vi.mock('server-only', () => ({}))
 
 const permitDetails = {
-  vehicle: '12345678-1234-1234-1234-567890abcdef',
+  vehicle: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
   zone: '27',
   duration: {'minutes': 30, 'hours': 0},
   paymentMethod: 'paypal'
 }
 
-const policeDetails = '12345678-1234-1234-1234-567890abcdef'
+const policeDetails = 'f2d7800e-67ce-41aa-b1fe-38e679112e0e'
 
 beforeEach( async () => {
   return db.reset()
@@ -95,13 +95,13 @@ test('Vehicle does not have valid permit (Police)', async () => {
 })
 
 test('getMyPermits returns empty', async () => {
-  const { active } = await permitService.getMyPermits(permitDetails.vehicle)
+  const { active } = await permitService.getMyPermits([permitDetails.vehicle])
   expect(active.length).toBe(0)
 })
 
 test('getMyPermits returns active permit', async () => {
   await permitService.purchaseMyZonePermit(permitDetails)
-  const { active } = await permitService.getMyPermits(permitDetails.vehicle)
+  const { active } = await permitService.getMyPermits([permitDetails.vehicle])
   expect(active.length).toBe(1)
 })
 
@@ -233,3 +233,32 @@ test('getZones properly returns zones', async () => {
   const receipt = await permitService.getZones()
   expect(receipt).toBeDefined()
 })
+
+test('updateZonePrice updates the zone hourly price and returns updated zone', async () => {
+  const updatedZone = {
+    zone: '27',
+    hourly: 9.99,
+    maxDuration: { hours: 2, minutes: 30 },
+    openTime: '06:00',
+    closeTime: '22:00'
+  };
+
+  const result = await permitService.updateZonePrice(updatedZone);
+
+  expect(result).toBeDefined();
+  expect(Array.isArray(result)).toBe(true);
+  expect(result[0].zone).toBe('27');
+  expect(result[0].hourly).toBe(9.99);
+  expect(result[0].maxDuration).toEqual({ hours: 2, minutes: 30 });
+  expect(result[0].openTime).toBe('06:00');
+  expect(result[0].closeTime).toBe('22:00');
+});
+
+test('updateZonePrice throws if zone does not exist', async () => {
+  await expect(
+    permitService.updateZonePrice({
+      zone: '999999',
+      hourly: 5.55
+    })
+  ).rejects.toThrow('Zone 999999 not found');
+});

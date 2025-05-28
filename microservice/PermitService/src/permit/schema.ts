@@ -302,3 +302,24 @@ export class LotStats {
   @Field(() => Number)
   totalPermits!: number
 }
+
+@ObjectType()
+export class PermitReport {
+  @Field()
+  totalPermits!: number;
+
+  @Field()
+  activePermits!: number;
+
+  @Field()
+  expiredPermits!: number;
+
+  @Field()
+  totalRevenue!: number;
+
+  @Field(() => [ZoneStats])
+  zoneBreakdown!: ZoneStats[];
+
+  @Field(() => [LotStats])
+  lotBreakdown!: LotStats[];
+}

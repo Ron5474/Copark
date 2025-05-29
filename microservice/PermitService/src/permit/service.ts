@@ -359,21 +359,8 @@ export class PermitService {
 
     const details = await this.getLotDetails(input.lot)
     const service = 0.50
-    let subTotal
-    switch (input.duration) {
-      case 'daily':
-        subTotal = details.daily?.price
-        break
-      case 'quarterly':
-        subTotal = details.quarterly?.price
-        break
-      case 'yearly':
-        subTotal = details.yearly?.price
-        break
-      default:
-        throw new Error('Incorrect permit option')
-    }
-    // if (subTotal === undefined) throw new Error(`Lot type ${input.lot} does not have ${input.duration} duration option`)
+    const subTotal = details[input.duration as keyof LotDetails]?.price
+    if (subTotal === undefined) throw new Error('Incorrect permit option')
     const total = service + (subTotal as number)
     const receipt = {
       service,
@@ -391,7 +378,7 @@ export class PermitService {
     
     const now = new Date()
     const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString()
-    const expireDate = details[input.duration]?.expireDate ?? localMidnight
+    const expireDate = details[input.duration as keyof LotDetails]?.expireDate ?? localMidnight
 
     const data = {
       purchaseDate,

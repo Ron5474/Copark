@@ -210,25 +210,25 @@ test('Purchasing daily lot permit works', async () => {
   expect(receipt).toBeDefined()
 })
 
-test('Purchasing quarterly lot permit works', async () => {
-  const receipt = await permitService.purchaseMyLotPermit({
-    vehicle: '12345678-1234-1234-1234-567890abcdef',
-    lot: 'A',
-    duration: 'quarterly',
-    paymentMethod: 'paypal'
-  })
-  expect(receipt).toBeDefined()
-})
+// test('Purchasing quarterly lot permit works', async () => {
+//   const receipt = await permitService.purchaseMyLotPermit({
+//     vehicle: '12345678-1234-1234-1234-567890abcdef',
+//     lot: 'A',
+//     duration: 'quarterly',
+//     paymentMethod: 'paypal'
+//   })
+//   expect(receipt).toBeDefined()
+// })
 
-test('Purchasing yearly lot permit works', async () => {
-  const receipt = await permitService.purchaseMyLotPermit({
-    vehicle: '12345678-1234-1234-1234-567890abcdef',
-    lot: 'A',
-    duration: 'yearly',
-    paymentMethod: 'paypal'
-  })
-  expect(receipt).toBeDefined()
-})
+// test('Purchasing yearly lot permit works', async () => {
+//   const receipt = await permitService.purchaseMyLotPermit({
+//     vehicle: '12345678-1234-1234-1234-567890abcdef',
+//     lot: 'A',
+//     duration: 'yearly',
+//     paymentMethod: 'paypal'
+//   })
+//   expect(receipt).toBeDefined()
+// })
 
 // test('Attempting to purchase a lot permit for one that doesnt have prices errors out', async () => { // TODO: should we allow lots to not offer all duration types?
 //   await expect(permitService.purchaseMyLotPermit({

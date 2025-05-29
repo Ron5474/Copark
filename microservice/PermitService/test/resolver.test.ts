@@ -512,6 +512,78 @@ test('Driver can purchase a lot permit', async () => {
   vi.useRealTimers()
 })
 
+test('Driver can purchase a lot permit with Visa', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'visa', vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a lot permit with mastercard', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'mastercard', vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a lot permit with Amex', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'amex', vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a lot permit with Discover', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'discover', vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
 // test('Driver can purchase a lot permit in advance', async () => {
 //   const now = new Date('2025-05-25T12:00:00Z')
 //   vi.setSystemTime(now)

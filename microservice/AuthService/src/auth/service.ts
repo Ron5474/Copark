@@ -155,7 +155,7 @@ export class AuthService {
       } else {
         if (payload.name && payload.email && payload.picture && payload.sub) {
           const payloadObj = payload as unknown as OauthLoginData;
-          console.log("Payload", payload);
+          // console.log("Payload", payload);
           // if  (payload.iss?.includes("google")) {
           //   try {
           //     const ticket = await oAuthClient.verifyIdToken({

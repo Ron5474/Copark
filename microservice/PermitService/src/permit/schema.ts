@@ -186,6 +186,9 @@ export class PurchaseZoneInput {
 
   @Field(() => String)
   paymentMethod!: string
+
+  @Field(() => String)
+  transactionId!: string
 }
 
 
@@ -202,6 +205,9 @@ export class PurchaseLotInput {
 
   @Field(() => String)
   paymentMethod!: string
+
+  @Field(() => String)
+  transactionId!: string
 }
 
 @ObjectType()

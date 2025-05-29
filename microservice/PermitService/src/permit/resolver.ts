@@ -106,7 +106,8 @@ export class PermitResolver {
       vehicle: vehicleId,
       zone: input.zone,
       duration: input.duration,
-      paymentMethod: input.paymentMethod
+      paymentMethod: input.paymentMethod,
+      transactionId: input.transactionId
     })
 
     const token = request.headers.authorization?.replace('Bearer ', '')
@@ -304,7 +305,8 @@ export class PermitResolver {
       vehicle: vehicleId,
       lot: input.lot,
       duration: input.duration,
-      paymentMethod: input.paymentMethod
+      paymentMethod: input.paymentMethod,
+      transactionId: input.transactionId
     })
 
     const token = request.headers.authorization?.replace('Bearer ', '')

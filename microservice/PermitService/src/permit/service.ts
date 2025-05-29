@@ -65,6 +65,7 @@ export class PermitService {
       expireDate,
       receipt,
       paymentMethod: input.paymentMethod,
+      transactionId: input.transactionId,
     }
 
     const { rows } = await pool.query(`
@@ -75,9 +76,16 @@ export class PermitService {
         LIMIT 1
       )
       INSERT INTO permit (vehicle, type, data)
-      SELECT $1, id, $3 FROM selected_zone
+      SELECT $1, id, $3 FROM selected_zone WHERE NOT EXISTS (
+        SELECT 1 FROM permit
+        WHERE data->>'transactionId' = $4
+      )
       RETURNING type, data
-    `, [input.vehicle, input.zone, data])
+    `, [input.vehicle, input.zone, data, input.transactionId])
+      
+      if (rows.length === 0) {
+        throw new Error(`Permit for vehicle ${input.vehicle} already exists for zone ${input.zone} with transaction ID ${input.transactionId}`);
+      }
 
     // TODO: Hit email api to send confirmation and receipt
     return {
@@ -399,6 +407,7 @@ export class PermitService {
       expireDate,
       receipt,
       paymentMethod: input.paymentMethod,
+      transactionId: input.transactionId,
     }
 
     const { rows } = await pool.query(`
@@ -409,9 +418,16 @@ export class PermitService {
         LIMIT 1
       )
       INSERT INTO permit (vehicle, type, data)
-      SELECT $1, id, $3 FROM selected_lot
+      SELECT $1, id, $3 FROM selected_lot WHERE NOT EXISTS (
+        SELECT 1 FROM permit
+        WHERE data->>'transactionId' = $4
+      )
       RETURNING type, data
-    `, [input.vehicle, input.lot, data])
+    `, [input.vehicle, input.lot, data, input.transactionId])
+
+    if (rows.length === 0) {
+      throw new Error(`Permit for vehicle ${input.vehicle} already exists for lot ${input.lot} with transaction ID ${input.transactionId}`);
+    }
 
     // TODO: Hit email api to send confirmation and receipt
     return {

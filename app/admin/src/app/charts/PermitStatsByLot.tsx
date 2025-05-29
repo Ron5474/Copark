@@ -56,7 +56,6 @@ export default function PermitStatsByLot() {
           stepSize: 1,
           precision: 0,
         },
-        suggestedMax: 5,
       },
     },
   }

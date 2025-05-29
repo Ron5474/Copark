@@ -56,7 +56,6 @@ export default function PermitStatsByZone() {
           stepSize: 1,
           precision: 0,
         },
-        suggestedMax: 5,
       },
     },
   }

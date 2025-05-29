@@ -245,7 +245,10 @@ export class Lot {
   price!: string
 
   @Field(() => String)
-  expireDate!: string
+  activeDate?: string
+
+  @Field(() => String)
+  expireDate?: string
 }
 
 @ObjectType()

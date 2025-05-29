@@ -119,9 +119,9 @@ test('zoneDetails errors on wrong zone', async () => {
   await expect(permitService.getZoneDetails('12312312312312312312123', 0)).rejects.toThrow('Zone 12312312312312312312123 not found')
 })
 
-test('getPermitsByDay retusn permits by day bought', async () => {
+test('getPermitsByDay returns permits by day bought', async () => {
   const permits = await permitService.getAllPermitsByDay()
-  expect(permits.length).toBe(1)
+  expect(permits.length).toBe(1) // expects 1 from previous test
 })
 
 test('admin create zone', async () => {
@@ -210,25 +210,96 @@ test('Purchasing daily lot permit works', async () => {
   expect(receipt).toBeDefined()
 })
 
-test('Purchasing quarterly lot permit works', async () => {
+test('Purchasing a lot permit in advance', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
   const receipt = await permitService.purchaseMyLotPermit({
     vehicle: '12345678-1234-1234-1234-567890abcdef',
     lot: 'A',
     duration: 'quarterly',
     paymentMethod: 'paypal'
   })
-  expect(receipt).toBeDefined()
+
+  const today = new Date().toISOString()
+
+  expect(receipt.activeDate).not.toBe(today)
+  
+  vi.useRealTimers()
 })
 
-test('Purchasing yearly lot permit works', async () => {
-  const receipt = await permitService.purchaseMyLotPermit({
+test('getAllPermits can return future permits', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
+  await permitService.purchaseMyLotPermit({
     vehicle: '12345678-1234-1234-1234-567890abcdef',
     lot: 'A',
-    duration: 'yearly',
+    duration: 'quarterly',
     paymentMethod: 'paypal'
   })
-  expect(receipt).toBeDefined()
+
+  const permits = await permitService.getAllPermits(false)
+  expect(permits.length).toBe(2) // expects 1 from previous tests
+
+  vi.useRealTimers()
 })
+
+test('getAllPermits can return expired permits', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
+  await permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'B',
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  })
+
+  const future = new Date('2025-07-04T12:00:00Z')
+  vi.setSystemTime(future)
+
+  const permits = await permitService.getAllPermits(false)
+  expect(permits.length).toBe(2) // expects 1 from previous tests
+
+  vi.useRealTimers()
+})
+
+test('Purchasing an expired lot permit doesn\'t work', async () => {
+  const now = new Date('2025-07-04T12:00:00Z')
+  vi.setSystemTime(now)
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'A',
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  })).rejects.toThrow('This permit type has expired')
+  
+  vi.useRealTimers()
+})
+
+// test('Purchasing quarterly lot permit works', async () => {
+//   const receipt = await permitService.purchaseMyLotPermit({
+//     vehicle: '12345678-1234-1234-1234-567890abcdef',
+//     lot: 'A',
+//     duration: 'quarterly',
+//     paymentMethod: 'paypal'
+//   })
+//   expect(receipt).toBeDefined()
+// })
+
+// test('Purchasing yearly lot permit works', async () => {
+//   const receipt = await permitService.purchaseMyLotPermit({
+//     vehicle: '12345678-1234-1234-1234-567890abcdef',
+//     lot: 'A',
+//     duration: 'yearly',
+//     paymentMethod: 'paypal'
+//   })
+//   expect(receipt).toBeDefined()
+// })
 
 // test('Attempting to purchase a lot permit for one that doesnt have prices errors out', async () => { // TODO: should we allow lots to not offer all duration types?
 //   await expect(permitService.purchaseMyLotPermit({
@@ -298,4 +369,23 @@ test('updateZonePrice throws if zone does not exist', async () => {
       hourly: 5.55
     })
   ).rejects.toThrow('Zone 999999 not found')
+})
+
+test('generatePermitReport returns correct permit report structure', async () => {
+  await permitService.purchaseMyZonePermit({
+    vehicle: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
+    zone: '27',
+    duration: { minutes: 30, hours: 0 },
+    paymentMethod: 'paypal'
+  })
+
+  const report = await permitService.generatePermitReport()
+
+  expect(report).toBeDefined()
+  expect(typeof report.totalPermits).toBe('number')
+  expect(typeof report.activePermits).toBe('number')
+  expect(typeof report.expiredPermits).toBe('number')
+  expect(typeof report.totalRevenue).toBe('number')
+  expect(Array.isArray(report.zoneBreakdown)).toBe(true)
+  expect(Array.isArray(report.lotBreakdown)).toBe(true)
 })

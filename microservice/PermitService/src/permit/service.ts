@@ -23,6 +23,7 @@ import {
 
 interface LotTypeDetails {
   price: number
+  activeDate?: string
   expireDate?: string
 }
 
@@ -365,23 +366,13 @@ export class PermitService {
 
   public async purchaseMyLotPermit(input: PurchaseLotInput): Promise<Confirmation> {
 
-    const details = await this.getLotDetails(input.lot)
+    const today = new Date()
+
+    const details = (await this.getLotDetails(input.lot))[input.duration as keyof LotDetails]
     const service = 0.50
-    let subTotal
-    switch (input.duration) {
-      case 'daily':
-        subTotal = details.daily?.price
-        break
-      case 'quarterly':
-        subTotal = details.quarterly?.price
-        break
-      case 'yearly':
-        subTotal = details.yearly?.price
-        break
-      default:
-        throw new Error('Incorrect permit option')
-    }
-    // if (subTotal === undefined) throw new Error(`Lot type ${input.lot} does not have ${input.duration} duration option`)
+    const subTotal = details?.price
+    if (subTotal === undefined) throw new Error('Incorrect permit option')
+    if (details?.expireDate && new Date(details.expireDate) < today) throw new Error('This permit type has expired')
     const total = service + (subTotal as number)
     const receipt = {
       service,
@@ -391,15 +382,15 @@ export class PermitService {
 
     // Stripe processing goes here
 
-
-    const today = new Date()
-
     const purchaseDate = today.toISOString()
-    const activeDate = today.toISOString() // TODO allow purchases in advance
+    const beginDate = new Date(details?.activeDate || purchaseDate)
+    const activeDate = today < beginDate ?
+      beginDate.toISOString() :
+      purchaseDate
     
     const now = new Date()
     const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString()
-    const expireDate = details[input.duration]?.expireDate ?? localMidnight
+    const expireDate = details?.expireDate ?? localMidnight
 
     const data = {
       purchaseDate,
@@ -562,8 +553,6 @@ export class PermitService {
       lotBreakdown
     }
   }
-
-
 
   public async updateZonePrice(zone: ZoneInput): Promise<Zone[]> {
     // Fetch the existing zone data

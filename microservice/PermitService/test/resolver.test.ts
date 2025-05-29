@@ -202,6 +202,32 @@ const purchaseZoneInput = {
   }
 }
 
+const purchaseLotPermitQuery = `
+mutation PurchaseLotPermit($input: PurchaseLotInput!) {
+  purchaseLotPermit(input: $input) {
+    type
+    area
+    purchaseDate
+    activeDate
+    expireDate
+    receipt {
+      service
+      subTotal
+      total
+    }
+    paymentMethod
+  }
+}`
+
+const purchaseLotInput = {
+  input: {
+    vehicle: "replace with derik's vid",
+    lot: "A",
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  }
+}
+
 const checkPermitQuery = `
 query CheckedPermit($plate: String!) {
   checkPermit(plate: $plate) {
@@ -450,6 +476,132 @@ test('Driver can purchase a zone permit with different duration 7', async () => 
   vi.useRealTimers()
 })
 
+test('Driver can\'t purchase a zone permit for wrong car', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: purchaseLotInput
+    })
+
+  expect(confirmation.body.errors[0].message).toBe("Vehicle not found")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a lot permit', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a lot permit with Visa', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'visa', vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a lot permit with mastercard', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'mastercard', vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a lot permit with Amex', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'amex', vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a lot permit with Discover', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'discover', vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a lot permit in advance', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.activeDate).not.toBe(now.toISOString())
+  
+  vi.useRealTimers()
+})
+
 
 // test('No token to getUserData', async () => {
 //   const receipt = await permitResolver.getUserData(permitDetails)
@@ -530,7 +682,32 @@ test('Driver has no permits', async () => {
   expect(permits.body.data.myPermits.active.length).toBe(0)
 })
 
+// test('Driver with no vehicle has no permits', async () => {
+//   const { token } = await loginAs("driver")
+
+//   // Remove vehicle -- not implemented in vehicle yet
+
+//   const permits = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + token)
+//     .send({ 
+//       query: `
+//         query {
+//           myPermits {
+//             future { vehicle type area activeDate expireDate }
+//             active { vehicle type area activeDate expireDate }
+//             expired { vehicle type area activeDate expireDate }
+//           }
+//         }
+//       `
+//     })
+
+//   expect(permits.body.data.myPermits.active.length).toBe(0)
+// })
+
 test('Zone details', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
   const { token } = await loginAs("driver")
 
   const details = await supertest(server)
@@ -541,7 +718,8 @@ test('Zone details', async () => {
       variables: zoneDetailsInput
     })
 
-  expect(details.body.data.zoneDetails.hourly).toBe(2.45)
+  expect(details.body.data.zoneDetails.hourly).toBe(2.95)
+  vi.useRealTimers()
 })
 
 test('Admin can get ticket stats grouped by day', async () => {
@@ -1061,6 +1239,110 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
   expect(lotC?.totalPermits).toBe(0)
 })
 
+test('Admin can update zone price', async () => {
+  const { token } = await loginAs("admin")
+
+  // First, get an existing zone to update
+  const getZonesQuery = `
+    query GetZones {
+      getZones {
+        zone
+        hourly
+        maxDuration { hours minutes }
+        openTime
+        closeTime
+      }
+    }
+  `
+  const zonesRes = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ query: getZonesQuery })
+    .expect(200)
+
+  expect(zonesRes.body.errors).toBeUndefined()
+  const zones = zonesRes.body.data.getZones
+  expect(Array.isArray(zones)).toBe(true)
+  const zoneToUpdate = zones[0]
+  expect(zoneToUpdate).toBeDefined()
+
+  // Prepare mutation to update the zone's hourly price
+  const mutation = `
+    mutation UpdateZonePrice($input: ZoneInput!) {
+      updateZonePrice(input: $input) {
+        zone
+        hourly
+        maxDuration { hours minutes }
+        openTime
+        closeTime
+      }
+    }
+  `
+  const newHourly = (zoneToUpdate.hourly || 1) + 1.23
+  const variables = {
+    input: {
+      zone: zoneToUpdate.zone,
+      hourly: newHourly,
+      maxDuration: { hours: 3, minutes: 15 },
+      openTime: "07:30",
+      closeTime: "21:00"
+    }
+  }
+
+  const updateRes = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ query: mutation, variables })
+    .expect(200)
+
+  expect(updateRes.body.errors).toBeUndefined()
+  const updatedZones = updateRes.body.data.updateZonePrice
+  expect(Array.isArray(updatedZones)).toBe(true)
+  expect(updatedZones[0].zone).toBe(zoneToUpdate.zone)
+  expect(updatedZones[0].hourly).toBeCloseTo(newHourly)
+  expect(updatedZones[0].maxDuration.hours).toBe(3)
+  expect(updatedZones[0].maxDuration.minutes).toBe(15)
+  expect(updatedZones[0].openTime).toBe("07:30")
+  expect(updatedZones[0].closeTime).toBe("21:00")
+})
+
+test('Admin can get permit summary in adminPermitReport', async () => {
+  const { token } = await loginAs("admin")
+
+  const query = `
+    query {
+      adminPermitReport {
+        totalPermits
+        activePermits
+        expiredPermits
+        totalRevenue
+        zoneBreakdown {
+          area
+          totalPermits
+        }
+        lotBreakdown {
+          area
+          totalPermits
+        }
+      }
+    }
+  `
+
+  const res = await supertest(server)
+    .post("/graphql")
+    .set("Authorization", `Bearer ${token}`)
+    .send({ query })
+
+  expect(res.body.errors).toBeUndefined()
+
+  const report = res.body.data.adminPermitReport
+
+  expect(report.totalPermits).toBeGreaterThanOrEqual(1)
+  expect(report.activePermits).toBeGreaterThanOrEqual(1)
+
+  expect(Array.isArray(report.zoneBreakdown)).toBe(true)
+  expect(Array.isArray(report.lotBreakdown)).toBe(true)
+})
 // need fixing
 // test('Admin sees correct permit summary in adminPermitReport', async () => {
 //   const { token } = await loginAs("admin")

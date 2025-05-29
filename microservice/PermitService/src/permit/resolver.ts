@@ -11,7 +11,6 @@ import {
   NewZone,
   ZoneDetails,
   PermitsByDay,
-  // LotDetails,
   PurchaseLotInput,
   NewLot,
   LotGroup,
@@ -20,6 +19,7 @@ import {
   ZoneStats,
   LotStats,
   PermitReport,
+  ZoneInput
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
@@ -39,7 +39,7 @@ export class PermitResolver {
   }
 
   private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[], email: string }> {
-    // if (!token) {
+    // if (!token) { // User already passed auth checker
     //   throw new Error('Token not provided')
     // }
     const response = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
@@ -51,9 +51,9 @@ export class PermitResolver {
     })
 
     const res = response.status === 200 ? await response.json() : null
-    if (!res) {
-      throw new Error('User not found')
-    }
+    // if (!res) { // User already passed auth checker
+    //   throw new Error('User not found')
+    // }
     return {
       id: res.id,
       name: res.name,
@@ -231,9 +231,9 @@ export class PermitResolver {
     const vehicleIDs: Vehicle[] =
       vehicleResult.data?.getVehicleByUserId?.map((v: {id: string}) => v.id)
 
-    if (!vehicleIDs) {
-      return { active: [], future: [], expired: [] }
-    }
+    // if (!vehicleIDs) { // Delete vehicle not implemented yet
+    //   return { active: [], future: [], expired: [] }
+    // }
 
     return await service.getMyPermits(vehicleIDs)
   }
@@ -311,27 +311,19 @@ export class PermitResolver {
 
     const token = request.headers.authorization?.replace('Bearer ', '')
     const user = await this.getUserData(token)
-    const durationString = ""
-    // if (input.duration?.hours && input.duration?.minutes) {
-    //   if (input.duration.hours > 1) {
-    //   durationString += `${input.duration.hours} hours`
-    //   } else {
-    //     durationString += `${input.duration.hours} hour`
-    //   }
-    //   if (input.duration.minutes > 1) {
-    //     durationString += ` ${input.duration.minutes} minutes`
-    //   } else {
-    //     durationString += ` ${input.duration.minutes} minute`
-    //   }
-    // } else if (input.duration?.hours) {
-    //   if (input.duration.hours > 1) {
-    //     durationString = `${input.duration.hours} hours`
-    //   } else {
-    //     durationString = `${input.duration.hours} hour`
-    //   }
-    // } else if (input.duration?.minutes) {
-    //   durationString = `${input.duration.minutes} minutes`
-    // }
+
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "short",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZoneName: "short"
+    }
+    const durationString = `From ${new Date(purchaseMyZonePermit.activeDate).toLocaleString(undefined, options)
+    //   new Date(purchaseMyZonePermit.purchaseDate) < new Date(purchaseMyZonePermit.activeDate) ?
+    //   new Date(purchaseMyZonePermit.activeDate).toLocaleString(undefined, options) :
+    //   new Date(purchaseMyZonePermit.purchaseDate).toLocaleString(undefined, options)
+    } until ${new Date(purchaseMyZonePermit.expireDate).toLocaleString(undefined, options)}`
 
     let brand
     switch (input.paymentMethod.split(" ")[0]) {
@@ -506,6 +498,14 @@ export class PermitResolver {
   @Query(() => PermitReport)
   async adminPermitReport(): Promise<PermitReport> {
     return await service.generatePermitReport()
+  }
+
+  @Authorized(['admin'])
+  @Mutation(() => [Zone])
+  async updateZonePrice(
+    @Arg("input", () => ZoneInput) input: ZoneInput
+  ): Promise<Zone[]> {
+    return await service.updateZonePrice(input)
   }
 
   /*

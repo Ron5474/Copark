@@ -71,32 +71,63 @@ export class PermitService {
 
     const { rows } = await pool.query(`
       WITH selected_zone AS (
-        SELECT id FROM type
+        SELECT id
+        FROM type
         WHERE data->>'name' = 'zone'
         AND TRIM(LOWER(data->>'area')) = TRIM(LOWER($2))
         LIMIT 1
-      )
-      INSERT INTO permit (vehicle, type, data)
-      SELECT $1, id, $3 FROM selected_zone WHERE NOT EXISTS (
-        SELECT 1 FROM permit
+      ),
+      duplicate_check AS (
+        SELECT COUNT(*)::int AS count FROM permit
         WHERE data->>'transactionId' = $4
+      ),
+      conflict_check AS (
+        SELECT COUNT(*)::int AS count FROM permit
+        WHERE vehicle = $1
+          AND type = (SELECT id FROM selected_zone)
+          AND (
+            (data->>'expireDate')::timestamptz IS NULL
+            OR (data->>'expireDate')::timestamptz > now()
+          )
+      ),
+      inserted AS (
+        INSERT INTO permit (vehicle, type, data)
+        SELECT $1, id, $3
+        FROM selected_zone
+        WHERE 
+          (SELECT count FROM duplicate_check) = 0 AND
+          (SELECT count FROM conflict_check) = 0
+        RETURNING type, data
       )
-      RETURNING type, data
-    `, [input.vehicle, input.zone, data, input.transactionId])
-      
-      if (rows.length === 0) {
-        throw new Error(`Permit for vehicle ${input.vehicle} already exists for zone ${input.zone} with transaction ID ${input.transactionId}`);
-      }
+      SELECT 
+        (SELECT count FROM duplicate_check) AS duplicate_count,
+        (SELECT count FROM conflict_check) AS conflict_count,
+        (SELECT row_to_json(i) FROM inserted i) AS inserted_row
+    `, [input.vehicle, input.zone, data, input.transactionId]);
+    
+    const result = rows[0];
+
+    if (result.duplicate_count > 0) {
+      throw new Error(`Permit for vehicle ${input.vehicle} already exists for zone ${input.zone} with transaction ID ${input.transactionId}`);
+    }
+
+    if (result.conflict_count > 0) {
+      throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in zone ${input.zone}`);
+    }
+
+    if (!result.inserted_row) {
+      throw new Error(`Permit creation failed unexpectedly.`);
+    }
 
     // TODO: Hit email api to send confirmation and receipt
     return {
       type: 'zone',
       area: input.zone,
-      purchaseDate: rows[0].data.purchaseDate,
-      activeDate: rows[0].data.activeDate,
-      expireDate: rows[0].data.expireDate,
-      receipt: rows[0].data.receipt,
-      paymentMethod: rows[0].data.paymentMethod,
+      purchaseDate: rows[0].inserted_row.purchaseDate,
+      activeDate: rows[0].inserted_row.activeDate,
+      expireDate: rows[0].inserted_row.expireDate,
+      receipt: rows[0].inserted_row.receipt,
+      paymentMethod: rows[0].inserted_row.paymentMethod,
     }
   }
 
@@ -400,26 +431,6 @@ export class PermitService {
       paymentMethod: input.paymentMethod,
       transactionId: input.transactionId,
     }
-
-    // const { rows } = await pool.query(`
-    //   WITH selected_lot AS (
-    //     SELECT id FROM type
-    //     WHERE data->>'name' = 'lot'
-    //     AND TRIM(LOWER(data->>'area')) = TRIM(LOWER($2))
-    //     LIMIT 1
-    //   )
-    //   INSERT INTO permit (vehicle, type, data)
-    //   SELECT $1, id, $3 FROM selected_lot
-    //   WHERE NOT EXISTS (
-    //     SELECT 1 FROM permit
-    //     WHERE data->>'transactionId' = $4
-    //   )
-    //   RETURNING type, data
-    // `, [input.vehicle, input.lot, data, input.transactionId])
-
-    // if (rows.length === 0) {
-    //   throw new Error(`Permit for vehicle ${input.vehicle} already exists for lot ${input.lot} with transaction ID ${input.transactionId}`);
-    // }
 
     const { rows } = await pool.query(`
       WITH selected_lot AS (

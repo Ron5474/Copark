@@ -530,6 +530,29 @@ test('Driver has no permits', async () => {
   expect(permits.body.data.myPermits.active.length).toBe(0)
 })
 
+// test('Driver with no vehicle has no permits', async () => {
+//   const { token } = await loginAs("driver")
+
+//   // Remove vehicle -- not implemented in vehicle yet
+
+//   const permits = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + token)
+//     .send({ 
+//       query: `
+//         query {
+//           myPermits {
+//             future { vehicle type area activeDate expireDate }
+//             active { vehicle type area activeDate expireDate }
+//             expired { vehicle type area activeDate expireDate }
+//           }
+//         }
+//       `
+//     })
+
+//   expect(permits.body.data.myPermits.active.length).toBe(0)
+// })
+
 test('Zone details', async () => {
   const { token } = await loginAs("driver")
 

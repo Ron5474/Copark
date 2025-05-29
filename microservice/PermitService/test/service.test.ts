@@ -119,9 +119,46 @@ test('zoneDetails errors on wrong zone', async () => {
   await expect(permitService.getZoneDetails('12312312312312312312123', 0)).rejects.toThrow('Zone 12312312312312312312123 not found')
 })
 
-test('getPermitsByDay retusn permits by day bought', async () => {
+test('getPermitsByDay returns permits by day bought', async () => {
   const permits = await permitService.getAllPermitsByDay()
-  expect(permits.length).toBe(1)
+  expect(permits.length).toBe(1) // expects 1 from previous test
+})
+
+test('getAllPermits returns future permits', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
+  await permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'A',
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  })
+
+  const permits = await permitService.getAllPermits(false)
+  expect(permits.length).toBe(2) // expects 1 from previous tests
+
+  vi.useRealTimers()
+})
+
+test('getAllPermits returns expired permits', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
+  await permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'B',
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  })
+
+  const future = new Date('2025-07-04T12:00:00Z')
+  vi.setSystemTime(future)
+
+  const permits = await permitService.getAllPermits(false)
+  expect(permits.length).toBe(2) // expects 1 from previous tests
+
+  vi.useRealTimers()
 })
 
 test('admin create zone', async () => {

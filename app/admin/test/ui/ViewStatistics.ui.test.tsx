@@ -17,11 +17,43 @@ vi.mock('../../src/enforcement/actions', () => ({
 }));
 
 vi.mock('../../src/permit/actions', () => ({
-  getAllPermitsByDay: vi.fn()
+  getAllPermitsByDay: vi.fn(),
+  getPermitReport: vi.fn().mockResolvedValue({
+    totalPermits: 100,
+    activePermits: 75,
+    expiredPermits: 25,
+    totalRevenue: 5000,
+    zoneBreakdown: [
+      { area: 'Zone A', totalPermits: 50 },
+      { area: 'Zone B', totalPermits: 50 }
+    ],
+    lotBreakdown: [
+      { area: 'Lot 1', totalPermits: 40 },
+      { area: 'Lot 2', totalPermits: 60 }
+    ]
+  }),
+  getPermitStatsByZone: vi.fn().mockResolvedValue([
+    { area: 'Zone A', totalPermits: 50 },
+    { area: 'Zone B', totalPermits: 50 }
+  ]),
+  getPermitStatsByLot: vi.fn().mockResolvedValue([
+    { area: 'Lot 1', totalPermits: 40 },
+    { area: 'Lot 2', totalPermits: 60 }
+  ]),
+  getAllPermits: vi.fn().mockResolvedValue([
+    {
+      type: 'zone',
+      area: 'A1',
+      purchaseDate: '2025-05-19T10:00:00Z',
+      activeDate: '2025-05-19T10:00:00Z',
+      expireDate: '2025-05-19T12:00:00Z'
+    }
+  ])
 }));
 
 vi.mock('react-chartjs-2', () => ({
-  Line: () => <div data-testid="mock-chart">A cool chart.</div>
+  Line: () => <div data-testid="mock-chart">A cool chart.</div>,
+  Bar: () => <div data-testid="mock-bar-chart">A bar chart.</div>
 }));
 
 // Mock data
@@ -284,6 +316,12 @@ it('handles error in permits fetch', async () => {
   render(<ViewStatistics />);
 
   // Click the permits tab
+  const zoneStatsTab = screen.getByText('Permits by Zone');
+  fireEvent.click(zoneStatsTab);
+  const lotStatsTab = screen.getByText('Permits by Lot');
+  fireEvent.click(lotStatsTab);
+  const allPermitsTab = screen.getByText('All Permits');
+  fireEvent.click(allPermitsTab);
   const permitsTab = screen.getByText('Permits by Day');
   fireEvent.click(permitsTab);
 

@@ -1061,6 +1061,72 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
   expect(lotC?.totalPermits).toBe(0)
 })
 
+test('Admin can update zone price', async () => {
+  const { token } = await loginAs("admin")
+
+  // First, get an existing zone to update
+  const getZonesQuery = `
+    query GetZones {
+      getZones {
+        zone
+        hourly
+        maxDuration { hours minutes }
+        openTime
+        closeTime
+      }
+    }
+  `
+  const zonesRes = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ query: getZonesQuery })
+    .expect(200)
+
+  expect(zonesRes.body.errors).toBeUndefined()
+  const zones = zonesRes.body.data.getZones
+  expect(Array.isArray(zones)).toBe(true)
+  const zoneToUpdate = zones[0]
+  expect(zoneToUpdate).toBeDefined()
+
+  // Prepare mutation to update the zone's hourly price
+  const mutation = `
+    mutation UpdateZonePrice($input: ZoneInput!) {
+      updateZonePrice(input: $input) {
+        zone
+        hourly
+        maxDuration { hours minutes }
+        openTime
+        closeTime
+      }
+    }
+  `
+  const newHourly = (zoneToUpdate.hourly || 1) + 1.23
+  const variables = {
+    input: {
+      zone: zoneToUpdate.zone,
+      hourly: newHourly,
+      maxDuration: { hours: 3, minutes: 15 },
+      openTime: "07:30",
+      closeTime: "21:00"
+    }
+  }
+
+  const updateRes = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ query: mutation, variables })
+    .expect(200)
+
+  expect(updateRes.body.errors).toBeUndefined()
+  const updatedZones = updateRes.body.data.updateZonePrice
+  expect(Array.isArray(updatedZones)).toBe(true)
+  expect(updatedZones[0].zone).toBe(zoneToUpdate.zone)
+  expect(updatedZones[0].hourly).toBeCloseTo(newHourly)
+  expect(updatedZones[0].maxDuration.hours).toBe(3)
+  expect(updatedZones[0].maxDuration.minutes).toBe(15)
+  expect(updatedZones[0].openTime).toBe("07:30")
+  expect(updatedZones[0].closeTime).toBe("21:00")
+})
 // need fixing
 // test('Admin sees correct permit summary in adminPermitReport', async () => {
 //   const { token } = await loginAs("admin")

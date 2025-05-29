@@ -69,6 +69,18 @@ test('Purchasing same zone permit transaction ID twice', async () => {
   await expect(permitService.purchaseMyZonePermit(zonePermitDetails)).rejects.toThrow(`Permit for vehicle ${zonePermitDetails.vehicle} already exists for zone ${zonePermitDetails.zone} with transaction ID ${zonePermitDetails.transactionId}`)
 })
 
+test('Purchasing same zone permit twice', async () => {
+  const now = new Date('2025-05-29T12:00:00Z')
+  vi.setSystemTime(now)
+  await permitService.purchaseMyZonePermit(zonePermitDetails)
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(permitService.purchaseMyZonePermit({...zonePermitDetails, transactionId: 'somethingElse', duration: {minutes: 30}}))
+      .rejects.toThrow(`Vehicle ${zonePermitDetails.vehicle} already has an active permit of this type in zone ${zonePermitDetails.zone}`)
+  vi.useRealTimers()
+})
+
 test('Vehicle has valid permit', async () => {
   await permitService.purchaseMyZonePermit(zonePermitDetails)
   const permits = await permitService.getValidPermit(zonePermitDetails.vehicle)
@@ -274,20 +286,27 @@ test('Purchasing an expired lot permit doesn\'t work', async () => {
 })
 
 test('Purchasing same lot permit transaction ID twice', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
   await permitService.purchaseMyLotPermit(lotPermitDetails)
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
   await expect(permitService.purchaseMyLotPermit(lotPermitDetails)).rejects.toThrow(`Permit for vehicle ${lotPermitDetails.vehicle} already exists for lot ${lotPermitDetails.lot} with transaction ID ${lotPermitDetails.transactionId}`)
+  vi.useRealTimers()
 })
 
-// test('Purchasing same lot permit twice - different lots', async () => {
-//   await permitService.purchaseMyLotPermit(lotPermitDetails)
+test('Purchasing same lot permit twice - different durations', async () => {
+  const now = new Date('2025-05-15T12:00:00Z')
+  vi.setSystemTime(now)
+  await permitService.purchaseMyLotPermit(lotPermitDetails)
 
-//   // eslint-disable-next-line @typescript-eslint/no-empty-function
-//   vi.spyOn(console, 'error').mockImplementation(() => {})
-//   await expect(permitService.purchaseMyLotPermit({...lotPermitDetails, transactionId: 'somethingElse', lot: 'B'})).rejects.toThrow(`Vehicle ${lotPermitDetails.vehicle} already has an active permit of this type in lot B`)
-// })
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(permitService.purchaseMyLotPermit({...lotPermitDetails, transactionId: 'somethingElse', duration: 'daily'}))
+      .rejects.toThrow(`Vehicle ${lotPermitDetails.vehicle} already has an active permit of this type in lot ${lotPermitDetails.lot}`)
+  vi.useRealTimers()
+})
 
 // test('Purchasing quarterly lot permit works', async () => {
 //   const receipt = await permitService.purchaseMyLotPermit({

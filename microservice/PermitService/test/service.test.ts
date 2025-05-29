@@ -210,6 +210,24 @@ test('Purchasing daily lot permit works', async () => {
   expect(receipt).toBeDefined()
 })
 
+test('Purchasing a lot permit in advance', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
+  const receipt = await permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'A',
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  })
+
+  const today = new Date().toISOString()
+
+  expect(receipt.activeDate).not.toBe(today)
+  
+  vi.useRealTimers()
+})
+
 // test('Purchasing quarterly lot permit works', async () => {
 //   const receipt = await permitService.purchaseMyLotPermit({
 //     vehicle: '12345678-1234-1234-1234-567890abcdef',

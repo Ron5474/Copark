@@ -584,23 +584,23 @@ test('Driver can purchase a lot permit with Discover', async () => {
   vi.useRealTimers()
 })
 
-// test('Driver can purchase a lot permit in advance', async () => {
-//   const now = new Date('2025-05-25T12:00:00Z')
-//   vi.setSystemTime(now)
-//   const driver = await loginAs("driver")
+test('Driver can purchase a lot permit in advance', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
 
-//   const confirmation = await supertest(server)
-//     .post('/graphql')
-//     .set('Authorization', 'Bearer ' + driver.token)
-//     .send({ 
-//       query: purchaseLotPermitQuery,
-//       variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate}}
-//     })
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate}}
+    })
 
-//   expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  expect(confirmation.body.data.purchaseLotPermit.activeDate).not.toBe(now.toISOString())
   
-//   vi.useRealTimers()
-// })
+  vi.useRealTimers()
+})
 
 
 // test('No token to getUserData', async () => {

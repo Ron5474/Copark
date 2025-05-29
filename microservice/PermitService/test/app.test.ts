@@ -216,7 +216,8 @@ const purchaseZoneInput = {
     vehicle: "12345678-1234-1234-1234-567890abcdef",
     zone: "123",
     duration: {'minutes': 30, 'hours': 0},
-    paymentMethod: "paypal"
+    paymentMethod: "paypal",
+    transactionId: 'stripeTransactionID',
   }
 }
 

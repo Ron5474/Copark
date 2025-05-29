@@ -198,7 +198,8 @@ const purchaseZoneInput = {
     vehicle: "replace with derik's vid",
     zone: "123",
     duration: {'minutes': 30, 'hours': 2},
-    paymentMethod: 'paypal'
+    paymentMethod: 'paypal',
+    transactionId: 'stripeTransactionID',
   }
 }
 
@@ -224,7 +225,8 @@ const purchaseLotInput = {
     vehicle: "replace with derik's vid",
     lot: "A",
     duration: 'quarterly',
-    paymentMethod: 'paypal'
+    paymentMethod: 'paypal',
+    transactionId: 'stripeTransactionID',
   }
 }
 
@@ -450,7 +452,7 @@ test('Driver can purchase a zone permit with different duration 6', async () => 
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseZonePermitQuery,
-      variables: {input: {...purchaseZoneInput.input,duration: {minutes: 30}, vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseZoneInput.input, duration: {minutes: 30}, vehicle: derikVehicleInput.input.plate}}
     })
 
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")

@@ -20,7 +20,8 @@ const permitDetails = {
   vehicle: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
   zone: '27',
   duration: {'minutes': 30, 'hours': 0},
-  paymentMethod: 'paypal'
+  paymentMethod: 'paypal',
+  transactionId: 'stripeTransactionID',
 }
 
 const policeDetails = 'f2d7800e-67ce-41aa-b1fe-38e679112e0e'
@@ -205,7 +206,8 @@ test('Purchasing daily lot permit works', async () => {
     vehicle: '12345678-1234-1234-1234-567890abcdef',
     lot: 'A',
     duration: 'daily',
-    paymentMethod: 'paypal'
+    paymentMethod: 'paypal',
+    transactionId: 'stripeTransactionID',
   })
   expect(receipt).toBeDefined()
 })
@@ -218,7 +220,8 @@ test('Purchasing a lot permit in advance', async () => {
     vehicle: '12345678-1234-1234-1234-567890abcdef',
     lot: 'A',
     duration: 'quarterly',
-    paymentMethod: 'paypal'
+    paymentMethod: 'paypal',
+    transactionId: 'stripeTransactionID',
   })
 
   const today = new Date().toISOString()
@@ -236,7 +239,8 @@ test('getAllPermits can return future permits', async () => {
     vehicle: '12345678-1234-1234-1234-567890abcdef',
     lot: 'A',
     duration: 'quarterly',
-    paymentMethod: 'paypal'
+    paymentMethod: 'paypal',
+    transactionId: 'stripeTransactionID',
   })
 
   const permits = await permitService.getAllPermits(false)
@@ -253,7 +257,8 @@ test('getAllPermits can return expired permits', async () => {
     vehicle: '12345678-1234-1234-1234-567890abcdef',
     lot: 'B',
     duration: 'quarterly',
-    paymentMethod: 'paypal'
+    paymentMethod: 'paypal',
+    transactionId: 'stripeTransactionID',
   })
 
   const future = new Date('2025-07-04T12:00:00Z')
@@ -275,7 +280,8 @@ test('Purchasing an expired lot permit doesn\'t work', async () => {
     vehicle: '12345678-1234-1234-1234-567890abcdef',
     lot: 'A',
     duration: 'quarterly',
-    paymentMethod: 'paypal'
+    paymentMethod: 'paypal',
+    transactionId: 'stripeTransactionID',
   })).rejects.toThrow('This permit type has expired')
   
   vi.useRealTimers()
@@ -317,7 +323,8 @@ test('Purchasing wrong lot permit doesn\'t work', async () => {
     vehicle: '12345678-1234-1234-1234-567890abcdef',
     lot: 'A',
     duration: 'biweekly',
-    paymentMethod: 'paypal'
+    paymentMethod: 'paypal',
+    transactionId: 'stripeTransactionID',
   })).rejects.toThrow('Incorrect permit option')
 })
 
@@ -376,7 +383,8 @@ test('generatePermitReport returns correct permit report structure', async () =>
     vehicle: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
     zone: '27',
     duration: { minutes: 30, hours: 0 },
-    paymentMethod: 'paypal'
+    paymentMethod: 'paypal',
+    transactionId: 'stripeTransactionID',
   })
 
   const report = await permitService.generatePermitReport()

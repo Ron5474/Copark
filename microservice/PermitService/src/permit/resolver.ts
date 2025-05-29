@@ -317,10 +317,10 @@ export class PermitResolver {
       day: "numeric",
       timeZoneName: "short"
     }
-    const durationString = `From ${
-      new Date(purchaseMyZonePermit.purchaseDate) < new Date(purchaseMyZonePermit.activeDate) ?
-      new Date(purchaseMyZonePermit.activeDate).toLocaleString(undefined, options) :
-      new Date(purchaseMyZonePermit.purchaseDate).toLocaleString(undefined, options)
+    const durationString = `From ${new Date(purchaseMyZonePermit.activeDate).toLocaleString(undefined, options)
+    //   new Date(purchaseMyZonePermit.purchaseDate) < new Date(purchaseMyZonePermit.activeDate) ?
+    //   new Date(purchaseMyZonePermit.activeDate).toLocaleString(undefined, options) :
+    //   new Date(purchaseMyZonePermit.purchaseDate).toLocaleString(undefined, options)
     } until ${new Date(purchaseMyZonePermit.expireDate).toLocaleString(undefined, options)}`
 
     let brand

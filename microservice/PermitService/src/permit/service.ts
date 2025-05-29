@@ -23,6 +23,7 @@ import {
 
 interface LotTypeDetails {
   price: number
+  activeDate?: string
   expireDate?: string
 }
 
@@ -374,7 +375,10 @@ export class PermitService {
     const today = new Date()
 
     const purchaseDate = today.toISOString()
-    const activeDate = today.toISOString() // TODO allow purchases in advance
+    const beginDate = new Date(details[input.duration as keyof LotDetails]?.activeDate || purchaseDate)
+    const activeDate = today < beginDate ?
+      beginDate.toISOString() :
+      purchaseDate
     
     const now = new Date()
     const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString()

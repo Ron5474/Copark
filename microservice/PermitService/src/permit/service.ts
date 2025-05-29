@@ -131,15 +131,15 @@ export class PermitService {
     }
   }
 
-  public async getValidPermit(vid: string): Promise<CheckedPermit[]> {
+  public async getValidPermit(vid: string, now=new Date().toISOString()): Promise<CheckedPermit[]> {
     const result = await pool.query(`
       SELECT t.data
       FROM permit p
       JOIN type t ON t.id = p.type
       WHERE p.vehicle = $1
-        AND now() >= (p.data->>'activeDate')::timestamptz
-        AND now() <= (p.data->>'expireDate')::timestamptz
-    `, [vid])
+        AND $2 >= (p.data->>'activeDate')::timestamptz
+        AND $2 <= (p.data->>'expireDate')::timestamptz
+    `, [vid, now])
   
     return result.rows.map(row => {
       return {
@@ -150,23 +150,23 @@ export class PermitService {
   }
   
 
-  public async isValidPermitPolice(vid: string): Promise<IsValidPolice> {
+  public async isValidPermitPolice(vid: string, now=new Date().toISOString()): Promise<IsValidPolice> {
 
     const result = await pool.query(`
         SELECT data
         FROM permit
         WHERE vehicle = $1
-        AND now() >= (data->>'activeDate')::timestamptz
-        AND now() <= (data->>'expireDate')::timestamptz
+        AND $2 >= (data->>'activeDate')::timestamptz
+        AND $2 <= (data->>'expireDate')::timestamptz
       `,
-      [vid]
+      [vid, now]
     )
 
     if (result.rowCount === 0) return { isValid: false }
     return { isValid: true }
   }
 
-  public async getMyPermits(vid: Vehicle[]): Promise<MyPermits> {
+  public async getMyPermits(vid: Vehicle[], now=new Date().toISOString()): Promise<MyPermits> {
 
     const result = await pool.query(`
         WITH future AS (
@@ -179,7 +179,7 @@ export class PermitService {
           FROM permit p, type t 
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
-          AND now() <= (p.data->>'activeDate')::timestamptz
+          AND $2 <= (p.data->>'activeDate')::timestamptz
         ),
         active AS (
           SELECT DISTINCT ON (p.id) p.vehicle,
@@ -191,8 +191,8 @@ export class PermitService {
           FROM permit p, type t 
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
-          AND now() >= (p.data->>'activeDate')::timestamptz
-          AND now() <= (p.data->>'expireDate')::timestamptz
+          AND $2 >= (p.data->>'activeDate')::timestamptz
+          AND $2 <= (p.data->>'expireDate')::timestamptz
         ),
         expired AS (
           SELECT DISTINCT ON (p.id) p.vehicle,
@@ -204,16 +204,15 @@ export class PermitService {
           FROM permit p, type t 
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
-          AND now() >= (p.data->>'expireDate')::timestamptz
+          AND $2 >= (p.data->>'expireDate')::timestamptz
         )
         SELECT
           COALESCE((SELECT json_agg(future) FROM future), '[]') AS future,
           COALESCE((SELECT json_agg(active) FROM active), '[]') AS active,
           COALESCE((SELECT json_agg(expired) FROM expired), '[]') AS expired
       `,
-      [vid]
+      [vid, now]
     )
-    // console.log(result.rows[0])
 
     return result.rows[0]
   }
@@ -606,7 +605,6 @@ export class PermitService {
 
     const zoneBreakdown = await this.getPermitStatsByZone(false)
     const lotBreakdown = await this.getPermitStatsByLot(false)
-    console.log("Revenue debug:", row.revenue, typeof row.revenue)
 
     return {
       totalPermits: parseInt(row.total),

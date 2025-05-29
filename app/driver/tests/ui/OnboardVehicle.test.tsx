@@ -125,3 +125,13 @@ it('Change Country to make state empty', async () => {
 
   await screen.findByText('Alberta')
 })
+
+it('User can change state', async () => {
+  render(<AddForm />)
+  const user = userEvent.setup()
+  const input = screen.getByLabelText('Select a state')
+  await user.click(input)
+  await user.click(await screen.findByText('California'))
+
+  await screen.findByText('United States')
+})

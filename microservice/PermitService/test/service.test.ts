@@ -124,43 +124,6 @@ test('getPermitsByDay returns permits by day bought', async () => {
   expect(permits.length).toBe(1) // expects 1 from previous test
 })
 
-test('getAllPermits returns future permits', async () => {
-  const now = new Date('2025-03-27T12:00:00Z')
-  vi.setSystemTime(now)
-
-  await permitService.purchaseMyLotPermit({
-    vehicle: '12345678-1234-1234-1234-567890abcdef',
-    lot: 'A',
-    duration: 'quarterly',
-    paymentMethod: 'paypal'
-  })
-
-  const permits = await permitService.getAllPermits(false)
-  expect(permits.length).toBe(2) // expects 1 from previous tests
-
-  vi.useRealTimers()
-})
-
-test('getAllPermits returns expired permits', async () => {
-  const now = new Date('2025-03-27T12:00:00Z')
-  vi.setSystemTime(now)
-
-  await permitService.purchaseMyLotPermit({
-    vehicle: '12345678-1234-1234-1234-567890abcdef',
-    lot: 'B',
-    duration: 'quarterly',
-    paymentMethod: 'paypal'
-  })
-
-  const future = new Date('2025-07-04T12:00:00Z')
-  vi.setSystemTime(future)
-
-  const permits = await permitService.getAllPermits(false)
-  expect(permits.length).toBe(2) // expects 1 from previous tests
-
-  vi.useRealTimers()
-})
-
 test('admin create zone', async () => {
   expect(await permitService.createNewZone({
     zone: 789,
@@ -261,6 +224,59 @@ test('Purchasing a lot permit in advance', async () => {
   const today = new Date().toISOString()
 
   expect(receipt.activeDate).not.toBe(today)
+  
+  vi.useRealTimers()
+})
+
+test('getAllPermits can return future permits', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
+  await permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'A',
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  })
+
+  const permits = await permitService.getAllPermits(false)
+  expect(permits.length).toBe(2) // expects 1 from previous tests
+
+  vi.useRealTimers()
+})
+
+test('getAllPermits can return expired permits', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
+  await permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'B',
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  })
+
+  const future = new Date('2025-07-04T12:00:00Z')
+  vi.setSystemTime(future)
+
+  const permits = await permitService.getAllPermits(false)
+  expect(permits.length).toBe(2) // expects 1 from previous tests
+
+  vi.useRealTimers()
+})
+
+test('Purchasing an expired lot permit doesn\'t work', async () => {
+  const now = new Date('2025-07-04T12:00:00Z')
+  vi.setSystemTime(now)
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(permitService.purchaseMyLotPermit({
+    vehicle: '12345678-1234-1234-1234-567890abcdef',
+    lot: 'A',
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  })).rejects.toThrow('This permit type has expired')
   
   vi.useRealTimers()
 })

@@ -358,10 +358,13 @@ export class PermitService {
 
   public async purchaseMyLotPermit(input: PurchaseLotInput): Promise<Confirmation> {
 
-    const details = await this.getLotDetails(input.lot)
+    const today = new Date()
+
+    const details = (await this.getLotDetails(input.lot))[input.duration as keyof LotDetails]
     const service = 0.50
-    const subTotal = details[input.duration as keyof LotDetails]?.price
+    const subTotal = details?.price
     if (subTotal === undefined) throw new Error('Incorrect permit option')
+    if (details?.expireDate && new Date(details.expireDate) < today) throw new Error('This permit type has expired')
     const total = service + (subTotal as number)
     const receipt = {
       service,
@@ -371,18 +374,15 @@ export class PermitService {
 
     // Stripe processing goes here
 
-
-    const today = new Date()
-
     const purchaseDate = today.toISOString()
-    const beginDate = new Date(details[input.duration as keyof LotDetails]?.activeDate || purchaseDate)
+    const beginDate = new Date(details?.activeDate || purchaseDate)
     const activeDate = today < beginDate ?
       beginDate.toISOString() :
       purchaseDate
     
     const now = new Date()
     const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString()
-    const expireDate = details[input.duration as keyof LotDetails]?.expireDate ?? localMidnight
+    const expireDate = details?.expireDate ?? localMidnight
 
     const data = {
       purchaseDate,

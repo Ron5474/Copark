@@ -598,6 +598,7 @@ test('Driver can purchase a lot permit in advance', async () => {
       query: purchaseLotPermitQuery,
       variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate}}
     })
+    console.log('CONFIRMATION: ', confirmation.body)
 
   expect(confirmation.body.data.purchaseLotPermit.activeDate).not.toBe(now.toISOString())
   

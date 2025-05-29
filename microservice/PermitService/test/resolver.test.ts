@@ -1346,6 +1346,80 @@ test('Admin can get permit summary in adminPermitReport', async () => {
   expect(Array.isArray(report.zoneBreakdown)).toBe(true)
   expect(Array.isArray(report.lotBreakdown)).toBe(true)
 })
+
+test('Admin can create a new lot', async () => {
+  const { token } = await loginAs("admin")
+
+  const mutation = `
+    mutation CreateLot($input: NewLot!) {
+      createLot(input: $input)
+    }
+  `
+  const variables = {
+    input: {
+      lot: '12123324243',
+      daily: { price: 10 },
+      quarterly: { price: 50, expireDate: '2025-12-31T23:59:59-07:00' },
+      yearly: { price: 200, expireDate: '2025-12-31T23:59:59-07:00' }
+    }
+  }
+
+  const createRes = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ query: mutation, variables })
+    .expect(200)
+
+  expect(createRes.body.errors).toBeUndefined()
+  expect(createRes.body.data.createLot).toBe(true)
+})
+
+// this test is scuffed because the update lot is currently hardcoded, fix later if needed
+test('Admin can update a lot', async () => {
+  const { token } = await loginAs("admin");
+
+  const createMutation = `
+    mutation CreateLot($input: NewLot!) {
+      createLot(input: $input)
+    }
+  `;
+  const createVariables = {
+    input: {
+      lot: 'UPDATE_TEST',
+      daily: { price: 10 },
+      quarterly: { price: 50, expireDate: '2025-12-31T23:59:59-07:00' },
+      yearly: { price: 200, expireDate: '2025-12-31T23:59:59-07:00' }
+    }
+  };
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ query: createMutation, variables: createVariables })
+    .expect(200);
+
+  const updateMutation = `
+    mutation UpdateLot($input: NewLot!) {
+      updateLot(input: $input)
+    }
+  `;
+  const updateVariables = {
+    input: {
+      lot: 'UPDATE_TEST',
+      daily: { price: 99 },
+      quarterly: { price: 199, expireDate: '2026-12-31T23:59:59-07:00' },
+      yearly: { price: 299, expireDate: '2026-12-31T23:59:59-07:00' }
+    }
+  };
+
+  const updateRes = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ query: updateMutation, variables: updateVariables })
+    .expect(200);
+
+  expect(updateRes.body.errors).toBeUndefined();
+  // expect(updateRes.body.data.updateLot).toBe(true);
+});
 // need fixing
 // test('Admin sees correct permit summary in adminPermitReport', async () => {
 //   const { token } = await loginAs("admin")

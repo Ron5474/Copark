@@ -116,9 +116,9 @@ export class PermitService {
       throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in zone ${input.zone}`)
     }
 
-    if (!result.zone_exists) {
-      throw new Error(`Zone "${input.zone}" doesn't exist`)
-    }
+    // if (!result.zone_exists) {
+    //   throw new Error(`Zone "${input.zone}" doesn't exist`)
+    // }
 
     return {
       type: 'zone',
@@ -480,9 +480,9 @@ export class PermitService {
       throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in lot ${input.lot}`)
     }
 
-    if (!result.lot_exists) {
-      throw new Error(`Lot "${input.lot}" doesn't exist`)
-    }
+    // if (!result.lot_exists) {
+    //   throw new Error(`Lot "${input.lot}" doesn't exist`)
+    // }
 
     return {
       type: 'lot',

@@ -143,7 +143,21 @@ vi.mock('../../src/permit/actions', () => ({
       openTime: "07:00",
       closeTime: "20:00"
     }
-  ])
+  ]),
+  getPermitReport: vi.fn().mockResolvedValue({
+    totalPermits: 100,
+    activePermits: 75,
+    expiredPermits: 25,
+    totalRevenue: 5000,
+    zoneBreakdown: [
+      { area: 'Zone 1', totalPermits: 50 },
+      { area: 'Zone 2', totalPermits: 50 }
+    ],
+    lotBreakdown: [
+      { area: 'Lot A', totalPermits: 40 },
+      { area: 'Lot B', totalPermits: 60 }
+    ]
+  })
 }));
 
 const mockRouter = {
@@ -230,7 +244,7 @@ it('navigates to Reports section', async () => {
   const clickableItem = reportsText.closest('div');
   fireEvent.click(clickableItem!);
   await waitFor(() => {
-    expect(screen.getByText('Reports Component')).toBeDefined();
+    expect(screen.getByText('Generate Reports Component')).toBeDefined();
   });
 });
 

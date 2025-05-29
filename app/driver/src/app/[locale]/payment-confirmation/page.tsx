@@ -12,7 +12,7 @@ import { useTranslations } from "next-intl";
 
 function PaymentConfirmation() {
   const sessionId = useSearchParams().get("session_id");
-  const [transactionId, setTransactionId] = useState<string | null>(null);
+  // const [transactionId, setTransactionId] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const router = useRouter();
   const t = useTranslations("paymentConfirmation");
@@ -27,7 +27,7 @@ function PaymentConfirmation() {
         return;
       }
       const paymentDetails = await getTransactionDetails(sessionId);
-      setTransactionId(paymentDetails.id);
+      // setTransactionId(paymentDetails.id);
 
       await addPaymentDetails(paymentDetails);
       const permitDetails = sessionStorage.getItem("permitDetails");
@@ -63,10 +63,10 @@ function PaymentConfirmation() {
         <Typography variant="h5" sx={{ fontWeight: 600, color: "green" }}>
           {t("title")}
         </Typography>
-        {transactionId && (
+        {/* {transactionId && (
         <Typography variant="body1" sx={{ fontWeight: 600, color: "gray" }}>
           {t("transaction")} {transactionId}
-        </Typography>)}
+        </Typography>)} */}
         <Typography variant="body1" sx={{ fontWeight: 400, color: "black", marginTop: "1rem" }}>
           {t("description.line1")}
         </Typography>

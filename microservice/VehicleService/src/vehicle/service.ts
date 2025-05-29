@@ -99,11 +99,17 @@ export class VehicleService {
     })))
   }
 
-  public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
-    const existing = await pool.query(
+  private async vehicleExists(plate: string): Promise<{ rowCount: number }> {
+    const res = await pool.query(
       `SELECT id FROM vehicle WHERE LOWER(data->>'plate') = LOWER($1)`,
-      [input.plate]
+      [plate]
     )
+    return {rowCount: res.rows.length};
+  }
+
+  public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
+    const existing = await this.vehicleExists(input.plate)
+
 
     if ((existing?.rowCount ?? 0) > 0) {
       throw new Error('This license plate is already registered')

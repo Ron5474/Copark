@@ -54,5 +54,13 @@ export const authOptions: NextAuthOptions = {
         return null;
       }
     },
+  },callbacks: {
+    async jwt({ token, user, account }) {
+      if (user && account) {
+        // Add issuer claim as the provider name, e.g. 'google', 'facebook', 'github'
+        token.iss = account.provider;
+      }
+      return token;
+    }
   }
 };

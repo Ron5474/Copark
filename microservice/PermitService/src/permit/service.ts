@@ -74,7 +74,7 @@ export class PermitService {
         SELECT id
         FROM type
         WHERE data->>'name' = 'zone'
-        AND TRIM(LOWER(data->>'area')) = TRIM(LOWER($2))
+        AND TRIM(LOWER(data->>'area')) = TRIM($2)
         LIMIT 1
       ),
       duplicate_check AS (
@@ -103,16 +103,22 @@ export class PermitService {
         (SELECT count FROM duplicate_check) AS duplicate_count,
         (SELECT count FROM conflict_check) AS conflict_count,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
-    `, [input.vehicle, input.zone, data, input.transactionId]);
+    `, [input.vehicle, input.zone, data, input.transactionId])
+
+    console.log("ZONE PURCHASE: ", rows)
     
-    const result = rows[0];
+    const result = rows[0]
 
     if (result.duplicate_count > 0) {
-      throw new Error(`Permit for vehicle ${input.vehicle} already exists for zone ${input.zone} with transaction ID ${input.transactionId}`);
+      throw new Error(`Permit for vehicle ${input.vehicle} already exists for zone ${input.zone} with transaction ID ${input.transactionId}`)
     }
 
     if (result.conflict_count > 0) {
-      throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in zone ${input.zone}`);
+      throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in zone ${input.zone}`)
+    }
+
+    if (!result.inserted_row) {
+      throw new Error(`Zone "${input.zone}" doesn't exist`)
     }
 
     // TODO: Hit email api to send confirmation and receipt
@@ -462,20 +468,22 @@ export class PermitService {
         (SELECT count FROM duplicate_check) AS duplicate_count,
         (SELECT count FROM conflict_check) AS conflict_count,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
-    `, [input.vehicle, input.lot, data, input.transactionId]);
+    `, [input.vehicle, input.lot, data, input.transactionId])
     
-    const result = rows[0];
+    const result = rows[0]
 
     if (result.duplicate_count > 0) {
-      throw new Error(`Permit for vehicle ${input.vehicle} already exists for lot ${input.lot} with transaction ID ${input.transactionId}`);
+      throw new Error(`Permit for vehicle ${input.vehicle} already exists for lot ${input.lot} with transaction ID ${input.transactionId}`)
     }
 
     if (result.conflict_count > 0) {
-      throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in lot ${input.lot}`);
+      throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in lot ${input.lot}`)
     }
 
+    if (!result.inserted_row) {
+      throw new Error(`Lot "${input.lot}" doesn't exist`)
+    }
 
-    // TODO: Hit email api to send confirmation and receipt
     return {
       type: 'lot',
       area: input.lot,

@@ -49,8 +49,6 @@ export class PermitService {
       total
     } as Receipt
 
-    // Stripe processing goes here
-
 
     const today = new Date()
 
@@ -107,10 +105,6 @@ export class PermitService {
         (SELECT count FROM zone_exists_check) AS zone_exists,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
     `, [input.vehicle, input.zone, data, input.transactionId, now])
-
-    console.log("ZONE ID: ", rows[0].inserted_row)
-    console.log("DATA: ", data)
-    console.log("ZONE PURCHASE: ", rows)
     
     const result = rows[0]
 
@@ -125,9 +119,6 @@ export class PermitService {
     if (!result.zone_exists) {
       throw new Error(`Zone "${input.zone}" doesn't exist`)
     }
-
-    const { rows: test } = await pool.query(`SELECT * FROM permit WHERE vehicle = 'f2d7800e-67ce-41aa-b1fe-38e679112e0e'`)
-    console.log("TEST DETAILS:", test)
 
     return {
       type: 'zone',
@@ -404,7 +395,7 @@ export class PermitService {
     return (rowCount as number) > 0
   }
 
-  public async purchaseMyLotPermit(input: PurchaseLotInput): Promise<Confirmation> {
+  public async purchaseMyLotPermit(input: PurchaseLotInput, now=new Date()): Promise<Confirmation> {
 
     const today = new Date()
 
@@ -428,7 +419,6 @@ export class PermitService {
       beginDate.toISOString() :
       purchaseDate
     
-    const now = new Date()
     const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString()
     const expireDate = details?.expireDate ?? localMidnight
 
@@ -449,6 +439,9 @@ export class PermitService {
         AND TRIM(LOWER(data->>'area')) = TRIM(LOWER($2))
         LIMIT 1
       ),
+      lot_exists_check AS (
+        SELECT COUNT(*)::int AS count FROM selected_lot
+      ),
       duplicate_check AS (
         SELECT COUNT(*)::int AS count FROM permit
         WHERE data->>'transactionId' = $4
@@ -459,7 +452,7 @@ export class PermitService {
           AND type = (SELECT id FROM selected_lot)
           AND (
             (data->>'expireDate')::timestamptz IS NULL
-            OR (data->>'expireDate')::timestamptz > now()
+            OR (data->>'expireDate')::timestamptz > $5
           )
       ),
       inserted AS (
@@ -474,8 +467,9 @@ export class PermitService {
       SELECT 
         (SELECT count FROM duplicate_check) AS duplicate_count,
         (SELECT count FROM conflict_check) AS conflict_count,
+        (SELECT count FROM lot_exists_check) AS lot_exists,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
-    `, [input.vehicle, input.lot, data, input.transactionId])
+    `, [input.vehicle, input.lot, data, input.transactionId, now.toISOString()])
     
     const result = rows[0]
 
@@ -487,7 +481,7 @@ export class PermitService {
       throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in lot ${input.lot}`)
     }
 
-    if (!result.inserted_row) {
+    if (!result.lot_exists) {
       throw new Error(`Lot "${input.lot}" doesn't exist`)
     }
 

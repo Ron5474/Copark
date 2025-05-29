@@ -97,3 +97,12 @@ it('Displays errors If License Plate is empty', async () => {
 
   expect(await screen.findByText('License plate number is required')).toBeDefined()
 })
+it('Can not enter more than 10 characters', async () => {
+  render(<AddForm />)
+  const user = userEvent.setup()
+  const input = screen.getByLabelText('Enter license plate number')
+  await user.type(input, '012345678912345')
+
+  expect((input as HTMLInputElement).value).toBe('0123456789')
+})
+

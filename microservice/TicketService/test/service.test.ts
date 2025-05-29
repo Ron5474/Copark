@@ -2,13 +2,13 @@
  * @vitest-environment node
  */
 
-import { afterAll, test, expect, beforeEach } from 'vitest';
+import { afterAll, test, expect, beforeEach, vi } from 'vitest';
 import { SignJWT } from 'jose';
 
 import db from './db';
 import { TicketService } from '../src/ticket/service';
 import { ModifyTicketInput, NewTicket, TicketInput } from '../src/ticket/schema';
-
+import { sendTicketIssuedEmail } from '../src/ticket/emailClient';
 
 const ticketService = new TicketService();
 
@@ -394,6 +394,27 @@ test('getUnpaidTicketsPerDay should return unpaid tickets grouped by day', async
 
   expect(unpaidTicketsByDay).toBeDefined();
 });
+
+test('sendTicketIssuedEmail logs error when fetch fails', async () => {
+  // Mock fetch to throw
+  global.fetch = vi.fn().mockRejectedValue(new Error('Simulated failure'))
+
+  // Spy on console.error
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+  await sendTicketIssuedEmail({
+    to: 'test@example.com',
+    subject: 'Test',
+    html: '<p>Test</p>',
+  })
+
+  expect(errorSpy).toHaveBeenCalledWith(
+    'EmailService failed:',
+    expect.any(Error)
+  )
+
+  errorSpy.mockRestore()
+})
 
 // test('getTicketsForUserJWT should return tickets for the provided userJWT', async () => {
 //     const userID = '0f99f921-594e-4387-9d05-e6e80d8aa54a'

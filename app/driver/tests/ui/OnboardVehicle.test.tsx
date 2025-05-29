@@ -115,3 +115,13 @@ it('Adding vehicle continues to Dashboard', async () => {
   await user.click(await screen.findByLabelText('Submit vehicle'))
   expect(push).toHaveBeenCalledWith('/dashboard')
 })
+
+it('Change Country to make state empty', async () => {
+  render(<AddForm />)
+  const user = userEvent.setup()
+  const input = screen.getByLabelText('Select a country')
+  await user.click(input)
+  await user.click(await screen.findByText('Canada'))
+
+  await screen.findByText('Alberta')
+})

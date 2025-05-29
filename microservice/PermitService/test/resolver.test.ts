@@ -202,6 +202,32 @@ const purchaseZoneInput = {
   }
 }
 
+const purchaseLotPermitQuery = `
+mutation PurchaseLotPermit($input: PurchaseLotInput!) {
+  purchaseLotPermit(input: $input) {
+    type
+    area
+    purchaseDate
+    activeDate
+    expireDate
+    receipt {
+      service
+      subTotal
+      total
+    }
+    paymentMethod
+  }
+}`
+
+const purchaseLotInput = {
+  input: {
+    vehicle: "replace with derik's vid",
+    lot: "A",
+    duration: 'quarterly',
+    paymentMethod: 'paypal'
+  }
+}
+
 const checkPermitQuery = `
 query CheckedPermit($plate: String!) {
   checkPermit(plate: $plate) {
@@ -450,6 +476,60 @@ test('Driver can purchase a zone permit with different duration 7', async () => 
   vi.useRealTimers()
 })
 
+test('Driver can\'t purchase a zone permit for wrong car', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: purchaseLotInput
+    })
+
+  expect(confirmation.body.errors[0].message).toBe("Vehicle not found")
+  
+  vi.useRealTimers()
+})
+
+test('Driver can purchase a lot permit', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
+// test('Driver can purchase a lot permit in advance', async () => {
+//   const now = new Date('2025-05-25T12:00:00Z')
+//   vi.setSystemTime(now)
+//   const driver = await loginAs("driver")
+
+//   const confirmation = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + driver.token)
+//     .send({ 
+//       query: purchaseLotPermitQuery,
+//       variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate}}
+//     })
+
+//   expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+//   vi.useRealTimers()
+// })
+
 
 // test('No token to getUserData', async () => {
 //   const receipt = await permitResolver.getUserData(permitDetails)
@@ -554,6 +634,8 @@ test('Driver has no permits', async () => {
 // })
 
 test('Zone details', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
   const { token } = await loginAs("driver")
 
   const details = await supertest(server)
@@ -564,7 +646,8 @@ test('Zone details', async () => {
       variables: zoneDetailsInput
     })
 
-  expect(details.body.data.zoneDetails.hourly).toBe(2.45)
+  expect(details.body.data.zoneDetails.hourly).toBe(2.95)
+  vi.useRealTimers()
 })
 
 test('Admin can get ticket stats grouped by day', async () => {

@@ -106,3 +106,12 @@ it('Can not enter more than 10 characters', async () => {
   expect((input as HTMLInputElement).value).toBe('0123456789')
 })
 
+it('Adding vehicle continues to Dashboard', async () => {
+  render(<AddForm />)
+  const user = userEvent.setup()
+  const input = screen.getByLabelText('Enter license plate number')
+  await user.type(input, 'TEST123')
+
+  await user.click(await screen.findByLabelText('Submit vehicle'))
+  expect(push).toHaveBeenCalledWith('/dashboard')
+})

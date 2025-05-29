@@ -135,3 +135,12 @@ it('User can change state', async () => {
 
   await screen.findByText('United States')
 })
+
+it('User can save nickname for vehicle', async () => {
+  render(<AddForm />)
+  const user = userEvent.setup()
+  const input = screen.getByLabelText('Enter nickname')
+  await user.type(input, 'Good Car')
+
+  await screen.findByText('Alabama')
+})

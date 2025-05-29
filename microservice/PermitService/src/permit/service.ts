@@ -34,7 +34,7 @@ interface LotDetails {
 }
 
 export class PermitService {
-  public async purchaseMyZonePermit(input: PurchaseZoneInput): Promise<Confirmation> {
+  public async purchaseMyZonePermit(input: PurchaseZoneInput, now=new Date().toISOString()): Promise<Confirmation> {
 
     const totalMinutes = (input.duration?.hours || 0) * 60 + (input.duration?.minutes || 0)
 
@@ -77,6 +77,9 @@ export class PermitService {
         AND TRIM(LOWER(data->>'area')) = TRIM($2)
         LIMIT 1
       ),
+      zone_exists_check AS (
+        SELECT COUNT(*)::int AS count FROM selected_zone
+      ),
       duplicate_check AS (
         SELECT COUNT(*)::int AS count FROM permit
         WHERE data->>'transactionId' = $4
@@ -84,27 +87,29 @@ export class PermitService {
       conflict_check AS (
         SELECT COUNT(*)::int AS count FROM permit
         WHERE vehicle = $1
-          AND type = (SELECT id FROM selected_zone)
-          AND (
-            (data->>'expireDate')::timestamptz IS NULL
-            OR (data->>'expireDate')::timestamptz > now()
-          )
+          AND type = (SELECT id FROM selected_zone)::uuid
+          AND (data->>'activeDate')::timestamptz <= $5
+          AND (data->>'expireDate')::timestamptz > $5
       ),
       inserted AS (
         INSERT INTO permit (vehicle, type, data)
         SELECT $1, id, $3
         FROM selected_zone
         WHERE 
-          (SELECT count FROM duplicate_check) = 0 AND
-          (SELECT count FROM conflict_check) = 0
+          (SELECT count FROM zone_exists_check) > 0 AND
+          COALESCE((SELECT count FROM duplicate_check), 0) = 0 AND
+          COALESCE((SELECT count FROM conflict_check), 0) = 0
         RETURNING type, data
       )
       SELECT 
         (SELECT count FROM duplicate_check) AS duplicate_count,
         (SELECT count FROM conflict_check) AS conflict_count,
+        (SELECT count FROM zone_exists_check) AS zone_exists,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
-    `, [input.vehicle, input.zone, data, input.transactionId])
+    `, [input.vehicle, input.zone, data, input.transactionId, now])
 
+    console.log("ZONE ID: ", rows[0].inserted_row)
+    console.log("DATA: ", data)
     console.log("ZONE PURCHASE: ", rows)
     
     const result = rows[0]
@@ -117,19 +122,21 @@ export class PermitService {
       throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in zone ${input.zone}`)
     }
 
-    if (!result.inserted_row) {
+    if (!result.zone_exists) {
       throw new Error(`Zone "${input.zone}" doesn't exist`)
     }
 
-    // TODO: Hit email api to send confirmation and receipt
+    const { rows: test } = await pool.query(`SELECT * FROM permit WHERE vehicle = 'f2d7800e-67ce-41aa-b1fe-38e679112e0e'`)
+    console.log("TEST DETAILS:", test)
+
     return {
       type: 'zone',
       area: input.zone,
-      purchaseDate: rows[0].inserted_row.purchaseDate,
-      activeDate: rows[0].inserted_row.activeDate,
-      expireDate: rows[0].inserted_row.expireDate,
-      receipt: rows[0].inserted_row.receipt,
-      paymentMethod: rows[0].inserted_row.paymentMethod,
+      purchaseDate: result.inserted_row.data.purchaseDate,
+      activeDate: result.inserted_row.data.activeDate,
+      expireDate: result.inserted_row.data.expireDate,
+      receipt: result.inserted_row.data.receipt,
+      paymentMethod: result.inserted_row.data.paymentMethod,
     }
   }
 
@@ -487,11 +494,11 @@ export class PermitService {
     return {
       type: 'lot',
       area: input.lot,
-      purchaseDate: rows[0].inserted_row.purchaseDate,
-      activeDate: rows[0].inserted_row.activeDate,
-      expireDate: rows[0].inserted_row.expireDate,
-      receipt: rows[0].inserted_row.receipt,
-      paymentMethod: rows[0].inserted_row.paymentMethod,
+      purchaseDate: rows[0].inserted_row.data.purchaseDate,
+      activeDate: rows[0].inserted_row.data.activeDate,
+      expireDate: rows[0].inserted_row.data.expireDate,
+      receipt: rows[0].inserted_row.data.receipt,
+      paymentMethod: rows[0].inserted_row.data.paymentMethod,
     }
   }
 

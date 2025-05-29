@@ -8,10 +8,9 @@ import ManageAPIUsers from './components/ManageAPIUsers';
 import ViewStatistics from './components/ViewStatistics';
 import ManageTicketChallenges from './components/ManageTicketChallenges';
 import ManageZones from './components/ManageZones';
-import PermitReportView from './components/PermitReport';
 
 export default function Page() {
-  const [currentComponent, setCurrentComponent] = useState<string>('home');
+  const [currentComponent, setCurrentComponent] = useState<string>('statistics');
 
   const handleNavigate = (component: string) => {
     setCurrentComponent(component);
@@ -28,7 +27,7 @@ export default function Page() {
       case 'statistics':
         return <ViewStatistics />; // No onNavigate prop needed here
       case 'reports':
-        return <Box><PermitReportView/></Box>;
+        return <Box>Generate Reports Component</Box>;
       case 'zones':
         return <ManageZones />;
       default:

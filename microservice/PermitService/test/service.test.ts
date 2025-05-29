@@ -299,3 +299,22 @@ test('updateZonePrice throws if zone does not exist', async () => {
     })
   ).rejects.toThrow('Zone 999999 not found')
 })
+
+test('generatePermitReport returns correct permit report structure', async () => {
+  await permitService.purchaseMyZonePermit({
+    vehicle: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
+    zone: '27',
+    duration: { minutes: 30, hours: 0 },
+    paymentMethod: 'paypal'
+  })
+
+  const report = await permitService.generatePermitReport()
+
+  expect(report).toBeDefined()
+  expect(typeof report.totalPermits).toBe('number')
+  expect(typeof report.activePermits).toBe('number')
+  expect(typeof report.expiredPermits).toBe('number')
+  expect(typeof report.totalRevenue).toBe('number')
+  expect(Array.isArray(report.zoneBreakdown)).toBe(true)
+  expect(Array.isArray(report.lotBreakdown)).toBe(true)
+})

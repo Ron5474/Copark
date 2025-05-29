@@ -547,8 +547,6 @@ export class PermitService {
     }
   }
 
-
-
   public async updateZonePrice(zone: ZoneInput): Promise<Zone[]> {
     // Fetch the existing zone data
     const result = await pool.query(

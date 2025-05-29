@@ -20,6 +20,7 @@ import {
   ZoneStats,
   LotStats,
   PermitReport,
+  ZoneInput
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
@@ -504,6 +505,14 @@ export class PermitResolver {
   @Query(() => PermitReport)
   async adminPermitReport(): Promise<PermitReport> {
     return await service.generatePermitReport()
+  }
+
+  @Authorized(['admin'])
+  @Mutation(() => [Zone])
+  async updateZonePrice(
+    @Arg("input", () => ZoneInput) input: ZoneInput
+  ): Promise<Zone[]> {
+    return await service.updateZonePrice(input)
   }
 
   /*

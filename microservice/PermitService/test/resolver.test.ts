@@ -1346,6 +1346,33 @@ test('Admin can get permit summary in adminPermitReport', async () => {
   expect(Array.isArray(report.zoneBreakdown)).toBe(true)
   expect(Array.isArray(report.lotBreakdown)).toBe(true)
 })
+
+test('Admin can create a new lot', async () => {
+  const { token } = await loginAs("admin")
+
+  const mutation = `
+    mutation CreateLot($input: NewLot!) {
+      createLot(input: $input)
+    }
+  `
+  const variables = {
+    input: {
+      lot: '12123324243',
+      daily: { price: 10 },
+      quarterly: { price: 50, expireDate: '2025-12-31T23:59:59-07:00' },
+      yearly: { price: 200, expireDate: '2025-12-31T23:59:59-07:00' }
+    }
+  }
+
+  const createRes = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ query: mutation, variables })
+    .expect(200)
+
+  expect(createRes.body.errors).toBeUndefined()
+  expect(createRes.body.data.createLot).toBe(true)
+})
 // need fixing
 // test('Admin sees correct permit summary in adminPermitReport', async () => {
 //   const { token } = await loginAs("admin")

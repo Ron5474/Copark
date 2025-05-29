@@ -1,4 +1,5 @@
 import { Stack, Box, Typography, Button, useTheme } from '@mui/material'
+import { useState } from 'react'
 import { ChallengedTicket } from '@/types'
 import { acceptTicketChallenge, rejectTicketChallenge, getChallengedTickets } from '../../../ticket/actions'
 
@@ -12,6 +13,14 @@ interface ChallengedTicketsProps {
 
 export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: ChallengedTicketsProps) {
   const theme = useTheme()
+  const [validImageCounts, setValidImageCounts] = useState<Record<string, number>>({})
+
+  const handleValidImage = (ticketId: string) => {
+    setValidImageCounts(prev => ({
+      ...prev,
+      [ticketId]: (prev[ticketId] || 0) + 1
+    }))
+  }
 
   return (
     <>
@@ -79,23 +88,21 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   {Array.isArray(ticket.images) ? ticket.images.map((image, index) => (
-                    <Box
+                    <img
                       key={index}
-                      component="img"
                       src={image}
                       alt={`Violation evidence ${index + 1}`}
-                      sx={{
+                      style={{
                         maxWidth: '200px',
                         height: 'auto',
                         borderRadius: '8px'
                       }}
                     />
                   )) : (
-                    <Box
-                      component="img"
+                    <img
                       src={ticket.images}
                       alt="Violation evidence"
-                      sx={{
+                      style={{
                         maxWidth: '100%',
                         height: 'auto',
                         borderRadius: '8px'

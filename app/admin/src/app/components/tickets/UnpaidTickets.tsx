@@ -1,5 +1,4 @@
 import { Stack, Box, Typography, useTheme } from '@mui/material'
-import { useState, useEffect } from 'react'
 import { Ticket } from '@/types'
 
 const getShortId = (jwt: string) => jwt.slice(-8).toUpperCase()
@@ -8,43 +7,8 @@ interface UnpaidTicketsProps {
   tickets: Ticket[]
 }
 
-const SafeImage = ({ src, alt, onValidImage, ...props }: { 
-  src: string; 
-  alt: string; 
-  onValidImage: () => void;
-  [key: string]: any 
-}) => {
-  const [hasError, setHasError] = useState(false);
-
-  useEffect(() => {
-    if (!hasError) {
-      onValidImage();
-    }
-  }, [hasError, onValidImage]);
-
-  if (hasError) return null;
-
-  return (
-    <Box
-      component="img"
-      src={src}
-      alt={alt}
-      onError={() => setHasError(true)}
-      {...props}
-    />
-  );
-};
-
 export function UnpaidTickets({ tickets }: UnpaidTicketsProps) {
-  const theme = useTheme();
-  const [validImageCounts, setValidImageCounts] = useState<Record<string, number>>({});
-
-  const handleValidImage = (ticketId: string) => {
-    setValidImageCounts(prev => ({
-      ...prev,
-      [ticketId]: (prev[ticketId] || 0) + 1
-    }));
-  };
+  const theme = useTheme()
 
   return (
     <>
@@ -96,30 +60,28 @@ export function UnpaidTickets({ tickets }: UnpaidTicketsProps) {
               </Box>
             )}
 
-            {ticket.images && validImageCounts[ticket.id] > 0 && (
+            {ticket.images && (
               <Box sx={{ mb: 2 }}>
                 <Typography sx={{ color: theme.palette.text.secondary, fontWeight: 500, mb: 1 }}>
                   Evidence:
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   {Array.isArray(ticket.images) ? ticket.images.map((image, index) => (
-                    <SafeImage
+                    <img
                       key={index}
                       src={image}
                       alt={`Violation evidence ${index + 1}`}
-                      onValidImage={() => handleValidImage(ticket.id)}
-                      sx={{
+                      style={{
                         maxWidth: '200px',
                         height: 'auto',
                         borderRadius: '8px'
                       }}
                     />
                   )) : (
-                    <SafeImage
+                    <img
                       src={ticket.images}
                       alt="Violation evidence"
-                      onValidImage={() => handleValidImage(ticket.id)}
-                      sx={{
+                      style={{
                         maxWidth: '100%',
                         height: 'auto',
                         borderRadius: '8px'

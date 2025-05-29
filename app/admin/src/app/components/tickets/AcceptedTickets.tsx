@@ -61,20 +61,34 @@ export function AcceptedTickets({ tickets }: AcceptedTicketsProps) {
             )}
 
             {ticket.images && (
-              <Box>
+              <Box sx={{ mb: 2 }}>
                 <Typography sx={{ color: theme.palette.text.secondary, fontWeight: 500, mb: 1 }}>
                   Evidence:
                 </Typography>
-                <Box
-                  component="img"
-                  src={ticket.images}
-                  alt="Violation evidence"
-                  sx={{
-                    maxWidth: '100%',
-                    height: 'auto',
-                    borderRadius: '8px'
-                  }}
-                />
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                  {Array.isArray(ticket.images) ? ticket.images.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`Violation evidence ${index + 1}`}
+                      style={{
+                        maxWidth: '200px',
+                        height: 'auto',
+                        borderRadius: '8px'
+                      }}
+                    />
+                  )) : (
+                    <img
+                      src={ticket.images}
+                      alt="Violation evidence"
+                      style={{
+                        maxWidth: '100%',
+                        height: 'auto',
+                        borderRadius: '8px'
+                      }}
+                    />
+                  )}
+                </Box>
               </Box>
             )}
           </Box>

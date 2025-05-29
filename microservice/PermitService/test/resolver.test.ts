@@ -1127,6 +1127,44 @@ test('Admin can update zone price', async () => {
   expect(updatedZones[0].openTime).toBe("07:30")
   expect(updatedZones[0].closeTime).toBe("21:00")
 })
+
+test('Admin can get permit summary in adminPermitReport', async () => {
+  const { token } = await loginAs("admin")
+
+  const query = `
+    query {
+      adminPermitReport {
+        totalPermits
+        activePermits
+        expiredPermits
+        totalRevenue
+        zoneBreakdown {
+          area
+          totalPermits
+        }
+        lotBreakdown {
+          area
+          totalPermits
+        }
+      }
+    }
+  `
+
+  const res = await supertest(server)
+    .post("/graphql")
+    .set("Authorization", `Bearer ${token}`)
+    .send({ query })
+
+  expect(res.body.errors).toBeUndefined()
+
+  const report = res.body.data.adminPermitReport
+
+  expect(report.totalPermits).toBeGreaterThanOrEqual(1)
+  expect(report.activePermits).toBeGreaterThanOrEqual(1)
+
+  expect(Array.isArray(report.zoneBreakdown)).toBe(true)
+  expect(Array.isArray(report.lotBreakdown)).toBe(true)
+})
 // need fixing
 // test('Admin sees correct permit summary in adminPermitReport', async () => {
 //   const { token } = await loginAs("admin")

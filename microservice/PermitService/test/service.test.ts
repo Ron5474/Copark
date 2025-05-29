@@ -273,13 +273,21 @@ test('Purchasing an expired lot permit doesn\'t work', async () => {
   vi.useRealTimers()
 })
 
-test('Purchasing same zone permit transaction ID twice', async () => {
+test('Purchasing same lot permit transaction ID twice', async () => {
   await permitService.purchaseMyLotPermit(lotPermitDetails)
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
   await expect(permitService.purchaseMyLotPermit(lotPermitDetails)).rejects.toThrow(`Permit for vehicle ${lotPermitDetails.vehicle} already exists for lot ${lotPermitDetails.lot} with transaction ID ${lotPermitDetails.transactionId}`)
 })
+
+// test('Purchasing same lot permit twice - different lots', async () => {
+//   await permitService.purchaseMyLotPermit(lotPermitDetails)
+
+//   // eslint-disable-next-line @typescript-eslint/no-empty-function
+//   vi.spyOn(console, 'error').mockImplementation(() => {})
+//   await expect(permitService.purchaseMyLotPermit({...lotPermitDetails, transactionId: 'somethingElse', lot: 'B'})).rejects.toThrow(`Vehicle ${lotPermitDetails.vehicle} already has an active permit of this type in lot B`)
+// })
 
 // test('Purchasing quarterly lot permit works', async () => {
 //   const receipt = await permitService.purchaseMyLotPermit({

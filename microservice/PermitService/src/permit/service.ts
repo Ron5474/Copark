@@ -115,10 +115,6 @@ export class PermitService {
       throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in zone ${input.zone}`);
     }
 
-    if (!result.inserted_row) {
-      throw new Error(`Permit creation failed unexpectedly.`);
-    }
-
     // TODO: Hit email api to send confirmation and receipt
     return {
       type: 'zone',
@@ -476,10 +472,6 @@ export class PermitService {
 
     if (result.conflict_count > 0) {
       throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in lot ${input.lot}`);
-    }
-
-    if (!result.inserted_row) {
-      throw new Error(`Permit creation failed unexpectedly.`);
     }
 
 

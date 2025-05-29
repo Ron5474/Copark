@@ -111,6 +111,20 @@ const vehicle = (server: Server, failGet=false, failAdd=false): void => {
           }
         }
 
+        if (body.query.includes('query defaultVehicle')) {
+          if (!failGet) {
+            return HttpResponse.json({
+              data: {
+                getDefaultVehicle: undefined,
+              },
+            })
+          } else {
+            return HttpResponse.json({
+              errors: [{ message: 'Failed to connect' }],
+            }, { status: 200 })
+          }
+        }
+
         if (body.query.includes('mutation RegisterVehicle')) {
           const inputVehicle = body.variables?.input
 

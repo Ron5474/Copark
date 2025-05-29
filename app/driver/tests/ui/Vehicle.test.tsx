@@ -24,13 +24,18 @@ const push = vi.fn();
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({
     push
-  })
+  }),
+  Link: ({ children, href, ...props }: { children: React.ReactNode, href: string, [key: string]: any }) => (
+    <a href={href} {...props}>{children}</a>
+  ),
+  usePathname: () => '/test',
 }))
 
 vi.mock('../../src/app/[locale]/vehicle/actions', () => ({
   getVehicles: vi.fn(),
   addVehicle: vi.fn().mockImplementation((vehicle) =>
-    Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174000', ...vehicle }))
+    Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174000', ...vehicle })),
+  getDefaultVehicle: vi.fn().mockResolvedValue({ plate: 'ABC123' }),
 }))
 
 vi.mock('@/app/[locale]/zone/actions', () => ({

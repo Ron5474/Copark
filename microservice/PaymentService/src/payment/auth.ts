@@ -31,7 +31,7 @@ export class AuthService {
         throw new Error("Unauthorized");
       }
   
-      return {id: userData.id};
+      return {id: userData.id, email: userData.email, name: userData.name, role: userData.role} as SessionUser;
     } catch {
       throw new Error("Unauthorized");
     }

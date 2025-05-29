@@ -85,7 +85,8 @@ export async function addPermitDetails(
       vehicle: JSON.parse(addPermitDetails.vehicle as unknown as string)?.plate,
       zone: addPermitDetails.zone,
       duration: addPermitDetails.duration,
-      paymentMethod: payment_method
+      paymentMethod: payment_method,
+      transactionId: details.id
     }
 
   }
@@ -131,7 +132,8 @@ export async function addPermitDetails(
       vehicle: vehicle.data.getDefaultVehicle.plate,
       lot: addPermitDetails.lot,
       duration: addPermitDetails.duration,
-      paymentMethod: payment_method
+      paymentMethod: payment_method,
+      transactionId: details.id
     }
   }
 
@@ -151,7 +153,7 @@ export async function addPermitDetails(
   });
 
   const result = await res.json();
-  
+  console.log("result", result);
 
   if (await result.errors !== undefined) {
     throw new Error("Failed to save permit details");

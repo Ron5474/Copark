@@ -125,28 +125,6 @@ export class NewLot {
 }
 
 @ObjectType()
-export class LotTypeDetails {
-  @Field(() => Number)
-  price!: number
-
-  @Field(() => String, { nullable: true })
-  expireDate?: string
-}
-
-@ObjectType()
-export class LotDetails {
-
-  @Field(() => LotTypeDetails, { nullable: true })
-  daily?: LotTypeDetails
-
-  @Field(() => LotTypeDetails, { nullable: true })
-  quarterly?: LotTypeDetails
-
-  @Field(() => LotTypeDetails, { nullable: true })
-  yearly?: LotTypeDetails
-}
-
-@ObjectType()
 export class Receipt {
 
   @Field(() => Number)
@@ -208,6 +186,9 @@ export class PurchaseZoneInput {
 
   @Field(() => String)
   paymentMethod!: string
+
+  @Field(() => String)
+  transactionId!: string
 }
 
 
@@ -224,6 +205,9 @@ export class PurchaseLotInput {
 
   @Field(() => String)
   paymentMethod!: string
+
+  @Field(() => String)
+  transactionId!: string
 }
 
 @ObjectType()
@@ -246,34 +230,37 @@ export class IsValidPolice {
 @ObjectType()
 export class PermitsByDay {
   @Field(() => String)
-  date!: string;
+  date!: string
 
   @Field(() => [Permit])
-  permits!: Permit[];
+  permits!: Permit[]
 }
 
 @ObjectType()
 export class Lot {
   @Field(() => String)
-  name!: string;
+  name!: string
 
   @Field(() => String)
-  price!: string;
+  price!: string
 
   @Field(() => String)
-  expireDate!: string;
+  activeDate?: string
+
+  @Field(() => String)
+  expireDate?: string
 }
 
 @ObjectType()
 export class LotGroup {
   @Field(() => String)
-  id!: string;
+  id!: string
 
   @Field(() => String)
-  title!: string;
+  title!: string
 
   @Field(() => [Lot])
-  lots!: Lot[];
+  lots!: Lot[]
 }
 
 @ObjectType()
@@ -292,6 +279,45 @@ export class Zone {
 
   @Field(() => String)
   closeTime!: string
+}
+
+@ObjectType()
+export class ZoneStats {
+  @Field(() => String)
+  area!: string
+
+  @Field(() => Number)
+  totalPermits!: number
+}
+
+@ObjectType()
+export class LotStats {
+  @Field(() => String)
+  area!: string
+
+  @Field(() => Number)
+  totalPermits!: number
+}
+
+@ObjectType()
+export class PermitReport {
+  @Field(() => Float)
+  totalPermits!: number
+
+  @Field(() => Float)
+  activePermits!: number
+
+  @Field(() => Float)
+  expiredPermits!: number
+
+  @Field(() => Float)
+  totalRevenue!: number
+
+  @Field(() => [ZoneStats])
+  zoneBreakdown!: ZoneStats[]
+
+  @Field(() => [LotStats])
+  lotBreakdown!: LotStats[]
 }
 
 @InputType()

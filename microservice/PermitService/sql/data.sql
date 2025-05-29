@@ -129,10 +129,12 @@ INSERT INTO type (id, location, data) VALUES
       ),
       'quarterly', jsonb_build_object(
         'price', 200,
+        'activeDate', '2025-03-31T00:00:00-07:00',
         'expireDate', '2025-06-12T23:59:59-07:00'
       ),
       'yearly', jsonb_build_object(
         'price', 500,
+        'activeDate', '2024-09-21T00:00:00-07:00',
         'expireDate', '2025-06-12T23:59:59-07:00'
       )
     )
@@ -150,10 +152,12 @@ INSERT INTO type (id, location, data) VALUES
       ),
       'quarterly', jsonb_build_object(
         'price', 150,
+        'activeDate', '2025-03-31T00:00:00-07:00',
         'expireDate', '2025-06-12T23:59:59-07:00'
       ),
       'yearly', jsonb_build_object(
         'price', 350,
+        'activeDate', '2024-09-21T00:00:00-07:00',
         'expireDate', '2025-06-12T23:59:59-07:00'
       )
     )
@@ -171,10 +175,12 @@ INSERT INTO type (id, location, data) VALUES
       ),
       'quarterly', jsonb_build_object(
         'price', 120,
+        'activeDate', '2025-03-31T00:00:00-07:00',
         'expireDate', '2025-06-12T23:59:59-07:00'
       ),
       'yearly', jsonb_build_object(
         'price', 300,
+        'activeDate', '2024-09-21T00:00:00-07:00',
         'expireDate', '2025-06-12T23:59:59-07:00'
       )
     )
@@ -192,10 +198,12 @@ INSERT INTO type (id, location, data) VALUES
       ),
       'quarterly', jsonb_build_object(
         'price', 100,
+        'activeDate', '2025-03-31T00:00:00-07:00',
         'expireDate', '2025-06-12T23:59:59-07:00'
       ),
       'yearly', jsonb_build_object(
         'price', 250,
+        'activeDate', '2024-09-21T00:00:00-07:00',
         'expireDate', '2025-06-12T23:59:59-07:00'
       )
     )
@@ -213,10 +221,12 @@ INSERT INTO type (id, location, data) VALUES
       ),
       'quarterly', jsonb_build_object(
         'price', 80,
+        'activeDate', '2025-03-31T00:00:00-07:00',
         'expireDate', '2025-06-12T23:59:59-07:00'
       ),
       'yearly', jsonb_build_object(
         'price', 200,
+        'activeDate', '2024-09-21T00:00:00-07:00',
         'expireDate', '2025-06-12T23:59:59-07:00'
       )
     )

@@ -3,12 +3,13 @@ import { pool } from "./db";
 import { SessionUser } from "../index";
 import { AuthUser, Credentials, User, OauthLoginData, loginResponse} from "./index";
 import { OauthUser } from "../index.d";
-
+// import { OAuth2Client } from 'google-auth-library';
 import { SignJWT, jwtVerify } from 'jose'
 
 // console.log('JWT Secret', process.env.JWT_SECRET)
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+// const oAuthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export class AuthService {
   public async authenticate(credentials: Credentials): Promise<User|undefined> {
@@ -154,6 +155,19 @@ export class AuthService {
       } else {
         if (payload.name && payload.email && payload.picture && payload.sub) {
           const payloadObj = payload as unknown as OauthLoginData;
+          // console.log("Payload", payload);
+          // if  (payload.iss?.includes("google")) {
+          //   try {
+          //     const ticket = await oAuthClient.verifyIdToken({
+          //       idToken: token,
+          //       audience: process.env.GOOGLE_CLIENT_ID,
+          //     });
+          //     ticket.getPayload(); // will throw if token is invalid or revoked
+          //   } catch {
+          //       throw new Error("Unauthorized (invalid Google token)");
+          //   }
+          // } 
+
           const uid: OauthLoginData = {
             type: "OauthUserData",
             name: payloadObj.name,
@@ -169,6 +183,7 @@ export class AuthService {
               throw new Error("Unauthorized2");
             }
           }
+
           return {type: "OauthUser", id: user.id, name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub, role: user.role };
         } else {
           throw new Error("Invalid token payload");

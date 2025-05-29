@@ -1,12 +1,13 @@
-import { render, waitFor, cleanup } from '@testing-library/react';
+import { render, waitFor, cleanup, screen } from '@testing-library/react';
 import { vi, it, expect, afterEach } from 'vitest';
 
 import { mockNextIntl } from './mockTranslations'
 mockNextIntl()
-import Page from '@/app/[locale]/dashboard/page';
+import MobileNavBar from '@/app/[locale]/dashboard/BottomNav';
 import { getUser } from '@/app/[locale]/shared/actions';
 import { userLoginAttempt } from '@/app/[locale]/dashboard/actions';
 import { signOut } from 'next-auth/react';
+import userEvent from '@testing-library/user-event';
 
 vi.mock('next-auth/react', () => {
   return {
@@ -19,6 +20,7 @@ vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
   }),
+  usePathname: () => '/test',
 }))
 
 vi.mock('next/headers', () => {
@@ -83,11 +85,16 @@ it('Redirects to /driver/en/login signOut when userLoginSignUpAttempt fails', as
 
   vi.mocked(userLoginAttempt).mockResolvedValue(undefined)
 
-  render(<Page />);
+  render(<MobileNavBar />);
+  await userEvent.click(await screen.findByText('Settings'))
+  await waitFor(() => {
+    expect(screen.findByText('Logout')).toBeDefined()
+  })
+  await userEvent.click(await screen.findByText('Logout'))
 
   await waitFor(() => {
     expect(signOut).toHaveBeenCalledWith({
-      callbackUrl: `${window.location.origin}/driver/en/login`,
+      callbackUrl: `/`,
     })
   })
 })

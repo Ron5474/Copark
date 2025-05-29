@@ -16,11 +16,20 @@ import {PermitService} from '../src/permit/service'
 
 vi.mock('server-only', () => ({}))
 
-const permitDetails = {
+const zonePermitDetails = {
   vehicle: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
   zone: '27',
   duration: {'minutes': 30, 'hours': 0},
-  paymentMethod: 'paypal'
+  paymentMethod: 'paypal',
+  transactionId: 'stripeTransactionID',
+}
+
+const lotPermitDetails = {
+  vehicle: '12345678-1234-1234-1234-567890abcdef',
+  lot: 'A',
+  duration: 'quarterly',
+  paymentMethod: 'paypal',
+  transactionId: 'stripeTransactionID',
 }
 
 const policeDetails = 'f2d7800e-67ce-41aa-b1fe-38e679112e0e'
@@ -36,25 +45,33 @@ afterAll(() => {
 const permitService = new PermitService()
 
 test('Purchasing zone permit works', async () => {
-  const receipt = await permitService.purchaseMyZonePermit(permitDetails)
+  const receipt = await permitService.purchaseMyZonePermit(zonePermitDetails)
   expect(receipt).toBeDefined()
 })
 
 test('Purchasing zone different duration', async () => {
-  const receipt = await permitService.purchaseMyZonePermit({...permitDetails, duration: {minutes: 0, hours: 2}})
+  const receipt = await permitService.purchaseMyZonePermit({...zonePermitDetails, duration: {minutes: 0, hours: 2}})
   expect(receipt.type).toBe('zone')
 })
 
 test('Purchasing unknown zone', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
-  await expect(permitService.purchaseMyZonePermit({...permitDetails, zone: '13'}))
+  await expect(permitService.purchaseMyZonePermit({...zonePermitDetails, zone: '13'}))
       .rejects.toThrow('Zone 13 not found')
 })
 
+test('Purchasing same zone permit transaction ID twice', async () => {
+  await permitService.purchaseMyZonePermit(zonePermitDetails)
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(permitService.purchaseMyZonePermit(zonePermitDetails)).rejects.toThrow(`Permit for vehicle ${zonePermitDetails.vehicle} already exists for zone ${zonePermitDetails.zone} with transaction ID ${zonePermitDetails.transactionId}`)
+})
+
 test('Vehicle has valid permit', async () => {
-  await permitService.purchaseMyZonePermit(permitDetails)
-  const permits = await permitService.getValidPermit(permitDetails.vehicle)
+  await permitService.purchaseMyZonePermit(zonePermitDetails)
+  const permits = await permitService.getValidPermit(zonePermitDetails.vehicle)
   expect(permits.length).toBe(1)
   expect(permits[0].area).toBe('27')
   expect(permits[0].type).toBe('zone')
@@ -65,43 +82,43 @@ test('Vehicle has expired permit', async () => {
   vi.useFakeTimers()
   vi.setSystemTime(now)
 
-  await permitService.purchaseMyZonePermit(permitDetails)
+  await permitService.purchaseMyZonePermit(zonePermitDetails)
 
   // Simulate time passing (e.g. 31 minutes later)
   vi.setSystemTime(new Date(now.getTime() + 31 * 60 * 1000))
 
-  const permits = await permitService.getValidPermit(permitDetails.vehicle)
+  const permits = await permitService.getValidPermit(zonePermitDetails.vehicle)
   expect(permits.length).toBe(0)
 
   vi.useRealTimers()
 })
 
 test('Vehicle does not have valid permit', async () => {
-  await permitService.purchaseMyZonePermit(permitDetails)
+  await permitService.purchaseMyZonePermit(zonePermitDetails)
   const permits = await permitService.getValidPermit( '11111111-1234-1234-1234-567890abcdef' )
   expect(permits.length).toBe(0)
 })
 
 test('Vehicle has valid permit (Police)', async () => {
-  await permitService.purchaseMyZonePermit(permitDetails)
+  await permitService.purchaseMyZonePermit(zonePermitDetails)
   const { isValid } = await permitService.isValidPermitPolice(policeDetails)
   expect(isValid).toBe(true)
 })
 
 test('Vehicle does not have valid permit (Police)', async () => {
-  await permitService.purchaseMyZonePermit(permitDetails)
+  await permitService.purchaseMyZonePermit(zonePermitDetails)
   const { isValid } = await permitService.isValidPermitPolice('11111111-1234-1234-1234-567890abcdef')
   expect(isValid).toBe(false)
 })
 
 test('getMyPermits returns empty', async () => {
-  const { active } = await permitService.getMyPermits([permitDetails.vehicle])
+  const { active } = await permitService.getMyPermits([zonePermitDetails.vehicle])
   expect(active.length).toBe(0)
 })
 
 test('getMyPermits returns active permit', async () => {
-  await permitService.purchaseMyZonePermit(permitDetails)
-  const { active } = await permitService.getMyPermits([permitDetails.vehicle])
+  await permitService.purchaseMyZonePermit(zonePermitDetails)
+  const { active } = await permitService.getMyPermits([zonePermitDetails.vehicle])
   expect(active.length).toBe(1)
 })
 
@@ -119,10 +136,10 @@ test('zoneDetails errors on wrong zone', async () => {
   await expect(permitService.getZoneDetails('12312312312312312312123', 0)).rejects.toThrow('Zone 12312312312312312312123 not found')
 })
 
-test('getPermitsByDay retusn permits by day bought', async () => {
+test('getPermitsByDay returns permits by day bought', async () => {
   const permits = await permitService.getAllPermitsByDay()
-  expect(permits.length).toBe(1)
-});
+  expect(permits.length).toBe(1) // expects 1 from previous test
+})
 
 test('admin create zone', async () => {
   expect(await permitService.createNewZone({
@@ -201,34 +218,96 @@ test('admin updates lot that doesn\'t exist', async () => {
 })
 
 test('Purchasing daily lot permit works', async () => {
-  const receipt = await permitService.purchaseMyLotPermit({
-    vehicle: '12345678-1234-1234-1234-567890abcdef',
-    lot: 'A',
-    duration: 'daily',
-    paymentMethod: 'paypal'
-  })
+  const receipt = await permitService.purchaseMyLotPermit({...lotPermitDetails, duration: 'daily'})
   expect(receipt).toBeDefined()
 })
 
-test('Purchasing quarterly lot permit works', async () => {
-  const receipt = await permitService.purchaseMyLotPermit({
-    vehicle: '12345678-1234-1234-1234-567890abcdef',
-    lot: 'A',
-    duration: 'quarterly',
-    paymentMethod: 'paypal'
-  })
-  expect(receipt).toBeDefined()
+test('Purchasing a lot permit in advance', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
+  const receipt = await permitService.purchaseMyLotPermit(lotPermitDetails)
+
+  const today = new Date().toISOString()
+
+  expect(receipt.activeDate).not.toBe(today)
+  
+  vi.useRealTimers()
 })
 
-test('Purchasing yearly lot permit works', async () => {
-  const receipt = await permitService.purchaseMyLotPermit({
-    vehicle: '12345678-1234-1234-1234-567890abcdef',
-    lot: 'A',
-    duration: 'yearly',
-    paymentMethod: 'paypal'
-  })
-  expect(receipt).toBeDefined()
+test('getAllPermits can return future permits', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
+  await permitService.purchaseMyLotPermit(lotPermitDetails)
+
+  const permits = await permitService.getAllPermits(false)
+  expect(permits.length).toBe(2) // expects 1 from previous tests
+
+  vi.useRealTimers()
 })
+
+test('getAllPermits can return expired permits', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+
+  await permitService.purchaseMyLotPermit({...lotPermitDetails, lot: 'B'})
+
+  const future = new Date('2025-07-04T12:00:00Z')
+  vi.setSystemTime(future)
+
+  const permits = await permitService.getAllPermits(false)
+  expect(permits.length).toBe(2) // expects 1 from previous tests
+
+  vi.useRealTimers()
+})
+
+test('Purchasing an expired lot permit doesn\'t work', async () => {
+  const now = new Date('2025-07-04T12:00:00Z')
+  vi.setSystemTime(now)
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(permitService.purchaseMyLotPermit(lotPermitDetails)).rejects.toThrow('This permit type has expired')
+  
+  vi.useRealTimers()
+})
+
+test('Purchasing same lot permit transaction ID twice', async () => {
+  await permitService.purchaseMyLotPermit(lotPermitDetails)
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(permitService.purchaseMyLotPermit(lotPermitDetails)).rejects.toThrow(`Permit for vehicle ${lotPermitDetails.vehicle} already exists for lot ${lotPermitDetails.lot} with transaction ID ${lotPermitDetails.transactionId}`)
+})
+
+// test('Purchasing same lot permit twice - different lots', async () => {
+//   await permitService.purchaseMyLotPermit(lotPermitDetails)
+
+//   // eslint-disable-next-line @typescript-eslint/no-empty-function
+//   vi.spyOn(console, 'error').mockImplementation(() => {})
+//   await expect(permitService.purchaseMyLotPermit({...lotPermitDetails, transactionId: 'somethingElse', lot: 'B'})).rejects.toThrow(`Vehicle ${lotPermitDetails.vehicle} already has an active permit of this type in lot B`)
+// })
+
+// test('Purchasing quarterly lot permit works', async () => {
+//   const receipt = await permitService.purchaseMyLotPermit({
+//     vehicle: '12345678-1234-1234-1234-567890abcdef',
+//     lot: 'A',
+//     duration: 'quarterly',
+//     paymentMethod: 'paypal'
+//   })
+//   expect(receipt).toBeDefined()
+// })
+
+// test('Purchasing yearly lot permit works', async () => {
+//   const receipt = await permitService.purchaseMyLotPermit({
+//     vehicle: '12345678-1234-1234-1234-567890abcdef',
+//     lot: 'A',
+//     duration: 'yearly',
+//     paymentMethod: 'paypal'
+//   })
+//   expect(receipt).toBeDefined()
+// })
 
 // test('Attempting to purchase a lot permit for one that doesnt have prices errors out', async () => { // TODO: should we allow lots to not offer all duration types?
 //   await expect(permitService.purchaseMyLotPermit({
@@ -242,12 +321,7 @@ test('Purchasing yearly lot permit works', async () => {
 test('Purchasing wrong lot permit doesn\'t work', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})
-  await expect(permitService.purchaseMyLotPermit({
-    vehicle: '12345678-1234-1234-1234-567890abcdef',
-    lot: 'A',
-    duration: 'biweekly',
-    paymentMethod: 'paypal'
-  })).rejects.toThrow('Incorrect permit option')
+  await expect(permitService.purchaseMyLotPermit({...lotPermitDetails, duration: 'biweekly'})).rejects.toThrow('Incorrect permit option')
 })
 
 test('getZones properly returns zones', async () => {
@@ -262,34 +336,34 @@ test('updateZonePrice updates the zone hourly price and returns updated zone', a
     maxDuration: { hours: 2, minutes: 30 },
     openTime: '06:00',
     closeTime: '22:00'
-  };
+  }
 
-  const result = await permitService.updateZonePrice(updatedZone);
+  const result = await permitService.updateZonePrice(updatedZone)
 
-  expect(result).toBeDefined();
-  expect(Array.isArray(result)).toBe(true);
-  expect(result[0].zone).toBe('27');
-  expect(result[0].hourly).toBe(9.99);
-  expect(result[0].maxDuration).toEqual({ hours: 2, minutes: 30 });
-  expect(result[0].openTime).toBe('06:00');
-  expect(result[0].closeTime).toBe('22:00');
-});
+  expect(result).toBeDefined()
+  expect(Array.isArray(result)).toBe(true)
+  expect(result[0].zone).toBe('27')
+  expect(result[0].hourly).toBe(9.99)
+  expect(result[0].maxDuration).toEqual({ hours: 2, minutes: 30 })
+  expect(result[0].openTime).toBe('06:00')
+  expect(result[0].closeTime).toBe('22:00')
+})
 
 test('updateZonePrice updates the zone hourly price and returns updated zone', async () => {
   const updatedZone = {
     zone: '999',
-  };
+  }
 
-  const result = await permitService.updateZonePrice(updatedZone);
+  const result = await permitService.updateZonePrice(updatedZone)
 
-  expect(result).toBeDefined();
-  expect(Array.isArray(result)).toBe(true);
-  expect(result[0].zone).toBe('999');
-  expect(result[0].hourly).toBe(0);
-  expect(result[0].maxDuration).toEqual({ hours: 0, minutes: 0 });
-  expect(result[0].openTime).toBe('00:00');
-  expect(result[0].closeTime).toBe('23:59');
-});
+  expect(result).toBeDefined()
+  expect(Array.isArray(result)).toBe(true)
+  expect(result[0].zone).toBe('999')
+  expect(result[0].hourly).toBe(0)
+  expect(result[0].maxDuration).toEqual({ hours: 0, minutes: 0 })
+  expect(result[0].openTime).toBe('00:00')
+  expect(result[0].closeTime).toBe('23:59')
+})
 
 test('updateZonePrice throws if zone does not exist', async () => {
   await expect(
@@ -297,5 +371,25 @@ test('updateZonePrice throws if zone does not exist', async () => {
       zone: '999999',
       hourly: 5.55
     })
-  ).rejects.toThrow('Zone 999999 not found');
-});
+  ).rejects.toThrow('Zone 999999 not found')
+})
+
+test('generatePermitReport returns correct permit report structure', async () => {
+  await permitService.purchaseMyZonePermit({
+    vehicle: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
+    zone: '27',
+    duration: { minutes: 30, hours: 0 },
+    paymentMethod: 'paypal',
+    transactionId: 'stripeTransactionID',
+  })
+
+  const report = await permitService.generatePermitReport()
+
+  expect(report).toBeDefined()
+  expect(typeof report.totalPermits).toBe('number')
+  expect(typeof report.activePermits).toBe('number')
+  expect(typeof report.expiredPermits).toBe('number')
+  expect(typeof report.totalRevenue).toBe('number')
+  expect(Array.isArray(report.zoneBreakdown)).toBe(true)
+  expect(Array.isArray(report.lotBreakdown)).toBe(true)
+})

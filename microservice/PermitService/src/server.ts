@@ -1,14 +1,19 @@
 import * as dotenv from 'dotenv'
 import { resolve } from 'path'
 
-const isBuilt = __dirname.includes('/build') || __dirname.includes('\\build');
-const p = resolve(__dirname, isBuilt ? '../../../.prod.env': '../../../.env')
+// const isBuilt = __dirname.includes('/build') || __dirname.includes('\\build')
+// const p = resolve(__dirname, isBuilt ? '../../../.prod.env': '../../../.env')
+export function getEnvPath(dir: string): string {
+  const isBuilt = dir.includes('/build') || dir.includes('\\build')
+  return resolve(dir, isBuilt ? '../../../.prod.env' : '../../../.env')
+}
+const p = getEnvPath(__dirname)
 dotenv.config({ path: p})
 
 
 import { app, bootstrap } from './app'
 
-app.listen(4003, async () => {
-  await bootstrap()
+app.listen(4003, () => {
+  bootstrap()
   console.log('Running a GraphQL Playground at http://localhost:4003/playground')
 })

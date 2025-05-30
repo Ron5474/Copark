@@ -99,7 +99,7 @@ function Topbar() {
             </IconButton>
           ) : (
             <Box sx={{ ml: 1 }}>
-              <Typography variant="subtitle1" fontWeight="bold" color="primary">
+              <Typography variant="subtitle1" fontWeight="bold" sx={{color: theme.palette.primary.main}}>
                 CoPark
               </Typography>
             </Box>

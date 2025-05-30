@@ -81,6 +81,9 @@ export default function SplashScreen() {
         justifyContent: 'center',
         width: '100%',
         padding: 2,
+        fontSize: '1.15rem',
+        textTransform: 'none',
+        gap: 1,
       }} onClick={handleNext}>
         <AddIcon />
         {t("prompt")}

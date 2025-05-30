@@ -124,6 +124,9 @@ export class VehicleService {
     if ((existing?.rowCount ?? 0) === 0) {
       throw new Error('Vehicle not found or not owned by user')
     }
+    if (!existing) {
+      throw new Error('Vehicle not found or not owned by user')
+    }
 
     const vehicles = await this.getMyVehicles(userId)
 
@@ -167,6 +170,31 @@ export class VehicleService {
     if (pendingTicketsData.data.pendingTickets.length > 0) {
       throw new Error('Vehicle cannot be removed because it has pending tickets');
     }
+
+    // expire permits on this vehicle
+    const expirePermits = await fetch(`http://localhost:4003/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        query: `
+          mutation ExpirePermits($vehicleId: String!) {
+            expirePermits(vehicleId: $vehicleId) {
+              id
+            }
+          }
+        `,
+        variables: { vehicleId: existing.rows[0].id }
+      })
+    });
+    const expirePermitsData = await expirePermits.json();
+    if (expirePermitsData.errors) {
+      console.error('Error expiring permits: ', expirePermitsData.errors);
+      throw new Error('Failed to expire permits. Please try again later.');
+    }
+    
 
     const res = await pool.query(
       `UPDATE vehicle

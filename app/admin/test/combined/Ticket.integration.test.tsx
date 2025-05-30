@@ -11,6 +11,38 @@ import {
   getAcceptedTickets 
 } from '../../src/ticket/actions';
 
+// Mock permit actions
+vi.mock('../../src/permit/actions', () => ({
+  getAllPermitsByDay: vi.fn().mockResolvedValue([
+    {
+      date: '2024-01-01',
+      permits: [
+        {
+          vehicle: 'ABC123',
+          type: 'zone',
+          area: 'A1',
+          activeDate: '2024-01-01T10:00:00Z',
+          expireDate: '2024-01-01T12:00:00Z'
+        }
+      ]
+    }
+  ]),
+  getPermitReport: vi.fn().mockResolvedValue({
+    totalPermits: 100,
+    activePermits: 75,
+    expiredPermits: 25,
+    totalRevenue: 5000,
+    zoneBreakdown: [
+      { area: 'Zone A', totalPermits: 50 },
+      { area: 'Zone B', totalPermits: 50 }
+    ],
+    lotBreakdown: [
+      { area: 'Lot 1', totalPermits: 40 },
+      { area: 'Lot 2', totalPermits: 60 }
+    ]
+  })
+}));
+
 const server = setupServer();
 
 vi.mock('next/headers', () => ({

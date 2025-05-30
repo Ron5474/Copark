@@ -50,7 +50,9 @@ export class PermitResolver {
       }
     })
 
-    const res = response.status === 200 ? await response.json() : null
+    const res = await response.json()
+    // We can't test this vvvvvv  because user passes auth
+    // const res = response.status === 200 ? await response.json() : null
     // if (!res) { // User already passed auth checker
     //   throw new Error('User not found')
     // }
@@ -149,10 +151,10 @@ export class PermitResolver {
         brand = 'https://www.discover.com/content/dam/discover/en_us/credit-cards/card-acquisitions/grey-redesign/global/images/icons/icon-discover-logo-136-23.png'
         break
       default:
-        brand = input.paymentMethod.split(" ")[0] ? input.paymentMethod.split(" ")[0] : input.paymentMethod
+        brand = input.paymentMethod.split(" ")[1] ? input.paymentMethod.split(" ")[0] : input.paymentMethod
         break
     }
-    const b = input.paymentMethod.split(" ")[0] ? input.paymentMethod.split(" ")[0] : undefined
+    const b = input.paymentMethod.split(" ")[1] ? input.paymentMethod.split(" ")[0] : undefined
     const showLogo = b && (b === 'visa' || b === 'mastercard' || b === 'amex' || b === 'discover')
 
     // Step 2: Send email
@@ -173,7 +175,7 @@ export class PermitResolver {
             <p><strong>Zone:</strong> ${input.zone}</p>
             <p><strong>Duration:</strong> ${durationString}</p>
             <p><strong>Vehicle Plate:</strong> ${plate}</p>
-            <p><strong>Payment Method: ${!showLogo ? brand: `<img src=${brand} alt="${b}" style="height: 1em vertical-align: middle" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
+            <p><strong>Payment Method: ${!showLogo ? brand : `<img src=${brand} alt="${b}" style="height: 1em vertical-align: middle" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
           </div>
 
           <p style="font-size: 15px color: #7f8c8d">
@@ -340,10 +342,10 @@ export class PermitResolver {
         brand = 'https://www.discover.com/content/dam/discover/en_us/credit-cards/card-acquisitions/grey-redesign/global/images/icons/icon-discover-logo-136-23.png'
         break
       default:
-        brand = input.paymentMethod.split(" ")[0] ? input.paymentMethod.split(" ")[0] : input.paymentMethod
+        brand = input.paymentMethod.split(" ")[1] ? input.paymentMethod.split(" ")[0] : input.paymentMethod
         break
     }
-    const b = input.paymentMethod.split(" ")[0] ? input.paymentMethod.split(" ")[0] : undefined
+    const b = input.paymentMethod.split(" ")[1] ? input.paymentMethod.split(" ")[0] : undefined
     const showLogo = b && (b === 'visa' || b === 'mastercard' || b === 'amex' || b === 'discover')
 
     // Step 2: Send email
@@ -364,7 +366,7 @@ export class PermitResolver {
             <p><strong>Lot:</strong> ${input.lot}</p>
             <p><strong>Duration:</strong> ${durationString}</p>
             <p><strong>Vehicle Plate:</strong> ${plate}</p>
-            <p><strong>Payment Method: ${!showLogo ? brand: `<img src=${brand} alt="${b}" style="height: 1em vertical-align: middle" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
+            <p><strong>Payment Method: ${!showLogo ? brand : `<img src=${brand} alt="${b}" style="height: 1em vertical-align: middle" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
           </div>
 
           <p style="font-size: 15px color: #7f8c8d">

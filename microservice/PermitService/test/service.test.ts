@@ -56,8 +56,7 @@ test('Purchasing zone different duration', async () => {
 })
 
 test('Purchasing unknown zone', async () => {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  vi.spyOn(console, 'error').mockImplementation(() => {})
+  vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(permitService.purchaseMyZonePermit({...zonePermitDetails, zone: '13'}))
       .rejects.toThrow('Zone 13 not found')
 })
@@ -67,8 +66,7 @@ test('Purchasing same zone permit transaction ID twice', async () => {
   vi.setSystemTime(now)
   await permitService.purchaseMyZonePermit(zonePermitDetails, now.toISOString())
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  vi.spyOn(console, 'error').mockImplementation(() => {})
+  vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(permitService.purchaseMyZonePermit(zonePermitDetails, now.toISOString())).rejects.toThrow(`Permit for vehicle ${zonePermitDetails.vehicle} already exists for zone ${zonePermitDetails.zone} with transaction ID ${zonePermitDetails.transactionId}`)
   vi.useRealTimers()
 })
@@ -78,8 +76,7 @@ test('Purchasing same zone permit twice', async () => {
   vi.setSystemTime(now)
   await permitService.purchaseMyZonePermit(zonePermitDetails, now.toISOString())
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  vi.spyOn(console, 'error').mockImplementation(() => {})
+  vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(permitService.purchaseMyZonePermit({...zonePermitDetails, transactionId: 'somethingElse', duration: {hours: 0, minutes: 30}}, now.toISOString()))
       .rejects.toThrow(`Vehicle ${zonePermitDetails.vehicle} already has an active permit of this type in zone ${zonePermitDetails.zone}`)
   vi.useRealTimers()
@@ -289,8 +286,7 @@ test('Purchasing an expired lot permit doesn\'t work', async () => {
   const now = new Date('2025-07-04T12:00:00Z')
   vi.setSystemTime(now)
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  vi.spyOn(console, 'error').mockImplementation(() => {})
+  vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(permitService.purchaseMyLotPermit(lotPermitDetails)).rejects.toThrow('This permit type has expired')
   
   vi.useRealTimers()
@@ -301,8 +297,7 @@ test('Purchasing same lot permit transaction ID twice', async () => {
   vi.setSystemTime(now)
   await permitService.purchaseMyLotPermit(lotPermitDetails)
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  vi.spyOn(console, 'error').mockImplementation(() => {})
+  vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(permitService.purchaseMyLotPermit(lotPermitDetails)).rejects.toThrow(`Permit for vehicle ${lotPermitDetails.vehicle} already exists for lot ${lotPermitDetails.lot} with transaction ID ${lotPermitDetails.transactionId}`)
   vi.useRealTimers()
 })
@@ -312,8 +307,7 @@ test('Purchasing same lot permit twice - different durations', async () => {
   vi.setSystemTime(now)
   await permitService.purchaseMyLotPermit(lotPermitDetails)
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  vi.spyOn(console, 'error').mockImplementation(() => {})
+ vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(permitService.purchaseMyLotPermit({...lotPermitDetails, transactionId: 'somethingElse', duration: 'daily'}))
       .rejects.toThrow(`Vehicle ${lotPermitDetails.vehicle} already has an active permit of this type in lot ${lotPermitDetails.lot}`)
   vi.useRealTimers()
@@ -349,8 +343,7 @@ test('Purchasing same lot permit twice - different durations', async () => {
 // })
 
 test('Purchasing wrong lot permit doesn\'t work', async () => {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  vi.spyOn(console, 'error').mockImplementation(() => {})
+  vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(permitService.purchaseMyLotPermit({...lotPermitDetails, duration: 'biweekly'})).rejects.toThrow('Incorrect permit option')
 })
 
@@ -429,7 +422,7 @@ test('sendPermitEmail logs error when fetch fails', async () => {
   global.fetch = vi.fn().mockRejectedValue(new Error('Simulated failure'))
 
   // Spy on console.error
-  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
   await sendPermitEmail({
     to: 'test@example.com',

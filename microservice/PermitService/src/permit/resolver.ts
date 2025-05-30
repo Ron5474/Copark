@@ -19,7 +19,8 @@ import {
   ZoneStats,
   LotStats,
   PermitReport,
-  ZoneInput
+  ZoneInput,
+  permitId
 } from './schema'
 import { PermitService } from './service'
 import { sendPermitEmail } from './emailClient'
@@ -559,13 +560,13 @@ export class PermitResolver {
   }
 
   @Authorized('driver')
-  @Query(() => [{permitID: String}])
+  @Mutation(() => [permitId])
   async expirePermits(
-    @Arg('vehicleID', () => String) vehicleID: string,
-  ): Promise<{permitId: string}[]> {
-    if (!vehicleID) {
+    @Arg('vehicleId', () => String) vehicleId: string,
+  ): Promise<permitId[]> {
+    if (!vehicleId) {
       throw new Error('Vehicle ID is required')
     }
-    return await service.expirePermits(vehicleID)
+    return await service.expirePermits(vehicleId)
   }
 }

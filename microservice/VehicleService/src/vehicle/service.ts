@@ -120,7 +120,6 @@ export class VehicleService {
 
   public async removeVehicle(plate: string, state: string, userId: string, token: string): Promise<VehicleID> {
     const existing = await this.vehicleExists(plate, state)
-
     if ((existing?.rowCount ?? 0) === 0) {
       throw new Error('Vehicle not found or not owned by user')
     }
@@ -154,14 +153,14 @@ export class VehicleService {
       },
       body: JSON.stringify({
         query: `
-          query GetPendingTickets($plate: String!) {
-            pendingTickets(plate: $plate) {
+          query GetPendingTickets($plate: String!, $state: String!) {
+            pendingTickets(plate: $plate, state: $state) {
               id,
               vehicle
             }
           }
         `,
-        variables: { plate }
+        variables: { plate, state }
       })
       
     });
@@ -201,7 +200,7 @@ export class VehicleService {
         SET data = jsonb_set(data, '{deleted}', to_jsonb(NOW()))
           WHERE LOWER(data->>'plate') = LOWER($1)
             AND LOWER(data->>'state') = LOWER($2)
-            AND driver = $2 RETURNING id`,
+            AND driver = $3 RETURNING id`,
       [plate, state, userId]
     )
     if (res.rowCount === 0) {

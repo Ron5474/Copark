@@ -188,8 +188,8 @@ mutation UpdateVehicle($input: UpdateVehicleInput!) {
 }`
 
 const findByPlateQuery = `
-query findVehicleByPlate($plate: String!) {
-  findVehicleByPlate(plate: $plate) {
+query findVehicleByPlate($plate: String!, $state: String!) {
+  findVehicleByPlate(plate: $plate, state: $state) {
     id
     plate
     country
@@ -242,12 +242,13 @@ const derikVehicleInput = {
 }
 
 const findByPlateInput = {
-  plate: "TEST123"
+  plate: "TEST123",
+  state: "California"
 }
 
 const findOrCreateVehicleByPlateMutation = `
-mutation FindOrCreateVehicleByPlate($plate: String!) {
-  findOrCreateVehicleByPlate(plate: $plate) {
+mutation FindOrCreateVehicleByPlate($plate: String!, $state: String!) {
+  findOrCreateVehicleByPlate(plate: $plate, state: $state) {
     id
     plate
     country
@@ -276,7 +277,7 @@ test('Enforcer can find or create vehicle by plate', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({
       query: findOrCreateVehicleByPlateMutation,
-      variables: { plate: "ENF456" }
+      variables: { plate: "ENF456", state: "CA" }
     })
 
   expect(response.body.data.findOrCreateVehicleByPlate.plate).toBe("ENF456")
@@ -290,7 +291,7 @@ test('Enforcer does not create duplicate vehicle if plate exists', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({
       query: findOrCreateVehicleByPlateMutation,
-      variables: { plate: "DUPLICATE123" }
+      variables: { plate: "DUPLICATE123", state: "CA" }
     })
 
   const vehicleId1 = first.body.data.findOrCreateVehicleByPlate.id
@@ -300,7 +301,7 @@ test('Enforcer does not create duplicate vehicle if plate exists', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({
       query: findOrCreateVehicleByPlateMutation,
-      variables: { plate: "DUPLICATE123" }
+      variables: { plate: "DUPLICATE123", state: "CA" }
     })
 
   const vehicleId2 = second.body.data.findOrCreateVehicleByPlate.id
@@ -330,12 +331,12 @@ test('Unregistered vehicle has null fields by default', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({
       query: findOrCreateVehicleByPlateMutation,
-      variables: { plate: "NULLCHECK456" }
+      variables: { plate: "NULLCHECK456", state: "CA" }
     })
 
   const vehicle = response.body.data.findOrCreateVehicleByPlate
   expect(vehicle.country).toBeNull()
-  expect(vehicle.state).toBeNull()
+  expect(vehicle.state).toBe("CA")
 })
 
 test('Enforcer can directly create an unregistered vehicle', async () => {

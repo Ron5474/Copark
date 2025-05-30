@@ -155,12 +155,12 @@ test('updateVehicle - Throws error because no vehicle exists', async () => {
 
 test('findVehicleByPlate - Returns Correct Vehicle', async () => {
   await new VehicleService().registerVehicle(mock_vehicle2, mock_driver1_ID)
-  const vehicle = await new VehicleService().findVehicleByPlate(mock_vehicle2.plate)
+  const vehicle = await new VehicleService().findVehicleByPlate(mock_vehicle2.plate, mock_vehicle2.state)
   expect((vehicle as Vehicle).nickname).toBe(mock_vehicle2.nickname)
 })
 
 test('findVehicleByPlate - Returns null if no Vehicle found', async () => {
-  const vehicle = await new VehicleService().findVehicleByPlate(mock_vehicle2.plate)
+  const vehicle = await new VehicleService().findVehicleByPlate(mock_vehicle2.plate, mock_vehicle2.plate)
   expect(vehicle).toBeNull()
 })
 
@@ -217,3 +217,40 @@ test('getVehicleByUserId - Returns Array of length 1', async () => {
   // console.log('body !!!!' + vehicles)
   expect(vehicles.length).toBe(1);
 });
+
+test('removeVehicle - throws if no such vehicle', async () => {
+  const svc = new VehicleService();
+  await expect(
+    svc.removeVehicle('NOSUCH', 'CA', mock_driver1_ID, await validDriverJWT)
+  ).rejects.toThrow('Vehicle not found or not owned by user');
+});
+
+test('removeVehicle - cannot delete the only default vehicle', async () => {
+  const svc = new VehicleService();
+  // only one vehicle default
+  await svc.registerVehicle(mock_vehicle1, mock_driver1_ID);
+  await expect(
+    svc.removeVehicle(mock_vehicle1.plate, mock_vehicle1.state, mock_driver1_ID, await validDriverJWT)
+  ).rejects.toThrow(
+    'Cannot delete the only default vehicle. Please add another vehicle as default first.'
+  );
+});
+
+// test('removeVehicle - deletes default when >1 vehicles exist', async () => {
+//   const svc = new VehicleService();
+//   const v1 = await svc.registerVehicle(mock_vehicle1, mock_driver1_ID);
+//   const v2 = await svc.registerVehicle(mock_vehicle2, mock_driver1_ID);
+
+//   const result = await svc.removeVehicle(
+//     mock_vehicle1.plate,
+//     mock_vehicle1.state,
+//     mock_driver1_ID,
+//     await validDriverJWT
+//   );
+//   // should return the ID of the default vehicle
+//   expect(result.id).toBe(v1.id);
+
+//   // and now only the second vehicle remains
+//   const remaining = await svc.getMyVehicles(mock_driver1_ID);
+//   expect(remaining.map(v => v.id)).toEqual([v2.id]);
+// });

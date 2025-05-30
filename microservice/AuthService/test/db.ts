@@ -34,7 +34,7 @@ const run = async (file: string) => {
       const newDb = newDbRaw.replace(/;$/, '')
 
       currentPool = new Pool({
-        host: 'localhost',
+        host: process.env.POSTGRES_HOST,
         port: parseInt(process.env.POSTGRES_PORT as string, 10),
         database: newDb,
         user: process.env.POSTGRES_USER,

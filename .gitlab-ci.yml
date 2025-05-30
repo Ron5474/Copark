@@ -299,10 +299,9 @@ test:permitService:
     - echo "// dummy file to avoid import error" > microservice/PermitService/express.js
     - cd microservice/AuthService && npm install
     - cd microservice/AuthService && npm run pretest
-    - cd microservice/PermitService
-    - rm -rf node_modules build
-    - npm ci
-    - npm run test
+    - cd microservice/PermitService && rm -rf node_modules build
+    - cd microservice/PermitService && npm ci
+    - cd microservice/PermitService && npm run test
   rules:
     - changes: 
       - microservice/PermitService/**/*

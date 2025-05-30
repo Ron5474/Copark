@@ -406,7 +406,7 @@ test('generatePermitReport returns correct permit report structure', async () =>
     transactionId: 'stripeTransactionID',
   })
 
-  const report = await permitService.generatePermitReport()
+  const report = await permitService.generatePermitReport({ numDays: 999 })
 
   expect(report).toBeDefined()
   expect(typeof report.totalPermits).toBe('number')

@@ -469,7 +469,8 @@ test('Driver can purchase a zone permit with different duration 5', async () => 
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseZonePermitQuery,
-      variables: {input: {...purchaseZoneInput.input,duration: {hours: 1}, vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseZoneInput.input,duration: {hours: 1},
+      paymentMethod: 'visa 4242',vehicle: derikVehicleInput.input.plate}}
     })
 
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
@@ -488,7 +489,8 @@ test('Driver can purchase a zone permit with different duration 6', async () => 
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseZonePermitQuery,
-      variables: {input: {...purchaseZoneInput.input, duration: {minutes: 30}, vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseZoneInput.input, duration: {minutes: 30},
+      paymentMethod: 'apple pay', vehicle: derikVehicleInput.input.plate}}
     })
 
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
@@ -622,6 +624,24 @@ test('Driver can purchase a lot permit with Discover', async () => {
   vi.useRealTimers()
 })
 
+test('Driver can purchase a lot permit with Apple Pay', async () => {
+  const now = new Date('2025-05-25T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  const confirmation = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'Apple Pay', vehicle: derikVehicleInput.input.plate}}
+    })
+
+  expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
+  
+  vi.useRealTimers()
+})
+
 test('Driver can purchase a lot permit in advance', async () => {
   const now = new Date('2025-03-27T12:00:00Z')
   vi.setSystemTime(now)
@@ -632,7 +652,7 @@ test('Driver can purchase a lot permit in advance', async () => {
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseLotPermitQuery,
-      variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate, paymentMethod: 'visa 4242'}}
     })
 
   expect(confirmation.body.data.purchaseLotPermit.activeDate).not.toBe(now.toISOString())

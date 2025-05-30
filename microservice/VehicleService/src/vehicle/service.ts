@@ -99,16 +99,27 @@ export class VehicleService {
     })))
   }
 
-  private async vehicleExists(plate: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
+  // private async vehicleExists(plate: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
+  //   const res = await pool.query(
+  //     `SELECT id FROM vehicle WHERE LOWER(data->>'plate') = LOWER($1) AND data->>'deleted' IS NULL`,
+  //     [plate]
+  //   )
+  //   return {rowCount: res.rows.length, rows: res.rows};
+  // }
+  private async vehicleExists(plate: string, state: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
     const res = await pool.query(
-      `SELECT id FROM vehicle WHERE LOWER(data->>'plate') = LOWER($1) AND data->>'deleted' IS NULL`,
-      [plate]
+      `SELECT id
+        FROM vehicle
+          WHERE LOWER(data->>'plate') = LOWER($1)
+            AND LOWER(data->>'state') = LOWER($2)
+            AND data->>'deleted' IS NULL`,
+      [plate, state]
     )
     return {rowCount: res.rows.length, rows: res.rows};
   }
 
-  public async removeVehicle(plate: string, userId: string, token: string): Promise<VehicleID> {
-    const existing = await this.vehicleExists(plate)
+  public async removeVehicle(plate: string, state: string, userId: string, token: string): Promise<VehicleID> {
+    const existing = await this.vehicleExists(plate, state)
 
     if ((existing?.rowCount ?? 0) === 0) {
       throw new Error('Vehicle not found or not owned by user')
@@ -158,8 +169,12 @@ export class VehicleService {
     }
 
     const res = await pool.query(
-      `UPDATE vehicle SET data = jsonb_set(data, '{deleted}', to_jsonb(NOW())) WHERE LOWER(data->>'plate') = LOWER($1) AND driver = $2 RETURNING id`,
-      [plate, userId]
+      `UPDATE vehicle
+        SET data = jsonb_set(data, '{deleted}', to_jsonb(NOW()))
+          WHERE LOWER(data->>'plate') = LOWER($1)
+            AND LOWER(data->>'state') = LOWER($2)
+            AND driver = $2 RETURNING id`,
+      [plate, state, userId]
     )
     if (res.rowCount === 0) {
       throw new Error('Vehicle not found or not owned by user')
@@ -170,7 +185,7 @@ export class VehicleService {
   }
 
   public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
-    const existing = await this.vehicleExists(input.plate)
+    const existing = await this.vehicleExists(input.plate, input.state)
 
     if ((existing?.rowCount as number) > 0) {
       throw new Error('This license plate is already registered')
@@ -296,23 +311,47 @@ export class VehicleService {
     return {id: vehicleID.id}
   }
 
-  public async findVehicleByPlate(plate: string): Promise<Vehicle | null> {
+  // public async findVehicleByPlate(plate: string): Promise<Vehicle | null> {
+  //   const result = await pool.query(
+  //     `SELECT id, data FROM vehicle WHERE data->>'plate' = $1 AND data->>'deleted' IS NULL`,
+  //     [plate]
+  //   )
+
+  //   if (result.rowCount === 0) return null
+
+
+  //   const row = result.rows[0]
+  //   return {
+  //     id: row.id,
+  //     plate: row.data.plate,
+  //     country: row.data.country,
+  //     state: row.data.state,
+  //     nickname: row.data.nickname
+  //   }
+  // }
+  public async findVehicleByPlate(
+    plate: string,
+    state: string
+  ): Promise<Vehicle | null> {
     const result = await pool.query(
-      `SELECT id, data FROM vehicle WHERE data->>'plate' = $1 AND data->>'deleted' IS NULL`,
-      [plate]
-    )
+      `SELECT id, data
+        FROM vehicle
+        WHERE LOWER(data->>'plate') = LOWER($1)
+          AND LOWER(data->>'state') = LOWER($2)
+          AND data->>'deleted' IS NULL
+      `,
+      [plate, state]
+    );
 
-    if (result.rowCount === 0) return null
-
-
-    const row = result.rows[0]
+    if (result.rowCount === 0) return null;
+    const row = result.rows[0];
     return {
-      id: row.id,
-      plate: row.data.plate,
-      country: row.data.country,
-      state: row.data.state,
+      id:       row.id,
+      plate:    row.data.plate,
+      country:  row.data.country,
+      state:    row.data.state,
       nickname: row.data.nickname
-    }
+    };
   }
 
   public async createUnregisteredVehicle(input: createdVehicleInput): Promise<CreatedVehicle> {

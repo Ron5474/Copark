@@ -101,10 +101,48 @@ export class VehicleService {
 
   private async vehicleExists(plate: string): Promise<{ rowCount: number }> {
     const res = await pool.query(
-      `SELECT id FROM vehicle WHERE LOWER(data->>'plate') = LOWER($1)`,
+      `SELECT id FROM vehicle WHERE LOWER(data->>'plate') = LOWER($1) AND data->>'deleted' IS NULL`,
       [plate]
     )
     return {rowCount: res.rows.length};
+  }
+
+  public async removeVehicle(plate: string, userId: string, token: string): Promise<void> {
+    const existing = await this.vehicleExists(plate)
+
+    if ((existing?.rowCount ?? 0) === 0) {
+      throw new Error('Vehicle not found or not owned by user')
+    }
+
+    // check if the vehicle has pending tickets
+    const pendingTickets = await fetch(`http://localhost:4002/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        query: `
+          query GetPendingTickets($plate: String!) {
+            pendingTickets(plate: $plate) {
+              id,
+              vehicle
+            }
+          }
+        `,
+        variables: { plate }
+      })
+    });
+
+    const pendingTicketsData = await pendingTickets.json();
+    if (pendingTicketsData.data.pendingTickets.length > 0) {
+      throw new Error('Vehicle cannot be removed because it has pending tickets');
+    }
+
+    // await pool.query(
+    //   `UPDATE vehicle SET data = jsonb_set(data, '{deleted}', to_jsonb(NOW())) WHERE LOWER(data->>'plate') = LOWER($1) AND driver = $2`,
+    //   [plate, userId]
+    // )
   }
 
   public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
@@ -127,7 +165,7 @@ export class VehicleService {
     )
 
     const vehicles = await pool.query(
-      `SELECT COUNT(*) FROM vehicle WHERE driver = $1`,
+      `SELECT COUNT(*) FROM vehicle WHERE driver = $1 AND data->>'deleted' IS NULL`,
       [userId]
     )
     if (parseInt(vehicles.rows[0].count) == 1) {

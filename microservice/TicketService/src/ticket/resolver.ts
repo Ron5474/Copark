@@ -346,4 +346,14 @@ export class TicketResolver {
   ): Promise<TicketReport> {
     return await this.ticketService.generateTicketReport({numDays: numDays ?? 999})
   }
+
+  @Authorized(['driver'])
+  @Query(() => [Ticket])
+  async pendingTickets(
+    @Ctx() request: Request & {user: SessionUser},
+    @Arg("plate", () => String) vehicleID: string
+  ): Promise<Ticket[]> {
+    
+    return await this.ticketService.getPendingTicketsByPlateNumber(vehicleID)
+  }
 }

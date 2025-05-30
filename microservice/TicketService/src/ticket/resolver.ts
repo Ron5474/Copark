@@ -269,8 +269,6 @@ export class TicketResolver {
           }
         }
       `;
-      console.log("plate", input.plate)
-      console.log("state", input.state)
       const vehicleRes = await fetch("http://localhost:4001/graphql", {
         method: "POST",
         headers: {

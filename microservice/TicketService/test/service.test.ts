@@ -47,7 +47,6 @@ test('createTicket should successfully create a ticket with all fields', async (
     };
 
     const ticket = await ticketService.createTicket(newTicket);
-    console.log("ticket", ticket)
     expect(ticket).toHaveProperty('id');
     expect(ticket).toHaveProperty('vehicle', newTicket.vehicle);
     // expect(ticket).toHaveProperty('enforcer', newTicket.enforcer);

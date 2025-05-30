@@ -36,7 +36,6 @@ const TicketContent = memo(function TicketContent({
       sx={{
         p: 3,
         background: '#ffffff',
-        maxWidth: 900,
         mx: 'auto',
         boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
         borderRadius: '15px'

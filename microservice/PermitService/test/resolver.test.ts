@@ -269,16 +269,16 @@ const purchaseLotInput = {
 }
 
 const checkPermitQuery = `
-query CheckedPermit($plate: String!) {
-  checkPermit(plate: $plate) {
+query CheckedPermit($plate: String!, $state: String!) {
+  checkPermit(plate: $plate, state: $state) {
     type
     area
   }
 }`
 
-const checkPermitInvalidInput = { plate: "0000000" }
+const checkPermitInvalidInput = { plate: "0000000", state: "NA" }
 
-const checkPermitInput = { plate: "JCDE544" }
+const checkPermitInput = { plate: "JCDE544", state: "NY" }
 
 const isValidPermitByPoliceQuery = `
 query IsValidPolice($plate: String!) {
@@ -661,7 +661,6 @@ test('Driver can purchase a lot permit in advance', async () => {
   
   vi.useRealTimers()
 })
-
 
 // test('No token to getUserData', async () => {
 //   const receipt = await permitResolver.getUserData(permitDetails)

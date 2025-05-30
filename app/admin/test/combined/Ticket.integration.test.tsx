@@ -8,25 +8,12 @@ import {
   getChallengedTickets, 
   acceptTicketChallenge, 
   rejectTicketChallenge,
-  getAcceptedTickets 
+  getAcceptedTickets,
+  getUnpaidTickets
 } from '../../src/ticket/actions';
 
 // Mock permit actions
 vi.mock('../../src/permit/actions', () => ({
-  getAllPermitsByDay: vi.fn().mockResolvedValue([
-    {
-      date: '2024-01-01',
-      permits: [
-        {
-          vehicle: 'ABC123',
-          type: 'zone',
-          area: 'A1',
-          activeDate: '2024-01-01T10:00:00Z',
-          expireDate: '2024-01-01T12:00:00Z'
-        }
-      ]
-    }
-  ]),
   getPermitReport: vi.fn().mockResolvedValue({
     totalPermits: 100,
     activePermits: 75,
@@ -337,5 +324,58 @@ it('handles network error when fetching accepted tickets', async () => {
   );
 
   await expect(getAcceptedTickets()).rejects.toThrow();
+});
+
+it('successfully fetches unpaid tickets', async () => {
+  const mockUnpaidTickets = [
+    {
+      id: '1',
+      vehicle: 'ABC123',
+      enforcer: 'enforcer-1', 
+      issuedDate: '2024-01-01T10:00:00Z',
+      violation: 'Invalid Parking',
+      fine: 50.00,
+      ticketStatus: 'unpaid',
+      images: 'image1.jpg',
+      note: 'Parked in reserved spot'
+    }
+  ];
+
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.json({
+        data: {
+          getUnpaidTickets: mockUnpaidTickets
+        }
+      });
+    })
+  );
+
+  const result = await getUnpaidTickets();
+  expect(result).toEqual(mockUnpaidTickets);
+});
+
+it('handles error when fetching unpaid tickets', async () => {
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.json({
+        errors: [{ message: 'Failed to fetch unpaid tickets' }]
+      });
+    })
+  );
+
+  await expect(getUnpaidTickets()).rejects.toThrow(
+    'Failed to fetch unpaid tickets'
+  );
+});
+
+it('handles network error when fetching unpaid tickets', async () => {
+  server.use(
+    http.post('http://localhost:4002/graphql', () => {
+      return HttpResponse.error();
+    })
+  );
+
+  await expect(getUnpaidTickets()).rejects.toThrow();
 });
 

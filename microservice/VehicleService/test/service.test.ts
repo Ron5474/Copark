@@ -128,6 +128,17 @@ test('getMyVehicles - does not show Driver2 vehicles belonging to Driver1', asyn
   expect(vehicles.length).toBe(0)
 })
 
+test('getDefaultVehicle returns null', async () => {
+  const vehicles = await new VehicleService().getDefaultVehicle(mock_driver2_ID)
+  expect(vehicles).toBeNull()
+})
+
+// test('getDefaultVehicleId returns null', async () => {
+//   await new VehicleService().registerVehicle(mock_vehicle1, mock_driver2_ID)
+//   const vehicles = await new VehicleService().getMyVehicles(mock_driver2_ID)
+//   expect(vehicles[0].default).toBeNull()
+// })
+
 test('updateVehicle - updates vehicle table correctly', async () => {
   const vehicle = await new VehicleService().registerVehicle(mock_vehicle1, mock_driver1_ID)
   await new VehicleService().updateVehicle({id: vehicle.id, ...update_vehicle1}, mock_driver1_ID)

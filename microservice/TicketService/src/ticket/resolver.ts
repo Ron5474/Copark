@@ -337,4 +337,12 @@ export class TicketResolver {
     return await this.ticketService.getUnpaidTicketsPerDay();
     // need to add a convertion from the vehicle ID to the plate number
   }
+
+  @Authorized(['admin'])
+  @Query(() => PermitReport)
+  async adminPermitReport(
+    @Arg("numDays", () => Number, { nullable: true }) numDays?: number,
+  ): Promise<PermitReport> {
+    return await service.generatePermitReport({numDays: numDays ?? 999})
+  }
 }

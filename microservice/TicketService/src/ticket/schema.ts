@@ -138,3 +138,42 @@ export class ChallengeTicket extends Ticket {
   @Field(() => String, { nullable: true })
   challengeReason?: string;
 }
+
+@ObjectType()
+export class ViolationBreakdown {
+  @Field(() => String)
+  violation!: string;
+
+  @Field(() => Number)
+  count!: number;
+}
+
+@ObjectType()
+export class EnforcerBreakdown {
+  @Field(() => String)
+  enforcer!: string;
+
+  @Field(() => Number)
+  count!: number;
+}
+
+@ObjectType()
+export class TicketReport {
+  @Field(() => Number)
+  totalTickets!: number;
+
+  @Field(() => Number)
+  unpaidTickets!: number;
+
+  @Field(() => Number)
+  paidTickets!: number;
+
+  @Field(() => Number)
+  totalRevenue!: number;
+
+  @Field(() => [ViolationBreakdown])
+  violationBreakdown!: ViolationBreakdown[];
+
+  @Field(() => [EnforcerBreakdown])
+  enforcerBreakdown!: EnforcerBreakdown[];
+}

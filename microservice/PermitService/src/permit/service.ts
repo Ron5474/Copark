@@ -542,22 +542,40 @@ export class PermitService {
     return result.rows
   }
 
-  public async getPermitStatsByZone(activeOnly = true): Promise<{ area: string; totalPermits: number }[]> {
+  public async getPermitStatsByZone(
+    activeOnly = true,
+    startDate?: string,
+    endDate?: string
+  ): Promise<{ area: string; totalPermits: number }[]> {
     const now = new Date().toISOString()
+    const useRange = !!(startDate && endDate)
 
-    const result = await pool.query(`
+    let query = `
       SELECT 
         t.data->>'area' AS area,
         COUNT(p.*) AS total
       FROM type t
       LEFT JOIN permit p ON p.type = t.id
-        AND ($1::boolean IS FALSE 
-          OR (p.data->>'activeDate')::timestamptz <= $2 
-          AND (p.data->>'expireDate')::timestamptz >= $2)
+        AND (
+          ($1::boolean IS FALSE 
+            OR (p.data->>'activeDate')::timestamptz <= $2 
+            AND (p.data->>'expireDate')::timestamptz >= $2)
+          ${useRange ? `
+            AND (p.data->>'purchaseDate')::timestamptz >= $3
+            AND (p.data->>'purchaseDate')::timestamptz <= $4
+          ` : ''}
+        )
       WHERE t.data->>'name' = 'zone'
       GROUP BY t.data->>'area'
       ORDER BY (t.data->>'area')::int
-    `, [activeOnly, now])
+    `
+
+    let params: any[] = [activeOnly, now]
+    if (useRange) {
+      params.push(startDate, endDate)
+    }
+
+    const result = await pool.query(query, params)
 
     return result.rows.map(row => ({
       area: row.area,
@@ -565,22 +583,40 @@ export class PermitService {
     }))
   }
 
-  public async getPermitStatsByLot(activeOnly = true): Promise<{ area: string; totalPermits: number }[]> {
+  public async getPermitStatsByLot(
+    activeOnly = true,
+    startDate?: string,
+    endDate?: string
+  ): Promise<{ area: string; totalPermits: number }[]> {
     const now = new Date().toISOString()
+    const useRange = !!(startDate && endDate)
 
-    const result = await pool.query(`
+    let query = `
       SELECT 
         t.data->>'area' AS area,
         COUNT(p.*) AS total
       FROM type t
       LEFT JOIN permit p ON p.type = t.id
-        AND ($1::boolean IS FALSE 
-          OR (p.data->>'activeDate')::timestamptz <= $2 
-          AND (p.data->>'expireDate')::timestamptz >= $2)
+        AND (
+          ($1::boolean IS FALSE 
+            OR (p.data->>'activeDate')::timestamptz <= $2 
+            AND (p.data->>'expireDate')::timestamptz >= $2)
+          ${useRange ? `
+            AND (p.data->>'purchaseDate')::timestamptz >= $3
+            AND (p.data->>'purchaseDate')::timestamptz <= $4
+          ` : ''}
+        )
       WHERE t.data->>'name' = 'lot'
       GROUP BY t.data->>'area'
       ORDER BY t.data->>'area'
-    `, [activeOnly, now])
+    `
+
+    let params: any[] = [activeOnly, now]
+    if (useRange) {
+      params.push(startDate, endDate)
+    }
+
+    const result = await pool.query(query, params)
 
     return result.rows.map(row => ({
       area: row.area,
@@ -588,23 +624,47 @@ export class PermitService {
     }))
   }
   
-  public async generatePermitReport(): Promise<PermitReport> {
-    const now = new Date().toISOString()
+  public async generatePermitReport(timeRange: { numDays: number }): Promise<PermitReport> {
+    const now = new Date()
+    const startDate = new Date(now)
+    startDate.setDate(now.getDate() - timeRange.numDays)
+    const nowISO = now.toISOString()
+    const startISO = startDate.toISOString()
 
     const totalQuery = `
       SELECT 
-        COUNT(*) FILTER (WHERE (p.data->>'expireDate')::timestamptz < $1) AS expired,
-        COUNT(*) FILTER (WHERE (p.data->>'activeDate')::timestamptz <= $1 AND (p.data->>'expireDate')::timestamptz >= $1) AS active,
-        COUNT(*) AS total,
-        COALESCE(SUM((p.data->'receipt'->>'total')::float), 0) AS revenue
+        COUNT(*) FILTER (
+          WHERE (p.data->>'purchaseDate')::timestamptz >= $1
+            AND (p.data->>'purchaseDate')::timestamptz <= $2
+            AND (p.data->>'expireDate')::timestamptz < $2
+        ) AS expired,
+        COUNT(*) FILTER (
+          WHERE (p.data->>'purchaseDate')::timestamptz >= $1
+            AND (p.data->>'purchaseDate')::timestamptz <= $2
+            AND (p.data->>'activeDate')::timestamptz <= $2
+            AND (p.data->>'expireDate')::timestamptz >= $2
+        ) AS active,
+        COUNT(*) FILTER (
+          WHERE (p.data->>'purchaseDate')::timestamptz >= $1
+            AND (p.data->>'purchaseDate')::timestamptz <= $2
+        ) AS total,
+        COALESCE(SUM(
+          CASE 
+            WHEN (p.data->>'purchaseDate')::timestamptz >= $1
+              AND (p.data->>'purchaseDate')::timestamptz <= $2
+            THEN (p.data->'receipt'->>'total')::float
+            ELSE 0
+          END
+        ), 0) AS revenue
       FROM permit p
     `
 
-    const result = await pool.query(totalQuery, [now])
+    const result = await pool.query(totalQuery, [startISO, nowISO])
     const row = result.rows[0]
 
-    const zoneBreakdown = await this.getPermitStatsByZone(false)
-    const lotBreakdown = await this.getPermitStatsByLot(false)
+    // Pass the time range to breakdowns as well
+    const zoneBreakdown = await this.getPermitStatsByZone(false, startISO, nowISO)
+    const lotBreakdown = await this.getPermitStatsByLot(false, startISO, nowISO)
 
     return {
       totalPermits: parseInt(row.total),

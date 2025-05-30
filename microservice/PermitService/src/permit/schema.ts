@@ -175,8 +175,11 @@ export class DurationInput {
 
 @InputType()
 export class PurchaseZoneInput {
+  @Field(() => String)
+  plate!: string
+
   @Field(() => ID)
-  vehicle!: string
+  vehicleId!: string
 
   @Field(() => String)
   zone!: string
@@ -194,8 +197,11 @@ export class PurchaseZoneInput {
 
 @InputType()
 export class PurchaseLotInput {
+  @Field(() => String)
+  plate!: string
+
   @Field(() => ID)
-  vehicle!: string
+  vehicleId!: string
 
   @Field(() => String)
   lot!: string
@@ -341,5 +347,5 @@ export class ZoneInput {
 @InputType()
 export class ReportTimeRange {
   @Field(() => Number)
-  numDays!: Number
+  numDays!: number
 }

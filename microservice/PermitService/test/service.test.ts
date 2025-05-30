@@ -18,7 +18,8 @@ import {sendPermitEmail} from '../src/permit/emailClient'
 vi.mock('server-only', () => ({}))
 
 const zonePermitDetails = {
-  vehicle: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
+  plate: '7RON123',
+  vehicleId: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
   zone: '27',
   duration: {'minutes': 30, 'hours': 0},
   paymentMethod: 'paypal',
@@ -26,7 +27,8 @@ const zonePermitDetails = {
 }
 
 const lotPermitDetails = {
-  vehicle: '12345678-1234-1234-1234-567890abcdef',
+  plate: 'Testing :)',
+  vehicleId: '12345678-1234-1234-1234-567890abcdef',
   lot: 'A',
   duration: 'quarterly',
   paymentMethod: 'paypal',
@@ -67,7 +69,7 @@ test('Purchasing same zone permit transaction ID twice', async () => {
   await permitService.purchaseMyZonePermit(zonePermitDetails, now.toISOString())
 
   vi.spyOn(console, 'error').mockImplementation(() => undefined)
-  await expect(permitService.purchaseMyZonePermit(zonePermitDetails, now.toISOString())).rejects.toThrow(`Permit for vehicle ${zonePermitDetails.vehicle} already exists for zone ${zonePermitDetails.zone} with transaction ID ${zonePermitDetails.transactionId}`)
+  await expect(permitService.purchaseMyZonePermit(zonePermitDetails, now.toISOString())).rejects.toThrow(`Permit for vehicle ${zonePermitDetails.plate} already exists for zone ${zonePermitDetails.zone} with transaction ID ${zonePermitDetails.transactionId}`)
   vi.useRealTimers()
 })
 
@@ -78,7 +80,7 @@ test('Purchasing same zone permit twice', async () => {
 
   vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(permitService.purchaseMyZonePermit({...zonePermitDetails, transactionId: 'somethingElse', duration: {hours: 0, minutes: 30}}, now.toISOString()))
-      .rejects.toThrow(`Vehicle ${zonePermitDetails.vehicle} already has an active permit of this type in zone ${zonePermitDetails.zone}`)
+      .rejects.toThrow(`Vehicle ${zonePermitDetails.plate} already has an active permit of this type in zone ${zonePermitDetails.zone}`)
   vi.useRealTimers()
 })
 
@@ -87,7 +89,7 @@ test('Vehicle has valid permit', async () => {
   vi.setSystemTime(now)
 
   await permitService.purchaseMyZonePermit(zonePermitDetails, now.toISOString())
-  const permits = await permitService.getValidPermit(zonePermitDetails.vehicle, now.toISOString())
+  const permits = await permitService.getValidPermit(zonePermitDetails.vehicleId, now.toISOString())
   expect(permits.length).toBe(1)
   expect(permits[0].area).toBe('27')
   expect(permits[0].type).toBe('zone')
@@ -132,13 +134,13 @@ test('Vehicle does not have valid permit (Police)', async () => {
 })
 
 test('getMyPermits returns empty', async () => {
-  const { active } = await permitService.getMyPermits([zonePermitDetails.vehicle])
+  const { active } = await permitService.getMyPermits([zonePermitDetails.vehicleId])
   expect(active.length).toBe(0)
 })
 
 test('getMyPermits returns active permit', async () => {
   await permitService.purchaseMyZonePermit(zonePermitDetails)
-  const { active } = await permitService.getMyPermits([zonePermitDetails.vehicle])
+  const { active } = await permitService.getMyPermits([zonePermitDetails.vehicleId])
   expect(active.length).toBe(1)
 })
 
@@ -298,7 +300,7 @@ test('Purchasing same lot permit transaction ID twice', async () => {
   await permitService.purchaseMyLotPermit(lotPermitDetails)
 
   vi.spyOn(console, 'error').mockImplementation(() => undefined)
-  await expect(permitService.purchaseMyLotPermit(lotPermitDetails)).rejects.toThrow(`Permit for vehicle ${lotPermitDetails.vehicle} already exists for lot ${lotPermitDetails.lot} with transaction ID ${lotPermitDetails.transactionId}`)
+  await expect(permitService.purchaseMyLotPermit(lotPermitDetails)).rejects.toThrow(`Permit for vehicle ${lotPermitDetails.plate} already exists for lot ${lotPermitDetails.lot} with transaction ID ${lotPermitDetails.transactionId}`)
   vi.useRealTimers()
 })
 
@@ -309,7 +311,7 @@ test('Purchasing same lot permit twice - different durations', async () => {
 
  vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(permitService.purchaseMyLotPermit({...lotPermitDetails, transactionId: 'somethingElse', duration: 'daily'}))
-      .rejects.toThrow(`Vehicle ${lotPermitDetails.vehicle} already has an active permit of this type in lot ${lotPermitDetails.lot}`)
+      .rejects.toThrow(`Vehicle ${lotPermitDetails.plate} already has an active permit of this type in lot ${lotPermitDetails.lot}`)
   vi.useRealTimers()
 })
 
@@ -398,13 +400,7 @@ test('updateZonePrice throws if zone does not exist', async () => {
 })
 
 test('generatePermitReport returns correct permit report structure', async () => {
-  await permitService.purchaseMyZonePermit({
-    vehicle: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
-    zone: '27',
-    duration: { minutes: 30, hours: 0 },
-    paymentMethod: 'paypal',
-    transactionId: 'stripeTransactionID',
-  })
+  await permitService.purchaseMyZonePermit(zonePermitDetails)
 
   const report = await permitService.generatePermitReport({ numDays: 999 })
 

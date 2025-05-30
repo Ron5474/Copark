@@ -75,37 +75,39 @@ export class PermitResolver {
     @Arg("input", () => PurchaseZoneInput) input: PurchaseZoneInput,
     @Ctx() request: Request
   ): Promise<Confirmation> {
-    const plate = input.vehicle
+    const plate = input.plate
+    const vehicleId = input.vehicleId
 
-    const vehicleQuery = `
-      query FindVehicleByPlate($plate: String!) {
-        findVehicleByPlate(plate: $plate) {
-          id
-        }
-      }
-    `
-    const vehicleRes = await fetch('http://localhost:4001/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${request.headers.authorization}`,
-      },
-      body: JSON.stringify({
-        query: vehicleQuery,
-        variables: { plate },
-      }),
-    })
+    // const vehicleQuery = `
+    //   query FindVehicleByPlate($plate: String!) {
+    //     findVehicleByPlate(plate: $plate) {
+    //       id
+    //     }
+    //   }
+    // `
+    // const vehicleRes = await fetch('http://localhost:4001/graphql', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: `${request.headers.authorization}`,
+    //   },
+    //   body: JSON.stringify({
+    //     query: vehicleQuery,
+    //     variables: { plate },
+    //   }),
+    // })
 
-    const vehicleJson = await vehicleRes.json()
+    // const vehicleJson = await vehicleRes.json()
 
-    const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
+    // const vehicleId = input.vehicle // vehicleJson?.data?.findVehicleByPlate?.id
 
-    if (!vehicleId) {
-      throw new Error('Vehicle not found')
-    }
+    // if (!vehicleId) {
+    //   throw new Error('Vehicle not found')
+    // }
     
     const purchaseMyZonePermit = await service.purchaseMyZonePermit({
-      vehicle: vehicleId,
+      plate,
+      vehicleId,
       zone: input.zone,
       duration: input.duration,
       paymentMethod: input.paymentMethod,
@@ -274,37 +276,39 @@ export class PermitResolver {
     @Arg("input", () => PurchaseLotInput) input: PurchaseLotInput,
     @Ctx() request: Request
   ): Promise<Confirmation> {
-    const plate = input.vehicle
+    const plate = input.plate
+    const vehicleId = input.vehicleId
 
-    const vehicleQuery = `
-      query FindVehicleByPlate($plate: String!) {
-        findVehicleByPlate(plate: $plate) {
-          id
-        }
-      }
-    `
-    const vehicleRes = await fetch('http://localhost:4001/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${request.headers.authorization}`,
-      },
-      body: JSON.stringify({
-        query: vehicleQuery,
-        variables: { plate },
-      }),
-    })
+    // const vehicleQuery = `
+    //   query FindVehicleByPlate($plate: String!) {
+    //     findVehicleByPlate(plate: $plate) {
+    //       id
+    //     }
+    //   }
+    // `
+    // const vehicleRes = await fetch('http://localhost:4001/graphql', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: `${request.headers.authorization}`,
+    //   },
+    //   body: JSON.stringify({
+    //     query: vehicleQuery,
+    //     variables: { plate },
+    //   }),
+    // })
 
-    const vehicleJson = await vehicleRes.json()
+    // const vehicleJson = await vehicleRes.json()
 
-    const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
+    // const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 
-    if (!vehicleId) {
-      throw new Error('Vehicle not found')
-    }
+    // if (!vehicleId) {
+    //   throw new Error('Vehicle not found')
+    // }
     
     const purchaseMyZonePermit = await service.purchaseMyLotPermit({
-      vehicle: vehicleId,
+      plate,
+      vehicleId,
       lot: input.lot,
       duration: input.duration,
       paymentMethod: input.paymentMethod,
@@ -397,12 +401,13 @@ export class PermitResolver {
   @Query(() => [CheckedPermit])
   async checkPermit(
     @Arg("plate", () => String) plate: string,
+    @Arg("state", () => String) state: string,
     @Ctx() request: Request
   ): Promise<CheckedPermit[]> {
 
     const vehicleQuery = `
-      query FindVehicleByPlate($plate: String!) {
-        findVehicleByPlate(plate: $plate) {
+      query FindVehicleByPlate($plate: String!, $state: String!) {
+        findVehicleByPlate(plate: $plate, state: $state) {
           id
         }
       }
@@ -415,7 +420,7 @@ export class PermitResolver {
       },
       body: JSON.stringify({
         query: vehicleQuery,
-        variables: { plate },
+        variables: { plate, state },
       }),
     })
 
@@ -521,11 +526,12 @@ export class PermitResolver {
   @Query(() => IsValidPolice)
   async isValidPermitByPolice (
     @Arg("plate", () => String) plate: string,
+    @Arg("state", () => String) state: string,
     @Ctx() request: Request
   ): Promise<IsValidPolice> {
     const vehicleQuery = `
-      query FindVehicleByPlate($plate: String!) {
-        findVehicleByPlate(plate: $plate) {
+      query FindVehicleByPlate($plate: String!, $state: String!) {
+        findVehicleByPlate(plate: $plate, state: $state) {
           id
         }
       }
@@ -538,7 +544,7 @@ export class PermitResolver {
       },
       body: JSON.stringify({
         query: vehicleQuery,
-        variables: { plate },
+        variables: { plate, state },
       }),
     })
 

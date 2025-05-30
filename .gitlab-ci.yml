@@ -299,7 +299,7 @@ test:vehicleService:
     - npm run test-VehicleService
   rules:
     - changes: 
-      - microservice/AuthService/**/*
+      - microservice/VehicleService/**/*
       - package.json
       - .gitlab-ci.yml
 

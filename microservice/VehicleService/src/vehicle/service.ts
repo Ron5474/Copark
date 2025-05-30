@@ -24,7 +24,7 @@ export class VehicleService {
     
 
     const result = await pool.query(
-      `SELECT id, data FROM vehicle WHERE driver = $1`,
+      `SELECT id, data FROM vehicle WHERE driver = $1 AND data->>'deleted' IS NULL`,
       [userId]
     )
 
@@ -99,19 +99,36 @@ export class VehicleService {
     })))
   }
 
-  private async vehicleExists(plate: string): Promise<{ rowCount: number }> {
+  private async vehicleExists(plate: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
     const res = await pool.query(
       `SELECT id FROM vehicle WHERE LOWER(data->>'plate') = LOWER($1) AND data->>'deleted' IS NULL`,
       [plate]
     )
-    return {rowCount: res.rows.length};
+    return {rowCount: res.rows.length, rows: res.rows};
   }
 
-  public async removeVehicle(plate: string, userId: string, token: string): Promise<void> {
+  public async removeVehicle(plate: string, userId: string, token: string): Promise<VehicleID> {
     const existing = await this.vehicleExists(plate)
 
     if ((existing?.rowCount ?? 0) === 0) {
       throw new Error('Vehicle not found or not owned by user')
+    }
+
+    const vehicles = await this.getMyVehicles(userId)
+
+    if ((vehicles.length) === 1) {
+        console.log('existing', existing)
+        throw new Error('Cannot delete the only default vehicle. Please add another vehicle as default first.')
+    } else {
+      const defaultVehicle = await this.getDefaultVehicleId(userId)
+      if (defaultVehicle?.plate === plate) {
+        const removed = vehicles.filter(row => row.id !== defaultVehicle.id)
+        if (!removed || removed?.length === 0) {
+          throw new Error('Cannot delete the only default vehicle. Please add another vehicle as default first.')
+        } else {
+          await this.setDefaultVehicle({ id: removed[0].id }, userId)
+        }
+      }
     }
 
     // check if the vehicle has pending tickets
@@ -132,6 +149,7 @@ export class VehicleService {
         `,
         variables: { plate }
       })
+      
     });
 
     const pendingTicketsData = await pendingTickets.json();
@@ -139,20 +157,25 @@ export class VehicleService {
       throw new Error('Vehicle cannot be removed because it has pending tickets');
     }
 
-    // await pool.query(
-    //   `UPDATE vehicle SET data = jsonb_set(data, '{deleted}', to_jsonb(NOW())) WHERE LOWER(data->>'plate') = LOWER($1) AND driver = $2`,
-    //   [plate, userId]
-    // )
+    const res = await pool.query(
+      `UPDATE vehicle SET data = jsonb_set(data, '{deleted}', to_jsonb(NOW())) WHERE LOWER(data->>'plate') = LOWER($1) AND driver = $2 RETURNING id`,
+      [plate, userId]
+    )
+    if (res.rowCount === 0) {
+      throw new Error('Vehicle not found or not owned by user')
+    }
+    const rows = res.rows[0]
+
+    return { id: rows.id}
   }
 
   public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
     const existing = await this.vehicleExists(input.plate)
 
-
     if ((existing?.rowCount as number) > 0) {
       throw new Error('This license plate is already registered')
     }
-
+    try {
     const result = await pool.query(
       `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
       [
@@ -163,6 +186,7 @@ export class VehicleService {
         }
       ]
     )
+ 
 
     const vehicles = await pool.query(
       `SELECT COUNT(*) FROM vehicle WHERE driver = $1 AND data->>'deleted' IS NULL`,
@@ -177,6 +201,10 @@ export class VehicleService {
       default: defaultVehicle == null ? false : defaultVehicle.id == result.rows[0].id,
       ...input
     }
+     } catch (error) {
+    console.log('Error inserting vehicle:', error);
+    throw new Error('Failed to register vehicle. Please try again later.');
+    } 
   }
   
 
@@ -270,7 +298,7 @@ export class VehicleService {
 
   public async findVehicleByPlate(plate: string): Promise<Vehicle | null> {
     const result = await pool.query(
-      `SELECT id, data FROM vehicle WHERE data->>'plate' = $1`,
+      `SELECT id, data FROM vehicle WHERE data->>'plate' = $1 AND data->>'deleted' IS NULL`,
       [plate]
     )
 

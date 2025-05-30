@@ -1160,3 +1160,43 @@ test('Admin can get ticket report via adminTicketReport', async () => {
   expect(Array.isArray(report.violationBreakdown)).toBe(true);
   expect(Array.isArray(report.enforcerBreakdown)).toBe(true);
 });
+
+test('Plate with ticket is returned by getPlateWithTicket', async () => {
+  const t1 = await loginAs("driver");
+  const t2 = await loginAs("enforcement");
+  const createResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + t2)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "DERIK123",
+          reason: "Test Ticket",
+          note: "This is a test ticket",
+          images: "test-image.jpg"
+        }
+      }
+    });
+    
+
+    const query = `
+    query GetPlateWithTicket($plate: String!) {
+      pendingTickets(plate: $plate) {
+        id
+        vehicle
+      }
+    }
+  `;
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + t1)
+    .send({
+      query,
+      variables: { plate: "DERIK123" }
+    })
+  expect(response.status).toBe(200);
+  expect(response.body.errors).toBeUndefined();
+  const tickets = response.body.data.pendingTickets;
+  expect(tickets.length).toBe(1);
+})

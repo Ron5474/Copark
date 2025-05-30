@@ -6,7 +6,7 @@ CREATE TABLE vehicle(
     data JSONB NOT NULL
 );
 
-CREATE UNIQUE INDEX unique_plate ON vehicle (LOWER(data->>'plate'));
+CREATE INDEX ON vehicle (LOWER(data->>'plate'));
 
 DROP TABLE IF EXISTS defaultVehicle CASCADE;
 CREATE TABLE defaultVehicle(

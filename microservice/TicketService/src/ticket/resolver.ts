@@ -35,6 +35,38 @@ export class TicketResolver {
     this.ticketService = new TicketService();
   }
 
+  private async getVehicleByPlate(plate: string, userId?: string): Promise<Vehicle | null> {
+    const vehicleQuery = {
+      query: `
+        query FindVehicleByPlate($plate: String!) {
+          findVehicleByPlate(plate: $plate) {
+            id
+            plate
+          }
+        }
+      `,
+      variables: { plate }
+    };
+    const vehicleResponse = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // '
+        'Authorization': 'Bearer ' + userId
+      },
+      body: JSON.stringify(vehicleQuery)
+    });
+
+    const vehicleResult = await vehicleResponse.json();
+    const vehicle = vehicleResult.data?.findVehicleByPlate;
+    if (!vehicle) {
+      return null;
+    }
+    return {
+      id: vehicle.id
+    };
+  }
+
   private async getVehicleById(userID: string): Promise<Vehicle[]> {
     const vehicleQuery = {
       query: `
@@ -351,9 +383,13 @@ export class TicketResolver {
   @Query(() => [Ticket])
   async pendingTickets(
     @Ctx() request: Request & {user: SessionUser},
-    @Arg("plate", () => String) vehicleID: string
+    @Arg("plate", () => String) plate: string
   ): Promise<Ticket[]> {
-    
-    return await this.ticketService.getPendingTicketsByPlateNumber(vehicleID)
+    const userToken = request.headers.authorization?.split(' ')[1]
+    const vehicleID: Vehicle|null = await this.getVehicleByPlate(plate, userToken)
+    if (!vehicleID) {
+      return []
+    }
+    return await this.ticketService.getPendingTicketsByPlateNumber(vehicleID.id)
   }
 }

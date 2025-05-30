@@ -151,4 +151,21 @@ export class VehicleResolver {
 
     return await service.createUnregisteredVehicle({ plate })
   }
+
+  @Authorized('driver')
+  @Mutation(() => VehicleID)
+  async deleteVehicle(
+    @Arg('plate', () => String) plate: string,
+    @Ctx() request: Request & {user: SessionUser}
+  ): Promise<VehicleID> {
+    const token = request.headers.authorization?.split(' ')[1]
+    const userId = (await this.getUserData(token)).id
+    if (!plate) {
+      throw new Error('Plate is required')
+    }
+    if (!token) {
+      throw new Error('Token not provided')
+    } 
+    return await service.removeVehicle(plate, userId, token)
+  }
 }

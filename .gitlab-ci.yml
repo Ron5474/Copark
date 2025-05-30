@@ -6,22 +6,7 @@ image: node:lts
 services:
   - name: postgres:15
     alias: postgres
-  
-init:postgres:
-  image: postgres:15
-  script:
-    - echo "Waiting for postgres..."
-    - until pg_isready -h postgres -p 5432; do sleep2; done
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
 
-  variables:
-    POSTGRES_DB: postgres
-    PGPASSWORD: "$POSTGRES_PASSWORD"
-  rules:
-    - when: always
 
 variables:
   PIPELINE: true
@@ -274,8 +259,11 @@ test:enforcement:
 
 test:auth:
   stage: test
-  needs: ["init:postgres"]
   script:
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
     - npm run install-auth
     - npm run test-auth
   rules:

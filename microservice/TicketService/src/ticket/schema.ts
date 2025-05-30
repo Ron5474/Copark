@@ -103,6 +103,9 @@ export class NewTicketInput {
   plate!: string;
 
   @Field(() => String)
+  state!: string;
+
+  @Field(() => String)
   reason!: string;
 
   @Field(() => String, { nullable: true })
@@ -160,16 +163,16 @@ export class EnforcerBreakdown {
 @ObjectType()
 export class TicketReport {
   @Field(() => Number)
-  totalTickets!: Number;
+  totalTickets!: number;
 
   @Field(() => Number)
-  unpaidTickets!: Number;
+  unpaidTickets!: number;
 
   @Field(() => Number)
-  paidTickets!: Number;
+  paidTickets!: number;
 
   @Field(() => Number)
-  totalRevenue!: Number;
+  totalRevenue!: number;
 
   @Field(() => [ViolationBreakdown])
   violationBreakdown!: ViolationBreakdown[];

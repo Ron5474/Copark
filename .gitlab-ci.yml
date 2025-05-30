@@ -281,8 +281,6 @@ test:auth:
 
 test:vehicleService:
   stage: test
-  before_script:
-    - rm -rf microservice/VehicleService/build
   script:
     - apt-get update && apt-get install -y postgresql-client
     - until pg_isready -h postgres -p 5432; do sleep 1; done
@@ -295,8 +293,10 @@ test:vehicleService:
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
-    - npm run install-vehicleService
-    - npm run test-VehicleService
+    - cd microservice/VehicleService
+    - rm -rf node_modules build
+    - npm ci
+    - npm run test
   rules:
     - changes: 
       - microservice/VehicleService/**/*

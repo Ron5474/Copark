@@ -179,7 +179,7 @@ export class PurchaseZoneInput {
   plate!: string
 
   @Field(() => ID)
-  vid!: string
+  vehicleId!: string
 
   @Field(() => String)
   zone!: string
@@ -197,8 +197,11 @@ export class PurchaseZoneInput {
 
 @InputType()
 export class PurchaseLotInput {
+  @Field(() => String)
+  plate!: string
+
   @Field(() => ID)
-  vehicle!: string
+  vehicleId!: string
 
   @Field(() => String)
   lot!: string

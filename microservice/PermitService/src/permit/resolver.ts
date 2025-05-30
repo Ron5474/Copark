@@ -76,7 +76,7 @@ export class PermitResolver {
     @Ctx() request: Request
   ): Promise<Confirmation> {
     const plate = input.plate
-    const vid = input.vid
+    const vehicleId = input.vehicleId
 
     // const vehicleQuery = `
     //   query FindVehicleByPlate($plate: String!) {
@@ -107,7 +107,7 @@ export class PermitResolver {
     
     const purchaseMyZonePermit = await service.purchaseMyZonePermit({
       plate,
-      vid,
+      vehicleId,
       zone: input.zone,
       duration: input.duration,
       paymentMethod: input.paymentMethod,
@@ -276,37 +276,39 @@ export class PermitResolver {
     @Arg("input", () => PurchaseLotInput) input: PurchaseLotInput,
     @Ctx() request: Request
   ): Promise<Confirmation> {
-    const plate = input.vehicle
+    const plate = input.plate
+    const vehicleId = input.vehicleId
 
-    const vehicleQuery = `
-      query FindVehicleByPlate($plate: String!) {
-        findVehicleByPlate(plate: $plate) {
-          id
-        }
-      }
-    `
-    const vehicleRes = await fetch('http://localhost:4001/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${request.headers.authorization}`,
-      },
-      body: JSON.stringify({
-        query: vehicleQuery,
-        variables: { plate },
-      }),
-    })
+    // const vehicleQuery = `
+    //   query FindVehicleByPlate($plate: String!) {
+    //     findVehicleByPlate(plate: $plate) {
+    //       id
+    //     }
+    //   }
+    // `
+    // const vehicleRes = await fetch('http://localhost:4001/graphql', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: `${request.headers.authorization}`,
+    //   },
+    //   body: JSON.stringify({
+    //     query: vehicleQuery,
+    //     variables: { plate },
+    //   }),
+    // })
 
-    const vehicleJson = await vehicleRes.json()
+    // const vehicleJson = await vehicleRes.json()
 
-    const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
+    // const vehicleId = vehicleJson?.data?.findVehicleByPlate?.id
 
-    if (!vehicleId) {
-      throw new Error('Vehicle not found')
-    }
+    // if (!vehicleId) {
+    //   throw new Error('Vehicle not found')
+    // }
     
     const purchaseMyZonePermit = await service.purchaseMyLotPermit({
-      vehicle: vehicleId,
+      plate,
+      vehicleId,
       lot: input.lot,
       duration: input.duration,
       paymentMethod: input.paymentMethod,

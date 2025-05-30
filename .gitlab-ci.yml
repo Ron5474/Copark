@@ -279,7 +279,7 @@ test:auth:
       - package.json
       - .gitlab-ci.yml
 
-test:vehicleService:
+test:permitService:
   stage: test
   script:
     - apt-get update && apt-get install -y postgresql-client
@@ -287,21 +287,50 @@ test:vehicleService:
     - export PGPASSWORD="$POSTGRES_PASSWORD"
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/VehicleService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/PermitService/sql/databases.sql
 
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
-    - cd microservice/VehicleService
+    - cd microservice/PermitService
     - rm -rf node_modules build
     - npm ci
     - npm run test
   rules:
     - changes: 
-      - microservice/VehicleService/**/*
+      - microservice/PermitService/**/*
       - package.json
       - .gitlab-ci.yml
+
+
+
+# test:vehicleService:
+#   stage: test
+#   script:
+#     - apt-get update && apt-get install -y postgresql-client
+#     - until pg_isready -h postgres -p 5432; do sleep 1; done
+#     - export PGPASSWORD="$POSTGRES_PASSWORD"
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/VehicleService/sql/databases.sql
+
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
+#     - cd microservice/VehicleService
+#     - rm -rf node_modules build
+#     - npm ci
+#     - npm run test
+#   rules:
+#     - changes: 
+#       - microservice/VehicleService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 
 # # Failing Integration Tests

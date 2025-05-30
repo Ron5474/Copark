@@ -247,7 +247,7 @@ test:enforcement:
 test:vehicleService:
   script:
     - npm run install-vehicleService
-    - npm run test-vehicleService
+    - npm run test-VehicleService
   rules:
     - changes: 
       - microservices/VehicleService/**/*

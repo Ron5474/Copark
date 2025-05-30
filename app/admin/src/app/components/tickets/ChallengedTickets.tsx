@@ -1,5 +1,4 @@
 import { Stack, Box, Typography, Button, useTheme } from '@mui/material'
-import { useState } from 'react'
 import { ChallengedTicket } from '@/types'
 import { acceptTicketChallenge, rejectTicketChallenge, getChallengedTickets } from '../../../ticket/actions'
 
@@ -13,7 +12,6 @@ interface ChallengedTicketsProps {
 
 export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: ChallengedTicketsProps) {
   const theme = useTheme()
-  const [validImageCounts, setValidImageCounts] = useState<Record<string, number>>({})
 
   return (
     <>

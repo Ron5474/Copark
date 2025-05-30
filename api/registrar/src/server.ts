@@ -1,5 +1,9 @@
 import dotenv from 'dotenv'
-dotenv.config()
+import { resolve } from 'path';
+
+const isBuilt = __dirname.includes('/build') || __dirname.includes('\\build');
+const p = resolve(__dirname, isBuilt ? '../../../../.prod.env': '../../../.env')
+dotenv.config({ path: p})
 
 import app from './app'
 

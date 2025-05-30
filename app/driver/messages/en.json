@@ -154,7 +154,7 @@
           "title": "Check and Pay for Tickets",
           "description": "Check for tickets on your vehicle and pay instantly"
         },
-        "prompt": "Add Your First Vehicle",
+        "prompt": "Add First Vehicle",
         "secure": "Your data is secure • Add unlimited vehicles later"
       },
       "page2": {

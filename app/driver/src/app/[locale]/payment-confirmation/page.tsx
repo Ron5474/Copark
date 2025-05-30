@@ -73,7 +73,14 @@ function PaymentConfirmation() {
         <Typography variant="body1" sx={{ fontWeight: 400, color: "black" }}>
           {t("description.line2")}
         </Typography>
-        {confirmed && <Button sx={{marginTop: "20%", backgroundColor: theme.palette.primary.main, color: "white", padding: '18px', textTransform: 'none'}} onClick={() => handleClick()}>{t("Continue")}</Button>}
+        {confirmed &&
+          <Button
+            sx={{marginTop: "20%", backgroundColor: theme.palette.primary.main, color: "white", padding: '18px', textTransform: 'none', fontSize: '1.15rem'}}
+            onClick={() => handleClick()}
+          >
+            {t("continue")}
+          </Button>
+        }
       </Box>
     </>
   );

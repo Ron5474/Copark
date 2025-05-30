@@ -3,6 +3,16 @@ import { pool } from "./db";
 import Stripe from "stripe";
 import { Checkout, PaymentDetails } from "./index";
 export class PaymentService {
+  private async generateCuponCode(name: string, percentoff: number): Promise<string> {
+    const stripe = new Stripe(process.env.STRIPE_SECRET as string);
+    const coupon = await stripe.coupons.create({
+      name: name,
+      percent_off: percentoff,
+      duration: "once",
+    });
+    return coupon.id;
+  }
+
   public async payment(
     checkoutDetails: Checkout,
     id?: string,

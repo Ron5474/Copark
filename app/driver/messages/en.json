@@ -213,12 +213,12 @@
               "required": "License plate number is required",
               "constraint": "Must be 1-10 characters"
             },
-            "country": "Country",
-            "state": "State",
-            "nickname": "Nickname",
-            "optional": "optional",
-            "save": "Save"
-      },
+      "country": "Country",
+      "state": "State",
+      "nickname": "Nickname",
+      "optional": "optional",
+      "save": "Save"
+    },
     "checkout": {
       "title": "Which Vehicle?",
       "continue": "Continue"

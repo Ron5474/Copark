@@ -12,6 +12,7 @@ import {
   TicketsByDay,
   ChallengeTicket,
   PaidTicketInput,
+  TicketReport,
 } from "./schema";
 
 import { SessionUser } from "src";
@@ -339,10 +340,10 @@ export class TicketResolver {
   }
 
   @Authorized(['admin'])
-  @Query(() => PermitReport)
+  @Query(() => TicketReport)
   async adminPermitReport(
     @Arg("numDays", () => Number, { nullable: true }) numDays?: number,
-  ): Promise<PermitReport> {
-    return await service.generatePermitReport({numDays: numDays ?? 999})
+  ): Promise<TicketReport> {
+    return await this.ticketService.generateTicketReport({numDays: numDays ?? 999})
   }
 }

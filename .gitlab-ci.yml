@@ -245,6 +245,7 @@ test:enforcement:
       - .gitlab-ci.yml
 
 test:vehicleService:
+  stage: test
   script:
     - npm run install-vehicleService
     - npm run test-VehicleService

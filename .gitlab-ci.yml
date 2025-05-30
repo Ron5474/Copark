@@ -272,6 +272,7 @@ test:enforcement:
 
 test:auth:
   stage: test
+  needs: ["init:postgres"]
   script:
     - npm run install-auth
     - npm run test-auth

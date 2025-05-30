@@ -213,7 +213,8 @@ mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
 
 const purchaseZoneInput = {
   input: {
-    vehicle: "12345678-1234-1234-1234-567890abcdef",
+    vid: "12345678-1234-1234-1234-567890abcdef",
+    plate: "Testing :)",
     zone: "123",
     duration: {'minutes': 30, 'hours': 0},
     paymentMethod: "paypal",

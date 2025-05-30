@@ -99,7 +99,7 @@ lint:authService:
     - npm run lint-auth
   rules:
     - changes: 
-      - microservices/AuthService/**/*
+      - microservice/AuthService/**/*
       - package.json
       - .gitlab-ci.yml
 
@@ -110,7 +110,7 @@ lint:adminService:
     - npm run lint-adminService
   rules:
     - changes: 
-      - microservices/AdminService/**/*
+      - microservice/AdminService/**/*
       - package.json
       - .gitlab-ci.yml
 
@@ -121,7 +121,7 @@ lint:vehicleService:
     - npm run lint-vehicleService
   rules:
     - changes: 
-      - microservices/VehicleService/**/*
+      - microservice/VehicleService/**/*
       - package.json
       - .gitlab-ci.yml
 
@@ -204,7 +204,7 @@ build:adminService:
     - npm run build-adminService
   rules:
     - changes: 
-      - microservices/AdminService/**/*
+      - microservice/AdminService/**/*
       - package.json
       - .gitlab-ci.yml
 
@@ -215,7 +215,7 @@ build:vehicleService:
     - npm run build-vehicleService
   rules:
     - changes: 
-      - microservices/VehicleService/**/*
+      - microservice/VehicleService/**/*
       - package.json
       - .gitlab-ci.yml
 
@@ -262,6 +262,7 @@ test:auth:
   script:
     - apt-get update && apt-get install -y postgresql-client
     - until pg_isready -h postgres -p 5432; do sleep 1; done
+    - export PGPASSWORD="$POSTGRES_PASSWORD"
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
@@ -270,7 +271,7 @@ test:auth:
     - npm run test-auth
   rules:
     - changes: 
-      - microservices/AuthService/**/*
+      - microservice/AuthService/**/*
       - package.json
       - .gitlab-ci.yml
 
@@ -281,7 +282,7 @@ test:auth:
 #     - npm run test-VehicleService
 #   rules:
 #     - changes: 
-#       - microservices/VehicleService/**/*
+#       - microservice/VehicleService/**/*
 #       - package.json
 #       - .gitlab-ci.yml
 

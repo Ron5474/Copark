@@ -34,7 +34,7 @@ interface LotDetails {
 }
 
 export class PermitService {
-  public async purchaseMyZonePermit(input: PurchaseZoneInput): Promise<Confirmation> {
+  public async purchaseMyZonePermit(input: PurchaseZoneInput, now=new Date().toISOString()): Promise<Confirmation> {
 
     const totalMinutes = (input.duration?.hours || 0) * 60 + (input.duration?.minutes || 0)
 
@@ -48,8 +48,6 @@ export class PermitService {
       subTotal,
       total
     } as Receipt
-
-    // Stripe processing goes here
 
 
     const today = new Date()
@@ -74,8 +72,11 @@ export class PermitService {
         SELECT id
         FROM type
         WHERE data->>'name' = 'zone'
-        AND TRIM(LOWER(data->>'area')) = TRIM(LOWER($2))
+        AND TRIM(LOWER(data->>'area')) = TRIM($2)
         LIMIT 1
+      ),
+      zone_exists_check AS (
+        SELECT COUNT(*)::int AS count FROM selected_zone
       ),
       duplicate_check AS (
         SELECT COUNT(*)::int AS count FROM permit
@@ -84,58 +85,61 @@ export class PermitService {
       conflict_check AS (
         SELECT COUNT(*)::int AS count FROM permit
         WHERE vehicle = $1
-          AND type = (SELECT id FROM selected_zone)
-          AND (
-            (data->>'expireDate')::timestamptz IS NULL
-            OR (data->>'expireDate')::timestamptz > now()
-          )
+          AND type = (SELECT id FROM selected_zone)::uuid
+          AND (data->>'activeDate')::timestamptz <= $5
+          AND (data->>'expireDate')::timestamptz > $5
       ),
       inserted AS (
         INSERT INTO permit (vehicle, type, data)
         SELECT $1, id, $3
         FROM selected_zone
         WHERE 
-          (SELECT count FROM duplicate_check) = 0 AND
-          (SELECT count FROM conflict_check) = 0
+          (SELECT count FROM zone_exists_check) > 0 AND
+          COALESCE((SELECT count FROM duplicate_check), 0) = 0 AND
+          COALESCE((SELECT count FROM conflict_check), 0) = 0
         RETURNING type, data
       )
       SELECT 
         (SELECT count FROM duplicate_check) AS duplicate_count,
         (SELECT count FROM conflict_check) AS conflict_count,
+        (SELECT count FROM zone_exists_check) AS zone_exists,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
-    `, [input.vehicle, input.zone, data, input.transactionId]);
+    `, [input.vehicle, input.zone, data, input.transactionId, now])
     
-    const result = rows[0];
+    const result = rows[0]
 
     if (result.duplicate_count > 0) {
-      throw new Error(`Permit for vehicle ${input.vehicle} already exists for zone ${input.zone} with transaction ID ${input.transactionId}`);
+      throw new Error(`Permit for vehicle ${input.vehicle} already exists for zone ${input.zone} with transaction ID ${input.transactionId}`)
     }
 
     if (result.conflict_count > 0) {
-      throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in zone ${input.zone}`);
+      throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in zone ${input.zone}`)
     }
 
-    // TODO: Hit email api to send confirmation and receipt
+    // if (!result.zone_exists) {
+    //   throw new Error(`Zone "${input.zone}" doesn't exist`)
+    // }
+
     return {
       type: 'zone',
       area: input.zone,
-      purchaseDate: rows[0].inserted_row.purchaseDate,
-      activeDate: rows[0].inserted_row.activeDate,
-      expireDate: rows[0].inserted_row.expireDate,
-      receipt: rows[0].inserted_row.receipt,
-      paymentMethod: rows[0].inserted_row.paymentMethod,
+      purchaseDate: result.inserted_row.data.purchaseDate,
+      activeDate: result.inserted_row.data.activeDate,
+      expireDate: result.inserted_row.data.expireDate,
+      receipt: result.inserted_row.data.receipt,
+      paymentMethod: result.inserted_row.data.paymentMethod,
     }
   }
 
-  public async getValidPermit(vid: string): Promise<CheckedPermit[]> {
+  public async getValidPermit(vid: string, now=new Date().toISOString()): Promise<CheckedPermit[]> {
     const result = await pool.query(`
       SELECT t.data
       FROM permit p
       JOIN type t ON t.id = p.type
       WHERE p.vehicle = $1
-        AND now() >= (p.data->>'activeDate')::timestamptz
-        AND now() <= (p.data->>'expireDate')::timestamptz
-    `, [vid])
+        AND $2 >= (p.data->>'activeDate')::timestamptz
+        AND $2 <= (p.data->>'expireDate')::timestamptz
+    `, [vid, now])
   
     return result.rows.map(row => {
       return {
@@ -146,23 +150,23 @@ export class PermitService {
   }
   
 
-  public async isValidPermitPolice(vid: string): Promise<IsValidPolice> {
+  public async isValidPermitPolice(vid: string, now=new Date().toISOString()): Promise<IsValidPolice> {
 
     const result = await pool.query(`
         SELECT data
         FROM permit
         WHERE vehicle = $1
-        AND now() >= (data->>'activeDate')::timestamptz
-        AND now() <= (data->>'expireDate')::timestamptz
+        AND $2 >= (data->>'activeDate')::timestamptz
+        AND $2 <= (data->>'expireDate')::timestamptz
       `,
-      [vid]
+      [vid, now]
     )
 
     if (result.rowCount === 0) return { isValid: false }
     return { isValid: true }
   }
 
-  public async getMyPermits(vid: Vehicle[]): Promise<MyPermits> {
+  public async getMyPermits(vid: Vehicle[], now=new Date().toISOString()): Promise<MyPermits> {
 
     const result = await pool.query(`
         WITH future AS (
@@ -175,7 +179,7 @@ export class PermitService {
           FROM permit p, type t 
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
-          AND now() <= (p.data->>'activeDate')::timestamptz
+          AND $2 <= (p.data->>'activeDate')::timestamptz
         ),
         active AS (
           SELECT DISTINCT ON (p.id) p.vehicle,
@@ -187,8 +191,8 @@ export class PermitService {
           FROM permit p, type t 
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
-          AND now() >= (p.data->>'activeDate')::timestamptz
-          AND now() <= (p.data->>'expireDate')::timestamptz
+          AND $2 >= (p.data->>'activeDate')::timestamptz
+          AND $2 <= (p.data->>'expireDate')::timestamptz
         ),
         expired AS (
           SELECT DISTINCT ON (p.id) p.vehicle,
@@ -200,16 +204,15 @@ export class PermitService {
           FROM permit p, type t 
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
-          AND now() >= (p.data->>'expireDate')::timestamptz
+          AND $2 >= (p.data->>'expireDate')::timestamptz
         )
         SELECT
           COALESCE((SELECT json_agg(future) FROM future), '[]') AS future,
           COALESCE((SELECT json_agg(active) FROM active), '[]') AS active,
           COALESCE((SELECT json_agg(expired) FROM expired), '[]') AS expired
       `,
-      [vid]
+      [vid, now]
     )
-    // console.log(result.rows[0])
 
     return result.rows[0]
   }
@@ -391,7 +394,7 @@ export class PermitService {
     return (rowCount as number) > 0
   }
 
-  public async purchaseMyLotPermit(input: PurchaseLotInput): Promise<Confirmation> {
+  public async purchaseMyLotPermit(input: PurchaseLotInput, now=new Date()): Promise<Confirmation> {
 
     const today = new Date()
 
@@ -415,7 +418,6 @@ export class PermitService {
       beginDate.toISOString() :
       purchaseDate
     
-    const now = new Date()
     const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString()
     const expireDate = details?.expireDate ?? localMidnight
 
@@ -436,6 +438,9 @@ export class PermitService {
         AND TRIM(LOWER(data->>'area')) = TRIM(LOWER($2))
         LIMIT 1
       ),
+      lot_exists_check AS (
+        SELECT COUNT(*)::int AS count FROM selected_lot
+      ),
       duplicate_check AS (
         SELECT COUNT(*)::int AS count FROM permit
         WHERE data->>'transactionId' = $4
@@ -446,7 +451,7 @@ export class PermitService {
           AND type = (SELECT id FROM selected_lot)
           AND (
             (data->>'expireDate')::timestamptz IS NULL
-            OR (data->>'expireDate')::timestamptz > now()
+            OR (data->>'expireDate')::timestamptz > $5
           )
       ),
       inserted AS (
@@ -461,29 +466,32 @@ export class PermitService {
       SELECT 
         (SELECT count FROM duplicate_check) AS duplicate_count,
         (SELECT count FROM conflict_check) AS conflict_count,
+        (SELECT count FROM lot_exists_check) AS lot_exists,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
-    `, [input.vehicle, input.lot, data, input.transactionId]);
+    `, [input.vehicle, input.lot, data, input.transactionId, now.toISOString()])
     
-    const result = rows[0];
+    const result = rows[0]
 
     if (result.duplicate_count > 0) {
-      throw new Error(`Permit for vehicle ${input.vehicle} already exists for lot ${input.lot} with transaction ID ${input.transactionId}`);
+      throw new Error(`Permit for vehicle ${input.vehicle} already exists for lot ${input.lot} with transaction ID ${input.transactionId}`)
     }
 
     if (result.conflict_count > 0) {
-      throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in lot ${input.lot}`);
+      throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in lot ${input.lot}`)
     }
 
+    // if (!result.lot_exists) {
+    //   throw new Error(`Lot "${input.lot}" doesn't exist`)
+    // }
 
-    // TODO: Hit email api to send confirmation and receipt
     return {
       type: 'lot',
       area: input.lot,
-      purchaseDate: rows[0].inserted_row.purchaseDate,
-      activeDate: rows[0].inserted_row.activeDate,
-      expireDate: rows[0].inserted_row.expireDate,
-      receipt: rows[0].inserted_row.receipt,
-      paymentMethod: rows[0].inserted_row.paymentMethod,
+      purchaseDate: rows[0].inserted_row.data.purchaseDate,
+      activeDate: rows[0].inserted_row.data.activeDate,
+      expireDate: rows[0].inserted_row.data.expireDate,
+      receipt: rows[0].inserted_row.data.receipt,
+      paymentMethod: rows[0].inserted_row.data.paymentMethod,
     }
   }
 
@@ -597,7 +605,6 @@ export class PermitService {
 
     const zoneBreakdown = await this.getPermitStatsByZone(false)
     const lotBreakdown = await this.getPermitStatsByLot(false)
-    console.log("Revenue debug:", row.revenue, typeof row.revenue)
 
     return {
       totalPermits: parseInt(row.total),

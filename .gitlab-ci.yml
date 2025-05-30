@@ -1,248 +1,265 @@
-# # Official framework image.
-# # https://hub.docker.com/r/library/node/tags/
-# # lts = Long Term Support
-# image: node:lts
+# Official framework image.
+# https://hub.docker.com/r/library/node/tags/
+# lts = Long Term Support
+image: node:lts
 
-# services:
-#   - postgres
+services:
+  - name: postgres:15
+    alias: postgres
+  
+init:postgres:
+  image: postgres:15
+  script:
+    - echo "Waiting for postgres..."
+    - until pg_isready -h postgres -p 5432; do sleep2; done
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
 
-# variables:
-#   PIPELINE: true
-#   POSTGRES_HOST: ${POSTGRES_HOST}
-#   POSTGRES_PORT: ${POSTGRES_PORT}
-#   POSTGRES_DB: ${POSTGRES_DB}
-#   POSTGRES_AUTH_DB: ${POSTGRES_AUTH_DB} 
-#   POSTGRES_VEHICLE_DB: ${POSTGRES_VEHICLE_DB}
-#   POSTGRES_PERMIT_DB: ${POSTGRES_PERMIT_DB}
-#   POSTGRES_TICKET_DB: ${POSTGRES_TICKET_DB}
-#   POSTGRES_USER: ${POSTGRES_USER}
-#   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-#   JWT_SECRET: ${JWT_SECRET}
-#   MICROSERVICE_INTERNAL_SECRET: ${MICROSERVICE_INTERNAL_SECRET}
-#   NEXT_PUBLIC_DRIVER_APP_URL: ${NEXT_PUBLIC_DRIVER_APP_URL}
-#   NEXT_PUBLIC_GOOGLE_ID: ${NEXT_PUBLIC_GOOGLE_ID}
-#   NEXT_PUBLIC_GOOGLE_SECRET: ${NEXT_PUBLIC_GOOGLE_SECRET}
-#   NEXT_PUBLIC_FACEBOOK_CLIENT_ID: ${NEXT_PUBLIC_FACEBOOK_CLIENT_ID}
-#   NEXT_PUBLIC_FACEBOOK_SECRET: ${NEXT_PUBLIC_FACEBOOK_SECRET}
-#   NEXT_PUBLIC_GITHUB_ID: ${NEXT_PUBLIC_GITHUB_ID}
-#   NEXT_PUBLIC_GITHUB_SECRET: ${NEXT_PUBLIC_GITHUB_SECRET}
-#   NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
-#   NEXTAUTH_URL: ${NEXTAUTH_URL}
-#   NEXT_PUBLIC_AUTH_COOKIE_NAME: ${NEXT_PUBLIC_AUTH_COOKIE_NAME}
+  variables:
+    POSTGRES_DB: postgres
+    PGPASSWORD: "$POSTGRES_PASSWORD"
+  rules:
+    - when: always
 
-# stages:
-#   - quality
-#   - build
-#   - test
-#   - setup-env-variables
-#   - conatainerize
-#   - deploy
+variables:
+  PIPELINE: true
+  POSTGRES_HOST: ${POSTGRES_HOST}
+  POSTGRES_PORT: ${POSTGRES_PORT}
+  POSTGRES_DB: ${POSTGRES_DB}
+  POSTGRES_AUTH_DB: ${POSTGRES_AUTH_DB} 
+  POSTGRES_VEHICLE_DB: ${POSTGRES_VEHICLE_DB}
+  POSTGRES_PERMIT_DB: ${POSTGRES_PERMIT_DB}
+  POSTGRES_TICKET_DB: ${POSTGRES_TICKET_DB}
+  POSTGRES_USER: ${POSTGRES_USER}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  JWT_SECRET: ${JWT_SECRET}
+  MICROSERVICE_INTERNAL_SECRET: ${MICROSERVICE_INTERNAL_SECRET}
+  NEXT_PUBLIC_DRIVER_APP_URL: ${NEXT_PUBLIC_DRIVER_APP_URL}
+  NEXT_PUBLIC_GOOGLE_ID: ${NEXT_PUBLIC_GOOGLE_ID}
+  NEXT_PUBLIC_GOOGLE_SECRET: ${NEXT_PUBLIC_GOOGLE_SECRET}
+  NEXT_PUBLIC_FACEBOOK_CLIENT_ID: ${NEXT_PUBLIC_FACEBOOK_CLIENT_ID}
+  NEXT_PUBLIC_FACEBOOK_SECRET: ${NEXT_PUBLIC_FACEBOOK_SECRET}
+  NEXT_PUBLIC_GITHUB_ID: ${NEXT_PUBLIC_GITHUB_ID}
+  NEXT_PUBLIC_GITHUB_SECRET: ${NEXT_PUBLIC_GITHUB_SECRET}
+  NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+  NEXTAUTH_URL: ${NEXTAUTH_URL}
+  NEXT_PUBLIC_AUTH_COOKIE_NAME: ${NEXT_PUBLIC_AUTH_COOKIE_NAME}
 
-# # default:
-# #   allow_failure: false
+stages:
+  - quality
+  - build
+  - test
+  - setup-env-variables
+  - conatainerize
+  - deploy
 
-# # .test_template: &test_template
-# #   stage: test
-# #   before_script:
-# #     - npm installs
+# default:
+#   allow_failure: false
 
-# lint:enforcement:
+# .test_template: &test_template
+#   stage: test
+#   before_script:
+#     - npm installs
+
+lint:enforcement:
+  stage: quality
+  script:
+    - npm run install-enforcement
+    - npm run lint-enforcement
+  rules:
+    - changes: 
+      - app/enforcement/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:admin:
+  stage: quality
+  script:
+    - npm run install-admin
+    - npm run lint-admin
+  rules:
+    - changes: 
+      - app/admin/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:driver:
+  stage: quality
+  script:
+    - npm run install-driver
+    - npm run lint-driver
+  rules:
+    - changes: 
+      - app/driver/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:marketing:
+  stage: quality
+  script:
+    - npm run install-marketing
+    - npm run lint-marketing
+  rules:
+    - changes: 
+      - app/marketing/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:authService:
+  stage: quality
+  script:
+    - npm run install-auth
+    - npm run lint-auth
+  rules:
+    - changes: 
+      - microservices/AuthService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:adminService:
+  stage: quality
+  script:
+    - npm run install-adminService
+    - npm run lint-adminService
+  rules:
+    - changes: 
+      - microservices/AdminService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:vehicleService:
+  stage: quality
+  script:
+    - npm run install-vehicleService
+    - npm run lint-vehicleService
+  rules:
+    - changes: 
+      - microservices/VehicleService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+# lint:ticketService:
 #   stage: quality
 #   script:
-#     - npm run install-enforcement
-#     - npm run lint-enforcement
+#     - npm run install-ticketService
+#     - npm run lint-ticketService
 #   rules:
 #     - changes: 
-#       - app/enforcement/**/*
+#       - microservices/TicketService/**/*
 #       - package.json
 #       - .gitlab-ci.yml
 
-# lint:admin:
-#   stage: quality
+# lint:
+#   stage: quality 
 #   script:
-#     - npm run install-admin
-#     - npm run lint-admin
-#   rules:
-#     - changes: 
-#       - app/admin/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+#     - npm run installs
+#     - npm run lint
 
-# lint:driver:
-#   stage: quality
-#   script:
-#     - npm run install-driver
-#     - npm run lint-driver
-#   rules:
-#     - changes: 
-#       - app/driver/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+build:enforcement:
+  stage: build
+  script:
+    - npm run install-enforcement
+    - npm run build-enforcement
+  rules:
+    - changes: 
+      - app/enforcement/**/*
+      - package.json
+      - .gitlab-ci.yml
 
-# lint:marketing:
-#   stage: quality
-#   script:
-#     - npm run install-marketing
-#     - npm run lint-marketing
-#   rules:
-#     - changes: 
-#       - app/marketing/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+build:admin:
+  stage: build
+  script:
+    - npm run install-admin
+    - npm run build-admin
+  rules:
+    - changes: 
+      - app/admin/**/*
+      - package.json
+      - .gitlab-ci.yml
 
-# lint:authService:
-#   stage: quality
-#   script:
-#     - npm run install-auth
-#     - npm run lint-auth
-#   rules:
-#     - changes: 
-#       - microservices/AuthService/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+build:driver:
+  stage: build
+  script:
+    - npm run install-driver
+    - npm run build-driver
+  rules:
+    - changes: 
+      - app/driver/**/*
+      - package.json
+      - .gitlab-ci.yml
 
-# lint:adminService:
-#   stage: quality
-#   script:
-#     - npm run install-adminService
-#     - npm run lint-adminService
-#   rules:
-#     - changes: 
-#       - microservices/AdminService/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+build:marketing:
+  stage: build
+  script:
+    - npm run install-marketing
+    - npm run build-marketing
+  rules:
+    - changes: 
+      - app/marketing/**/*
+      - package.json
+      - .gitlab-ci.yml
 
-# lint:vehicleService:
-#   stage: quality
-#   script:
-#     - npm run install-vehicleService
-#     - npm run lint-vehicleService
-#   rules:
-#     - changes: 
-#       - microservices/VehicleService/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+build:auth:
+  stage: build
+  script:
+    - npm run install-auth
+    - npm run build-auth
+  rules:
+    - changes: 
+      - microservice/auth/**/*
+      - package.json
+      - .gitlab-ci.yml
 
-# # lint:ticketService:
-# #   stage: quality
-# #   script:
-# #     - npm run install-ticketService
-# #     - npm run lint-ticketService
-# #   rules:
-# #     - changes: 
-# #       - microservices/TicketService/**/*
-# #       - package.json
-# #       - .gitlab-ci.yml
+build:adminService:
+  stage: build
+  script:
+    - npm run install-adminService
+    - npm run build-adminService
+  rules:
+    - changes: 
+      - microservices/AdminService/**/*
+      - package.json
+      - .gitlab-ci.yml
 
-# # lint:
-# #   stage: quality 
-# #   script:
-# #     - npm run installs
-# #     - npm run lint
+build:vehicleService:
+  stage: build
+  script:
+    - npm run install-vehicleService
+    - npm run build-vehicleService
+  rules:
+    - changes: 
+      - microservices/VehicleService/**/*
+      - package.json
+      - .gitlab-ci.yml
 
-# build:enforcement:
+# build:ticketService:
 #   stage: build
 #   script:
-#     - npm run install-enforcement
-#     - npm run build-enforcement
+#     - npm run install-ticketService
+#     - npm run build-ticketService
 #   rules:
-#     - changes: 
-#       - app/enforcement/**/*
+#     - changes:
+#       - microservices/TicketService/**/*
 #       - package.json
 #       - .gitlab-ci.yml
 
-# build:admin:
+# build:
 #   stage: build
 #   script:
-#     - npm run install-admin
-#     - npm run build-admin
-#   rules:
-#     - changes: 
-#       - app/admin/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+#     - npm run installs
+#     - npm run build
 
-# build:driver:
-#   stage: build
-#   script:
-#     - npm run install-driver
-#     - npm run build-driver
-#   rules:
-#     - changes: 
-#       - app/driver/**/*
-#       - package.json
-#       - .gitlab-ci.yml
-
-# build:marketing:
-#   stage: build
-#   script:
-#     - npm run install-marketing
-#     - npm run build-marketing
-#   rules:
-#     - changes: 
-#       - app/marketing/**/*
-#       - package.json
-#       - .gitlab-ci.yml
-
-# build:auth:
-#   stage: build
-#   script:
-#     - npm run install-auth
-#     - npm run build-auth
-#   rules:
-#     - changes: 
-#       - microservice/auth/**/*
-#       - package.json
-#       - .gitlab-ci.yml
-
-# build:adminService:
-#   stage: build
-#   script:
-#     - npm run install-adminService
-#     - npm run build-adminService
-#   rules:
-#     - changes: 
-#       - microservices/AdminService/**/*
-#       - package.json
-#       - .gitlab-ci.yml
-
-# build:vehicleService:
-#   stage: build
-#   script:
-#     - npm run install-vehicleService
-#     - npm run build-vehicleService
-#   rules:
-#     - changes: 
-#       - microservices/VehicleService/**/*
-#       - package.json
-#       - .gitlab-ci.yml
-
-# # build:ticketService:
-# #   stage: build
-# #   script:
-# #     - npm run install-ticketService
-# #     - npm run build-ticketService
-# #   rules:
-# #     - changes:
-# #       - microservices/TicketService/**/*
-# #       - package.json
-# #       - .gitlab-ci.yml
-
-# # build:
-# #   stage: build
-# #   script:
-# #     - npm run installs
-# #     - npm run build
-
-# # Uncomment this @Yaquob
-# test:enforcement:
-#   script:
-#     - cd app/enforcement && npm install && npm test
-#   rules:
-#     - changes: 
-#       - app/enforcement/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+# Uncomment this @Yaquob
+test:enforcement:
+  script:
+    - cd app/enforcement && npm install && npm test
+  rules:
+    - changes: 
+      - app/enforcement/**/*
+      - package.json
+      - .gitlab-ci.yml
 
 # test:vehicleService:
 #   stage: test
@@ -255,164 +272,163 @@
 #       - package.json
 #       - .gitlab-ci.yml
 
-# # # Failing Integration Tests
+test:auth:
+  stage: test
+  needs: ["init:postgres"]
+  script:
+    - npm run install-auth
+    - npm run test-auth
+  rules:
+    - changes: 
+      - microservices/AuthService/**/*
+      - package.json
+      - .gitlab-ci.yml
 
-# # test:admin:
-# #   script:
-# #     - cd app/admin && npm install && npm test
-# #   rules:
-# #     - changes: 
-# #       - app/admin/**/*
-# #       - package.json
-# #       - .gitlab-ci.yml
-
-# # test:auth:
-# #   stage: test
-# #   image: node:lts
-# #   services:
-# #     - name: postgres:15
-# #       alias: postgres
-# #   variables:
-# #     PIPELINE: true
-# #     POSTGRES_HOST: ${POSTGRES_HOST}
-# #     POSTGRES_PORT: ${POSTGRES_PORT}
-# #     POSTGRES_DB: ${POSTGRES_DB}
-# #     POSTGRES_USER: ${POSTGRES_USER}
-# #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-# #     # MICROSERVICE_INTERNAL_SECRET: not-a-very-secret-secret
-# #     NEXT_PUBLIC_GOOGLE_ID: ${NEXT_PUBLIC_GOOGLE_ID}
-# #     NEXT_PUBLIC_GOOGLE_SECRET: ${NEXT_PUBLIC_GOOGLE_SECRET}
-# #     NEXT_PUBLIC_FACEBOOK_CLIENT_ID: ${NEXT_PUBLIC_FACEBOOK_CLIENT_ID}
-# #     NEXT_PUBLIC_FACEBOOK_SECRET: ${NEXT_PUBLIC_FACEBOOK_SECRET}
-# #     NEXT_PUBLIC_GITHUB_ID: ${NEXT_PUBLIC_GITHUB_ID}
-# #     NEXT_PUBLIC_GITHUB_SECRET: ${NEXT_PUBLIC_GITHUB_SECRET}
-# #     NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
-# #     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/your
-# #   script:
-# #     - npm install-auth
-# #     - npm run test-auth
-# #   rules:
-# #     - changes:
-# #         - microservice/AuthService/**/*
-# #         - package.json
-# #         - .gitlab-ci.yml
-
-# test:driver:
+# test:vehicleService:
+#   stage: test
 #   script:
-#     - cd app/driver && npm install && npm test
+#     - npm run install-vehicleService
+#     - npm run test-VehicleService
 #   rules:
 #     - changes: 
-#       - app/driver/**/*
+#       - microservices/VehicleService/**/*
 #       - package.json
 #       - .gitlab-ci.yml
 
-# setup-env-variables:root:
-#   stage: setup-env-variables
+
+# # Failing Integration Tests
+
+# test:admin:
 #   script:
-#     - rm -f .env
-#     - echo "POSTGRES_HOST=${POSTGRES_HOST}" >> .env
-#     - echo "POSTGRES_PORT=${POSTGRES_PORT}" >> .env
-#     - echo "POSTGRES_DB=${POSTGRES_DB}" >> .env
-#     - echo "POSTGRES_AUTH_DB=${POSTGRES_AUTH_DB}" >> .env
-#     - echo "POSTGRES_VEHICLE_DB=${POSTGRES_VEHICLE_DB}" >> .env
-#     - echo "POSTGRES_PERMIT_DB=${POSTGRES_PERMIT_DB}" >> .env
-#     - echo "POSTGRES_TICKET_DB=${POSTGRES_TICKET_DB}" >> .env
-#     - echo "POSTGRES_USER=${POSTGRES_USER}" >> .env
-#     - echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" >> .env
-#     - echo "JWT_SECRET=${JWT_SECRET}" >> .env
-#     - echo "MICROSERVICE_INTERNAL_SECRET=${MICROSERVICE_INTERNAL_SECRET}" >> .env
+#     - cd app/admin && npm install && npm test
+#   rules:
+#     - changes: 
+#       - app/admin/**/*
+#       - package.json
+#       - .gitlab-ci.yml
+
+# test:auth:
+#   stage: test
+#   image: node:lts
+#   services:
+#     - name: postgres:15
+#       alias: postgres
+#   variables:
+#     PIPELINE: true
+#     POSTGRES_HOST: ${POSTGRES_HOST}
+#     POSTGRES_PORT: ${POSTGRES_PORT}
+#     POSTGRES_DB: ${POSTGRES_DB}
+#     POSTGRES_USER: ${POSTGRES_USER}
+#     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#     # MICROSERVICE_INTERNAL_SECRET: not-a-very-secret-secret
+#     NEXT_PUBLIC_GOOGLE_ID: ${NEXT_PUBLIC_GOOGLE_ID}
+#     NEXT_PUBLIC_GOOGLE_SECRET: ${NEXT_PUBLIC_GOOGLE_SECRET}
+#     NEXT_PUBLIC_FACEBOOK_CLIENT_ID: ${NEXT_PUBLIC_FACEBOOK_CLIENT_ID}
+#     NEXT_PUBLIC_FACEBOOK_SECRET: ${NEXT_PUBLIC_FACEBOOK_SECRET}
+#     NEXT_PUBLIC_GITHUB_ID: ${NEXT_PUBLIC_GITHUB_ID}
+#     NEXT_PUBLIC_GITHUB_SECRET: ${NEXT_PUBLIC_GITHUB_SECRET}
+#     NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+#     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/your
+#   script:
+#     - npm install-auth
+#     - npm run test-auth
+#   rules:
+#     - changes:
+#         - microservice/AuthService/**/*
+#         - package.json
+#         - .gitlab-ci.yml
+
+test:driver:
+  script:
+    - cd app/driver && npm install && npm test
+  rules:
+    - changes: 
+      - app/driver/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+setup-env-variables:root:
+  stage: setup-env-variables
+  script:
+    - rm -f .env
+    - echo "POSTGRES_HOST=${POSTGRES_HOST}" >> .env
+    - echo "POSTGRES_PORT=${POSTGRES_PORT}" >> .env
+    - echo "POSTGRES_DB=${POSTGRES_DB}" >> .env
+    - echo "POSTGRES_AUTH_DB=${POSTGRES_AUTH_DB}" >> .env
+    - echo "POSTGRES_VEHICLE_DB=${POSTGRES_VEHICLE_DB}" >> .env
+    - echo "POSTGRES_PERMIT_DB=${POSTGRES_PERMIT_DB}" >> .env
+    - echo "POSTGRES_TICKET_DB=${POSTGRES_TICKET_DB}" >> .env
+    - echo "POSTGRES_USER=${POSTGRES_USER}" >> .env
+    - echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" >> .env
+    - echo "JWT_SECRET=${JWT_SECRET}" >> .env
+    - echo "MICROSERVICE_INTERNAL_SECRET=${MICROSERVICE_INTERNAL_SECRET}" >> .env
+  artifacts:
+    paths:
+      - .env
+
+
+setup-env-variables:driver-app:
+  stage: setup-env-variables
+  script:
+    - rm -f app/driver/.env
+    - echo "NEXT_PUBLIC_GOOGLE_ID=${NEXT_PUBLIC_GOOGLE_ID}" >> app/driver/.env
+    - echo "NEXT_PUBLIC_GOOGLE_SECRET=${NEXT_PUBLIC_GOOGLE_SECRET}" >> app/driver/.env
+    - echo "NEXT_PUBLIC_FACEBOOK_CLIENT_ID=${NEXT_PUBLIC_FACEBOOK_CLIENT_ID}" >> app/driver/.env
+    - echo "NEXT_PUBLIC_FACEBOOK_SECRET=${NEXT_PUBLIC_FACEBOOK_SECRET}" >> app/driver/.env
+    - echo "NEXT_PUBLIC_GITHUB_ID=${NEXT_PUBLIC_GITHUB_ID}" >> app/driver/.env
+    - echo "NEXT_PUBLIC_GITHUB_SECRET=${NEXT_PUBLIC_GITHUB_SECRET}" >> app/driver/.env
+    - echo "NEXTAUTH_SECRET=${NEXTAUTH_SECRET}" >> app/driver/.env
+    - echo "NEXTAUTH_URL=${NEXTAUTH_URL}" >> app/driver/.env
+    - echo "NEXT_PUBLIC_AUTH_COOKIE_NAME=${NEXT_PUBLIC_AUTH_COOKIE_NAME}" >> app/driver/.env
+  artifacts:
+    paths:
+      - app/driver/.env
+
+setup-env-variables:marketing-app:
+  stage: setup-env-variables
+  script:
+    - rm -f app/marketing/.env
+    - echo "NEXT_PUBLIC_DRIVER_APP_URL=${NEXT_PUBLIC_DRIVER_APP_URL}" >> app/marketing/.env
+  artifacts:
+    paths:
+      - app/marketing/.env
+
+# conatainerize:setup:
+#   stage: conatainerize
+#   script:
+#     - npm run installs
+
+# conatainerize:build-docker-image:
+#   stage: conatainerize
+#   needs:
+#     - conatainerize:setup
+#   image: docker:24
+#   services:
+#     - name: docker:24-dind
+#       alias: docker
+#   variables:
+#     DOCKER_HOST: tcp://docker:2375
+#     DOCKER_TLS_CERTDIR: ""
+#   before_script:
+#     - apk add --no-cache npm
+#   script:
+#     - docker version
+#     - docker info
+#     - npm run package
 #   artifacts:
 #     paths:
-#       - .env
+#       - cte-linux-amd64.tar
+#       - docker-compose.yml
 
-
-# setup-env-variables:driver-app:
-#   stage: setup-env-variables
-#   script:
-#     - rm -f app/driver/.env
-#     - echo "NEXT_PUBLIC_GOOGLE_ID=${NEXT_PUBLIC_GOOGLE_ID}" >> app/driver/.env
-#     - echo "NEXT_PUBLIC_GOOGLE_SECRET=${NEXT_PUBLIC_GOOGLE_SECRET}" >> app/driver/.env
-#     - echo "NEXT_PUBLIC_FACEBOOK_CLIENT_ID=${NEXT_PUBLIC_FACEBOOK_CLIENT_ID}" >> app/driver/.env
-#     - echo "NEXT_PUBLIC_FACEBOOK_SECRET=${NEXT_PUBLIC_FACEBOOK_SECRET}" >> app/driver/.env
-#     - echo "NEXT_PUBLIC_GITHUB_ID=${NEXT_PUBLIC_GITHUB_ID}" >> app/driver/.env
-#     - echo "NEXT_PUBLIC_GITHUB_SECRET=${NEXT_PUBLIC_GITHUB_SECRET}" >> app/driver/.env
-#     - echo "NEXTAUTH_SECRET=${NEXTAUTH_SECRET}" >> app/driver/.env
-#     - echo "NEXTAUTH_URL=${NEXTAUTH_URL}" >> app/driver/.env
-#     - echo "NEXT_PUBLIC_AUTH_COOKIE_NAME=${NEXT_PUBLIC_AUTH_COOKIE_NAME}" >> app/driver/.env
-#   artifacts:
-#     paths:
-#       - app/driver/.env
-
-# setup-env-variables:marketing-app:
-#   stage: setup-env-variables
-#   script:
-#     - rm -f app/marketing/.env
-#     - echo "NEXT_PUBLIC_DRIVER_APP_URL=${NEXT_PUBLIC_DRIVER_APP_URL}" >> app/marketing/.env
-#   artifacts:
-#     paths:
-#       - app/marketing/.env
-
-# # conatainerize:setup:
-# #   stage: conatainerize
-# #   script:
-# #     - npm run installs
-
-# # conatainerize:build-docker-image:
-# #   stage: conatainerize
-# #   needs:
-# #     - conatainerize:setup
-# #   image: docker:24
-# #   services:
-# #     - name: docker:24-dind
-# #       alias: docker
-# #   variables:
-# #     DOCKER_HOST: tcp://docker:2375
-# #     DOCKER_TLS_CERTDIR: ""
-# #   before_script:
-# #     - apk add --no-cache npm
-# #   script:
-# #     - docker version
-# #     - docker info
-# #     - npm run package
-# #   artifacts:
-# #     paths:
-# #       - cte-linux-amd64.tar
-# #       - docker-compose.yml
-
-# deploy:predeploy:
-#   stage: deploy
-#   script:
-#     - echo "Define your pre-deployment script!"
-#     - echo "Deploying to production environment..."
+deploy:predeploy:
+  stage: deploy
+  script:
+    - echo "Define your pre-deployment script!"
+    - echo "Deploying to production environment..."
   
 
-# deploy:deploy:
-#   stage: deploy
-#   script: echo "Define your deployment script!"
-#   environment: production
-
-
-# Official framework image.
-# https://hub.docker.com/r/library/node/tags/
-# lts = Long Term Support
-image: docker:24.0.5
-
-services:
-  - name: docker:24.0.5-dind
-    alias: dind
-
-variables:
-  DOCKER_HOST: tcp://dind:2375
-  DOCKER_TLS_CERTDIR: ""
-
-before_script:
-  - apk add --no-cache docker-cli docker-compose
-  - docker info
-
-test:docker-setup:
-  stage: test
-  script:
-    - docker version
-    - docker-compose version
-    - docker ps -a
+deploy:deploy:
+  stage: deploy
+  script: echo "Define your deployment script!"
+  environment: production
 

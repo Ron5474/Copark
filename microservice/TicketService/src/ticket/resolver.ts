@@ -12,6 +12,7 @@ import {
   TicketsByDay,
   ChallengeTicket,
   PaidTicketInput,
+  TicketReport,
 } from "./schema";
 
 import { SessionUser } from "src";
@@ -336,5 +337,13 @@ export class TicketResolver {
   ): Promise<Ticket[] | null> {
     return await this.ticketService.getUnpaidTicketsPerDay();
     // need to add a convertion from the vehicle ID to the plate number
+  }
+
+  @Authorized(['admin'])
+  @Query(() => TicketReport)
+  async adminTicketReport(
+    @Arg("numDays", () => Number, { nullable: true }) numDays?: number,
+  ): Promise<TicketReport> {
+    return await this.ticketService.generateTicketReport({numDays: numDays ?? 999})
   }
 }

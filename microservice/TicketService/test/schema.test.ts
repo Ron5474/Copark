@@ -4,7 +4,19 @@ import * as http from 'http'
 import supertest from 'supertest'
 
 import { app, bootstrap } from '../src/app'
-import { Ticket, NewTicket, TicketInput, ModifyTicketInput, hasTicket, TicketsByDay, ChallengeTicketInput, ChallengeTicket} from '../src/ticket/schema'
+import {
+  Ticket,
+  NewTicket,
+  TicketInput,
+  ModifyTicketInput,
+  hasTicket,
+  TicketsByDay,
+  ChallengeTicketInput,
+  ChallengeTicket,
+  ViolationBreakdown,
+  EnforcerBreakdown,
+  TicketReport
+} from '../src/ticket/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 
@@ -152,6 +164,52 @@ test('ChallengeTicket schema loads correctly', () => {
   expect(ticket.images).toBe('image1.jpg');
   expect(ticket.challengeReason).toBe('I had a valid permit');
 });
+
+test('ViolationBreakdown schema loads correctly', () => {
+  const v = new ViolationBreakdown()
+  v.violation = 'parking'
+  v.count = 5
+
+  expect(v).toBeDefined()
+  expect(v.violation).toBe('parking')
+  expect(v.count).toBe(5)
+})
+
+test('EnforcerBreakdown schema loads correctly', () => {
+  const e = new EnforcerBreakdown()
+  e.enforcer = 'enforcer-1'
+  e.count = 3
+
+  expect(e).toBeDefined()
+  expect(e.enforcer).toBe('enforcer-1')
+  expect(e.count).toBe(3)
+})
+
+test('TicketReport schema loads correctly', () => {
+  const v = new ViolationBreakdown()
+  v.violation = 'parking'
+  v.count = 5
+
+  const e = new EnforcerBreakdown()
+  e.enforcer = 'enforcer-1'
+  e.count = 3
+
+  const report = new TicketReport()
+  report.totalTickets = 10
+  report.unpaidTickets = 4
+  report.paidTickets = 6
+  report.totalRevenue = 1234.56
+  report.violationBreakdown = [v]
+  report.enforcerBreakdown = [e]
+
+  expect(report).toBeDefined()
+  expect(report.totalTickets).toBe(10)
+  expect(report.unpaidTickets).toBe(4)
+  expect(report.paidTickets).toBe(6)
+  expect(report.totalRevenue).toBe(1234.56)
+  expect(report.violationBreakdown[0]).toBe(v)
+  expect(report.enforcerBreakdown[0]).toBe(e)
+})
 
 test('GET playground', async () => {
     await supertest(server)

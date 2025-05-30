@@ -337,3 +337,9 @@ export class ZoneInput {
   @Field(() => String)
   closeTime?: string
 }
+
+@InputType()
+export class ReportTimeRange {
+  @Field(() => Number)
+  numDays!: Number
+}

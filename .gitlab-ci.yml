@@ -273,7 +273,7 @@ test:enforcement:
 test:auth:
   stage: test
   script:
-    - npm install-auth
+    - npm run install-auth
     - npm run test-auth
   rules:
     - changes: 

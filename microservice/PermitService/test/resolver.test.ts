@@ -292,40 +292,24 @@ const isValidPermitByPoliceInput = {
   state: "CA"
 }
 
-// const nonExistentPlateInput = {
-//   plate: "1AAA111",
-// }
-
-// const myPermitsQuery = `
-// query MyPermits($vehicleID: String!) {
-//   myPermits(vehicleID: $vehicleID) {
-//     future {
-//       vehicle
-//       type
-//       area
-//       activeDate
-//       expireDate
-//     }
-//     active {
-//       vehicle
-//       type
-//       area
-//       activeDate
-//       expireDate
-//     }
-//     expired {
-//       vehicle
-//       type
-//       area
-//       activeDate
-//       expireDate
-//     }
-//   }
-// }`
-
-// const myPermitsInput = {
-//   vehicleID: "12345678-1234-1234-1234-567890abcdef"
-// }
+const adminPermitReportQuery = `
+    query($numDays: Float) {
+      adminPermitReport(numDays: $numDays) {
+        totalPermits
+        activePermits
+        expiredPermits
+        totalRevenue
+        zoneBreakdown {
+          area
+          totalPermits
+        }
+        lotBreakdown {
+          area
+          totalPermits
+        }
+      }
+    }
+  `
 
 const zoneDetailsQuery = `
 query ZoneDetails($zone: String!) {
@@ -1373,29 +1357,10 @@ test('Admin can update zone price', async () => {
 test('Admin can get permit summary in adminPermitReport with days input', async () => {
   const { token } = await loginAs("admin")
 
-  const query = `
-    query($numDays: Float) {
-      adminPermitReport(numDays: $numDays) {
-        totalPermits
-        activePermits
-        expiredPermits
-        totalRevenue
-        zoneBreakdown {
-          area
-          totalPermits
-        }
-        lotBreakdown {
-          area
-          totalPermits
-        }
-      }
-    }
-  `
-
   const res = await supertest(server)
     .post("/graphql")
     .set("Authorization", `Bearer ${token}`)
-    .send({ query, variables: { numDays: 3 } })
+    .send({ query: adminPermitReportQuery, variables: { numDays: 3 } })
 
   expect(res.body.errors).toBeUndefined()
 
@@ -1411,29 +1376,10 @@ test('Admin can get permit summary in adminPermitReport with days input', async 
 test('Admin can get permit summary in adminPermitReport without days input', async () => {
   const { token } = await loginAs("admin")
 
-  const query = `
-    query($numDays: Float) {
-      adminPermitReport(numDays: $numDays) {
-        totalPermits
-        activePermits
-        expiredPermits
-        totalRevenue
-        zoneBreakdown {
-          area
-          totalPermits
-        }
-        lotBreakdown {
-          area
-          totalPermits
-        }
-      }
-    }
-  `
-
   const res = await supertest(server)
     .post("/graphql")
     .set("Authorization", `Bearer ${token}`)
-    .send({ query })
+    .send({ query: adminPermitReportQuery })
 
   expect(res.body.errors).toBeUndefined()
 

@@ -738,7 +738,7 @@ export class PermitService {
     }
 
     const result = await pool.query(
-      `UPDATE vehicle SET data = jsonb_set(data, '{expired}', to_jsonb(NOW())) WHERE id = $1 RETURNING id`,
+      `UPDATE permit SET data = jsonb_set(data, '{expireDate}', NOW()) WHERE vehicle = $1 RETURNING id`,
       [vehicleId]
     );
 

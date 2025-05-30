@@ -281,14 +281,15 @@ const checkPermitInvalidInput = { plate: "0000000", state: "NA" }
 const checkPermitInput = { plate: "JCDE544", state: "NY" }
 
 const isValidPermitByPoliceQuery = `
-query IsValidPolice($plate: String!) {
-  isValidPermitByPolice(plate: $plate) {
+query IsValidPolice($plate: String!, $state: String!) {
+  isValidPermitByPolice(plate: $plate, state: $state) {
     isValid
   }
 }`
 
 const isValidPermitByPoliceInput = {
   plate: "7RON123",
+  state: "CA"
 }
 
 // const nonExistentPlateInput = {
@@ -718,7 +719,7 @@ test('Police gets invalid for nonexistent plate', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({ 
       query: isValidPermitByPoliceQuery,
-      variables: {plate: "something Wrong"}
+      variables: {plate: "something Wrong", state: "NA"}
     })
     
   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
@@ -1395,6 +1396,44 @@ test('Admin can get permit summary in adminPermitReport with days input', async 
     .post("/graphql")
     .set("Authorization", `Bearer ${token}`)
     .send({ query, variables: { numDays: 3 } })
+
+  expect(res.body.errors).toBeUndefined()
+
+  const report = res.body.data.adminPermitReport
+
+  expect(report.totalPermits).toBeGreaterThanOrEqual(1)
+  expect(report.activePermits).toBeGreaterThanOrEqual(1)
+
+  expect(Array.isArray(report.zoneBreakdown)).toBe(true)
+  expect(Array.isArray(report.lotBreakdown)).toBe(true)
+})
+
+test('Admin can get permit summary in adminPermitReport without days input', async () => {
+  const { token } = await loginAs("admin")
+
+  const query = `
+    query($numDays: Float) {
+      adminPermitReport(numDays: $numDays) {
+        totalPermits
+        activePermits
+        expiredPermits
+        totalRevenue
+        zoneBreakdown {
+          area
+          totalPermits
+        }
+        lotBreakdown {
+          area
+          totalPermits
+        }
+      }
+    }
+  `
+
+  const res = await supertest(server)
+    .post("/graphql")
+    .set("Authorization", `Bearer ${token}`)
+    .send({ query })
 
   expect(res.body.errors).toBeUndefined()
 

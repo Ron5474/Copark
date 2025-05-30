@@ -526,11 +526,12 @@ export class PermitResolver {
   @Query(() => IsValidPolice)
   async isValidPermitByPolice (
     @Arg("plate", () => String) plate: string,
+    @Arg("state", () => String) state: string,
     @Ctx() request: Request
   ): Promise<IsValidPolice> {
     const vehicleQuery = `
-      query FindVehicleByPlate($plate: String!) {
-        findVehicleByPlate(plate: $plate) {
+      query FindVehicleByPlate($plate: String!, $state: String!) {
+        findVehicleByPlate(plate: $plate, state: $state) {
           id
         }
       }
@@ -543,7 +544,7 @@ export class PermitResolver {
       },
       body: JSON.stringify({
         query: vehicleQuery,
-        variables: { plate },
+        variables: { plate, state },
       }),
     })
 

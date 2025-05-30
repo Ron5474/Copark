@@ -3,15 +3,14 @@ import { pool } from "./db";
 import Stripe from "stripe";
 import { Checkout, PaymentDetails } from "./index";
 export class PaymentService {
-  private async generateCuponCode(name: string, percentoff: number): Promise<string> {
-    const stripe = new Stripe(process.env.STRIPE_SECRET as string);
-    const coupon = await stripe.coupons.create({
-      name: name,
-      percent_off: percentoff,
-      duration: "once",
-    });
-    return coupon.id;
-  }
+  // private async generateCuponCode(percentoff: number): Promise<string> {
+  //   const stripe = new Stripe(process.env.STRIPE_SECRET as string);
+  //   const coupon = await stripe.coupons.create({
+  //     percent_off: percentoff,
+  //     duration: "once",
+  //   });
+  //   return coupon.id;
+  // }
 
   public async payment(
     checkoutDetails: Checkout,
@@ -23,6 +22,11 @@ export class PaymentService {
     }
     // console.log(process.env.FRONTEND_URL);
     const stripe = new Stripe(process.env.STRIPE_SECRET as string);
+    let amount = checkoutDetails.amount;
+    if (checkoutDetails.type === "permit" && email?.endsWith("ucsc.edu")) {
+      amount = amount * 0.9; // 10% discount for UCSC students
+    }
+
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
@@ -33,7 +37,7 @@ export class PaymentService {
               description: checkoutDetails.description,
               images: checkoutDetails.image ? [checkoutDetails.image]: undefined, // optional
             },
-            unit_amount: checkoutDetails.amount, // in cents
+            unit_amount: amount, // in cents
           },
         quantity: 1,
         },

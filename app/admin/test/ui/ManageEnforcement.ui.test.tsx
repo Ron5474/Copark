@@ -1,9 +1,10 @@
 import { it, expect, vi, beforeEach, Mock } from 'vitest';
-import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import Page from '../../src/app/page';
 import ManageEnforcement from '../../src/app/components/ManageEnforcement';
 import { getEnforcers, addEnforcer, suspendUser, reinstateUser, deleteUser } from '../../src/enforcement/actions';
+import { getPermitReport } from '../../src/permit/actions';
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
@@ -25,6 +26,17 @@ vi.mock('../../src/enforcement/actions', () => ({
   suspendUser: vi.fn(),
   reinstateUser: vi.fn(),
   deleteUser: vi.fn()
+}));
+
+vi.mock('../../src/permit/actions', () => ({
+  getPermitReport: vi.fn().mockResolvedValue({
+    totalPermits: 100,
+    activePermits: 75,
+    expiredPermits: 25,
+    totalRevenue: 5000,
+    zoneBreakdown: [],
+    lotBreakdown: []
+  })
 }));
 
 const mockRouter = {

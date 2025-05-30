@@ -12,19 +12,22 @@ import {
 
 import { ChallengedTickets } from './tickets/ChallengedTickets'
 import { AcceptedTickets } from './tickets/AcceptedTickets'
-import { getChallengedTickets, getAcceptedTickets } from '../../ticket/actions'
+import { UnpaidTickets } from './tickets/UnpaidTickets'
+import { getChallengedTickets, getAcceptedTickets, getUnpaidTickets } from '../../ticket/actions'
 import { ChallengedTicket, Ticket } from '@/types'
 
 const TicketContent = memo(function TicketContent({ 
   currentTab, 
   challengedTickets, 
-  acceptedTickets, 
+  acceptedTickets,
+  unpaidTickets, 
   setChallengedTickets, 
   setError 
 }: { 
   currentTab: number
   challengedTickets: ChallengedTicket[]
   acceptedTickets: Ticket[]
+  unpaidTickets: Ticket[]
   setChallengedTickets: (tickets: ChallengedTicket[]) => void
   setError: (error: string) => void
 }) {
@@ -45,8 +48,10 @@ const TicketContent = memo(function TicketContent({
           onTicketsUpdate={setChallengedTickets}
           onError={setError}
         />
-      ) : (
+      ) : currentTab === 1 ? (
         <AcceptedTickets tickets={acceptedTickets} />
+      ) : (
+        <UnpaidTickets tickets={unpaidTickets} />
       )}
     </Box>
   )
@@ -57,6 +62,7 @@ export default function ManageTicketChallenges() {
   const [currentTab, setCurrentTab] = useState(0)
   const [challengedTickets, setChallengedTickets] = useState<ChallengedTicket[]>([])
   const [acceptedTickets, setAcceptedTickets] = useState<Ticket[]>([])
+  const [unpaidTickets, setUnpaidTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -84,11 +90,25 @@ export default function ManageTicketChallenges() {
     }
   }
 
+  const fetchUnpaidTickets = async () => {
+    try {
+      setLoading(true)
+      const tickets = await getUnpaidTickets()
+      setUnpaidTickets(tickets)
+    } catch {
+      setError('Failed to fetch unpaid tickets')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
     if (currentTab === 0) {
       fetchChallengedTickets()
-    } else {
+    } else if (currentTab === 1) {
       fetchAcceptedTickets()
+    } else {
+      fetchUnpaidTickets()
     }
   }, [currentTab])
 
@@ -122,7 +142,7 @@ export default function ManageTicketChallenges() {
             fontSize: '32px'
           }}
         >
-          Manage Ticket Challenges
+          Manage Tickets
         </Typography>
       </Box>
 
@@ -135,6 +155,7 @@ export default function ManageTicketChallenges() {
         >
           <Tab label="Challenged Tickets" />
           <Tab label="Accepted Tickets" />
+          <Tab label="Unpaid Tickets" />
         </Tabs>
       </Box>
 
@@ -143,6 +164,7 @@ export default function ManageTicketChallenges() {
           currentTab={currentTab}
           challengedTickets={challengedTickets}
           acceptedTickets={acceptedTickets}
+          unpaidTickets={unpaidTickets}
           setChallengedTickets={setChallengedTickets}
           setError={setError}
         />

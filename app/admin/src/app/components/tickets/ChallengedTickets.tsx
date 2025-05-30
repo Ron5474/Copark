@@ -79,23 +79,21 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   {Array.isArray(ticket.images) ? ticket.images.map((image, index) => (
-                    <Box
+                    <img
                       key={index}
-                      component="img"
                       src={image}
                       alt={`Violation evidence ${index + 1}`}
-                      sx={{
+                      style={{
                         maxWidth: '200px',
                         height: 'auto',
                         borderRadius: '8px'
                       }}
                     />
                   )) : (
-                    <Box
-                      component="img"
+                    <img
                       src={ticket.images}
                       alt="Violation evidence"
-                      sx={{
+                      style={{
                         maxWidth: '100%',
                         height: 'auto',
                         borderRadius: '8px'

@@ -3,16 +3,16 @@ import { Ticket } from '@/types'
 
 const getShortId = (jwt: string) => jwt.slice(-8).toUpperCase()
 
-interface AcceptedTicketsProps {
+interface UnpaidTicketsProps {
   tickets: Ticket[]
 }
 
-export function AcceptedTickets({ tickets }: AcceptedTicketsProps) {
+export function UnpaidTickets({ tickets }: UnpaidTicketsProps) {
   const theme = useTheme()
 
   return (
     <>
-      <Typography sx={{ mb: 2 }}>Accepted Tickets: {tickets.length}</Typography>
+      <Typography sx={{ mb: 2 }}>Unpaid Tickets: {tickets.length}</Typography>
       <Stack spacing={2}>
         {tickets.map((ticket) => (
           <Box
@@ -20,8 +20,8 @@ export function AcceptedTickets({ tickets }: AcceptedTicketsProps) {
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              bgcolor: '#E8F4F4',
-              border: `1px solid ${theme.palette.primary.light}20`,
+              bgcolor: '#FFF4E6',
+              border: `1px solid ${theme.palette.warning.light}20`,
               p: 3,
               borderRadius: '15px',
               transition: 'all 0.2s ease-in-out',
@@ -33,10 +33,10 @@ export function AcceptedTickets({ tickets }: AcceptedTicketsProps) {
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Box>
-                <Typography sx={{ fontSize: '20px', fontWeight: 500, color: theme.palette.primary.dark }}>
+                <Typography sx={{ fontSize: '20px', fontWeight: 500, color: theme.palette.warning.dark }}>
                   Ticket #{getShortId(ticket.id)}
                 </Typography>
-                <Typography sx={{ color: theme.palette.success.main }}>
+                <Typography sx={{ color: theme.palette.warning.main, fontWeight: 600 }}>
                   {ticket.ticketStatus.toUpperCase()}
                 </Typography>
               </Box>
@@ -96,7 +96,7 @@ export function AcceptedTickets({ tickets }: AcceptedTicketsProps) {
 
         {tickets.length === 0 && (
           <Typography variant="body1" textAlign="center">
-            No accepted tickets found.
+            No unpaid tickets found.
           </Typography>
         )}
       </Stack>

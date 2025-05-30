@@ -1,5 +1,5 @@
 import { it, expect, vi, beforeEach, Mock } from 'vitest';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, waitFor, cleanup, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ManageTicketChallenges from '../../src/app/components/ManageTicketChallenges';
 import {
@@ -30,6 +30,18 @@ const mockChallengedTickets = [
     images: 'test.jpg',
     note: 'Test note',
     challengeReason: 'I had a valid permit'
+  },
+  {
+    id: '456',
+    vehicle: 'DEF456',
+    enforcer: '789',
+    issuedDate: new Date().toISOString(),
+    violation: 'Expired Permit',
+    fine: 75,
+    ticketStatus: 'challenged',
+    images: ['image1.jpg', 'image2.jpg', 'image3.jpg'],
+    note: 'Multiple violations',
+    challengeReason: 'Permit was valid'
   }
 ];
 
@@ -47,23 +59,6 @@ const mockAcceptedTickets = [
   }
 ];
 
-// Add to mock data section
-const mockTicketWithMultipleImages = [
-  {
-    id: '456',
-    vehicle: 'DEF456',
-    enforcer: '789',
-    issuedDate: new Date().toISOString(),
-    violation: 'Invalid Parking',
-    fine: 75,
-    ticketStatus: 'challenged',
-    images: ['image1.jpg', 'image2.jpg', 'image3.jpg'],
-    note: 'Multiple evidence photos',
-    challengeReason: 'The signs were not visible'
-  }
-];
-
-// Setup and cleanup
 beforeEach(() => {
   vi.clearAllMocks();
   cleanup();
@@ -78,7 +73,7 @@ it('renders challenged tickets correctly', async () => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  expect(screen.getByText(/Active Challenges: 1/)).toBeDefined();
+  expect(screen.getByText('Active Challenges: 2')).toBeDefined();
   expect(screen.getByText('ABC123')).toBeDefined();
   expect(screen.getByText('No Permit')).toBeDefined();
   expect(screen.getByText('$50.00')).toBeDefined();
@@ -97,31 +92,6 @@ it('displays empty state when no tickets exist', async () => {
   expect(screen.getByText('No challenged tickets found.')).toBeDefined();
 });
 
-// Add new test case
-it('renders challenged ticket with multiple images correctly', async () => {
-  (getChallengedTickets as Mock).mockResolvedValue(mockTicketWithMultipleImages);
-
-  render(<ManageTicketChallenges />);
-
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
-
-  // Check for multiple images
-  const images = screen.getAllByRole('img', { name: /Violation evidence/i });
-  expect(images).toHaveLength(3);
-  
-  // Verify each image has correct src
-  expect(images[0]).toHaveProperty('src', 'http://localhost:3000/image1.jpg');
-  expect(images[1]).toHaveProperty('src', 'http://localhost:3000/image2.jpg');
-  expect(images[2]).toHaveProperty('src', 'http://localhost:3000/image3.jpg');
-
-  // Verify alt text includes numbering
-  expect(images[0]).toHaveProperty('alt', 'Violation evidence 1');
-  expect(images[1]).toHaveProperty('alt', 'Violation evidence 2');
-  expect(images[2]).toHaveProperty('alt', 'Violation evidence 3');
-});
-
 it('handles accepting a ticket challenge successfully', async () => {
   render(<ManageTicketChallenges />);
 
@@ -129,11 +99,28 @@ it('handles accepting a ticket challenge successfully', async () => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  const acceptButton = screen.getByRole('button', { name: /Accept Challenge/ });
+  const ticketContainer = screen.getByText('Ticket #123', { exact: true }).closest('.MuiBox-root') as HTMLElement;
+
+  const acceptButton = within(ticketContainer.parentElement?.parentElement as HTMLElement).getByText('Accept Challenge', { exact: true });
   await userEvent.click(acceptButton);
 
   expect(acceptTicketChallenge).toHaveBeenCalledWith('123');
-  expect(getChallengedTickets).toHaveBeenCalledTimes(2); // Initial load + after accept
+  expect(getChallengedTickets).toHaveBeenCalledTimes(2);
+});
+
+it('handles rejecting a ticket challenge successfully', async () => {
+  render(<ManageTicketChallenges />);
+
+  await waitFor(() => {
+    expect(screen.queryByRole('progressbar')).toBeNull();
+  });
+
+  const ticketContainer = screen.getByText('Ticket #123', { exact: true }).closest('.MuiBox-root') as HTMLElement;
+  const rejectButton = within(ticketContainer.parentElement?.parentElement as HTMLElement).getByText('Reject Challenge', { exact: true });
+  await userEvent.click(rejectButton);
+
+  expect(rejectTicketChallenge).toHaveBeenCalledWith('123');
+  expect(getChallengedTickets).toHaveBeenCalledTimes(2);
 });
 
 it('handles accepting a ticket challenge with error', async () => {
@@ -145,26 +132,13 @@ it('handles accepting a ticket challenge with error', async () => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  const acceptButton = screen.getByRole('button', { name: /Accept Challenge/ });
+  const ticketContainer = screen.getByText('Ticket #123', { exact: true }).closest('.MuiBox-root') as HTMLElement;
+  const acceptButton = within(ticketContainer.parentElement?.parentElement as HTMLElement).getByText('Accept Challenge', { exact: true });
   await userEvent.click(acceptButton);
 
   await waitFor(() => {
     expect(screen.getByText('Error: Failed to accept challenge')).toBeDefined();
   });
-});
-
-it('handles rejecting a ticket challenge successfully', async () => {
-  render(<ManageTicketChallenges />);
-
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
-
-  const rejectButton = screen.getByRole('button', { name: /Reject Challenge/ });
-  await userEvent.click(rejectButton);
-
-  expect(rejectTicketChallenge).toHaveBeenCalledWith('123');
-  expect(getChallengedTickets).toHaveBeenCalledTimes(2); // Initial load + after reject
 });
 
 it('handles rejecting a ticket challenge with error', async () => {
@@ -176,7 +150,8 @@ it('handles rejecting a ticket challenge with error', async () => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  const rejectButton = screen.getByRole('button', { name: /Reject Challenge/ });
+  const ticketContainer = screen.getByText('Ticket #123', { exact: true }).closest('.MuiBox-root') as HTMLElement;
+  const rejectButton = within(ticketContainer.parentElement?.parentElement as HTMLElement).getByText('Reject Challenge', { exact: true });
   await userEvent.click(rejectButton);
 
   await waitFor(() => {
@@ -184,3 +159,24 @@ it('handles rejecting a ticket challenge with error', async () => {
   });
 });
 
+it('renders multiple evidence images correctly', async () => {
+  render(<ManageTicketChallenges />);
+
+  await waitFor(() => {
+    expect(screen.queryByRole('progressbar')).toBeNull();
+  });
+
+  // Check for the presence of multiple images
+  const images = screen.getAllByAltText(/Violation evidence \d+/);
+  expect(images).toHaveLength(3);
+  
+  // Verify each image has correct src and styling
+  images.forEach((image, index) => {
+    expect(image).toHaveProperty('src', `http://localhost:3000/image${index + 1}.jpg`);
+    expect(image.style).contain({
+      maxWidth: '200px',
+      height: 'auto',
+      borderRadius: '8px'
+    });
+  });
+});

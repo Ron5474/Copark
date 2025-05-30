@@ -1121,3 +1121,42 @@ test('Admin can get unpaid tickets', async () => {
   expect(Array.isArray(result)).toBe(true);
   expect(result.length).toBeGreaterThan(0);
 });
+
+test('Admin can get ticket report via adminTicketReport', async () => {
+  const token = await loginAs("admin");
+
+  const query = `
+    query AdminTicketReport($numDays: Float) {
+      adminTicketReport(numDays: $numDays) {
+        totalTickets
+        unpaidTickets
+        paidTickets
+        totalRevenue
+        violationBreakdown {
+          violation
+          count
+        }
+        enforcerBreakdown {
+          enforcer
+          count
+        }
+      }
+    }
+  `;
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query, variables: { numDays: 7 } })
+    .expect(200);
+
+  expect(response.body.errors).toBeUndefined();
+  const report = response.body.data.adminTicketReport;
+  expect(report).toBeDefined();
+  expect(report).toHaveProperty('totalTickets');
+  expect(report).toHaveProperty('unpaidTickets');
+  expect(report).toHaveProperty('paidTickets');
+  expect(report).toHaveProperty('totalRevenue');
+  expect(Array.isArray(report.violationBreakdown)).toBe(true);
+  expect(Array.isArray(report.enforcerBreakdown)).toBe(true);
+});

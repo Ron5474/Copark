@@ -1368,12 +1368,12 @@ test('Admin can update zone price', async () => {
   expect(updatedZones[0].closeTime).toBe("21:00")
 })
 
-test('Admin can get permit summary in adminPermitReport', async () => {
+test('Admin can get permit summary in adminPermitReport with days input', async () => {
   const { token } = await loginAs("admin")
 
   const query = `
-    query {
-      adminPermitReport {
+    query($numDays: Float) {
+      adminPermitReport(numDays: $numDays) {
         totalPermits
         activePermits
         expiredPermits
@@ -1393,7 +1393,7 @@ test('Admin can get permit summary in adminPermitReport', async () => {
   const res = await supertest(server)
     .post("/graphql")
     .set("Authorization", `Bearer ${token}`)
-    .send({ query })
+    .send({ query, variables: { numDays: 3 } })
 
   expect(res.body.errors).toBeUndefined()
 

@@ -160,16 +160,16 @@ export class EnforcerBreakdown {
 @ObjectType()
 export class TicketReport {
   @Field(() => Number)
-  totalTickets!: number;
+  totalTickets!: Number;
 
   @Field(() => Number)
-  unpaidTickets!: number;
+  unpaidTickets!: Number;
 
   @Field(() => Number)
-  paidTickets!: number;
+  paidTickets!: Number;
 
   @Field(() => Number)
-  totalRevenue!: number;
+  totalRevenue!: Number;
 
   @Field(() => [ViolationBreakdown])
   violationBreakdown!: ViolationBreakdown[];

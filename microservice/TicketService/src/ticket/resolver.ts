@@ -341,7 +341,7 @@ export class TicketResolver {
 
   @Authorized(['admin'])
   @Query(() => TicketReport)
-  async adminPermitReport(
+  async adminTicketReport(
     @Arg("numDays", () => Number, { nullable: true }) numDays?: number,
   ): Promise<TicketReport> {
     return await this.ticketService.generateTicketReport({numDays: numDays ?? 999})

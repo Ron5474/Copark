@@ -1,4 +1,4 @@
-import { Resolver, Query,  Mutation, Arg, Ctx, Authorized } from 'type-graphql'
+import { Resolver, Query,  Mutation, Arg, Ctx, Authorized} from 'type-graphql'
 import { Request } from 'express'
 import { SignJWT } from 'jose'
 

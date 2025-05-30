@@ -729,4 +729,24 @@ export class PermitService {
       closeTime: data.weekday?.closeTime || '23:59'
     }]
   }
+
+  public async expirePermits(vehicleId: string): Promise<{
+    permitId: string;
+  }[]> {
+    if (!vehicleId) {
+      throw new Error('Vehicle ID is required');
+    }
+
+    const result = await pool.query(
+      `UPDATE vehicle SET data = jsonb_set(data, '{expired}', to_jsonb(NOW())) WHERE id = $1 RETURNING id`,
+      [vehicleId]
+    );
+
+    if (result.rowCount === 0) {
+      return [];
+    }
+    return result.rows.map(row => ({
+      permitId: row.id,
+    }));
+  }
 }

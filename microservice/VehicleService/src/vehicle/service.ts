@@ -357,6 +357,8 @@ export class VehicleService {
   //     nickname: row.data.nickname
   //   }
   // }
+
+
   public async findVehicleByPlate(
     plate: string,
     state: string

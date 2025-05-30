@@ -556,4 +556,15 @@ export class PermitResolver {
 
     return await service.isValidPermitPolice(vehicleId)
   }
+
+  @Authorized('driver')
+  @Query(() => [{permitID: String}])
+  async expirePermits(
+    @Arg('vehicleID', () => String) vehicleID: string,
+  ): Promise<{permitId: string}[]> {
+    if (!vehicleID) {
+      throw new Error('Vehicle ID is required')
+    }
+    return await service.expirePermits(vehicleID)
+  }
 }

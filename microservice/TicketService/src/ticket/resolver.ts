@@ -35,17 +35,17 @@ export class TicketResolver {
     this.ticketService = new TicketService();
   }
 
-  private async getVehicleByPlate(plate: string, userId?: string): Promise<Vehicle | null> {
+  private async getVehicleByPlate(plate: string, state: string, userId?: string): Promise<Vehicle | null> {
     const vehicleQuery = {
       query: `
-        query FindVehicleByPlate($plate: String!) {
-          findVehicleByPlate(plate: $plate) {
+        query FindVehicleByPlate($plate: String!, $state: String!) {
+          findVehicleByPlate(plate: $plate, state: $state) {
             id
             plate
           }
         }
       `,
-      variables: { plate }
+      variables: { plate, state }
     };
     const vehicleResponse = await fetch('http://localhost:4001/graphql', {
       method: 'POST',
@@ -261,10 +261,10 @@ export class TicketResolver {
       @Arg("input", () => NewTicketInput) input: NewTicketInput,
       @Ctx() request: Request
     ): Promise<Ticket> {
-      const plate = input.plate
+      const { plate, state } = input
       const vehicleQuery = `
-        mutation FindOrCreateVehicleByPlate($plate: String!) {
-          findOrCreateVehicleByPlate(plate: $plate) {
+        mutation FindOrCreateVehicleByPlate($plate: String!, $state: String!) {
+          findOrCreateVehicleByPlate(plate: $plate, state: $state) {
             id
           }
         }
@@ -277,7 +277,7 @@ export class TicketResolver {
         },
         body: JSON.stringify({
           query: vehicleQuery,
-          variables: { plate: plate },
+          variables: { plate: plate, state: state },
         }),
       });
       const vehicleJson = await vehicleRes.json();
@@ -383,10 +383,11 @@ export class TicketResolver {
   @Query(() => [Ticket])
   async pendingTickets(
     @Ctx() request: Request & {user: SessionUser},
-    @Arg("plate", () => String) plate: string
+    @Arg("plate", () => String) plate: string,
+    @Arg("state", () => String) state: string
   ): Promise<Ticket[]> {
     const userToken = request.headers.authorization?.split(' ')[1]
-    const vehicleID: Vehicle|null = await this.getVehicleByPlate(plate, userToken)
+    const vehicleID: Vehicle|null = await this.getVehicleByPlate(plate, state, userToken)
     if (!vehicleID) {
       return []
     }

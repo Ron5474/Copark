@@ -416,6 +416,18 @@ test('sendTicketIssuedEmail logs error when fetch fails', async () => {
   errorSpy.mockRestore()
 })
 
+test('generateTicketReport returns expected fields', async () => {
+  const report = await ticketService.generateTicketReport({ numDays: 7 });
+  // console.log(report)
+  expect(report).toBeDefined();
+  expect(report).toHaveProperty('totalTickets');
+  expect(report).toHaveProperty('unpaidTickets');
+  expect(report).toHaveProperty('paidTickets');
+  expect(report).toHaveProperty('totalRevenue');
+  expect(report).toHaveProperty('violationBreakdown');
+  expect(report).toHaveProperty('enforcerBreakdown');
+});
+
 // test('getTicketsForUserJWT should return tickets for the provided userJWT', async () => {
 //     const userID = '0f99f921-594e-4387-9d05-e6e80d8aa54a'
 

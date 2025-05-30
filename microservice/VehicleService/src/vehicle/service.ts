@@ -106,7 +106,8 @@ export class VehicleService {
   //   )
   //   return {rowCount: res.rows.length, rows: res.rows};
   // }
-  private async vehicleExists(plate: string, state: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
+  private async vehicleExists(plate: string, state: string, userID?: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
+    if (!userID) {
     const res = await pool.query(
       `SELECT id
         FROM vehicle
@@ -114,12 +115,26 @@ export class VehicleService {
             AND LOWER(data->>'state') = LOWER($2)
             AND data->>'deleted' IS NULL`,
       [plate, state]
-    )
+    );
+
     return {rowCount: res.rows.length, rows: res.rows};
+  } else {
+    const res = await pool.query(
+      `SELECT id
+        FROM vehicle
+          WHERE LOWER(data->>'plate') = LOWER($1)
+            AND LOWER(data->>'state') = LOWER($2)
+            AND driver = $3
+            AND data->>'deleted' IS NULL`,
+      [plate, state, userID]
+    );
+
+    return {rowCount: res.rows.length, rows: res.rows};
+  }
   }
 
   public async removeVehicle(plate: string, state: string, userId: string, token: string): Promise<VehicleID> {
-    const existing = await this.vehicleExists(plate, state)
+    const existing = await this.vehicleExists(plate, state, userId)
     if ((existing?.rowCount ?? 0) === 0) {
       throw new Error('Vehicle not found or not owned by user')
     }

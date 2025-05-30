@@ -10,16 +10,19 @@ import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
 import { app as emailApp } from '../../EmailService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
+import { app as AdminApp, bootstrap as AdminBoot } from '../../AdminService/src/app'
 
 let server: http.Server
 let authServer: http.Server
 let emailServer: http.Server
 let vehcServer: http.Server
+let adminServer: http.Server
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 const EMAIL_PORT = 3015
 const VEHC_PORT = 4001
+const ADMIN_PORT = 4000
 // const VEHC_SERVICE_URL = `http://localhost:${VEHC_PORT}`
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 
@@ -45,6 +48,12 @@ beforeAll(async () => {
     vehcServer.listen(VEHC_PORT, () => resolve())
   })
   await VehicleBoot()
+
+  adminServer = http.createServer(AdminApp)
+  await new Promise<void>((resolve) => {
+    adminServer.listen(ADMIN_PORT, () => resolve())
+  })
+  await AdminBoot()
 
   return db.reset()
 })
@@ -74,6 +83,12 @@ const driver = {
 const adminUser = {
   email: 'jxiong0822@outlook.com',
   password: 'password1',
+}
+
+const SCPD = {
+  name: "Santa Cruz Police Department",
+  email: "police@santacruz.gov", 
+  role: "police"
 }
 
 async function loginAs(who: string, defaultVehicle=true): Promise<{vid?: string, token: string} | undefined> {
@@ -137,7 +152,28 @@ async function loginAs(who: string, defaultVehicle=true): Promise<{vid?: string,
       throw new Error(`Enforcement login failed with status ${response.status}`)
     }
     return {token: response.body.id}
-  } else {
+  }  else if (who === "police") {
+      const {token: adminToken} = await loginAs("admin")
+  
+      const addOrgMutation = `
+        mutation AddAPIUser($organization: APICredential!) {
+          addAPIUser(organization: $organization) {
+            id
+          }
+        }
+      `
+  
+      const addResponse = await supertest(adminServer)
+        .post('/graphql')
+        .set('Authorization', 'Bearer ' + adminToken)
+        .send({ 
+          query: addOrgMutation,
+          variables: { organization: SCPD }
+        })
+        .expect(200)
+      
+      return {token: addResponse.body.data.addAPIUser.id}
+    } else {
     const response = await supertest(AUTH_SERVICE_URL)
       .post('/api/v0/auth/login')
       .send(adminUser)
@@ -242,16 +278,16 @@ const checkPermitInvalidInput = { plate: "0000000" }
 
 const checkPermitInput = { plate: "JCDE544" }
 
-// const isValidPermitByPoliceQuery = `
-// query IsValidPolice($plate: String!) {
-//   isValidPermitByPolice(plate: $plate) {
-//     isValid
-//   }
-// }`
+const isValidPermitByPoliceQuery = `
+query IsValidPolice($plate: String!) {
+  isValidPermitByPolice(plate: $plate) {
+    isValid
+  }
+}`
 
-// const isValidPermitByPoliceInput = {
-//   plate: "7RON123",
-// }
+const isValidPermitByPoliceInput = {
+  plate: "7RON123",
+}
 
 // const nonExistentPlateInput = {
 //   plate: "1AAA111",
@@ -598,7 +634,6 @@ test('Driver can purchase a lot permit in advance', async () => {
       query: purchaseLotPermitQuery,
       variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate}}
     })
-    console.log('CONFIRMATION: ', confirmation.body)
 
   expect(confirmation.body.data.purchaseLotPermit.activeDate).not.toBe(now.toISOString())
   
@@ -640,29 +675,33 @@ test('Enforcer gets valid permit', async () => {
 
 })
 
-// test('Police gets invalid permit', async () => {
-//   const isValid = await supertest(server)
-//     .post('/graphql')
-//     .set('Authorization', 'Bearer ' + policeJWT)
-//     .send({ 
-//       query: isValidPermitByPoliceQuery,
-//       variables: isValidPermitByPoliceInput
-//     })
-//     // console.log(isValid.body)
-//   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
-// })
+test('Police gets invalid permit', async () => {
+  const { token } = await loginAs("police")
 
-// test('Police gets invalid for nonexistent plate', async () => {
-//   const isValid = await supertest(server)
-//     .post('/graphql')
-//     .set('Authorization', 'Bearer ' + policeJWT)
-//     .send({ 
-//       query: isValidPermitByPoliceQuery,
-//       variables: nonExistentPlateInput
-//     })
+  const isValid = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: isValidPermitByPoliceQuery,
+      variables: isValidPermitByPoliceInput
+    })
+  
+  expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
+})
+
+test('Police gets invalid for nonexistent plate', async () => {
+  const { token } = await loginAs("police")
+
+  const isValid = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: isValidPermitByPoliceQuery,
+      variables: {plate: "something Wrong"}
+    })
     
-//   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
-// })
+  expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
+})
 
 test('Driver has no permits', async () => {
   const { token } = await loginAs("driver")

@@ -15,13 +15,6 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
   const theme = useTheme()
   const [validImageCounts, setValidImageCounts] = useState<Record<string, number>>({})
 
-  const handleValidImage = (ticketId: string) => {
-    setValidImageCounts(prev => ({
-      ...prev,
-      [ticketId]: (prev[ticketId] || 0) + 1
-    }))
-  }
-
   return (
     <>
       <Typography sx={{ mb: 2 }}>Active Challenges: {tickets.length}</Typography>

@@ -244,6 +244,16 @@ test:enforcement:
       - package.json
       - .gitlab-ci.yml
 
+test:vehicleService:
+  script:
+    - npm run install-vehicleService
+    - npm run test-VehicleService
+  rules:
+    - changes: 
+      - microservices/VehicleService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
 # # Failing Integration Tests
 
 # test:admin:

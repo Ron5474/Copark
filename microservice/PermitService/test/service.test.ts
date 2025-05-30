@@ -13,6 +13,7 @@ import {test, afterAll, expect, vi, beforeEach} from 'vitest'
 
 import db from './db'
 import {PermitService} from '../src/permit/service'
+import {sendPermitEmail} from '../src/permit/emailClient'
 
 vi.mock('server-only', () => ({}))
 
@@ -421,4 +422,25 @@ test('generatePermitReport returns correct permit report structure', async () =>
   expect(typeof report.totalRevenue).toBe('number')
   expect(Array.isArray(report.zoneBreakdown)).toBe(true)
   expect(Array.isArray(report.lotBreakdown)).toBe(true)
+})
+
+test('sendPermitEmail logs error when fetch fails', async () => {
+  // Mock fetch to throw
+  global.fetch = vi.fn().mockRejectedValue(new Error('Simulated failure'))
+
+  // Spy on console.error
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+  await sendPermitEmail({
+    to: 'test@example.com',
+    subject: 'Test',
+    html: '<p>Test</p>',
+  })
+
+  expect(errorSpy).toHaveBeenCalledWith(
+    'EmailService failed:',
+    expect.any(Error)
+  )
+
+  errorSpy.mockRestore()
 })

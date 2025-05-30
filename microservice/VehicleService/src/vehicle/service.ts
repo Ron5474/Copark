@@ -149,7 +149,7 @@ export class VehicleService {
     const existing = await this.vehicleExists(input.plate)
 
 
-    if ((existing?.rowCount ?? 0) > 0) {
+    if ((existing?.rowCount as number) > 0) {
       throw new Error('This license plate is already registered')
     }
 

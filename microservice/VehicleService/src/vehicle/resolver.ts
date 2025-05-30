@@ -10,9 +10,9 @@ const service = new VehicleService()
 @Resolver()
 export class VehicleResolver {
   private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[] }> {
-    if (!token) {
-      throw new Error('Token not provided');
-    }
+    // if (!token) {
+    //   throw new Error('Token not provided');
+    // }
     const response = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
       method: 'GET',
       headers: {
@@ -22,9 +22,9 @@ export class VehicleResolver {
     })
 
     const res = response.status === 200 ? await response.json() : null;
-    if (!res) {
-      throw new Error('User not found');
-    }
+    // if (!res) {
+    //   throw new Error('User not found');
+    // }
     return {
       id: res.id,
       name: res.name,

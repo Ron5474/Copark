@@ -19,7 +19,7 @@ vi.mock('server-only', () => ({}))
 
 const zonePermitDetails = {
   plate: '7RON123',
-  vid: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
+  vehicleId: 'f2d7800e-67ce-41aa-b1fe-38e679112e0e',
   zone: '27',
   duration: {'minutes': 30, 'hours': 0},
   paymentMethod: 'paypal',
@@ -27,7 +27,8 @@ const zonePermitDetails = {
 }
 
 const lotPermitDetails = {
-  vehicle: '12345678-1234-1234-1234-567890abcdef',
+  plate: 'Testing :)',
+  vehicleId: '12345678-1234-1234-1234-567890abcdef',
   lot: 'A',
   duration: 'quarterly',
   paymentMethod: 'paypal',
@@ -88,7 +89,7 @@ test('Vehicle has valid permit', async () => {
   vi.setSystemTime(now)
 
   await permitService.purchaseMyZonePermit(zonePermitDetails, now.toISOString())
-  const permits = await permitService.getValidPermit(zonePermitDetails.vid, now.toISOString())
+  const permits = await permitService.getValidPermit(zonePermitDetails.vehicleId, now.toISOString())
   expect(permits.length).toBe(1)
   expect(permits[0].area).toBe('27')
   expect(permits[0].type).toBe('zone')
@@ -133,13 +134,13 @@ test('Vehicle does not have valid permit (Police)', async () => {
 })
 
 test('getMyPermits returns empty', async () => {
-  const { active } = await permitService.getMyPermits([zonePermitDetails.vid])
+  const { active } = await permitService.getMyPermits([zonePermitDetails.vehicleId])
   expect(active.length).toBe(0)
 })
 
 test('getMyPermits returns active permit', async () => {
   await permitService.purchaseMyZonePermit(zonePermitDetails)
-  const { active } = await permitService.getMyPermits([zonePermitDetails.vid])
+  const { active } = await permitService.getMyPermits([zonePermitDetails.vehicleId])
   expect(active.length).toBe(1)
 })
 
@@ -299,7 +300,7 @@ test('Purchasing same lot permit transaction ID twice', async () => {
   await permitService.purchaseMyLotPermit(lotPermitDetails)
 
   vi.spyOn(console, 'error').mockImplementation(() => undefined)
-  await expect(permitService.purchaseMyLotPermit(lotPermitDetails)).rejects.toThrow(`Permit for vehicle ${lotPermitDetails.vehicle} already exists for lot ${lotPermitDetails.lot} with transaction ID ${lotPermitDetails.transactionId}`)
+  await expect(permitService.purchaseMyLotPermit(lotPermitDetails)).rejects.toThrow(`Permit for vehicle ${lotPermitDetails.plate} already exists for lot ${lotPermitDetails.lot} with transaction ID ${lotPermitDetails.transactionId}`)
   vi.useRealTimers()
 })
 
@@ -310,7 +311,7 @@ test('Purchasing same lot permit twice - different durations', async () => {
 
  vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(permitService.purchaseMyLotPermit({...lotPermitDetails, transactionId: 'somethingElse', duration: 'daily'}))
-      .rejects.toThrow(`Vehicle ${lotPermitDetails.vehicle} already has an active permit of this type in lot ${lotPermitDetails.lot}`)
+      .rejects.toThrow(`Vehicle ${lotPermitDetails.plate} already has an active permit of this type in lot ${lotPermitDetails.lot}`)
   vi.useRealTimers()
 })
 

@@ -104,7 +104,7 @@ export class PermitService {
         (SELECT count FROM conflict_check) AS conflict_count,
         (SELECT count FROM zone_exists_check) AS zone_exists,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
-    `, [input.vid, input.zone, data, input.transactionId, now])
+    `, [input.vehicleId, input.zone, data, input.transactionId, now])
     
     const result = rows[0]
 
@@ -468,16 +468,16 @@ export class PermitService {
         (SELECT count FROM conflict_check) AS conflict_count,
         (SELECT count FROM lot_exists_check) AS lot_exists,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
-    `, [input.vehicle, input.lot, data, input.transactionId, now.toISOString()])
+    `, [input.vehicleId, input.lot, data, input.transactionId, now.toISOString()])
     
     const result = rows[0]
 
     if (result.duplicate_count > 0) {
-      throw new Error(`Permit for vehicle ${input.vehicle} already exists for lot ${input.lot} with transaction ID ${input.transactionId}`)
+      throw new Error(`Permit for vehicle ${input.plate} already exists for lot ${input.lot} with transaction ID ${input.transactionId}`)
     }
 
     if (result.conflict_count > 0) {
-      throw new Error(`Vehicle ${input.vehicle} already has an active permit of this type in lot ${input.lot}`)
+      throw new Error(`Vehicle ${input.plate} already has an active permit of this type in lot ${input.lot}`)
     }
 
     // if (!result.lot_exists) {

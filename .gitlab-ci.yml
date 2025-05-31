@@ -297,6 +297,7 @@ test:permitService:
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
 
+    - npm run installs
     - npm run ci-auth
     - npm run build-auth
 

@@ -6,6 +6,7 @@ import ManageZones from '../../src/app/components/ManageZones';
 import { ThemeProvider } from '@mui/material';
 import theme from '../../src/app/theme';
 import AllPermitsTable from '@/app/charts/AllPermitsTable';
+import PermitStatsByZone from '@/app/charts/PermitStatsByZone';
 
 // Mock data
 const mockZones = [
@@ -26,7 +27,8 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 vi.mock('react-chartjs-2', () => ({
-  Line: () => <div data-testid="mock-chart">A cool chart.</div>
+  Line: () => <div data-testid="mock-line-chart">A cool line chart.</div>,
+  Bar: () => <div data-testid="mock-bar-chart">A cool bar chart.</div>
 }));
 
 beforeAll(() => {
@@ -98,6 +100,20 @@ beforeAll(() => {
           })
         });
       }
+
+      if (body.query.includes('allZoneStats')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: {
+              allZoneStats: [
+                { area: '1', totalPermits: 10 },
+                { area: '2', totalPermits: 5 }
+              ]
+            }
+          })
+        });
+      }
     }
 
     return Promise.reject(new Error(`Unhandled fetch to ${url}`));
@@ -136,7 +152,7 @@ it('renders permit statistics chart with data', async () => {
 
   // Chart should render after data loads
   await waitFor(() => {
-    expect(screen.getByTestId('mock-chart')).toBeDefined();
+    expect(screen.getByTestId('mock-line-chart')).toBeDefined();
   });
 });
 
@@ -285,4 +301,56 @@ it('handles error when fetching all permits', async () => {
     expect(screen.getByText('Error: Failed to fetch permit data')).toBeDefined();
   });
 });
+
+it('successfully fetches and displays zone permit statistics', async () => {
+  const mockZoneStats = [
+    { area: '1', totalPermits: 10 },
+    { area: '2', totalPermits: 5 }
+  ];
+
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      const body = JSON.parse(options?.body as string);
+      if (body.query.includes('allZoneStats')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: { allZoneStats: mockZoneStats }
+          })
+        });
+      }
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
+
+  render(<PermitStatsByZone />);
+
+  // Wait for data to load and chart to display
+  await waitFor(() => {
+    expect(screen.getByTestId('mock-bar-chart')).toBeDefined();
+  });
+});
+
+// it('handles error when fetching zone permit statistics', async () => {
+//   mockFetch.mockImplementationOnce(async (url, options) => {
+//     if (url === 'http://localhost:4003/graphql') {
+//       const body = JSON.parse(options?.body as string);
+//       if (body.query.includes('allZoneStats')) {
+//         return Promise.resolve({
+//           ok: false,
+//           json: () => Promise.resolve({
+//             errors: [{ message: 'Failed to fetch zone stats' }]
+//           })
+//         });
+//       }
+//     }
+//     return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+//   });
+
+//   render(<PermitStatsByZone />);
+
+//   await waitFor(() => {
+//     expect(screen.getByText('Error: Failed to fetch zone stats')).toBeDefined();
+//   });
+// });
 

@@ -82,7 +82,8 @@ export async function addPermitDetails(
           }`
 
     inputData = {
-      vehicle: JSON.parse(addPermitDetails.vehicle as unknown as string)?.plate,
+      plate: JSON.parse(addPermitDetails.vehicle as unknown as string)?.plate,
+      vehicleId: JSON.parse(addPermitDetails.vehicle as unknown as string)?.id,
       zone: addPermitDetails.zone,
       duration: addPermitDetails.duration,
       paymentMethod: payment_method,
@@ -129,7 +130,8 @@ export async function addPermitDetails(
                     }
                   }`
     inputData = {
-      vehicle: vehicle.data.getDefaultVehicle.plate,
+      vehicleId: vehicle.data.getDefaultVehicle.id,
+      plate: vehicle.data.getDefaultVehicle.plate,
       lot: addPermitDetails.lot,
       duration: addPermitDetails.duration,
       paymentMethod: payment_method,

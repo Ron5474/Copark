@@ -120,7 +120,7 @@ export default function OnboardView() {
         <Button
           variant="contained"
           fullWidth
-          sx={{ mt: 2 }}
+          sx={{ mt: 2, textTransform: 'none', color: 'white', fontSize: '1.15rem' }}
           disabled={!accepted}
           onClick={handleClick}
         >

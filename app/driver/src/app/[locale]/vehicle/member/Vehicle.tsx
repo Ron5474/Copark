@@ -34,7 +34,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
   const { setVehicle, next } = useContext(ZoneContext)
   const [open, setOpen] = useState(false)
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
-  const [selectedPlate, setSelectedPlate] = useState<string | null>(null)
+  const [selectedVID, setSelectedVID] = useState<string | null>(null)
   const [isValidSelection, setIsValidSelection] = useState<boolean>(true)
   const [loading, setLoading] = useState(true)
   const t = useTranslations('garage')
@@ -45,19 +45,19 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
       setVehicles(fetchedVehicles)
       setLoading(false)
     })()
-    let plate: string | null = null;
+    let vid: string | null = null;
     (async () => {
       const res = await getDefaultVehicle()
-      if (res && res.plate) {
-        plate = res.plate
+      if (res && res.id) {
+        vid = res.id
         if (isCheckout) {
-          setSelectedPlate(plate)
+          setSelectedVID(vid)
         }
       } else {
-        plate = null
+        vid = null
       }
     })()
-  }, [setSelectedPlate, isCheckout])
+  }, [setSelectedVID, isCheckout])
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
@@ -68,8 +68,8 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
     setLoading(false)
   }
 
-  const setDefaultVehicle = async (plate: string) => {
-    const vehicle = vehicles.find(v => v.plate === plate)
+  const setDefaultVehicle = async (vid: string) => {
+    const vehicle = vehicles.find(v => v.id === vid)
     if (vehicle && vehicle.id) {
       // Assuming you have a function to set the default vehicle
       await updateDefaultVehicle(vehicle.id)
@@ -78,11 +78,11 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
   }
 
   const handleButton = () => {
-    if (!selectedPlate) {
+    if (!selectedVID) {
       setIsValidSelection(false)
       return
     }
-    setVehicle(vehicles.find((v: Vehicle) => v.plate === selectedPlate))
+    setVehicle(vehicles.find((v: Vehicle) => v.id === selectedVID))
     if (isCheckout)
       next()
     else
@@ -182,16 +182,16 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
               }}
             >
               <RadioGroup
-                value={selectedPlate}
+                value={selectedVID}
                 onChange={(event) => {
-                  setSelectedPlate(event.target.value)
+                  setSelectedVID(event.target.value)
                   setIsValidSelection(true)
                 }}
               >
                 {vehicles.map((v, i) => (
                   <FormControlLabel
                     key={i}
-                    value={v.plate}
+                    value={v.id}
                     control={<Radio sx={{ transform: 'scale(1.2)' }} />}
                     label={
                       <Box sx={{ display: 'flex', flexDirection: 'column', ml: 1}}>
@@ -223,7 +223,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                       width: '100%',
                       display: 'flex',
                       borderTop: i !== 0 ? '1px solid #ccc' : 'none',
-                      backgroundColor: selectedPlate === v.plate ? '#f5f5f5' : 'white',
+                      backgroundColor: selectedVID === v.id ? '#f5f5f5' : 'white',
                       transition: 'background-color 0.2s',
                       '&:hover': {
                         backgroundColor: '#f9f9f9',
@@ -255,13 +255,13 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
             >
               {isCheckout ? t("checkout.continue") : t("edit")}
             </Button>
-            {!isCheckout && selectedPlate && (
-              vehicles.find(v => v.plate === selectedPlate)?.default !== true
+            {!isCheckout && selectedVID && (
+              vehicles.find(v => v.id === selectedVID)?.default !== true
             ) && (
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={() => setDefaultVehicle(selectedPlate)}
+                onClick={() => setDefaultVehicle(selectedVID)}
                 sx={{
                   width: '100%',
                   marginTop: '1vh',

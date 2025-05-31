@@ -154,7 +154,7 @@
           "title": "Check and Pay for Tickets",
           "description": "Check for tickets on your vehicle and pay instantly"
         },
-        "prompt": "Add Your First Vehicle",
+        "prompt": "Add First Vehicle",
         "secure": "Your data is secure • Add unlimited vehicles later"
       },
       "page2": {
@@ -213,12 +213,12 @@
               "required": "License plate number is required",
               "constraint": "Must be 1-10 characters"
             },
-            "country": "Country",
-            "state": "State",
-            "nickname": "Nickname",
-            "optional": "optional",
-            "save": "Save"
-      },
+      "country": "Country",
+      "state": "State",
+      "nickname": "Nickname",
+      "optional": "optional",
+      "save": "Save"
+    },
     "checkout": {
       "title": "Which Vehicle?",
       "continue": "Continue"

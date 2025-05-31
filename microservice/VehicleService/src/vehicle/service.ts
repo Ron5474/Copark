@@ -24,7 +24,7 @@ export class VehicleService {
     
 
     const result = await pool.query(
-      `SELECT id, data FROM vehicle WHERE driver = $1`,
+      `SELECT id, data FROM vehicle WHERE driver = $1 AND data->>'deleted' IS NULL`,
       [userId]
     )
 
@@ -99,16 +99,140 @@ export class VehicleService {
     })))
   }
 
-  public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
-    const existing = await pool.query(
-      `SELECT id FROM vehicle WHERE LOWER(data->>'plate') = LOWER($1)`,
-      [input.plate]
-    )
+  // private async vehicleExists(plate: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
+  //   const res = await pool.query(
+  //     `SELECT id FROM vehicle WHERE LOWER(data->>'plate') = LOWER($1) AND data->>'deleted' IS NULL`,
+  //     [plate]
+  //   )
+  //   return {rowCount: res.rows.length, rows: res.rows};
+  // }
+  private async vehicleExists(plate: string, state: string, userID?: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
+    if (!userID) {
+    const res = await pool.query(
+      `SELECT id
+        FROM vehicle
+          WHERE LOWER(data->>'plate') = LOWER($1)
+            AND LOWER(data->>'state') = LOWER($2)
+            AND data->>'deleted' IS NULL`,
+      [plate, state]
+    );
 
-    if ((existing?.rowCount ?? 0) > 0) {
-      throw new Error('This license plate is already registered')
+    return {rowCount: res.rows.length, rows: res.rows};
+  } else {
+    const res = await pool.query(
+      `SELECT id
+        FROM vehicle
+          WHERE LOWER(data->>'plate') = LOWER($1)
+            AND LOWER(data->>'state') = LOWER($2)
+            AND driver = $3
+            AND data->>'deleted' IS NULL`,
+      [plate, state, userID]
+    );
+
+    return {rowCount: res.rows.length, rows: res.rows};
+  }
+  }
+
+  public async removeVehicle(plate: string, state: string, userId: string, token: string): Promise<VehicleID> {
+    const existing = await this.vehicleExists(plate, state, userId)
+    if ((existing?.rowCount ?? 0) === 0) {
+      throw new Error('Vehicle not found or not owned by user')
+    }
+    if (!existing) {
+      throw new Error('Vehicle not found or not owned by user')
     }
 
+    const vehicles = await this.getMyVehicles(userId)
+
+    if ((vehicles.length) === 1) {
+        console.log('existing', existing)
+        throw new Error('Cannot delete the only default vehicle. Please add another vehicle as default first.')
+    } else {
+      const defaultVehicle = await this.getDefaultVehicleId(userId)
+      if (defaultVehicle?.plate === plate) {
+        const removed = vehicles.filter(row => row.id !== defaultVehicle.id)
+        if (!removed || removed?.length === 0) {
+          throw new Error('Cannot delete the only default vehicle. Please add another vehicle as default first.')
+        } else {
+          await this.setDefaultVehicle({ id: removed[0].id }, userId)
+        }
+      }
+    }
+
+    // check if the vehicle has pending tickets
+    const pendingTickets = await fetch(`http://localhost:4002/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        query: `
+          query GetPendingTickets($plate: String!, $state: String!) {
+            pendingTickets(plate: $plate, state: $state) {
+              id,
+              vehicle
+            }
+          }
+        `,
+        variables: { plate, state }
+      })
+      
+    });
+
+    const pendingTicketsData = await pendingTickets.json();
+    if (pendingTicketsData.data.pendingTickets.length > 0) {
+      throw new Error('Vehicle cannot be removed because it has pending tickets');
+    }
+
+    // expire permits on this vehicle
+    const expirePermits = await fetch(`http://localhost:4003/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        query: `
+          mutation ExpirePermits($vehicleId: String!) {
+            expirePermits(vehicleId: $vehicleId) {
+              id
+            }
+          }
+        `,
+        variables: { vehicleId: existing.rows[0].id }
+      })
+    });
+    const expirePermitsData = await expirePermits.json();
+    if (expirePermitsData.errors) {
+      console.error('Error expiring permits: ', expirePermitsData.errors);
+      throw new Error('Failed to expire permits. Please try again later.');
+    }
+    
+
+    const res = await pool.query(
+      `UPDATE vehicle
+        SET data = jsonb_set(data, '{deleted}', to_jsonb(NOW()))
+          WHERE LOWER(data->>'plate') = LOWER($1)
+            AND LOWER(data->>'state') = LOWER($2)
+            AND driver = $3 RETURNING id`,
+      [plate, state, userId]
+    )
+    if (res.rowCount === 0) {
+      throw new Error('Vehicle not found or not owned by user')
+    }
+    const rows = res.rows[0]
+
+    return { id: rows.id}
+  }
+
+  public async registerVehicle(input: RegisterVehicleInput, userId: string): Promise<Vehicle> {
+    const existing = await this.vehicleExists(input.plate, input.state)
+
+    if ((existing?.rowCount as number) > 0) {
+      throw new Error('This license plate is already registered')
+    }
+    try {
     const result = await pool.query(
       `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
       [
@@ -119,9 +243,10 @@ export class VehicleService {
         }
       ]
     )
+ 
 
     const vehicles = await pool.query(
-      `SELECT COUNT(*) FROM vehicle WHERE driver = $1`,
+      `SELECT COUNT(*) FROM vehicle WHERE driver = $1 AND data->>'deleted' IS NULL`,
       [userId]
     )
     if (parseInt(vehicles.rows[0].count) == 1) {
@@ -133,6 +258,10 @@ export class VehicleService {
       default: defaultVehicle == null ? false : defaultVehicle.id == result.rows[0].id,
       ...input
     }
+     } catch (error) {
+    console.log('Error inserting vehicle:', error);
+    throw new Error('Failed to register vehicle. Please try again later.');
+    } 
   }
   
 
@@ -224,23 +353,49 @@ export class VehicleService {
     return {id: vehicleID.id}
   }
 
-  public async findVehicleByPlate(plate: string): Promise<Vehicle | null> {
+  // public async findVehicleByPlate(plate: string): Promise<Vehicle | null> {
+  //   const result = await pool.query(
+  //     `SELECT id, data FROM vehicle WHERE data->>'plate' = $1 AND data->>'deleted' IS NULL`,
+  //     [plate]
+  //   )
+
+  //   if (result.rowCount === 0) return null
+
+
+  //   const row = result.rows[0]
+  //   return {
+  //     id: row.id,
+  //     plate: row.data.plate,
+  //     country: row.data.country,
+  //     state: row.data.state,
+  //     nickname: row.data.nickname
+  //   }
+  // }
+
+
+  public async findVehicleByPlate(
+    plate: string,
+    state: string
+  ): Promise<Vehicle | null> {
     const result = await pool.query(
-      `SELECT id, data FROM vehicle WHERE data->>'plate' = $1`,
-      [plate]
-    )
+      `SELECT id, data
+        FROM vehicle
+        WHERE LOWER(data->>'plate') = LOWER($1)
+          AND LOWER(data->>'state') = LOWER($2)
+          AND data->>'deleted' IS NULL
+      `,
+      [plate, state]
+    );
 
-    if (result.rowCount === 0) return null
-
-
-    const row = result.rows[0]
+    if (result.rowCount === 0) return null;
+    const row = result.rows[0];
     return {
-      id: row.id,
-      plate: row.data.plate,
-      country: row.data.country,
-      state: row.data.state,
+      id:       row.id,
+      plate:    row.data.plate,
+      country:  row.data.country,
+      state:    row.data.state,
       nickname: row.data.nickname
-    }
+    };
   }
 
   public async createUnregisteredVehicle(input: createdVehicleInput): Promise<CreatedVehicle> {

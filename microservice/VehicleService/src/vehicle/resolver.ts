@@ -10,9 +10,9 @@ const service = new VehicleService()
 @Resolver()
 export class VehicleResolver {
   private async getUserData(token?: string): Promise<{ id: string, name: string, role: string[] }> {
-    if (!token) {
-      throw new Error('Token not provided');
-    }
+    // if (!token) {
+    //   throw new Error('Token not provided');
+    // }
     const response = await fetch('http://localhost:3010/api/v0/auth/driver/id', {
       method: 'GET',
       headers: {
@@ -22,9 +22,9 @@ export class VehicleResolver {
     })
 
     const res = response.status === 200 ? await response.json() : null;
-    if (!res) {
-      throw new Error('User not found');
-    }
+    // if (!res) {
+    //   throw new Error('User not found');
+    // }
     return {
       id: res.id,
       name: res.name,
@@ -101,12 +101,20 @@ export class VehicleResolver {
     return await service.findOwnerByVehicleID(vehicle)
   }
 
+  // @Authorized('admin', 'enforcement', 'police', 'driver')
+  // @Query(() => Vehicle, { nullable: true })
+  // async findVehicleByPlate(
+  //    @Arg('plate', () => String) plate: string
+  // ): Promise<Vehicle | null> {
+  //   return await service.findVehicleByPlate(plate)
+  // }
   @Authorized('admin', 'enforcement', 'police', 'driver')
   @Query(() => Vehicle, { nullable: true })
   async findVehicleByPlate(
-     @Arg('plate', () => String) plate: string
+    @Arg('plate', () => String) plate: string,
+    @Arg('state', ()   => String) state: string,
   ): Promise<Vehicle | null> {
-    return await service.findVehicleByPlate(plate)
+    return await service.findVehicleByPlate(plate, state);
   }
 
   @Authorized('admin', 'enforcement')
@@ -137,9 +145,10 @@ export class VehicleResolver {
   @Authorized('enforcement')
   @Mutation(() => CreatedVehicle)
   async findOrCreateVehicleByPlate(
-    @Arg('plate', () => String) plate: string
+    @Arg('plate', () => String) plate: string,
+    @Arg('state', () => String) state: string
   ): Promise<CreatedVehicle> {
-    const vehicle = await service.findVehicleByPlate(plate)
+    const vehicle = await service.findVehicleByPlate(plate, state)
     if (vehicle) {
       return {
         id: vehicle.id,
@@ -149,6 +158,24 @@ export class VehicleResolver {
       }
     }
 
-    return await service.createUnregisteredVehicle({ plate })
+    return await service.createUnregisteredVehicle({ plate, state })
+  }
+
+  @Authorized('driver')
+  @Mutation(() => VehicleID)
+  async deleteVehicle(
+    @Arg('plate', () => String) plate: string,
+    @Arg('state', () => String) state: string,
+    @Ctx() request: Request & {user: SessionUser}
+  ): Promise<VehicleID> {
+    const token = request.headers.authorization?.split(' ')[1]
+    const userId = (await this.getUserData(token)).id
+    if (!plate) {
+      throw new Error('Plate is required')
+    }
+    if (!token) {
+      throw new Error('Token not provided')
+    } 
+    return await service.removeVehicle(plate, state, userId, token)
   }
 }

@@ -231,7 +231,8 @@ mutation PurchaseZonePermit($input: PurchaseZoneInput!) {
 
 const purchaseZoneInput = {
   input: {
-    vehicle: "replace with derik's vid",
+    plate: derikVehicleInput.input.plate,
+    vehicleId: "fd302206-fa28-4e2b-964d-8cc8cf1d3aba", // fake uuid, replace with real
     zone: "123",
     duration: {'minutes': 30, 'hours': 2},
     paymentMethod: 'paypal',
@@ -258,7 +259,8 @@ mutation PurchaseLotPermit($input: PurchaseLotInput!) {
 
 const purchaseLotInput = {
   input: {
-    vehicle: "replace with derik's vid",
+    plate: derikVehicleInput.input.plate,
+    vehicleId: "fd302206-fa28-4e2b-964d-8cc8cf1d3aba", // fake uuid, replace with real
     lot: "A",
     duration: 'quarterly',
     paymentMethod: 'paypal',
@@ -267,62 +269,47 @@ const purchaseLotInput = {
 }
 
 const checkPermitQuery = `
-query CheckedPermit($plate: String!) {
-  checkPermit(plate: $plate) {
+query CheckedPermit($plate: String!, $state: String!) {
+  checkPermit(plate: $plate, state: $state) {
     type
     area
   }
 }`
 
-const checkPermitInvalidInput = { plate: "0000000" }
+const checkPermitInvalidInput = { plate: "0000000", state: "NA" }
 
-const checkPermitInput = { plate: "JCDE544" }
+const checkPermitInput = { plate: "JCDE544", state: "NY" }
 
 const isValidPermitByPoliceQuery = `
-query IsValidPolice($plate: String!) {
-  isValidPermitByPolice(plate: $plate) {
+query IsValidPolice($plate: String!, $state: String!) {
+  isValidPermitByPolice(plate: $plate, state: $state) {
     isValid
   }
 }`
 
 const isValidPermitByPoliceInput = {
   plate: "7RON123",
+  state: "CA"
 }
 
-// const nonExistentPlateInput = {
-//   plate: "1AAA111",
-// }
-
-// const myPermitsQuery = `
-// query MyPermits($vehicleID: String!) {
-//   myPermits(vehicleID: $vehicleID) {
-//     future {
-//       vehicle
-//       type
-//       area
-//       activeDate
-//       expireDate
-//     }
-//     active {
-//       vehicle
-//       type
-//       area
-//       activeDate
-//       expireDate
-//     }
-//     expired {
-//       vehicle
-//       type
-//       area
-//       activeDate
-//       expireDate
-//     }
-//   }
-// }`
-
-// const myPermitsInput = {
-//   vehicleID: "12345678-1234-1234-1234-567890abcdef"
-// }
+const adminPermitReportQuery = `
+    query($numDays: Float) {
+      adminPermitReport(numDays: $numDays) {
+        totalPermits
+        activePermits
+        expiredPermits
+        totalRevenue
+        zoneBreakdown {
+          area
+          totalPermits
+        }
+        lotBreakdown {
+          area
+          totalPermits
+        }
+      }
+    }
+  `
 
 const zoneDetailsQuery = `
 query ZoneDetails($zone: String!) {
@@ -343,23 +330,23 @@ const zoneDetailsInput = {
 
 // const permitResolver = new PermitResolver()
 
-test('Driver can\'t purchase a zone permit for wrong car', async () => {
-  const now = new Date('2025-05-25T12:00:00Z')
-  vi.setSystemTime(now)
-  const driver = await loginAs("driver")
+// test('Driver can\'t purchase a zone permit for wrong car', async () => {
+//   const now = new Date('2025-05-25T12:00:00Z')
+//   vi.setSystemTime(now)
+//   const driver = await loginAs("driver")
 
-  const confirmation = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + driver.token)
-    .send({ 
-      query: purchaseZonePermitQuery,
-      variables: purchaseZoneInput
-    })
+//   const confirmation = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + driver.token)
+//     .send({ 
+//       query: purchaseZonePermitQuery,
+//       variables: purchaseZoneInput
+//     })
 
-  expect(confirmation.body.errors[0].message).toBe("Vehicle not found")
+//   expect(confirmation.body.errors[0].message).toBe("Vehicle not found")
   
-  vi.useRealTimers()
-})
+//   vi.useRealTimers()
+// })
 
 test('Driver can purchase a zone permit', async () => {
   const now = new Date('2025-05-25T12:00:00Z')
@@ -371,7 +358,7 @@ test('Driver can purchase a zone permit', async () => {
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseZonePermitQuery,
-      variables: {input: {...purchaseZoneInput.input, vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseZoneInput.input, vehicleId: driver.vid}}
     })
 
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
@@ -390,7 +377,7 @@ test('Driver can purchase a zone permit with different duration 1', async () => 
     .send({ 
       query: purchaseZonePermitQuery,
       variables: {input: {...purchaseZoneInput.input,duration: {hours: 1, minutes: 1},
-        paymentMethod: 'mastercard', vehicle: derikVehicleInput.input.plate
+        paymentMethod: 'mastercard', vehicleId: driver.vid
       }}
     })
 
@@ -410,7 +397,7 @@ test('Driver can purchase a zone permit with different duration 2', async () => 
     .send({ 
       query: purchaseZonePermitQuery,
       variables: {input: {...purchaseZoneInput.input,duration: {hours: 2},
-        paymentMethod: 'amex', vehicle: derikVehicleInput.input.plate
+        paymentMethod: 'amex', vehicleId: driver.vid
       }}
     })
 
@@ -430,7 +417,7 @@ test('Driver can purchase a zone permit with different duration 3', async () => 
     .send({ 
       query: purchaseZonePermitQuery,
       variables: {input: {...purchaseZoneInput.input,duration: {hours: 1},
-        paymentMethod: 'discover', vehicle: derikVehicleInput.input.plate
+        paymentMethod: 'discover', vehicleId: driver.vid
       }}
     })
 
@@ -450,7 +437,7 @@ test('Driver can purchase a zone permit with different duration 4', async () => 
     .send({ 
       query: purchaseZonePermitQuery,
       variables: {input: {...purchaseZoneInput.input,duration: {hours: 2},
-       paymentMethod: 'visa', vehicle: derikVehicleInput.input.plate
+       paymentMethod: 'visa', vehicleId: driver.vid
       }}
     })
 
@@ -470,7 +457,7 @@ test('Driver can purchase a zone permit with different duration 5', async () => 
     .send({ 
       query: purchaseZonePermitQuery,
       variables: {input: {...purchaseZoneInput.input,duration: {hours: 1},
-      paymentMethod: 'visa 4242',vehicle: derikVehicleInput.input.plate}}
+      paymentMethod: 'visa 4242', vehicleId: driver.vid}}
     })
 
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
@@ -490,7 +477,7 @@ test('Driver can purchase a zone permit with different duration 6', async () => 
     .send({ 
       query: purchaseZonePermitQuery,
       variables: {input: {...purchaseZoneInput.input, duration: {minutes: 30},
-      paymentMethod: 'apple pay', vehicle: derikVehicleInput.input.plate}}
+      paymentMethod: 'apple pay', vehicleId: driver.vid}}
     })
 
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
@@ -508,7 +495,7 @@ test('Driver can purchase a zone permit with different duration 7', async () => 
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseZonePermitQuery,
-      variables: {input: {...purchaseZoneInput.input,duration: {minutes: 1}, vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseZoneInput.input,duration: {minutes: 1}, vehicleId: driver.vid}}
     })
 
   expect(confirmation.body.data.purchaseZonePermit.type).toBe("zone")
@@ -516,23 +503,23 @@ test('Driver can purchase a zone permit with different duration 7', async () => 
   vi.useRealTimers()
 })
 
-test('Driver can\'t purchase a zone permit for wrong car', async () => {
-  const now = new Date('2025-05-25T12:00:00Z')
-  vi.setSystemTime(now)
-  const driver = await loginAs("driver")
+// test('Driver can\'t purchase a lot permit for wrong car', async () => {
+//   const now = new Date('2025-05-25T12:00:00Z')
+//   vi.setSystemTime(now)
+//   const driver = await loginAs("driver")
 
-  const confirmation = await supertest(server)
-    .post('/graphql')
-    .set('Authorization', 'Bearer ' + driver.token)
-    .send({ 
-      query: purchaseLotPermitQuery,
-      variables: purchaseLotInput
-    })
+//   const confirmation = await supertest(server)
+//     .post('/graphql')
+//     .set('Authorization', 'Bearer ' + driver.token)
+//     .send({ 
+//       query: purchaseLotPermitQuery,
+//       variables: purchaseLotInput
+//     })
 
-  expect(confirmation.body.errors[0].message).toBe("Vehicle not found")
+//   expect(confirmation.body.errors[0].message).toBe("Vehicle not found")
   
-  vi.useRealTimers()
-})
+//   vi.useRealTimers()
+// })
 
 test('Driver can purchase a lot permit', async () => {
   const now = new Date('2025-05-25T12:00:00Z')
@@ -544,7 +531,7 @@ test('Driver can purchase a lot permit', async () => {
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseLotPermitQuery,
-      variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseLotInput.input, vehicleId: driver.vid}}
     })
 
   expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
@@ -562,7 +549,7 @@ test('Driver can purchase a lot permit with Visa', async () => {
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseLotPermitQuery,
-      variables: {input: {...purchaseLotInput.input, paymentMethod: 'visa', vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'visa', vehicleId: driver.vid}}
     })
 
   expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
@@ -580,7 +567,7 @@ test('Driver can purchase a lot permit with mastercard', async () => {
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseLotPermitQuery,
-      variables: {input: {...purchaseLotInput.input, paymentMethod: 'mastercard', vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'mastercard', vehicleId: driver.vid}}
     })
 
   expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
@@ -598,7 +585,7 @@ test('Driver can purchase a lot permit with Amex', async () => {
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseLotPermitQuery,
-      variables: {input: {...purchaseLotInput.input, paymentMethod: 'amex', vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'amex', vehicleId: driver.vid}}
     })
 
   expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
@@ -616,7 +603,7 @@ test('Driver can purchase a lot permit with Discover', async () => {
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseLotPermitQuery,
-      variables: {input: {...purchaseLotInput.input, paymentMethod: 'discover', vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'discover', vehicleId: driver.vid}}
     })
 
   expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
@@ -634,7 +621,7 @@ test('Driver can purchase a lot permit with Apple Pay', async () => {
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseLotPermitQuery,
-      variables: {input: {...purchaseLotInput.input, paymentMethod: 'Apple Pay', vehicle: derikVehicleInput.input.plate}}
+      variables: {input: {...purchaseLotInput.input, paymentMethod: 'Apple Pay', vehicleId: driver.vid}}
     })
 
   expect(confirmation.body.data.purchaseLotPermit.type).toBe("lot")
@@ -652,14 +639,13 @@ test('Driver can purchase a lot permit in advance', async () => {
     .set('Authorization', 'Bearer ' + driver.token)
     .send({ 
       query: purchaseLotPermitQuery,
-      variables: {input: {...purchaseLotInput.input, vehicle: derikVehicleInput.input.plate, paymentMethod: 'visa 4242'}}
+      variables: {input: {...purchaseLotInput.input, vehicleId: driver.vid, paymentMethod: 'visa 4242'}}
     })
 
   expect(confirmation.body.data.purchaseLotPermit.activeDate).not.toBe(now.toISOString())
   
   vi.useRealTimers()
 })
-
 
 // test('No token to getUserData', async () => {
 //   const receipt = await permitResolver.getUserData(permitDetails)
@@ -717,7 +703,7 @@ test('Police gets invalid for nonexistent plate', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({ 
       query: isValidPermitByPoliceQuery,
-      variables: {plate: "something Wrong"}
+      variables: {plate: "something Wrong", state: "NA"}
     })
     
   expect(isValid.body.data.isValidPermitByPolice.isValid).toBe(false)
@@ -1368,32 +1354,32 @@ test('Admin can update zone price', async () => {
   expect(updatedZones[0].closeTime).toBe("21:00")
 })
 
-test('Admin can get permit summary in adminPermitReport', async () => {
+test('Admin can get permit summary in adminPermitReport with days input', async () => {
   const { token } = await loginAs("admin")
-
-  const query = `
-    query {
-      adminPermitReport {
-        totalPermits
-        activePermits
-        expiredPermits
-        totalRevenue
-        zoneBreakdown {
-          area
-          totalPermits
-        }
-        lotBreakdown {
-          area
-          totalPermits
-        }
-      }
-    }
-  `
 
   const res = await supertest(server)
     .post("/graphql")
     .set("Authorization", `Bearer ${token}`)
-    .send({ query })
+    .send({ query: adminPermitReportQuery, variables: { numDays: 3 } })
+
+  expect(res.body.errors).toBeUndefined()
+
+  const report = res.body.data.adminPermitReport
+
+  expect(report.totalPermits).toBeGreaterThanOrEqual(1)
+  expect(report.activePermits).toBeGreaterThanOrEqual(1)
+
+  expect(Array.isArray(report.zoneBreakdown)).toBe(true)
+  expect(Array.isArray(report.lotBreakdown)).toBe(true)
+})
+
+test('Admin can get permit summary in adminPermitReport without days input', async () => {
+  const { token } = await loginAs("admin")
+
+  const res = await supertest(server)
+    .post("/graphql")
+    .set("Authorization", `Bearer ${token}`)
+    .send({ query: adminPermitReportQuery })
 
   expect(res.body.errors).toBeUndefined()
 

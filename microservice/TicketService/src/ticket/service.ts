@@ -650,4 +650,117 @@ export class TicketService {
 
     return tickets;
   }
+
+  public async generateTicketReport(timeRange: { numDays: number }) {
+    const now = new Date();
+    const startDate = new Date(now);
+    startDate.setDate(now.getDate() - timeRange.numDays);
+    const nowISO = now.toISOString();
+    const startISO = startDate.toISOString();
+  
+    const totalQuery = `
+      SELECT 
+        COUNT(*) FILTER (
+          WHERE (data->>'issuedDate')::timestamptz >= $1
+            AND (data->>'issuedDate')::timestamptz <= $2
+        ) AS total,
+        COUNT(*) FILTER (
+          WHERE (data->>'issuedDate')::timestamptz >= $1
+            AND (data->>'issuedDate')::timestamptz <= $2
+            AND data->>'ticketStatus' = 'unpaid'
+        ) AS unpaid,
+        COUNT(*) FILTER (
+          WHERE (data->>'issuedDate')::timestamptz >= $1
+            AND (data->>'issuedDate')::timestamptz <= $2
+            AND data->>'ticketStatus' = 'paid'
+        ) AS paid,
+        COALESCE(SUM(
+          CASE 
+            WHEN (data->>'issuedDate')::timestamptz >= $1
+              AND (data->>'issuedDate')::timestamptz <= $2
+              AND data->>'ticketStatus' = 'paid'
+            THEN (data->>'fine')::float
+            ELSE 0
+          END
+        ), 0) AS revenue
+      FROM ticket
+    `;
+  
+    const result = await pool.query(totalQuery, [startISO, nowISO]);
+    const row = result.rows[0];
+  
+    // Example breakdown by violation type
+    const violationBreakdownQuery = `
+      SELECT 
+        data->>'violation' AS violation,
+        COUNT(*) AS count
+      FROM ticket
+      WHERE (data->>'issuedDate')::timestamptz >= $1
+        AND (data->>'issuedDate')::timestamptz <= $2
+      GROUP BY violation
+      ORDER BY count DESC
+    `;
+    const violationBreakdown = (await pool.query(violationBreakdownQuery, [startISO, nowISO])).rows;
+  
+    // Example breakdown by enforcer
+    const enforcerBreakdownQuery = `
+      SELECT 
+        enforcer,
+        COUNT(*) AS count
+      FROM ticket
+      WHERE (data->>'issuedDate')::timestamptz >= $1
+        AND (data->>'issuedDate')::timestamptz <= $2
+      GROUP BY enforcer
+      ORDER BY count DESC
+    `;
+    const enforcerBreakdown = (await pool.query(enforcerBreakdownQuery, [startISO, nowISO])).rows;
+  
+    return {
+      totalTickets: parseInt(row.total),
+      unpaidTickets: parseInt(row.unpaid),
+      paidTickets: parseInt(row.paid),
+      totalRevenue: Math.round(parseFloat(row.revenue) * 100),
+      violationBreakdown,
+      enforcerBreakdown,
+    };
+  }
+
+  public async getPendingTicketsByPlateNumber(plateNumber: string): Promise<Ticket[]> {
+    const query = `
+      SELECT 
+        id,
+        vehicle,
+        enforcer,
+        data->>'issuedDate' AS issueddate,
+        data->>'violation' AS violation,
+        data->>'fine' AS fine,
+        data->>'ticketStatus' AS ticketstatus,
+        data->>'images' AS images,
+        data->>'note' AS note
+      FROM ticket
+      WHERE vehicle = $1
+        AND data->>'ticketStatus' IN ('unpaid', 'challenged')
+      ORDER BY data->>'issuedDate' DESC;
+    `;
+
+    const result = await pool.query(query, [plateNumber]);
+
+    const tickets: Ticket[] = [];
+
+    for (const row of result.rows) {
+      tickets.push({
+        id: await this.encrypt(row.id),
+        vehicle: row.vehicle,
+        enforcer: await this.encrypt(row.enforcer),
+        issuedDate: new Date(row.issueddate),
+        violation: row.violation,
+        fine: parseFloat(row.fine),
+        ticketStatus: row.ticketstatus,
+        images: row.images,
+        note: row.note
+      });
+    }
+
+    return tickets;
+  }
 }

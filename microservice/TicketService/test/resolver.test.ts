@@ -262,6 +262,7 @@ test('Admin can modify a ticket with images', async () => {
   const createVariables = {
     input: {
       plate: "Some Plate",
+      state: "California",
       reason: "Blocking Driveway",
       note: "Parked right in front of gate",
       images: "https://example.com/photo.jpg",
@@ -321,6 +322,7 @@ test('Admin can delete a ticket', async () => {
   const createVariables = {
     input: {
       plate: "Test Plate",
+      state: "California",
       reason: "speeding",
       images: "photo1.jpg",
     },
@@ -415,6 +417,7 @@ test('Enforcer can create a ticket', async () => {
       variables: {
         input: {
           plate: "TICKET123",
+          state: "California",
           reason: "Blocking Driveway",
           note: "Parked right in front of gate",
           images: "https://example.com/photo.jpg"
@@ -573,6 +576,7 @@ test('Ticket creation sends email to vehicle owner', async () => {
       variables: {
         input: {
           plate: "TESTPLATE123", // Use same plate as registered vehicle
+          state: "California",
           reason: "Invalid Parking",
           note: "Test ticket for email notification",
           images: "test-photo.jpg"
@@ -705,6 +709,7 @@ test('Full ticket challenge flow - create, challenge, and get challenged tickets
       variables: {
         input: {
           plate: "TEST123",
+          state: "California",
           reason: "Invalid Parking",
           note: "Vehicle in no parking zone",
           images: "https://example.com/photo.jpg"
@@ -784,6 +789,7 @@ test('Admin can accept a ticket challenge', async () => {
       variables: {
         input: {
           plate: "TEST456",
+          state: "California",
           reason: "Invalid Parking",
           note: "Vehicle in reserved spot",
           images: "photo.jpg"
@@ -854,6 +860,7 @@ test('Admin can get accepted tickets', async () => {
       variables: {
         input: {
           plate: "TEST456",
+          state: "California",
           reason: "Invalid Parking",
           note: "Vehicle in reserved spot",
           images: "photo.jpg"
@@ -959,6 +966,7 @@ test('Admin can reject a ticket challenge', async () => {
       variables: {
         input: {
           plate: "REJECT123",
+          state: "California",
           reason: "Fire Lane",
           note: "Blocking fire lane",
           images: "reject-photo.jpg"
@@ -1026,6 +1034,7 @@ test('Driver can mark a ticket as paid', async () => {
       variables: {
         input: {
           plate: "PAID123",
+          state: "California",
           reason: "Expired Permit",
           note: "Permit expired last month",
           images: "paid-photo.jpg"
@@ -1077,6 +1086,7 @@ test('Admin can get unpaid tickets', async () => {
       variables: {
         input: {
           plate: "UNPAID1",
+          state: "California",
           reason: "No Permit",
           note: "No permit displayed",
           images: "unpaid1.jpg"
@@ -1092,6 +1102,7 @@ test('Admin can get unpaid tickets', async () => {
       variables: {
         input: {
           plate: "UNPAID2",
+          state: "California",
           reason: "Expired Permit",
           note: "Permit expired",
           images: "unpaid2.jpg"
@@ -1121,3 +1132,83 @@ test('Admin can get unpaid tickets', async () => {
   expect(Array.isArray(result)).toBe(true);
   expect(result.length).toBeGreaterThan(0);
 });
+
+test('Admin can get ticket report via adminTicketReport', async () => {
+  const token = await loginAs("admin");
+
+  const query = `
+    query AdminTicketReport($numDays: Float) {
+      adminTicketReport(numDays: $numDays) {
+        totalTickets
+        unpaidTickets
+        paidTickets
+        totalRevenue
+        violationBreakdown {
+          violation
+          count
+        }
+        enforcerBreakdown {
+          enforcer
+          count
+        }
+      }
+    }
+  `;
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query, variables: { numDays: 7 } })
+    .expect(200);
+
+  expect(response.body.errors).toBeUndefined();
+  const report = response.body.data.adminTicketReport;
+  expect(report).toBeDefined();
+  expect(report).toHaveProperty('totalTickets');
+  expect(report).toHaveProperty('unpaidTickets');
+  expect(report).toHaveProperty('paidTickets');
+  expect(report).toHaveProperty('totalRevenue');
+  expect(Array.isArray(report.violationBreakdown)).toBe(true);
+  expect(Array.isArray(report.enforcerBreakdown)).toBe(true);
+});
+
+test('Plate with ticket is returned by getPlateWithTicket', async () => {
+  const t1 = await loginAs("driver");
+  const t2 = await loginAs("enforcement");
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + t2)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "DERIK123",
+          state: "California",
+          reason: "Test Ticket",
+          note: "This is a test ticket",
+          images: "test-image.jpg"
+        }
+      }
+    });
+    
+
+    const query = `
+    query GetPlateWithTicket($plate: String!, $state: String!) {
+      pendingTickets(plate: $plate, state: $state) {
+        id
+        vehicle
+      }
+    }
+  `;
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + t1)
+    .send({
+      query,
+      variables: { plate: "DERIK123", state: "California" }
+    })
+  expect(response.status).toBe(200);
+  expect(response.body.errors).toBeUndefined();
+  const tickets = response.body.data.pendingTickets;
+  expect(tickets.length).toBe(1);
+})

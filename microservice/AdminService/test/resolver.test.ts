@@ -7,23 +7,39 @@ import killPort from 'kill-port'
 import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
-
-let server: http.Server
-let authServer: http.Server
+import { app as ticketApp, bootstrap as ticketBoot } from '../../TicketService/src/app'
+import { app as permitApp, bootstrap as permitBoot } from '../../PermitService/src/app'
 
 const AUTH_PORT = 3010
 const TICKET_PORT = 4002
+const PERMIT_PORT = 4003
+
+let server: http.Server
+let ticketServer: http.Server
+let permitServer: http.Server
+let authServer: http.Server
 
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 
 beforeAll(async () => {
-  // Start your GraphQL server on ADMIN_PORT
+  // Start AdminService GraphQL server
   server = http.createServer(app)
-  await new Promise<void>((resolve, reject) => {
-    server.listen(TICKET_PORT, () => resolve())
-      .on('error', (err) => reject(err))
-  })
+  server.listen()
   await bootstrap()
+
+  // Start TicketService
+  ticketServer = http.createServer(ticketApp)
+  await new Promise<void>((resolve) => {
+    ticketServer.listen(TICKET_PORT, () => resolve())
+  })
+  await ticketBoot()
+
+  // Start PermitService
+  permitServer = http.createServer(permitApp)
+  await new Promise<void>((resolve) => {
+    permitServer.listen(PERMIT_PORT, () => resolve())
+  })
+  await permitBoot()
 
   // Force kill anything on AUTH_PORT
   try {
@@ -32,31 +48,19 @@ beforeAll(async () => {
     console.log(`No process was running on port ${AUTH_PORT}`)
   }
 
-  // Create and start auth server with retries
+  // Start AuthService
   authServer = http.createServer(authApp)
-  
-  let retries = 3
-  while (retries > 0) {
-    try {
-      await new Promise<void>((resolve, reject) => {
-        authServer.listen(AUTH_PORT, () => resolve())
-          .on('error', (err) => reject(err))
-      })
-      break
-    } catch (error) {
-      console.log(`Retry ${4 - retries}: Failed to start auth server, retrying...`)
-      retries--
-      if (retries === 0) throw error
-      await new Promise(resolve => setTimeout(resolve, 1000))
-    }
-  }
+  await new Promise<void>((resolve) => {
+    authServer.listen(AUTH_PORT, () => resolve())
+  })
 
   return db.reset()
 }, 100000)
 
 afterAll(() => {
   db.shutdown()
-  server.close()
+  ticketServer.close()
+  permitServer.close()
   authServer.close()
 })
 
@@ -403,3 +407,23 @@ test('Admin can get a list of API users', async () => {
   expect(apiUsers[0]).toHaveProperty('email')
   expect(apiUsers[0]).toHaveProperty('role')
 })
+
+test('Admin can generate a report with ticket and permit summary', async () => {
+  const token = await loginAsAdmin();
+
+  const query = `
+    query {
+      generateReport
+    }
+  `;
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query })
+    .expect(200);
+
+  expect(response.body.errors).toBeUndefined();
+  expect(response.body.data.generateReport).toBeDefined();
+  expect(typeof response.body.data.generateReport).toBe('string');
+});

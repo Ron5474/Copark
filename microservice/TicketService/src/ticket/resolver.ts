@@ -12,6 +12,7 @@ import {
   TicketsByDay,
   ChallengeTicket,
   PaidTicketInput,
+  TicketReport,
 } from "./schema";
 
 import { SessionUser } from "src";
@@ -32,6 +33,38 @@ async function encrypt(userId: string, key=emailEncodedKey): Promise<string> {
 export class TicketResolver {
   constructor(private ticketService: TicketService) {
     this.ticketService = new TicketService();
+  }
+
+  private async getVehicleByPlate(plate: string, state: string, userId?: string): Promise<Vehicle | null> {
+    const vehicleQuery = {
+      query: `
+        query FindVehicleByPlate($plate: String!, $state: String!) {
+          findVehicleByPlate(plate: $plate, state: $state) {
+            id
+            plate
+          }
+        }
+      `,
+      variables: { plate, state }
+    };
+    const vehicleResponse = await fetch('http://localhost:4001/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // '
+        'Authorization': 'Bearer ' + userId
+      },
+      body: JSON.stringify(vehicleQuery)
+    });
+
+    const vehicleResult = await vehicleResponse.json();
+    const vehicle = vehicleResult.data?.findVehicleByPlate;
+    if (!vehicle) {
+      return null;
+    }
+    return {
+      id: vehicle.id
+    };
   }
 
   private async getVehicleById(userID: string): Promise<Vehicle[]> {
@@ -228,10 +261,10 @@ export class TicketResolver {
       @Arg("input", () => NewTicketInput) input: NewTicketInput,
       @Ctx() request: Request
     ): Promise<Ticket> {
-      const plate = input.plate
+      const { plate, state } = input
       const vehicleQuery = `
-        mutation FindOrCreateVehicleByPlate($plate: String!) {
-          findOrCreateVehicleByPlate(plate: $plate) {
+        mutation FindOrCreateVehicleByPlate($plate: String!, $state: String!) {
+          findOrCreateVehicleByPlate(plate: $plate, state: $state) {
             id
           }
         }
@@ -244,7 +277,7 @@ export class TicketResolver {
         },
         body: JSON.stringify({
           query: vehicleQuery,
-          variables: { plate: plate },
+          variables: { plate: plate, state: state },
         }),
       });
       const vehicleJson = await vehicleRes.json();
@@ -336,5 +369,28 @@ export class TicketResolver {
   ): Promise<Ticket[] | null> {
     return await this.ticketService.getUnpaidTicketsPerDay();
     // need to add a convertion from the vehicle ID to the plate number
+  }
+
+  @Authorized(['admin'])
+  @Query(() => TicketReport)
+  async adminTicketReport(
+    @Arg("numDays", () => Number, { nullable: true }) numDays?: number,
+  ): Promise<TicketReport> {
+    return await this.ticketService.generateTicketReport({numDays: numDays ?? 999})
+  }
+
+  @Authorized(['driver'])
+  @Query(() => [Ticket])
+  async pendingTickets(
+    @Ctx() request: Request & {user: SessionUser},
+    @Arg("plate", () => String) plate: string,
+    @Arg("state", () => String) state: string
+  ): Promise<Ticket[]> {
+    const userToken = request.headers.authorization?.split(' ')[1]
+    const vehicleID: Vehicle|null = await this.getVehicleByPlate(plate, state, userToken)
+    if (!vehicleID) {
+      return []
+    }
+    return await this.ticketService.getPendingTicketsByPlateNumber(vehicleID.id)
   }
 }

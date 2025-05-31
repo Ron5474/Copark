@@ -301,10 +301,11 @@ test:permitService:
     - npm run swagger
     - cd ../../microservice/EmailService && npm install
     - cd ../../microservice/EmailService && npm run build
-    - ls -la ../../microservice/PermitService
+    - ls -la ../../microservice/PermitService/src
+    - cat ../../microservice/PermitService/test/resolver.test.ts
     - echo "// dummy file to avoid import error" > ../../microservice/PermitService/express.js
     - cd ../../microservice/PermitService && npm ci
-    - cd ../../microservice/PermitService && npm build
+    - cd ../../microservice/PermitService && npm run build
     - cd ../../microservice/PermitService && npm run test
   rules:
     - changes: 

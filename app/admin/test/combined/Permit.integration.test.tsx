@@ -5,6 +5,7 @@ import PermitsPerDay from '../../src/app/charts/PermitsPerDay';
 import ManageZones from '../../src/app/components/ManageZones';
 import { ThemeProvider } from '@mui/material';
 import theme from '../../src/app/theme';
+import AllPermitsTable from '@/app/charts/AllPermitsTable';
 
 // Mock data
 const mockZones = [
@@ -32,7 +33,7 @@ beforeAll(() => {
   mockFetch.mockImplementation(async (url, options) => {
     if (url === 'http://localhost:4003/graphql') {
       const body = JSON.parse(options?.body as string);
-      
+
       if (body.query.includes('getZones')) {
         return Promise.resolve({
           ok: true,
@@ -72,6 +73,25 @@ beforeAll(() => {
                       expireDate: "2025-05-19T12:00:00Z"
                     }
                   ]
+                }
+              ]
+            }
+          })
+        });
+      }
+
+      if (body.query.includes('allPermits')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: {
+              allPermits: [
+                {
+                  type: 'zone',
+                  area: 'A1',
+                  purchaseDate: '2025-05-19T10:00:00Z',
+                  activeDate: '2025-05-19T10:00:00Z',
+                  expireDate: '2025-05-19T22:00:00Z'
                 }
               ]
             }
@@ -125,7 +145,7 @@ it('handles error when fetching permit data', async () => {
   mockFetch.mockImplementationOnce(async (url, options) => {
     if (url === 'http://localhost:4003/graphql') {
       const body = JSON.parse(options?.body as string);
-      
+
       if (body.query.includes('getPermitStats')) {
         return Promise.resolve({
           ok: false,
@@ -173,3 +193,96 @@ it('successfully creates a new zone', async () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 });
+
+it('shows loading state while fetching permits', async () => {
+  // Add delay to mock loading state
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      const body = JSON.parse(options?.body as string);
+      if (body.query.includes('getPermitStats')) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: { getPermitStats: [] }
+          })
+        });
+      }
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
+
+  render(<PermitsPerDay />);
+  expect(screen.getByText('Loading...')).toBeDefined();
+});
+
+it('successfully fetches and displays all permits', async () => {
+  const mockPermitData = [
+    {
+      type: 'zone',
+      area: 'A1',
+      purchaseDate: '2025-05-19T10:00:00Z',
+      activeDate: '2025-05-19T10:00:00Z',
+      expireDate: '2025-05-19T22:00:00Z'
+    }
+  ];
+
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      const body = JSON.parse(options?.body as string);
+      if (body.query.includes('allPermits')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: { allPermits: mockPermitData }
+          })
+        });
+      }
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
+
+  render(<AllPermitsTable />);
+
+  // Check loading state
+  expect(screen.getByText('Loading...')).toBeDefined();
+
+  // Wait for data to load
+  await waitFor(() => {
+    expect(screen.getByText('All Permits (Active Only)')).toBeDefined();
+    expect(screen.getByText('zone')).toBeDefined();
+    expect(screen.getByText('A1')).toBeDefined();
+  });
+
+  // Test active/all toggle
+  const toggle = screen.getByRole('checkbox');
+  fireEvent.click(toggle);
+
+  await waitFor(() => {
+    expect(screen.getByText('All Permits (All)')).toBeDefined();
+  });
+});
+
+it('handles error when fetching all permits', async () => {
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      const body = JSON.parse(options?.body as string);
+      if (body.query.includes('allPermits')) {
+        return Promise.resolve({
+          ok: false,
+          json: () => Promise.resolve({
+            errors: [{ message: 'Failed to fetch permits' }]
+          })
+        });
+      }
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
+
+  render(<AllPermitsTable />);
+
+  await waitFor(() => {
+    expect(screen.getByText('Error: Failed to fetch permit data')).toBeDefined();
+  });
+});
+

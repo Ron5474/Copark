@@ -298,6 +298,7 @@ test:permitService:
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
 
     - cd microservice/AuthService && npm install
+    - pwd
     - cd microservice/AuthService && npm run swagger
 
     - echo "// dummy file to avoid import error" > microservice/PermitService/express.js

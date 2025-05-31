@@ -7,6 +7,8 @@ import killPort from 'kill-port'
 import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
+import { app as ticketApp, bootstrap as ticketBoot } from '../../TicketService/src/app'
+import { app as permitApp, bootstrap as permitBoot } from '../../PermitService/src/app'
 
 const AUTH_PORT = 3010
 const TICKET_PORT = 4002
@@ -20,21 +22,24 @@ let authServer: http.Server
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 
 beforeAll(async () => {
-  // Start TicketService and PermitService on their own ports
-  ticketServer = http.createServer(app)
-  permitServer = http.createServer(app)
-
-  await new Promise<void>((resolve, reject) => {
-    ticketServer.listen(TICKET_PORT, () => resolve())
-      .on('error', (err) => reject(err))
-  })
-
-  await new Promise<void>((resolve, reject) => {
-    permitServer.listen(PERMIT_PORT, () => resolve())
-      .on('error', (err) => reject(err))
-  })
-
+  // Start AdminService GraphQL server
+  server = http.createServer(app)
+  server.listen()
   await bootstrap()
+
+  // Start TicketService
+  ticketServer = http.createServer(ticketApp)
+  await new Promise<void>((resolve) => {
+    ticketServer.listen(TICKET_PORT, () => resolve())
+  })
+  await ticketBoot()
+
+  // Start PermitService
+  permitServer = http.createServer(permitApp)
+  await new Promise<void>((resolve) => {
+    permitServer.listen(PERMIT_PORT, () => resolve())
+  })
+  await permitBoot()
 
   // Force kill anything on AUTH_PORT
   try {
@@ -43,25 +48,12 @@ beforeAll(async () => {
     console.log(`No process was running on port ${AUTH_PORT}`)
   }
 
-  // Start AuthService with retries
+  // Start AuthService
   authServer = http.createServer(authApp)
-  let retries = 3
-  while (retries > 0) {
-    try {
-      await new Promise<void>((resolve, reject) => {
-        authServer.listen(AUTH_PORT, () => resolve())
-          .on('error', (err) => reject(err))
-      })
-      break
-    } catch (error) {
-      console.log(`Retry ${4 - retries}: Failed to start auth server, retrying...`)
-      retries--
-      if (retries === 0) throw error
-      await new Promise(resolve => setTimeout(resolve, 1000))
-    }
-  }
+  await new Promise<void>((resolve) => {
+    authServer.listen(AUTH_PORT, () => resolve())
+  })
 
-  server = ticketServer;
   return db.reset()
 }, 100000)
 

@@ -209,10 +209,10 @@
     "add": {
       "add Vehicle": "Add Vehicle",
       "license": {
-              "label": "License Plate Number",
-              "required": "License plate number is required",
-              "constraint": "Must be 1-10 characters"
-            },
+        "label": "License Plate Number",
+        "required": "License plate number is required",
+        "constraint": "Must be 1-10 characters"
+      },
       "country": "Country",
       "state": "State",
       "nickname": "Nickname",

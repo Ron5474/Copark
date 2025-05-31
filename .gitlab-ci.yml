@@ -304,7 +304,7 @@ test:permitService:
     - ls -la ../../microservice/PermitService
     - echo "// dummy file to avoid import error" > ../../microservice/PermitService/express.js
     - cd ../../microservice/PermitService && npm ci
-    - cd ../../microservice/PermitService && npm build
+    - cd ../../microservice/PermitService && npm run build
     - cd ../../microservice/PermitService && npm run test
   rules:
     - changes: 

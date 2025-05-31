@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import theme from "../theme";
 import Typography from '@mui/material/Typography';
+import { signOut } from "next-auth/react";
 
 function Footer() {
   const router = useRouter()
@@ -116,6 +117,35 @@ function Footer() {
                           Inglés
                         </Button>}
         </Box>
+        {pathname.startsWith("/onboarding") && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Typography
+                sx={{ fontSize: "14px", fontWeight: 500, color: "#000000" }}
+              >
+                Need to exit setup?
+              </Typography>
+              <Button
+                onClick={() => signOut({ callbackUrl: `/driver/${locale}/login` })}
+                aria-label="Logout"
+                sx={{
+                  color: "error.main",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  fontSize: "14px",
+                  padding: 0,
+                  minWidth: "auto",
+                }}
+              >
+                Logout
+              </Button>
+            </Box>
+          )}
       </Box>
       <p style={{ fontSize: "14px", color: "#000000", fontWeight: 500 }}>{t("Rights Reserved")}</p>
     </Box>

@@ -31,10 +31,17 @@ export async function generatePdf(
   let page = pdfDoc.addPage([600, 800]);
   let y = 750;
 
+  page.drawText('Report for period: TEMP REPLACE', {
+    x: 50,
+    y: y,
+    size: 18,
+    color: rgb(0, 0, 0.6),
+  });
+  y -= 40;
+
 //   console.log(ticketInfo, permitInfo);
-  let ticketInfo = ticketData.data.adminTicketReport;
-  let permitInfo = permitData.data.adminPermitReport;
-  // Prepare summary statements for tickets
+  const ticketInfo = ticketData.data.adminTicketReport;
+  const permitInfo = permitData.data.adminPermitReport;
   const ticketStatements: string[] = [
     `Ticket Summary:`,
     `Total Tickets: ${ticketInfo.totalTickets}`,
@@ -52,7 +59,7 @@ export async function generatePdf(
     ticketStatements.push('No violations recorded.');
   }
   ticketStatements.push('');
-  ticketStatements.push('Enforcer Breakdown:');
+  ticketStatements.push('Num Tickets By Enforcer:');
   if (ticketInfo.enforcerBreakdown && ticketInfo.enforcerBreakdown.length > 0) {
     for (const e of ticketInfo.enforcerBreakdown) {
       ticketStatements.push(`- ${e.enforcer}: ${e.count}`);
@@ -61,7 +68,6 @@ export async function generatePdf(
     ticketStatements.push('No enforcer data.');
   }
 
-  // Prepare summary statements for permits
   const permitStatements: string[] = [
     `Permit Summary:`,
     `Total Permits: ${permitInfo.totalPermits}`,
@@ -107,7 +113,7 @@ export async function generatePdf(
   };
 
   // Draw tickets on the left, permits on the right
-  let yStart = y;
+  const yStart = y;
   y = yStart;
   drawSection('Ticket Report', ticketStatements, 50);
   y = yStart;

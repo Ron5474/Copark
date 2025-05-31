@@ -78,7 +78,7 @@ export class AdminResolver {
   @Query(() => String)
   async generateReport(
       @Ctx() request: Request
-  ): Promise<String> {
+  ): Promise<string> {
     const ticketQuery = `
       query AdminTicketReport {
         adminTicketReport {

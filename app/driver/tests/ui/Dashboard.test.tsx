@@ -7,11 +7,16 @@ mockNextIntl()
 import DashboardView from '@/app/[locale]/dashboard/DashboardView'
 import { DashboardContext } from '@/app/[locale]/dashboard/context'
 import { getLotDetails, getMyPermits } from '@/app/[locale]/dashboard/permitActions'
+import { getDefaultVehicle } from '@/app/[locale]/vehicle/actions'
 
 // Mock permitActions
 vi.mock('@/app/[locale]/dashboard/permitActions', () => ({
   getLotDetails: vi.fn(),
   getMyPermits: vi.fn(),
+}))
+
+vi.mock('@/app/[locale]/vehicle/actions', () => ({
+  getDefaultVehicle: vi.fn(),
 }))
 
 const setCurrentPage = vi.fn()
@@ -71,6 +76,11 @@ beforeEach(() => {
       }
     ]
   })
+
+  vi.mocked(getDefaultVehicle).mockResolvedValue({
+    id: '123',
+    plate: 'YAQ123', 
+  })
 })
 
 afterEach(() => {
@@ -106,6 +116,18 @@ it('clicking on Daily permits expands and shows available lots', async () => {
 
   await user.click(await screen.findByText('Daily'))
   expect(await screen.findByLabelText('Select Lot A from Daily')).toBeDefined()
+})
+
+it('clicking on Daily permits shows default vehicle', async () => {
+  const user = userEvent.setup()
+  render(
+    <DashboardContext.Provider value={{ currentPage: 'dashboard', setCurrentPage }}>
+      <DashboardView />
+    </DashboardContext.Provider>
+  )
+
+  await user.click(await screen.findByText('Daily'))
+  expect(await screen.findByText('Default Vehicle:')).toBeDefined()
 })
 
 it('calls setCurrentPage with "buy-permit" when Zone is clicked', async () => {

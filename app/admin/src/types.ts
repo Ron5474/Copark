@@ -50,10 +50,10 @@ export interface ChallengedTicket {
   vehicle: string;
   violation: string;
   fine: number;
-  ticketStatus: 'challenged';
+  ticketStatus: string;
   issuedDate: string;
   note: string;
-  images: string[];
+  images: string;
   challengeReason: string;
 }
 

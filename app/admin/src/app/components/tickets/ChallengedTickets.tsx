@@ -20,19 +20,19 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
   const [selectedTicket, setSelectedTicket] = useState<ChallengedTicket | null>(null)
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      gap: 3, 
+    <Box sx={{
+      display: 'flex',
+      gap: 3,
       height: '80vh',
       maxWidth: '1400px',
       width: '100%',
-      mx: 'auto',         
+      mx: 'auto',
       p: 2                // Reduced from 3 to 2
     }}>
       {/* Left side - List view */}
-      <Box sx={{ 
-        width: '35%', 
-        borderRight: 1, 
+      <Box sx={{
+        width: '35%',
+        borderRight: 1,
         borderColor: 'divider',
         pl: 1,            // Reduced left padding
         pr: 2,            // Keep right padding
@@ -41,15 +41,15 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
         <Typography sx={{ mb: 2 }}>Active Challenges: {tickets.length}</Typography>
         <List sx={{ overflowY: 'auto', maxHeight: '100%' }}>
           {tickets.map((ticket) => (
-            <ListItem 
+            <ListItem
               key={ticket.id}
               onClick={() => setSelectedTicket(ticket)}
               sx={{
                 cursor: 'pointer',
                 bgcolor: selectedTicket?.id === ticket.id ? '#E8F4F4' : 'transparent',
                 borderRadius: 1,
-                border: selectedTicket?.id === ticket.id 
-                  ? `1px solid ${theme.palette.primary.main}` 
+                border: selectedTicket?.id === ticket.id
+                  ? `1px solid ${theme.palette.primary.main}`
                   : `1px solid ${theme.palette.grey[300]}`,  // Add grey border for unselected
                 mb: 1,
                 '&:hover': {
@@ -63,10 +63,10 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                     <Typography sx={{ fontWeight: 500 }}>
                       Ticket #{getShortId(ticket.id)}
                     </Typography>
-                    <Chip 
+                    <Chip
                       label="CHALLENGED"
                       size="small"
-                      sx={{ 
+                      sx={{
                         bgcolor: theme.palette.warning.dark,
                         color: 'white'
                       }}
@@ -74,10 +74,11 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                   </Box>
                 }
                 secondary={
-                  <>
-                    <Typography variant="body2">Vehicle: {truncateVehicle(ticket.vehicle)}</Typography>
-                    <Typography variant="body2">Fine: ${ticket.fine.toFixed(2)}</Typography>
-                  </>
+                  <Typography component="div" variant="body2" color="text.secondary">
+                    Vehicle: {truncateVehicle(ticket.vehicle)}
+                    <br />
+                    Fine: ${ticket.fine.toFixed(2)}
+                  </Typography>
                 }
               />
             </ListItem>
@@ -89,19 +90,19 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
       <Box sx={{ width: '65%', p: 2 }}>
         {selectedTicket ? (
           <Box>
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
               alignItems: 'center',
               mb: 3
             }}>
               <Typography variant="h5">
                 Ticket #{getShortId(selectedTicket.id)}
               </Typography>
-              <Chip 
+              <Chip
                 label="CHALLENGED"
                 size="small"
-                sx={{ 
+                sx={{
                   bgcolor: theme.palette.warning.dark,
                   color: 'white'
                 }}
@@ -138,28 +139,16 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>Evidence</Typography>
                   <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                    {Array.isArray(selectedTicket.images) ? selectedTicket.images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={image}
-                        alt={`Evidence ${index + 1}`}
-                        style={{
-                          maxWidth: '200px',
-                          height: 'auto',
-                          borderRadius: '8px'
-                        }}
-                      />
-                    )) : (
-                      <img
-                        src={selectedTicket.images}
-                        alt="Evidence"
-                        style={{
-                          maxWidth: '200px',
-                          height: 'auto',
-                          borderRadius: '8px'
-                        }}
-                      />
-                    )}
+                    <p>{typeof (selectedTicket.images)}</p>
+                    <img
+                      src={selectedTicket.images}
+                      alt={`Evidence`}
+                      style={{
+                        maxWidth: '200px',
+                        height: 'auto',
+                        borderRadius: '8px'
+                      }}
+                    />
                   </Box>
                 </Box>
               )}
@@ -199,11 +188,11 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
             </Stack>
           </Box>
         ) : (
-          <Box sx={{ 
-            display: 'flex', 
+          <Box sx={{
+            display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center', 
-            alignItems: 'center', 
+            justifyContent: 'center',
+            alignItems: 'center',
             height: '100%',
             gap: 2
           }}>

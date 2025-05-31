@@ -1,29 +1,20 @@
-import { it, expect, vi, beforeEach, Mock } from 'vitest';
-import { render, screen, waitFor, cleanup, within } from '@testing-library/react';
+import { it, expect, vi, beforeEach } from 'vitest';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ManageTicketChallenges from '../../src/app/components/ManageTicketChallenges';
-import {
-  acceptTicketChallenge,
-  rejectTicketChallenge,
-  getChallengedTickets,
-  getAcceptedTickets
-} from '../../src/ticket/actions';
+import { ChallengedTickets } from '../../src/app/components/tickets/ChallengedTickets';
+import { acceptTicketChallenge, rejectTicketChallenge, getChallengedTickets } from '../../src/ticket/actions';
 
-// Mock all actions
 vi.mock('../../src/ticket/actions', () => ({
   acceptTicketChallenge: vi.fn(),
   rejectTicketChallenge: vi.fn(),
-  getChallengedTickets: vi.fn(),
-  getAcceptedTickets: vi.fn()
+  getChallengedTickets: vi.fn()  // Add this mock
 }));
 
-// Mock data
-const mockChallengedTickets = [
+const mockTickets = [
   {
     id: '123',
     vehicle: 'ABC123',
-    enforcer: '456',
-    issuedDate: new Date().toISOString(),
+    issuedDate: new Date('2024-01-01').toISOString(),
     violation: 'No Permit',
     fine: 50,
     ticketStatus: 'challenged',
@@ -34,149 +25,180 @@ const mockChallengedTickets = [
   {
     id: '456',
     vehicle: 'DEF456',
-    enforcer: '789',
-    issuedDate: new Date().toISOString(),
+    issuedDate: new Date('2024-01-02').toISOString(),
     violation: 'Expired Permit',
     fine: 75,
     ticketStatus: 'challenged',
-    images: ['image1.jpg', 'image2.jpg', 'image3.jpg'],
+    images: 'image1.jpg',
     note: 'Multiple violations',
     challengeReason: 'Permit was valid'
-  }
-];
-
-const mockAcceptedTickets = [
+  },
   {
     id: '789',
-    vehicle: 'XYZ789',
-    enforcer: '012',
-    issuedDate: new Date().toISOString(),
+    vehicle: 'ThisIsAVeryLongVehicleIdentifier123',  // Add long vehicle ID
+    issuedDate: new Date('2024-01-03').toISOString(),
     violation: 'No Permit',
-    fine: 50,
-    ticketStatus: 'accepted',
+    fine: 60,
+    ticketStatus: 'challenged',
     images: 'test.jpg',
-    note: 'Test note'
+    note: 'Test note',
+    challengeReason: 'Wrong vehicle'
   }
 ];
 
+const onTicketsUpdate = vi.fn();
+const onError = vi.fn();
+
 beforeEach(() => {
-  vi.clearAllMocks();
   cleanup();
-  (getChallengedTickets as Mock).mockResolvedValue(mockChallengedTickets);
-  (getAcceptedTickets as Mock).mockResolvedValue(mockAcceptedTickets);
+  vi.clearAllMocks();
 });
 
-it('renders challenged tickets correctly', async () => {
-  render(<ManageTicketChallenges />);
+it('renders list of challenged tickets', () => {
+  render(
+    <ChallengedTickets
+      tickets={mockTickets}
+      onTicketsUpdate={onTicketsUpdate}
+      onError={onError}
+    />
+  );
 
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
+  expect(screen.getByText('Active Challenges: 3')).toBeDefined();
+});
 
-  expect(screen.getByText('Active Challenges: 2')).toBeDefined();
-  expect(screen.getByText('ABC123')).toBeDefined();
+it('displays ticket details when selected', async () => {
+  render(
+    <ChallengedTickets
+      tickets={mockTickets}
+      onTicketsUpdate={onTicketsUpdate}
+      onError={onError}
+    />
+  );
+
+  const ticket = screen.getByText('Ticket #123');
+  await userEvent.click(ticket);
+
+  expect(screen.getByText('I had a valid permit')).toBeDefined();
   expect(screen.getByText('No Permit')).toBeDefined();
   expect(screen.getByText('$50.00')).toBeDefined();
-  expect(screen.getByText('I had a valid permit')).toBeDefined();
 });
 
-it('displays empty state when no tickets exist', async () => {
-  (getChallengedTickets as Mock).mockResolvedValue([]);
+it('handles accepting a challenge', async () => {
+  vi.mocked(acceptTicketChallenge).mockResolvedValueOnce(mockTickets[0]);
+  vi.mocked(getChallengedTickets).mockResolvedValueOnce([mockTickets[1]]); // Mock directly instead of re-mocking module
 
-  render(<ManageTicketChallenges />);
+  render(
+    <ChallengedTickets
+      tickets={mockTickets}
+      onTicketsUpdate={onTicketsUpdate}
+      onError={onError}
+    />
+  );
 
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
+  const ticket = screen.getByText('Ticket #123');
+  await userEvent.click(ticket);
 
-  expect(screen.getByText('No challenged tickets found.')).toBeDefined();
-});
-
-it('handles accepting a ticket challenge successfully', async () => {
-  render(<ManageTicketChallenges />);
-
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
-
-  const ticketContainer = screen.getByText('Ticket #123', { exact: true }).closest('.MuiBox-root') as HTMLElement;
-
-  const acceptButton = within(ticketContainer.parentElement?.parentElement as HTMLElement).getByText('Accept Challenge', { exact: true });
+  const acceptButton = screen.getByText('Accept Challenge');
   await userEvent.click(acceptButton);
 
   expect(acceptTicketChallenge).toHaveBeenCalledWith('123');
-  expect(getChallengedTickets).toHaveBeenCalledTimes(2);
+  
+  await waitFor(() => {
+    expect(onTicketsUpdate).toHaveBeenCalledWith([mockTickets[1]]);
+    expect(screen.getByText('No Ticket Selected')).toBeDefined();
+  });
 });
 
-it('handles rejecting a ticket challenge successfully', async () => {
-  render(<ManageTicketChallenges />);
+it('handles rejecting a challenge', async () => {
+  vi.mocked(rejectTicketChallenge).mockResolvedValueOnce(mockTickets[0]);
+  vi.mocked(getChallengedTickets).mockResolvedValueOnce([mockTickets[1]]); // Mock directly instead of re-mocking module
 
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
+  render(
+    <ChallengedTickets
+      tickets={mockTickets}
+      onTicketsUpdate={onTicketsUpdate}
+      onError={onError}
+    />
+  );
 
-  const ticketContainer = screen.getByText('Ticket #123', { exact: true }).closest('.MuiBox-root') as HTMLElement;
-  const rejectButton = within(ticketContainer.parentElement?.parentElement as HTMLElement).getByText('Reject Challenge', { exact: true });
+  const ticket = screen.getByText('Ticket #123');
+  await userEvent.click(ticket);
+
+  const rejectButton = screen.getByText('Reject Challenge');
   await userEvent.click(rejectButton);
 
   expect(rejectTicketChallenge).toHaveBeenCalledWith('123');
-  expect(getChallengedTickets).toHaveBeenCalledTimes(2);
+  
+  await waitFor(() => {
+    expect(onTicketsUpdate).toHaveBeenCalledWith([mockTickets[1]]);
+    expect(screen.getByText('No Ticket Selected')).toBeDefined();
+  });
 });
 
-it('handles accepting a ticket challenge with error', async () => {
-  (acceptTicketChallenge as Mock).mockRejectedValueOnce(new Error('Failed to accept challenge'));
+it('handles errors when accepting challenge', async () => {
+  const error = new Error('Failed to accept challenge');
+  vi.mocked(acceptTicketChallenge).mockRejectedValueOnce(error);
 
-  render(<ManageTicketChallenges />);
+  render(
+    <ChallengedTickets
+      tickets={mockTickets}
+      onTicketsUpdate={onTicketsUpdate}
+      onError={onError}
+    />
+  );
 
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
+  const ticket = screen.getByText('Ticket #123');
+  await userEvent.click(ticket);
 
-  const ticketContainer = screen.getByText('Ticket #123', { exact: true }).closest('.MuiBox-root') as HTMLElement;
-  const acceptButton = within(ticketContainer.parentElement?.parentElement as HTMLElement).getByText('Accept Challenge', { exact: true });
+  const acceptButton = screen.getByText('Accept Challenge');
   await userEvent.click(acceptButton);
 
-  await waitFor(() => {
-    expect(screen.getByText('Error: Failed to accept challenge')).toBeDefined();
-  });
+  expect(onError).toHaveBeenCalledWith('Failed to accept challenge');
 });
 
-it('handles rejecting a ticket challenge with error', async () => {
-  (rejectTicketChallenge as Mock).mockRejectedValueOnce(new Error('Failed to reject challenge'));
+it('handles errors when rejecting challenge', async () => {
+  const error = new Error('Failed to reject challenge');
+  vi.mocked(rejectTicketChallenge).mockRejectedValueOnce(error);
 
-  render(<ManageTicketChallenges />);
+  render(
+    <ChallengedTickets
+      tickets={mockTickets}
+      onTicketsUpdate={onTicketsUpdate}
+      onError={onError}
+    />
+  );
 
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
+  const ticket = screen.getByText('Ticket #123');
+  await userEvent.click(ticket);
 
-  const ticketContainer = screen.getByText('Ticket #123', { exact: true }).closest('.MuiBox-root') as HTMLElement;
-  const rejectButton = within(ticketContainer.parentElement?.parentElement as HTMLElement).getByText('Reject Challenge', { exact: true });
+  const rejectButton = screen.getByText('Reject Challenge');
   await userEvent.click(rejectButton);
 
-  await waitFor(() => {
-    expect(screen.getByText('Error: Failed to reject challenge')).toBeDefined();
-  });
+  expect(onError).toHaveBeenCalledWith('Failed to reject challenge');
 });
 
-it('renders multiple evidence images correctly', async () => {
-  render(<ManageTicketChallenges />);
+it('displays no tickets selected message initially', () => {
+  render(
+    <ChallengedTickets
+      tickets={mockTickets}
+      onTicketsUpdate={onTicketsUpdate}
+      onError={onError}
+    />
+  );
 
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
-
-  // Check for the presence of multiple images
-  const images = screen.getAllByAltText(/Violation evidence \d+/);
-  expect(images).toHaveLength(3);
-  
-  // Verify each image has correct src and styling
-  images.forEach((image, index) => {
-    expect(image).toHaveProperty('src', `http://localhost:3000/image${index + 1}.jpg`);
-    expect(image.style).contain({
-      maxWidth: '200px',
-      height: 'auto',
-      borderRadius: '8px'
-    });
-  });
+  expect(screen.getByText('No Ticket Selected')).toBeDefined();
 });
+
+it('truncates long vehicle identifiers', () => {
+  render(
+    <ChallengedTickets
+      tickets={[mockTickets[2]]} // Use the ticket with long vehicle ID
+      onTicketsUpdate={onTicketsUpdate}
+      onError={onError}
+    />
+  );
+
+  // Should not show full vehicle ID
+  expect(screen.queryByText('Vehicle: ThisIsAVeryLongVehicleIdentifier123')).toBeNull();
+});
+

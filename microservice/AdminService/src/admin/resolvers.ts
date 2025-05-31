@@ -77,11 +77,12 @@ export class AdminResolver {
   @Authorized(["admin"])
   @Query(() => String)
   async generateReport(
-      @Ctx() request: Request
+    @Ctx() request: Request,
+    @Arg("numDays", () => Number) numDays: number
   ): Promise<string> {
     const ticketQuery = `
       query AdminTicketReport {
-        adminTicketReport {
+        adminTicketReport(numDays: ${numDays}) {
           totalTickets
           unpaidTickets
           paidTickets

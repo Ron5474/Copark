@@ -7,6 +7,7 @@ import { ThemeProvider } from '@mui/material';
 import theme from '../../src/app/theme';
 import AllPermitsTable from '@/app/charts/AllPermitsTable';
 import PermitStatsByZone from '@/app/charts/PermitStatsByZone';
+import PermitStatsByLot from '@/app/charts/PermitStatsByLot';
 
 // Mock data
 const mockZones = [
@@ -109,6 +110,20 @@ beforeAll(() => {
               allZoneStats: [
                 { area: '1', totalPermits: 10 },
                 { area: '2', totalPermits: 5 }
+              ]
+            }
+          })
+        });
+      }
+
+      if (body.query.includes('allLotStats')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: {
+              allLotStats: [
+                { area: 'A', totalPermits: 10 },
+                { area: 'B', totalPermits: 5 }
               ]
             }
           })
@@ -331,26 +346,31 @@ it('successfully fetches and displays zone permit statistics', async () => {
   });
 });
 
-// it('handles error when fetching zone permit statistics', async () => {
-//   mockFetch.mockImplementationOnce(async (url, options) => {
-//     if (url === 'http://localhost:4003/graphql') {
-//       const body = JSON.parse(options?.body as string);
-//       if (body.query.includes('allZoneStats')) {
-//         return Promise.resolve({
-//           ok: false,
-//           json: () => Promise.resolve({
-//             errors: [{ message: 'Failed to fetch zone stats' }]
-//           })
-//         });
-//       }
-//     }
-//     return Promise.reject(new Error(`Unhandled fetch to ${url}`));
-//   });
+it('successfully fetches and displays lot permit statistics', async () => {
+  const mockLotStats = [
+    { area: 'A', totalPermits: 10 },
+    { area: 'B', totalPermits: 5 }
+  ];
 
-//   render(<PermitStatsByZone />);
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      const body = JSON.parse(options?.body as string);
+      if (body.query.includes('allLotStats')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: { allLotStats: mockLotStats }
+          })
+        });
+      }
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
 
-//   await waitFor(() => {
-//     expect(screen.getByText('Error: Failed to fetch zone stats')).toBeDefined();
-//   });
-// });
+  render(<PermitStatsByLot />);
 
+  // Wait for data to load and chart to display
+  await waitFor(() => {
+    expect(screen.getByTestId('mock-bar-chart')).toBeDefined();
+  });
+});

@@ -203,11 +203,6 @@ export async function getPermitStatsByLot(activeOnly = true): Promise<LotStat[]>
   });
 
   const result = await response.json();
-
-  if (result.errors) {
-    throw new Error(result.errors[0].message);
-  }
-
   return result.data.allLotStats;
 }
 

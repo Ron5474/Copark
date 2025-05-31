@@ -299,6 +299,7 @@ test:permitService:
 
     - cd microservice/AuthService && npm install
     - npm run swagger
+    - cd ../../microservice/EmailService && npm install
     - cd ../../microservice/EmailService && npm run build
 
     - echo "// dummy file to avoid import error" > ../../microservice/PermitService/express.js

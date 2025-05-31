@@ -8,21 +8,32 @@ import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
 
-let server: http.Server
-let authServer: http.Server
-
 const AUTH_PORT = 3010
 const TICKET_PORT = 4002
+const PERMIT_PORT = 4003
+
+let server: http.Server
+let ticketServer: http.Server
+let permitServer: http.Server
+let authServer: http.Server
 
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 
 beforeAll(async () => {
-  // Start your GraphQL server on ADMIN_PORT
-  server = http.createServer(app)
+  // Start TicketService and PermitService on their own ports
+  ticketServer = http.createServer(app)
+  permitServer = http.createServer(app)
+
   await new Promise<void>((resolve, reject) => {
-    server.listen(TICKET_PORT, () => resolve())
+    ticketServer.listen(TICKET_PORT, () => resolve())
       .on('error', (err) => reject(err))
   })
+
+  await new Promise<void>((resolve, reject) => {
+    permitServer.listen(PERMIT_PORT, () => resolve())
+      .on('error', (err) => reject(err))
+  })
+
   await bootstrap()
 
   // Force kill anything on AUTH_PORT
@@ -32,9 +43,8 @@ beforeAll(async () => {
     console.log(`No process was running on port ${AUTH_PORT}`)
   }
 
-  // Create and start auth server with retries
+  // Start AuthService with retries
   authServer = http.createServer(authApp)
-  
   let retries = 3
   while (retries > 0) {
     try {
@@ -51,12 +61,14 @@ beforeAll(async () => {
     }
   }
 
+  server = ticketServer;
   return db.reset()
 }, 100000)
 
 afterAll(() => {
   db.shutdown()
-  server.close()
+  ticketServer.close()
+  permitServer.close()
   authServer.close()
 })
 

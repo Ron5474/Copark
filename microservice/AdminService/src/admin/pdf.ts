@@ -25,13 +25,14 @@ function wrapTextPreservingNewlines(text: string, maxCharsPerLine: number): stri
 
 export async function generatePdf(
   ticketData: TicketReport,
-  permitData: PermitReport
+  permitData: PermitReport,
+  numDays: number,
 ): Promise<string> {
   const pdfDoc = await PDFDocument.create();
   let page = pdfDoc.addPage([600, 800]);
   let y = 750;
 
-  page.drawText('Report for period: TEMP REPLACE', {
+  page.drawText('Report for previous ' + numDays + ' days', {
     x: 50,
     y: y,
     size: 18,

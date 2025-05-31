@@ -10,6 +10,8 @@ import {
   // ReportDay
 } from "./schema";
 
+import { generatePdf } from "./pdf";
+
 const adminService = new AdminService();
 
 @Resolver()
@@ -109,7 +111,7 @@ export class AdminResolver {
     })
 
     const ticketJson = await ticketRes.json()
-    console.log(ticketJson)
+    // console.log(ticketJson)
 
     const permitQuery = `
       query AdminPermitReport {
@@ -143,10 +145,11 @@ export class AdminResolver {
     })
 
     const permitJson = await permitRes.json()
-    console.log(permitJson)
+    // console.log(permitJson)
 
-    return 'remove this later, this is just a placeholder for the report generation';
+    const pdf = await generatePdf(ticketJson, permitJson)
 
-    // still need to add permit data and aggregate it
+    // console.log(pdf)
+    return pdf;
   }
 }

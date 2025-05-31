@@ -318,6 +318,35 @@ test:permitService:
       - .gitlab-ci.yml
 
 
+test:vehicleService:
+  stage: test
+  script:
+    - apt-get update && apt-get install -y postgresql-client
+    - until pg_isready -h postgres -p 5432; do sleep 1; done
+    - export PGPASSWORD="$POSTGRES_PASSWORD"
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/VehicleService/sql/databases.sql
+
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
+
+    - npm run installs
+    - npm run ci-auth
+    - npm run build-auth
+
+    - npm run ci-vehicleService
+    - npm run build-vehicleService
+
+    - npm run test-VehicleService
+  rules:
+    - changes: 
+      - microservice/VehicleService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
 
 # test:vehicleService:
 #   stage: test

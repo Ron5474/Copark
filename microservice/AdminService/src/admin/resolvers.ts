@@ -77,11 +77,12 @@ export class AdminResolver {
   @Authorized(["admin"])
   @Query(() => String)
   async generateReport(
-      @Ctx() request: Request
-  ): Promise<String> {
+    @Ctx() request: Request,
+    @Arg("numDays", () => Number) numDays: number
+  ): Promise<string> {
     const ticketQuery = `
       query AdminTicketReport {
-        adminTicketReport {
+        adminTicketReport(numDays: ${numDays}) {
           totalTickets
           unpaidTickets
           paidTickets
@@ -115,7 +116,7 @@ export class AdminResolver {
 
     const permitQuery = `
       query AdminPermitReport {
-        adminPermitReport {
+        adminPermitReport(numDays: ${numDays}) {
           totalPermits
           activePermits
           expiredPermits
@@ -147,9 +148,9 @@ export class AdminResolver {
     const permitJson = await permitRes.json()
     // console.log(permitJson)
 
-    const pdf = await generatePdf(ticketJson, permitJson)
+    const pdf = await generatePdf(ticketJson, permitJson, numDays)
 
-    // console.log(pdf)
+    console.log(pdf)
     return pdf;
   }
 }

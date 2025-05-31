@@ -27,16 +27,16 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
       maxWidth: '1400px',
       width: '100%',
       mx: 'auto',
-      p: 2                // Reduced from 3 to 2
+      p: 2                
     }}>
       {/* Left side - List view */}
       <Box sx={{
         width: '35%',
         borderRight: 1,
         borderColor: 'divider',
-        pl: 1,            // Reduced left padding
-        pr: 2,            // Keep right padding
-        py: 2             // Keep vertical padding
+        pl: 1,            
+        pr: 2,            
+        py: 2             
       }}>
         <Typography sx={{ mb: 2 }}>Active Challenges: {tickets.length}</Typography>
         <List sx={{ overflowY: 'auto', maxHeight: '100%' }}>
@@ -50,7 +50,7 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                 borderRadius: 1,
                 border: selectedTicket?.id === ticket.id
                   ? `1px solid ${theme.palette.primary.main}`
-                  : `1px solid ${theme.palette.grey[300]}`,  // Add grey border for unselected
+                  : `1px solid ${theme.palette.grey[300]}`,  
                 mb: 1,
                 '&:hover': {
                   bgcolor: '#F5F5F5',
@@ -139,7 +139,6 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>Evidence</Typography>
                   <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                    <p>{typeof (selectedTicket.images)}</p>
                     <img
                       src={selectedTicket.images}
                       alt={`Evidence`}

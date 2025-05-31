@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Authorized, Ctx } from "type-graphql";
 import { AdminService } from "./service";
 import { 
   User,
@@ -72,41 +72,82 @@ export class AdminResolver {
     return adminService.reinstateUser(user);
   }
 
-  // @Authorized(["admin"])
-  // @Query(() => [ReportDay])
-  // async generateReport(
-  //     @Ctx() request: Request
-  // ): Promise<ReportDay[]> {
-  //   const ticketQuery = `
-  //     query GetTicketsStats {
-  //       getTicketsStats {
-  //         date
-  //         tickets {
-  //           id
-  //         }
-  //       }
-  //     }
-  //   `
-  //   const ticketRes = await fetch('http://localhost:4002/graphql', {
-  //     method: 'POST',
-  //     headers: {
-  //     'Content-Type': 'application/json',
-  //     // eslint-disable-next-line
-  //     // @ts-ignore
-  //     Authorization: `${request.headers.authorization}`,
-  //     },
-  //     body: JSON.stringify({
-  //     query: ticketQuery,
-  //     }),
-  //   })
+  @Authorized(["admin"])
+  @Query(() => String)
+  async generateReport(
+      @Ctx() request: Request
+  ): Promise<String> {
+    const ticketQuery = `
+      query AdminTicketReport {
+        adminTicketReport {
+          totalTickets
+          totalFines
+          totalPaid
+          totalUnpaid
+          totalOverdue
+          ticketsByStatus {
+            status
+            count
+          }
+          ticketsByViolation {
+            violation
+            count
+          }
+        }
+      }
+    `
+    const ticketRes = await fetch('http://localhost:4002/graphql', {
+      method: 'POST',
+      headers: {
+      'Content-Type': 'application/json',
+      // eslint-disable-next-line
+      // @ts-ignore
+      Authorization: `${request.headers.authorization}`,
+      },
+      body: JSON.stringify({
+        query: ticketQuery,
+      }),
+    })
 
-  //   const ticketJson = await ticketRes.json()
-  //   console.log(ticketJson)
-  //   const ticketData = ticketJson?.data?.getTicketsStats
+    const ticketJson = await ticketRes.json()
+    console.log(ticketJson)
 
-  //   console.log(ticketData)
-  //   return ticketData;
+    const permitQuery = `
+      query AdminPermitReport {
+        adminPermitReport {
+          totalPermits
+          totalActive
+          totalExpired
+          totalRevoked
+          permitsByType {
+            type
+            count
+          }
+          permitsByStatus {
+            status
+            count
+          }
+        }
+      }
+    `
+    const permitRes = await fetch('http://localhost:4003/graphql', {
+      method: 'POST',
+      headers: {
+      'Content-Type': 'application/json',
+      // eslint-disable-next-line
+      // @ts-ignore
+      Authorization: `${request.headers.authorization}`,
+      },
+      body: JSON.stringify({
+        query: permitQuery,
+      }),
+    })
 
-  //   // still need to add permit data and aggregate it
-  // }
+    const permitJson = await permitRes.json()
+    console.log(permitJson)
+
+    return 'remove this later, this is just a placeholder for the report generation';
+
+    // still need to add permit data and aggregate it
+  }
 }

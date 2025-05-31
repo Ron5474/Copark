@@ -32,6 +32,7 @@ export class VehicleService {
 
     const defaultVehicle = await this.getDefaultVehicleId(userId)
 
+    console.log("NICKNAME:", result.rows)
     return Promise.all(result.rows.map(async row => ({
       id: row.id,
       default: defaultVehicle == null ? false : defaultVehicle.id == row.id,
@@ -266,14 +267,13 @@ export class VehicleService {
   
 
   public async updateVehicle(input: UpdateVehicleInput, userId: string): Promise<Vehicle> {
-    const { id, ...patch } = input
+    const { id: vehicleId, ...patch } = input
 
-    const vehicleID = id
     // const userIdDecrypted = await this.decrypt(userId)
 
     const existing = await pool.query(
       `SELECT data FROM vehicle WHERE id = $1 AND driver = $2`,
-      [vehicleID, userId]
+      [vehicleId, userId]
     )
 
     if (existing.rowCount === 0) throw new Error('Vehicle not found or not owned by user')
@@ -285,11 +285,11 @@ export class VehicleService {
 
     await pool.query(
       `UPDATE vehicle SET data = $1 WHERE id = $2`,
-      [updated, vehicleID]
+      [updated, vehicleId]
     )
 
     // id is the encrypted vehicle id
-    return { id, ...updated }
+    return { vehicleId, ...updated }
   }
 
   public async getDefaultVehicle(userId: string): Promise<{

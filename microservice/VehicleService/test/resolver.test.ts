@@ -145,6 +145,7 @@ const getVehiclequery = `
           plate
           country
           state
+          nickname
         }
       }
     `
@@ -440,9 +441,7 @@ test('Driver can get a list of their vehicles', async () => {
     const newUpdate = {
       input: {
         "id": vID,
-        "state": "Texas",
-        "country": "US",
-        "nickname": "Test Vehicle"
+        "nickname": "Real Vehicle"
       }
     }
     
@@ -459,7 +458,7 @@ test('Driver can get a list of their vehicles', async () => {
       .set('Authorization', 'Bearer ' + token)
       .send({ query: getVehiclequery })
 
-    expect(listResponse.body.data.myVehicles[1].state).toBe("Texas")
+    expect(listResponse.body.data.myVehicles[1].nickname).toBe("Real Vehicle")
   })
 
   test('Admin can find a vehicle using plate', async () => {

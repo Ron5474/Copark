@@ -41,14 +41,8 @@ export class UpdateVehicleInput {
   @Field(() => ID)
   id!: string
 
-  @Field(() => String, { nullable: true })
-  country?: string
-
-  @Field(() => String, { nullable: true })
-  state?: string
-
-  @Field(() => String, { nullable: true })
-  nickname?: string
+  @Field(() => String)
+  nickname!: string
 }
 
 @ObjectType()

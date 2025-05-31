@@ -27,6 +27,7 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
       onTicketsUpdate(updatedTickets);
       setSelectedTicket(null);
     } catch (error) {
+      void error;
       onError('Failed to accept challenge');
       setIsError(true);
     }
@@ -39,6 +40,7 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
       onTicketsUpdate(updatedTickets);
       setSelectedTicket(null);
     } catch (error) {
+      void error;
       onError('Failed to reject challenge');
       setIsError(true);
     }

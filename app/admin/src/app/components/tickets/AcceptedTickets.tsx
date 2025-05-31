@@ -10,11 +10,27 @@ const truncateVehicle = (vehicle: string) => {
 
 interface AcceptedTicketsProps {
   tickets: Ticket[]
+  error?: string | null
 }
 
-export function AcceptedTickets({ tickets }: AcceptedTicketsProps) {
+export function AcceptedTickets({ tickets, error }: AcceptedTicketsProps) {
   const theme = useTheme()
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
+
+  if (error) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100%' 
+      }}>
+        <Typography color="error">
+          {error}
+        </Typography>
+      </Box>
+    )
+  }
 
   return (
     <Box sx={{

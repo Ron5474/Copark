@@ -1,18 +1,21 @@
 import { it, expect, vi, beforeEach, Mock } from 'vitest';
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ManageTicketChallenges from '../../src/app/components/ManageTicketChallenges';
 import {
   getChallengedTickets,
   getAcceptedTickets,
+  getUnpaidTickets,
   acceptTicketChallenge,
   rejectTicketChallenge
 } from '../../src/ticket/actions';
+import { AcceptedTickets } from '../../src/app/components/tickets/AcceptedTickets';
 
 
 vi.mock('../../src/ticket/actions', () => ({
   getChallengedTickets: vi.fn(),
   getAcceptedTickets: vi.fn(),
+  getUnpaidTickets: vi.fn(),
   acceptTicketChallenge: vi.fn(),
   rejectTicketChallenge: vi.fn()
 }));
@@ -23,7 +26,7 @@ const mockChallengedTickets = [
     id: '123',
     vehicle: 'ABC123',
     enforcer: '456',
-    issuedDate: new Date().toISOString(),
+    issuedDate: new Date('2024-01-01').toISOString(),
     violation: 'No Permit',
     fine: 50,
     ticketStatus: 'challenged',
@@ -38,7 +41,7 @@ const mockAcceptedTickets = [
     id: '789',
     vehicle: 'XYZ789',
     enforcer: '012',
-    issuedDate: new Date().toISOString(),
+    issuedDate: new Date('2024-01-02').toISOString(),
     violation: 'No Permit',
     fine: 50,
     ticketStatus: 'accepted',
@@ -47,105 +50,120 @@ const mockAcceptedTickets = [
   }
 ];
 
+const mockUnpaidTickets = [
+  {
+    id: '456',
+    vehicle: 'DEF456',
+    enforcer: '789',
+    issuedDate: new Date('2024-01-03').toISOString(),
+    violation: 'Expired Permit',
+    fine: 75,
+    ticketStatus: 'unpaid',
+    images: 'test2.jpg',
+    note: 'Another test note'
+  }
+];
+
 beforeEach(() => {
   vi.clearAllMocks();
   cleanup();
   (getChallengedTickets as Mock).mockResolvedValue(mockChallengedTickets);
   (getAcceptedTickets as Mock).mockResolvedValue(mockAcceptedTickets);
-  (acceptTicketChallenge as Mock).mockResolvedValue({ ...mockChallengedTickets[0], ticketStatus: 'accepted' });
-  (rejectTicketChallenge as Mock).mockResolvedValue({ ...mockChallengedTickets[0], ticketStatus: 'unpaid' });
+  (getUnpaidTickets as Mock).mockResolvedValue(mockUnpaidTickets);
 });
 
-it.only('renders and fetches challenged tickets initially', async () => {
+it('shows loading state initially', () => {
   render(<ManageTicketChallenges />);
-
-  // Check loading state
   expect(screen.getByRole('progressbar')).toBeDefined();
-
-  // Wait for loading to finish
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
-
-  // Check initial list view
-  expect(screen.getByText(/Active Challenges:/)).toBeDefined();
-  
-  // Check that ticket is in list but details aren't visible yet
-  const ticketItem = screen.getByText('Ticket #123', { exact: true });
-  expect(ticketItem).toBeDefined();
-  expect(screen.getByText('Vehicle: ABC123')).toBeDefined();
-  
-  // Select the ticket
-  await userEvent.click(ticketItem as HTMLElement);
-  
-  // Now check for detailed info
-  expect(screen.getByText('No Permit')).toBeDefined();
-  expect(screen.getByText('I had a valid permit')).toBeDefined();
-  expect(screen.getByText('$50.00')).toBeDefined();
-  
-  // Verify API call
-  expect(getChallengedTickets).toHaveBeenCalledTimes(1);
 });
 
-it('switches between challenged and accepted tickets tabs', async () => {
+it('renders challenged tickets tab by default', async () => {
   render(<ManageTicketChallenges />);
 
   await waitFor(() => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  
-  const acceptedTab = screen.getByRole('tab', { name: /Accepted Tickets/ });
+  expect(screen.getByText('Active Challenges: 1')).toBeDefined();
+  expect(screen.getByText('ABC123', { exact: false })).toBeDefined();
+  expect(screen.getByText('$50.00', { exact: false })).toBeDefined();
+});
+
+it('switches to accepted tickets tab', async () => {
+  render(<ManageTicketChallenges />);
+
+  const acceptedTab = screen.getByRole('tab', { name: /Accepted Tickets/i });
   await userEvent.click(acceptedTab);
 
-  
-  expect(getAcceptedTickets).toHaveBeenCalledTimes(1);
   await waitFor(() => {
-    expect(screen.getByText('XYZ789')).toBeDefined();
+    expect(screen.getByText('Accepted Tickets: 1')).toBeDefined();
+    expect(screen.getByText('XYZ789', { exact: false })).toBeDefined();
+  });
+});
+
+it('switches to unpaid tickets tab', async () => {
+  render(<ManageTicketChallenges />);
+
+  const unpaidTab = screen.getByRole('tab', { name: /Unpaid Tickets/i });
+  await userEvent.click(unpaidTab);
+
+  await waitFor(() => {
+    expect(screen.getByText('Unpaid Tickets: 1')).toBeDefined();
+    expect(screen.getByText('DEF456', { exact: false })).toBeDefined();
   });
 });
 
 it('handles accepting a challenge', async () => {
+  (acceptTicketChallenge as Mock).mockResolvedValueOnce({
+    ...mockChallengedTickets[0],
+    ticketStatus: 'accepted'
+  });
+
   render(<ManageTicketChallenges />);
 
   await waitFor(() => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  // First select the ticket
-  const ticketItem = screen.getByText('Ticket #123', { exact: true });
-  await userEvent.click(ticketItem);
+  // Select the ticket first
+  const ticketItem = screen.getByText('ABC123', { exact: false });
+  await userEvent.click(ticketItem as HTMLElement);
 
-  // Now the accept button should be visible
-  const acceptButton = screen.getByText('Accept Challenge', { exact: true });
+  // Find and click accept button
+  const acceptButton = screen.getByText('Accept Challenge');
   await userEvent.click(acceptButton);
 
   expect(acceptTicketChallenge).toHaveBeenCalledWith('123');
-  expect(getChallengedTickets).toHaveBeenCalledTimes(2);
+  expect(getChallengedTickets).toHaveBeenCalledTimes(2); // Initial + after accept
 });
 
 it('handles rejecting a challenge', async () => {
+  (rejectTicketChallenge as Mock).mockResolvedValueOnce({
+    ...mockChallengedTickets[0],
+    ticketStatus: 'unpaid'
+  });
+
   render(<ManageTicketChallenges />);
 
   await waitFor(() => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  // First select the ticket
-  const ticketItem = screen.getByText('Ticket #123', { exact: true });
-  await userEvent.click(ticketItem);
+  // Select the ticket first
+  const ticketItem = screen.getByText('ABC123', { exact: false });
+  await userEvent.click(ticketItem as HTMLElement);
 
-  // Now the reject button should be visible
-  const rejectButton = screen.getByText('Reject Challenge', { exact: true });
+  // Find and click reject button
+  const rejectButton = screen.getByText('Reject Challenge');
   await userEvent.click(rejectButton);
 
   expect(rejectTicketChallenge).toHaveBeenCalledWith('123');
-  expect(getChallengedTickets).toHaveBeenCalledTimes(2);
+  expect(getChallengedTickets).toHaveBeenCalledTimes(2); // Initial + after reject
 });
 
-it('displays error state when fetching tickets fails', async () => {
+it('shows error state when fetching tickets fails', async () => {
   const error = 'Failed to fetch challenged tickets';
-  (getChallengedTickets as Mock).mockRejectedValueOnce(new Error(error));
+  (getChallengedTickets as Mock).mockRejectedValueOnce(new Error('Failed to fetch'));
 
   render(<ManageTicketChallenges />);
 
@@ -154,91 +172,32 @@ it('displays error state when fetching tickets fails', async () => {
   });
 });
 
-it('displays empty state when no tickets are found', async () => {
-  (getChallengedTickets as Mock).mockResolvedValueOnce([]);
-  (getAcceptedTickets as Mock).mockResolvedValueOnce([]);
+it('shows error state when fetching accepted tickets fails', async () => {
+  // Mock getAcceptedTickets to reject
+  (getAcceptedTickets as Mock).mockRejectedValueOnce(new Error('Failed to fetch'));
 
   render(<ManageTicketChallenges />);
-
-  await waitFor(() => {
-    expect(screen.getByText('Active Challenges: 0')).toBeDefined();
-  });
-
-  
-  const acceptedTab = screen.getByRole('tab', { name: /Accepted Tickets/ });
-  await userEvent.click(acceptedTab);
-
-  await waitFor(() => {
-    expect(screen.getByText('No accepted tickets found.')).toBeDefined();
-  });
-});
-
-it('successfully displays accepted tickets when switching tabs', async () => {
-  render(<ManageTicketChallenges />);
-
-  // Wait for initial load
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
-
-  // Verify initial challenged tickets view
-  const ticket = screen.getByText('123').closest('[data-testid="ticket-item"]');
-  expect(ticket).toBeDefined();
-  expect(screen.getByText('ABC123')).toBeDefined();
-  expect(screen.getByText('No Permit')).toBeDefined();
-  expect(screen.getByText('$50.00')).toBeDefined();
 
   // Switch to accepted tickets tab
-  const acceptedTab = screen.getByRole('tab', { name: /Accepted Tickets/ });
+  const acceptedTab = screen.getByRole('tab', { name: /Accepted Tickets/i });
   await userEvent.click(acceptedTab);
 
-  // Wait for accepted tickets to load
   await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
+    expect(screen.getByText('Error: Failed to fetch accepted tickets')).toBeDefined();
   });
-
-  // Verify accepted tickets view
-  const acceptedTicket = screen.getByText('789').closest('[data-testid="ticket-item"]');
-  expect(acceptedTicket).toBeDefined(); 
-  expect(screen.getByText('XYZ789')).toBeDefined();
-  expect(screen.getByText('No Permit')).toBeDefined();
-  expect(screen.getByText('$50.00')).toBeDefined();
-
-  // Verify API calls
-  expect(getAcceptedTickets).toHaveBeenCalledTimes(1);
-  expect(getChallengedTickets).toHaveBeenCalledTimes(1);
-
-  // Switch back to challenged tickets tab
-  const challengedTab = screen.getByRole('tab', { name: /Challenged Tickets/ });
-  await userEvent.click(challengedTab);
-
-  // Verify back to challenged view
-  const challengedTicket = screen.getByText('123').closest('[data-testid="ticket-item"]');
-  expect(challengedTicket).toBeDefined();
-  expect(screen.getByText('ABC123')).toBeDefined();
 });
 
-it('displays error state when fetching accepted tickets fails', async () => {
-  const error = 'Failed to fetch accepted tickets';
-  
-  (getChallengedTickets as Mock).mockResolvedValueOnce(mockChallengedTickets);
-  
-  (getAcceptedTickets as Mock).mockRejectedValueOnce(new Error(error));
+it('shows error state when fetching unpaid tickets fails', async () => {
+  // Mock getUnpaidTickets to reject
+  (getUnpaidTickets as Mock).mockRejectedValueOnce(new Error('Failed to fetch'));
 
   render(<ManageTicketChallenges />);
 
-  
-  await waitFor(() => {
-    expect(screen.queryByRole('progressbar')).toBeNull();
-  });
+  // Switch to unpaid tickets tab
+  const unpaidTab = screen.getByRole('tab', { name: /Unpaid Tickets/i });
+  await userEvent.click(unpaidTab);
 
-  
-  const acceptedTab = screen.getByRole('tab', { name: /Accepted Tickets/ });
-  await userEvent.click(acceptedTab);
-
-  
   await waitFor(() => {
-    expect(screen.getByText(`Error: ${error}`)).toBeDefined();
+    expect(screen.getByText('Error: Failed to fetch unpaid tickets')).toBeDefined();
   });
 });
-

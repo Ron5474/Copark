@@ -21,7 +21,8 @@ const TicketContent = memo(function TicketContent({
   challengedTickets, 
   acceptedTickets,
   unpaidTickets, 
-  setChallengedTickets, 
+  setChallengedTickets,
+  error,
   setError 
 }: { 
   currentTab: number
@@ -29,18 +30,17 @@ const TicketContent = memo(function TicketContent({
   acceptedTickets: Ticket[]
   unpaidTickets: Ticket[]
   setChallengedTickets: (tickets: ChallengedTicket[]) => void
+  error: string | null
   setError: (error: string) => void
 }) {
   return (
-    <Box
-      sx={{
-        p: 3,
-        background: '#ffffff',
-        mx: 'auto',
-        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
-        borderRadius: '15px'
-      }}
-    >
+    <Box sx={{
+      p: 3,
+      background: '#ffffff',
+      mx: 'auto',
+      boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
+      borderRadius: '15px'
+    }}>
       {currentTab === 0 ? (
         <ChallengedTickets 
           tickets={challengedTickets}
@@ -48,7 +48,10 @@ const TicketContent = memo(function TicketContent({
           onError={setError}
         />
       ) : currentTab === 1 ? (
-        <AcceptedTickets tickets={acceptedTickets} />
+        <AcceptedTickets 
+          tickets={acceptedTickets} 
+          error={error}
+        />
       ) : (
         <UnpaidTickets tickets={unpaidTickets} />
       )}
@@ -165,6 +168,7 @@ export default function ManageTicketChallenges() {
           acceptedTickets={acceptedTickets}
           unpaidTickets={unpaidTickets}
           setChallengedTickets={setChallengedTickets}
+          error={error}
           setError={setError}
         />
       )}

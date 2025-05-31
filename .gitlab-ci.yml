@@ -271,7 +271,7 @@ test:auth:
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
-    - npm run install-auth
+    - npm run ci-auth
     - npm run test-auth
   rules:
     - changes: 
@@ -297,16 +297,19 @@ test:permitService:
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
 
-    - cd microservice/AuthService && npm install
-    - npm run swagger
-    - cd ../../microservice/EmailService && npm install
-    - cd ../../microservice/EmailService && npm run build
-    - ls -la ../../microservice/PermitService/src
-    - cat ../../microservice/PermitService/test/resolver.test.ts
-    - echo "// dummy file to avoid import error" > ../../microservice/PermitService/express.js
-    - cd ../../microservice/PermitService && npm ci
-    - cd ../../microservice/PermitService && npm run build
-    - cd ../../microservice/PermitService && npm run test
+    - npm run ci-auth
+    - npm run build-auth
+
+    - npm run ci-adminService
+    - npm run build-adminService
+
+    - npm run ci-permitService
+    - npm run build-permitService
+
+    - npm run ci-emailService
+    - npm run build-emailService
+
+    - npm run test-PermitService
   rules:
     - changes: 
       - microservice/PermitService/**/*

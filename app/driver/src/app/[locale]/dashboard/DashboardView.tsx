@@ -38,12 +38,31 @@ import { DashboardContext } from "./context";
 import type { LotGroup, Permit, Vehicle } from "../types";
 import { Payment } from "../shared/actions";
 
+function formatPermitDuration(permit: Permit): string {
+  const start = new Date(permit.activeDate!);
+  const end = new Date(permit.expireDate);
+
+  // If permit.type is 'zone', display duration
+  if (permit.type.toLowerCase() === 'zone') {
+    const diffMs = end.getTime() - start.getTime();
+    const totalMinutes = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return `${hours}h ${minutes}m`;
+  }
+
+  // Otherwise fallback to formatted date
+  return end.toLocaleDateString();
+}
+
 export default function DashboardView() {
   const t = useTranslations("dashboard");
   const tp = useTranslations("permits");
   const context = useContext(DashboardContext);
 
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  // const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>("active");
   const [selectedLots, setSelectedLots] = useState<Record<string, string>>({});
   const [permits, setPermits] = useState<LotGroup[]>([]);
   const [activePermits, setActivePermits] = useState<Permit[]>([]);
@@ -153,7 +172,7 @@ export default function DashboardView() {
                   {t("active")}: {new Date(permit.activeDate!).toLocaleDateString()}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {t("expires")}: {new Date(permit.expireDate).toLocaleDateString()}
+                  {t("expires")}: {formatPermitDuration(permit)}
                 </Typography>
               </Box>
             ))}

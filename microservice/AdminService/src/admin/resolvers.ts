@@ -81,16 +81,15 @@ export class AdminResolver {
       query AdminTicketReport {
         adminTicketReport {
           totalTickets
-          totalFines
-          totalPaid
-          totalUnpaid
-          totalOverdue
-          ticketsByStatus {
-            status
+          unpaidTickets
+          paidTickets
+          totalRevenue
+          violationBreakdown {
+            violation
             count
           }
-          ticketsByViolation {
-            violation
+          enforcerBreakdown {
+            enforcer
             count
           }
         }
@@ -116,16 +115,16 @@ export class AdminResolver {
       query AdminPermitReport {
         adminPermitReport {
           totalPermits
-          totalActive
-          totalExpired
-          totalRevoked
-          permitsByType {
-            type
-            count
+          activePermits
+          expiredPermits
+          totalRevenue
+          zoneBreakdown {
+            area
+            totalPermits
           }
-          permitsByStatus {
-            status
-            count
+          lotBreakdown {
+            area
+            totalPermits
           }
         }
       }

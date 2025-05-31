@@ -41,8 +41,8 @@ export class UpdateVehicleInput {
   @Field(() => ID)
   id!: string
 
-  @Field(() => String)
-  nickname!: string
+  @Field(() => String, { nullable: true })
+  nickname?: string
 }
 
 @ObjectType()

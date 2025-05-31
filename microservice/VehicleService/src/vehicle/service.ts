@@ -32,7 +32,6 @@ export class VehicleService {
 
     const defaultVehicle = await this.getDefaultVehicleId(userId)
 
-    console.log("NICKNAME:", result.rows)
     return Promise.all(result.rows.map(async row => ({
       id: row.id,
       default: defaultVehicle == null ? false : defaultVehicle.id == row.id,
@@ -146,7 +145,7 @@ export class VehicleService {
     const vehicles = await this.getMyVehicles(userId)
 
     if ((vehicles.length) === 1) {
-        console.log('existing', existing)
+        // console.log('existing', existing)
         throw new Error('Cannot delete the only default vehicle. Please add another vehicle as default first.')
     } else {
       const defaultVehicle = await this.getDefaultVehicleId(userId)
@@ -268,28 +267,28 @@ export class VehicleService {
 
   public async updateVehicle(input: UpdateVehicleInput, userId: string): Promise<Vehicle> {
     const { id: vehicleId, ...patch } = input
-
-    // const userIdDecrypted = await this.decrypt(userId)
-
+  
     const existing = await pool.query(
       `SELECT data FROM vehicle WHERE id = $1 AND driver = $2`,
       [vehicleId, userId]
     )
-
+  
     if (existing.rowCount === 0) throw new Error('Vehicle not found or not owned by user')
-
-    const updated = {
-      ...existing.rows[0].data,
-      ...patch
+  
+    const updatedData = { ...existing.rows[0].data }
+  
+    if (!patch.nickname) {
+      delete updatedData.nickname
+    } else {
+      updatedData.nickname = patch.nickname
     }
-
+  
     await pool.query(
       `UPDATE vehicle SET data = $1 WHERE id = $2`,
-      [updated, vehicleId]
+      [updatedData, vehicleId]
     )
-
-    // id is the encrypted vehicle id
-    return { vehicleId, ...updated }
+  
+    return { id: vehicleId, ...updatedData }
   }
 
   public async getDefaultVehicle(userId: string): Promise<{

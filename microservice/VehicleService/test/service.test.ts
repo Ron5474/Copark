@@ -95,8 +95,12 @@ const mock_vehicle2 = {
   "nickname": "electric fiat"
 }
 
+// const update_vehicle1 = {
+//   "state": "Texas"
+// }
+
 const update_vehicle1 = {
-  "state": "Texas"
+  "nickname": "My Vehicle"
 }
 
 test('RegisterVehicle with same plate twice - Throws error', async () => {
@@ -139,11 +143,29 @@ test('getDefaultVehicle returns null', async () => {
 //   expect(vehicles[0].default).toBeNull()
 // })
 
-test('updateVehicle - updates vehicle table correctly', async () => {
+// Why does this test pass?
+// test('updateVehicle - updates vehicle table correctly', async () => {
+//   const vehicle = await new VehicleService().registerVehicle(mock_vehicle1, mock_driver1_ID)
+//   await new VehicleService().updateVehicle({id: vehicle.id, ...update_vehicle1}, mock_driver1_ID)
+//   const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)
+//   console.log("VEHICLES:", vehicles)
+//   expect(vehicles[0].state).toBe('Texas')
+// })
+
+test('updateVehicle - updates nickname correctly', async () => {
   const vehicle = await new VehicleService().registerVehicle(mock_vehicle1, mock_driver1_ID)
   await new VehicleService().updateVehicle({id: vehicle.id, ...update_vehicle1}, mock_driver1_ID)
   const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)
-  expect(vehicles[0].state).toBe('Texas')
+  console.log("VEHICLES:", vehicles)
+  expect(vehicles[0].nickname).toBe('My Vehicle')
+})
+
+test('updateVehicle - removes nickname correctly', async () => {
+  const vehicle = await new VehicleService().registerVehicle(mock_vehicle1, mock_driver1_ID)
+  await new VehicleService().updateVehicle({id: vehicle.id}, mock_driver1_ID)
+  const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)
+  console.log("VEHICLES:", vehicles)
+  expect(vehicles[0].nickname).toBeUndefined()
 })
 
 test('updateVehicle - Throws error because no vehicle exists', async () => {

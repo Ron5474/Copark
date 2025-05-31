@@ -154,6 +154,7 @@ it('handles errors when accepting challenge', async () => {
   await userEvent.click(acceptButton);
 
   expect(onError).toHaveBeenCalledWith('Failed to accept challenge');
+  expect(screen.getByText('An error occurred while managing the ticket challenge.')).toBeDefined();
 });
 
 it('handles errors when rejecting challenge', async () => {
@@ -175,6 +176,7 @@ it('handles errors when rejecting challenge', async () => {
   await userEvent.click(rejectButton);
 
   expect(onError).toHaveBeenCalledWith('Failed to reject challenge');
+  expect(screen.getByText('An error occurred while managing the ticket challenge.')).toBeDefined();
 });
 
 it('displays no tickets selected message initially', () => {

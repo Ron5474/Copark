@@ -18,6 +18,46 @@ interface ChallengedTicketsProps {
 export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: ChallengedTicketsProps) {
   const theme = useTheme()
   const [selectedTicket, setSelectedTicket] = useState<ChallengedTicket | null>(null)
+  const [isError, setIsError] = useState(false)
+
+  const handleAcceptChallenge = async (ticket: ChallengedTicket) => {
+    try {
+      await acceptTicketChallenge(ticket.id);
+      const updatedTickets = await getChallengedTickets();
+      onTicketsUpdate(updatedTickets);
+      setSelectedTicket(null);
+    } catch (error) {
+      onError('Failed to accept challenge');
+      setIsError(true);
+    }
+  }
+
+  const handleRejectChallenge = async (ticket: ChallengedTicket) => {
+    try {
+      await rejectTicketChallenge(ticket.id);
+      const updatedTickets = await getChallengedTickets();
+      onTicketsUpdate(updatedTickets);
+      setSelectedTicket(null);
+    } catch (error) {
+      onError('Failed to reject challenge');
+      setIsError(true);
+    }
+  }
+
+  if (isError) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100%' 
+      }}>
+        <Typography color="error">
+          An error occurred while managing the ticket challenge.
+        </Typography>
+      </Box>
+    )
+  }
 
   return (
     <Box sx={{
@@ -27,16 +67,16 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
       maxWidth: '1400px',
       width: '100%',
       mx: 'auto',
-      p: 2                
+      p: 2
     }}>
       {/* Left side - List view */}
       <Box sx={{
         width: '35%',
         borderRight: 1,
         borderColor: 'divider',
-        pl: 1,            
-        pr: 2,            
-        py: 2             
+        pl: 1,
+        pr: 2,
+        py: 2
       }}>
         <Typography sx={{ mb: 2 }}>Active Challenges: {tickets.length}</Typography>
         <List sx={{ overflowY: 'auto', maxHeight: '100%' }}>
@@ -50,7 +90,7 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                 borderRadius: 1,
                 border: selectedTicket?.id === ticket.id
                   ? `1px solid ${theme.palette.primary.main}`
-                  : `1px solid ${theme.palette.grey[300]}`,  
+                  : `1px solid ${theme.palette.grey[300]}`,
                 mb: 1,
                 '&:hover': {
                   bgcolor: '#F5F5F5',
@@ -155,31 +195,13 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
               <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 4 }}>
                 <Button
                   variant="outlined"
-                  onClick={async () => {
-                    try {
-                      await rejectTicketChallenge(selectedTicket.id);
-                      const tickets = await getChallengedTickets();
-                      onTicketsUpdate(tickets);
-                      setSelectedTicket(null);
-                    } catch (err) {
-                      onError(`${(err as Error).message}`);
-                    }
-                  }}
+                  onClick={() => handleRejectChallenge(selectedTicket)}
                 >
                   Reject Challenge
                 </Button>
                 <Button
                   variant="contained"
-                  onClick={async () => {
-                    try {
-                      await acceptTicketChallenge(selectedTicket.id);
-                      const tickets = await getChallengedTickets();
-                      onTicketsUpdate(tickets);
-                      setSelectedTicket(null);
-                    } catch (err) {
-                      onError(`${(err as Error).message}`);
-                    }
-                  }}
+                  onClick={() => handleAcceptChallenge(selectedTicket)}
                 >
                   Accept Challenge
                 </Button>

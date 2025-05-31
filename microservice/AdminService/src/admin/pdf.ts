@@ -24,35 +24,94 @@ function wrapTextPreservingNewlines(text: string, maxCharsPerLine: number): stri
 }
 
 export async function generatePdf(
-  ticketInfo: TicketReport,
-  permitInfo: PermitReport
+  ticketData: TicketReport,
+  permitData: PermitReport
 ): Promise<string> {
   const pdfDoc = await PDFDocument.create();
   let page = pdfDoc.addPage([600, 800]);
   let y = 750;
 
-  const drawWrappedText = (label: string, content: string) => {
-    const title = `${label}:`;
-    const lines = wrapTextPreservingNewlines(content, 90);
+//   console.log(ticketInfo, permitInfo);
+  let ticketInfo = ticketData.data.adminTicketReport;
+  let permitInfo = permitData.data.adminPermitReport;
+  // Prepare summary statements for tickets
+  const ticketStatements: string[] = [
+    `Ticket Summary:`,
+    `Total Tickets: ${ticketInfo.totalTickets}`,
+    `Unpaid Tickets: ${ticketInfo.unpaidTickets}`,
+    `Paid Tickets: ${ticketInfo.paidTickets}`,
+    `Total Revenue: $${(ticketInfo.totalRevenue / 100).toFixed(2)}`,
+    '',
+    `Violation Breakdown:`
+  ];
+  if (ticketInfo.violationBreakdown && ticketInfo.violationBreakdown.length > 0) {
+    for (const v of ticketInfo.violationBreakdown) {
+      ticketStatements.push(`- ${v.violation}: ${v.count}`);
+    }
+  } else {
+    ticketStatements.push('No violations recorded.');
+  }
+  ticketStatements.push('');
+  ticketStatements.push('Enforcer Breakdown:');
+  if (ticketInfo.enforcerBreakdown && ticketInfo.enforcerBreakdown.length > 0) {
+    for (const e of ticketInfo.enforcerBreakdown) {
+      ticketStatements.push(`- ${e.enforcer}: ${e.count}`);
+    }
+  } else {
+    ticketStatements.push('No enforcer data.');
+  }
 
-    page.drawText(title, { x: 50, y, size: 14, color: rgb(0.1, 0.1, 0.1) });
+  // Prepare summary statements for permits
+  const permitStatements: string[] = [
+    `Permit Summary:`,
+    `Total Permits: ${permitInfo.totalPermits}`,
+    `Active Permits: ${permitInfo.activePermits}`,
+    `Expired Permits: ${permitInfo.expiredPermits}`,
+    `Total Revenue: $${(permitInfo.totalRevenue / 100).toFixed(2)}`,
+    '',
+    `Zone Breakdown:`
+  ];
+  if (permitInfo.zoneBreakdown && permitInfo.zoneBreakdown.length > 0) {
+    for (const z of permitInfo.zoneBreakdown) {
+      permitStatements.push(`- ${z.area}: ${z.totalPermits}`);
+    }
+  } else {
+    permitStatements.push('No zone data.');
+  }
+  permitStatements.push('');
+  permitStatements.push('Lot Breakdown:');
+  if (permitInfo.lotBreakdown && permitInfo.lotBreakdown.length > 0) {
+    for (const l of permitInfo.lotBreakdown) {
+      permitStatements.push(`- ${l.area}: ${l.totalPermits}`);
+    }
+  } else {
+    permitStatements.push('No lot data.');
+  }
+
+  // Helper to draw a section
+  const drawSection = (title: string, lines: string[], x: number) => {
+    page.drawText(title, { x, y, size: 14, color: rgb(0.1, 0.1, 0.1) });
     y -= 20;
-
     for (const line of lines) {
-      page.drawText(line, { x: 60, y, size: 12, color: rgb(0, 0, 0) });
-      y -= 16;
-
-      if (y < 50) {
-        page = pdfDoc.addPage([600, 800]);
-        y = 750;
+      const wrapped = wrapTextPreservingNewlines(line, 40);
+      for (const w of wrapped) {
+        page.drawText(w, { x: x + 10, y, size: 12, color: rgb(0, 0, 0) });
+        y -= 16;
+        if (y < 50) {
+          page = pdfDoc.addPage([600, 800]);
+          y = 750;
+        }
       }
     }
-
     y -= 16;
   };
 
-  drawWrappedText('Ticket Info', JSON.stringify(ticketInfo, null, 2));
-  drawWrappedText('Permit Info', JSON.stringify(permitInfo, null, 2));
+  // Draw tickets on the left, permits on the right
+  let yStart = y;
+  y = yStart;
+  drawSection('Ticket Report', ticketStatements, 50);
+  y = yStart;
+  drawSection('Permit Report', permitStatements, 320);
 
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes).toString('base64');

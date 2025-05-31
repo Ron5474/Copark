@@ -138,30 +138,15 @@ export function UnpaidTickets({ tickets }: UnpaidTicketsProps) {
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>Evidence</Typography>
                   <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                    {Array.isArray(selectedTicket.images) ? (
-                      selectedTicket.images.map((image, index) => (
-                        <img
-                          key={index}
-                          src={image}
-                          alt={`Evidence ${index + 1}`}
-                          style={{
-                            maxWidth: '200px',
-                            height: 'auto',
-                            borderRadius: '8px'
-                          }}
-                        />
-                      ))
-                    ) : (
-                      <img
-                        src={selectedTicket.images}
-                        alt="Evidence"
-                        style={{
-                          maxWidth: '200px',
-                          height: 'auto',
-                          borderRadius: '8px'
-                        }}
-                      />
-                    )}
+                    {<img
+                      src={selectedTicket.images}
+                      alt="Evidence"
+                      style={{
+                        maxWidth: '200px',
+                        height: 'auto',
+                        borderRadius: '8px'
+                      }}
+                    />}
                   </Box>
                 </Box>
               )}

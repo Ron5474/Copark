@@ -8,6 +8,7 @@ import theme from '../../src/app/theme';
 import AllPermitsTable from '@/app/charts/AllPermitsTable';
 import PermitStatsByZone from '@/app/charts/PermitStatsByZone';
 import PermitStatsByLot from '@/app/charts/PermitStatsByLot';
+import ViewStatistics from '@/app/components/ViewStatistics';
 
 // Mock data
 const mockZones = [
@@ -125,6 +126,30 @@ beforeAll(() => {
                 { area: 'A', totalPermits: 10 },
                 { area: 'B', totalPermits: 5 }
               ]
+            }
+          })
+        });
+      }
+
+      if (body.query.includes('adminPermitReport')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: {
+              adminPermitReport: {
+                totalPermits: 100,
+                activePermits: 75,
+                expiredPermits: 25,
+                totalRevenue: 5000,
+                zoneBreakdown: [
+                  { area: '1', totalPermits: 10 },
+                  { area: '2', totalPermits: 5 }
+                ],
+                lotBreakdown: [
+                  { area: 'A', totalPermits: 10 },
+                  { area: 'B', totalPermits: 5 }
+                ]
+              }
             }
           })
         });
@@ -372,5 +397,47 @@ it('successfully fetches and displays lot permit statistics', async () => {
   // Wait for data to load and chart to display
   await waitFor(() => {
     expect(screen.getByTestId('mock-bar-chart')).toBeDefined();
+  });
+});
+
+it('successfully fetches and displays permit report statistics', async () => {
+  const mockPermitReport = {
+    totalPermits: 100,
+    activePermits: 75,
+    expiredPermits: 25,
+    totalRevenue: 5000,
+    zoneBreakdown: [
+      { area: '1', totalPermits: 10 },
+      { area: '2', totalPermits: 5 }
+    ],
+    lotBreakdown: [
+      { area: 'A', totalPermits: 10 },
+      { area: 'B', totalPermits: 5 }
+    ]
+  };
+
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      const body = JSON.parse(options?.body as string);
+      if (body.query.includes('adminPermitReport')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: { adminPermitReport: mockPermitReport }
+          })
+        });
+      }
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
+
+  render(<ViewStatistics />);
+
+  // Wait for data to load and verify summary statistics
+  await waitFor(() => {
+    expect(screen.getByText('Total Permits')).toBeDefined();
+    expect(screen.getByText('Active Permits')).toBeDefined();
+    expect(screen.getByText('Expired Permits')).toBeDefined();
+    expect(screen.getByText('Total Revenue ($)')).toBeDefined();
   });
 });

@@ -232,7 +232,6 @@ export async function getPermitReport(): Promise<PermitReport> {
   })
 
   const json = await res.json()
-  if (json.errors) throw new Error(json.errors[0].message)
   return json.data.adminPermitReport
 }
 

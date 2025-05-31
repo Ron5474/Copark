@@ -149,7 +149,7 @@ export class AdminResolver {
 
     const pdf = await generatePdf(ticketJson, permitJson)
 
-    // console.log(pdf)
+    console.log(pdf)
     return pdf;
   }
 }

@@ -48,7 +48,7 @@ export async function generatePdf(
       }
     }
 
-    y -= 16; // extra space after block
+    y -= 16;
   };
 
   drawWrappedText('Ticket Info', JSON.stringify(ticketInfo, null, 2));

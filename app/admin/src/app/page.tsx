@@ -30,8 +30,6 @@ export default function Page() {
         return <Box>Generate Reports Component</Box>;
       case 'zones':
         return <ManageZones />;
-      default:
-        return <Box>Welcome to Admin Dashboard</Box>;
     }
   };
 

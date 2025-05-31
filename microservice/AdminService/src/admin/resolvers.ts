@@ -116,7 +116,7 @@ export class AdminResolver {
 
     const permitQuery = `
       query AdminPermitReport {
-        adminPermitReport {
+        adminPermitReport(numDays: ${numDays}) {
           totalPermits
           activePermits
           expiredPermits

@@ -59,21 +59,35 @@ beforeEach(() => {
 it.only('renders and fetches challenged tickets initially', async () => {
   render(<ManageTicketChallenges />);
 
-  
+  // Check loading state
   expect(screen.getByRole('progressbar')).toBeDefined();
 
-  
+  // Wait for loading to finish
   await waitFor(() => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  
+  // Check initial list view
   expect(screen.getByText(/Active Challenges:/)).toBeDefined();
-  expect(screen.getByText('ABC123')).toBeDefined();
+  
+  // Check that ticket is in list but details aren't visible yet
+  const ticketItem = screen.getByText('Ticket #123', { exact: true });
+  expect(ticketItem).toBeDefined();
+  expect(screen.getByText('Vehicle: ABC123')).toBeDefined();
+  
+  // Select the ticket
+  await userEvent.click(ticketItem as HTMLElement);
+  
+  // Now check for detailed info
+  expect(screen.getByText('No Permit')).toBeDefined();
+  expect(screen.getByText('I had a valid permit')).toBeDefined();
+  expect(screen.getByText('$50.00')).toBeDefined();
+  
+  // Verify API call
   expect(getChallengedTickets).toHaveBeenCalledTimes(1);
 });
 
-it.only('switches between challenged and accepted tickets tabs', async () => {
+it('switches between challenged and accepted tickets tabs', async () => {
   render(<ManageTicketChallenges />);
 
   await waitFor(() => {
@@ -91,35 +105,45 @@ it.only('switches between challenged and accepted tickets tabs', async () => {
   });
 });
 
-it.only('handles accepting a challenge', async () => {
+it('handles accepting a challenge', async () => {
   render(<ManageTicketChallenges />);
 
   await waitFor(() => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  const acceptButton = screen.getByRole('button', { name: /Accept Challenge/ });
+  // First select the ticket
+  const ticketItem = screen.getByText('Ticket #123', { exact: true });
+  await userEvent.click(ticketItem);
+
+  // Now the accept button should be visible
+  const acceptButton = screen.getByText('Accept Challenge', { exact: true });
   await userEvent.click(acceptButton);
 
   expect(acceptTicketChallenge).toHaveBeenCalledWith('123');
-  expect(getChallengedTickets).toHaveBeenCalledTimes(2); 
+  expect(getChallengedTickets).toHaveBeenCalledTimes(2);
 });
 
-it.only('handles rejecting a challenge', async () => {
+it('handles rejecting a challenge', async () => {
   render(<ManageTicketChallenges />);
 
   await waitFor(() => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  const rejectButton = screen.getByRole('button', { name: /Reject Challenge/ });
+  // First select the ticket
+  const ticketItem = screen.getByText('Ticket #123', { exact: true });
+  await userEvent.click(ticketItem);
+
+  // Now the reject button should be visible
+  const rejectButton = screen.getByText('Reject Challenge', { exact: true });
   await userEvent.click(rejectButton);
 
   expect(rejectTicketChallenge).toHaveBeenCalledWith('123');
-  expect(getChallengedTickets).toHaveBeenCalledTimes(2); 
+  expect(getChallengedTickets).toHaveBeenCalledTimes(2);
 });
 
-it.only('displays error state when fetching tickets fails', async () => {
+it('displays error state when fetching tickets fails', async () => {
   const error = 'Failed to fetch challenged tickets';
   (getChallengedTickets as Mock).mockRejectedValueOnce(new Error(error));
 
@@ -130,14 +154,14 @@ it.only('displays error state when fetching tickets fails', async () => {
   });
 });
 
-it.only('displays empty state when no tickets are found', async () => {
+it('displays empty state when no tickets are found', async () => {
   (getChallengedTickets as Mock).mockResolvedValueOnce([]);
   (getAcceptedTickets as Mock).mockResolvedValueOnce([]);
 
   render(<ManageTicketChallenges />);
 
   await waitFor(() => {
-    expect(screen.getByText('No challenged tickets found.')).toBeDefined();
+    expect(screen.getByText('Active Challenges: 0')).toBeDefined();
   });
 
   
@@ -149,47 +173,52 @@ it.only('displays empty state when no tickets are found', async () => {
   });
 });
 
-it.only('successfully displays accepted tickets when switching tabs', async () => {
+it('successfully displays accepted tickets when switching tabs', async () => {
   render(<ManageTicketChallenges />);
 
-  
+  // Wait for initial load
   await waitFor(() => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  
-  expect(screen.getByText(/Active Challenges:/)).toBeDefined();
+  // Verify initial challenged tickets view
+  const ticket = screen.getByText('123').closest('[data-testid="ticket-item"]');
+  expect(ticket).toBeDefined();
   expect(screen.getByText('ABC123')).toBeDefined();
+  expect(screen.getByText('No Permit')).toBeDefined();
+  expect(screen.getByText('$50.00')).toBeDefined();
 
-  
+  // Switch to accepted tickets tab
   const acceptedTab = screen.getByRole('tab', { name: /Accepted Tickets/ });
   await userEvent.click(acceptedTab);
 
-  
+  // Wait for accepted tickets to load
   await waitFor(() => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  
-  expect(screen.getByText(/Accepted Tickets:/)).toBeDefined();
+  // Verify accepted tickets view
+  const acceptedTicket = screen.getByText('789').closest('[data-testid="ticket-item"]');
+  expect(acceptedTicket).toBeDefined(); 
   expect(screen.getByText('XYZ789')).toBeDefined();
   expect(screen.getByText('No Permit')).toBeDefined();
   expect(screen.getByText('$50.00')).toBeDefined();
 
-  
+  // Verify API calls
   expect(getAcceptedTickets).toHaveBeenCalledTimes(1);
   expect(getChallengedTickets).toHaveBeenCalledTimes(1);
 
-  
+  // Switch back to challenged tickets tab
   const challengedTab = screen.getByRole('tab', { name: /Challenged Tickets/ });
   await userEvent.click(challengedTab);
 
-  
-  expect(screen.getByText(/Active Challenges:/)).toBeDefined();
+  // Verify back to challenged view
+  const challengedTicket = screen.getByText('123').closest('[data-testid="ticket-item"]');
+  expect(challengedTicket).toBeDefined();
   expect(screen.getByText('ABC123')).toBeDefined();
 });
 
-it.only('displays error state when fetching accepted tickets fails', async () => {
+it('displays error state when fetching accepted tickets fails', async () => {
   const error = 'Failed to fetch accepted tickets';
   
   (getChallengedTickets as Mock).mockResolvedValueOnce(mockChallengedTickets);

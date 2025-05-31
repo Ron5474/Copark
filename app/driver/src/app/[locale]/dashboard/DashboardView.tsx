@@ -35,7 +35,7 @@ import {
 import CardButton from "./components/cardButton";
 import { useTranslations } from "next-intl";
 import { DashboardContext } from "./context";
-import type { LotGroup, Permit } from "../types";
+import type { LotGroup, Permit, Vehicle } from "../types";
 import { Payment } from "../shared/actions";
 
 export default function DashboardView() {
@@ -48,20 +48,25 @@ export default function DashboardView() {
   const [permits, setPermits] = useState<LotGroup[]>([]);
   const [activePermits, setActivePermits] = useState<Permit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [defaultVehicle, setDefaultVehicle] = useState<Vehicle | null>(null);
+
 
   useEffect(() => {
     const fetchData = async () => {
       const { getLotDetails } = await import("./permitActions");
       const { getMyPermits } = await import("./permitActions");
+      const { getDefaultVehicle } = await import("../vehicle/actions");
 
       try {
-        const [lots, myPermits] = await Promise.all([
+        const [lots, myPermits, vehicle] = await Promise.all([
           getLotDetails(),
           getMyPermits(),
+          getDefaultVehicle(),
         ]);
 
         setPermits(lots);
         setActivePermits(myPermits.active);
+        setDefaultVehicle(vehicle)
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -199,6 +204,26 @@ export default function DashboardView() {
                 );
               })}
             </RadioGroup>
+
+            {defaultVehicle && (
+              <Box
+                sx={{
+                  mt: 1,
+                  px: 2,
+                  py: 1,
+                  backgroundColor: "#e3f2fd",
+                  border: "1px solid #90caf9",
+                  borderRadius: 2,
+                }}
+              >
+                <Typography variant="subtitle2" color="primary.main">
+                  Default Vehicle: 
+                </Typography>
+                <Typography variant="body2">
+                  {defaultVehicle.plate}
+                </Typography>
+              </Box>
+            )}
 
             <Button
               variant="contained"

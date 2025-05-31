@@ -67,7 +67,7 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                       label="CHALLENGED"
                       size="small"
                       sx={{
-                        bgcolor: theme.palette.warning.dark,
+                        bgcolor: '#BA8E23',
                         color: 'white'
                       }}
                     />
@@ -103,7 +103,7 @@ export function ChallengedTickets({ tickets, onTicketsUpdate, onError }: Challen
                 label="CHALLENGED"
                 size="small"
                 sx={{
-                  bgcolor: theme.palette.warning.dark,
+                  bgcolor: '#BA8E23',
                   color: 'white'
                 }}
               />

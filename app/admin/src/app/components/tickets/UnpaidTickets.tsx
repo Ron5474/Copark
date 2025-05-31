@@ -1,7 +1,12 @@
-import { Stack, Box, Typography, useTheme } from '@mui/material'
+import { Box, Typography, useTheme, List, ListItem, ListItemText, Chip, Stack } from '@mui/material'
 import { Ticket } from '@/types'
+import { useState } from 'react'
 
 const getShortId = (jwt: string) => jwt.slice(-8).toUpperCase()
+
+const truncateVehicle = (vehicle: string) => {
+  return vehicle.length > 16 ? `${vehicle.slice(0, 16)}...` : vehicle;
+};
 
 interface UnpaidTicketsProps {
   tickets: Ticket[]
@@ -9,97 +14,175 @@ interface UnpaidTicketsProps {
 
 export function UnpaidTickets({ tickets }: UnpaidTicketsProps) {
   const theme = useTheme()
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
 
   return (
-    <>
-      <Typography sx={{ mb: 2 }}>Unpaid Tickets: {tickets.length}</Typography>
-      <Stack spacing={2}>
-        {tickets.map((ticket) => (
-          <Box
-            key={ticket.id}
-            sx={{
+    <Box sx={{
+      display: 'flex',
+      gap: 3,
+      height: '80vh',
+      maxWidth: '1400px',
+      width: '100%',
+      mx: 'auto',
+      p: 2
+    }}>
+      {/* Left side - List view */}
+      <Box sx={{
+        width: '35%',
+        borderRight: 1,
+        borderColor: 'divider',
+        pl: 1,
+        pr: 2,
+        py: 2
+      }}>
+        <Typography sx={{ mb: 2 }}>Unpaid Tickets: {tickets.length}</Typography>
+        <List sx={{ overflowY: 'auto', maxHeight: '100%' }}>
+          {tickets.map((ticket) => (
+            <ListItem
+              key={ticket.id}
+              onClick={() => setSelectedTicket(ticket)}
+              sx={{
+                cursor: 'pointer',
+                bgcolor: selectedTicket?.id === ticket.id ? '#FFF4E6' : 'transparent',
+                borderRadius: 1,
+                border: selectedTicket?.id === ticket.id
+                  ? `1px solid ${theme.palette.warning.main}`
+                  : `1px solid ${theme.palette.grey[300]}`,
+                mb: 1,
+                '&:hover': {
+                  bgcolor: '#FFF8F0',
+                }
+              }}
+            >
+              <ListItemText
+                primary={
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography component="span" sx={{ fontWeight: 500 }}>
+                      Ticket #{getShortId(ticket.id)}
+                    </Typography>
+                    <Chip
+                      label="UNPAID"
+                      size="small"
+                      sx={{
+                        bgcolor: theme.palette.warning.main,
+                        color: 'white'
+                      }}
+                    />
+                  </Box>
+                }
+                secondary={
+                  <Typography component="div" variant="body2" color="text.secondary">
+                    Vehicle: {truncateVehicle(ticket.vehicle)}
+                    <br />
+                    Fine: ${ticket.fine.toFixed(2)}
+                  </Typography>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+
+      {/* Right side - Detail view */}
+      <Box sx={{ width: '65%', p: 2 }}>
+        {selectedTicket ? (
+          <Box>
+            <Box sx={{
               display: 'flex',
-              flexDirection: 'column',
-              bgcolor: '#FFF4E6',
-              border: `1px solid ${theme.palette.warning.light}20`,
-              p: 3,
-              borderRadius: '15px',
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)'
-              }
-            }}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 3
+            }}>
+              <Typography variant="h5">
+                Ticket #{getShortId(selectedTicket.id)}
+              </Typography>
+              <Chip
+                label="UNPAID"
+                size="small"
+                sx={{
+                  bgcolor: theme.palette.warning.main,
+                  color: 'white'
+                }}
+              />
+            </Box>
+
+            <Stack spacing={3}>
               <Box>
-                <Typography sx={{ fontSize: '20px', fontWeight: 500, color: theme.palette.warning.dark }}>
-                  Ticket #{getShortId(ticket.id)}
-                </Typography>
-                <Typography sx={{ color: theme.palette.warning.main, fontWeight: 600 }}>
-                  {ticket.ticketStatus.toUpperCase()}
-                </Typography>
+                <Typography variant="subtitle2" color="text.secondary">Vehicle</Typography>
+                <Typography>{selectedTicket.vehicle}</Typography>
               </Box>
-            </Box>
 
-            <Box sx={{ mb: 2 }}>
-              <Typography sx={{ mb: 1 }}><strong>Vehicle:</strong> {ticket.vehicle}</Typography>
-              <Typography sx={{ mb: 1 }}><strong>Violation:</strong> {ticket.violation}</Typography>
-              <Typography sx={{ mb: 1 }}><strong>Fine:</strong> ${ticket.fine.toFixed(2)}</Typography>
-              <Typography><strong>Issue Date:</strong> {new Date(ticket.issuedDate).toLocaleDateString()}</Typography>
-            </Box>
-
-            {ticket.note && (
-              <Box sx={{ mb: 2 }}>
-                <Typography sx={{ color: theme.palette.text.secondary, fontWeight: 500, mb: 1 }}>
-                  Note:
-                </Typography>
-                <Typography sx={{ pl: 2 }}>
-                  {ticket.note}
-                </Typography>
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">Violation</Typography>
+                <Typography>{selectedTicket.violation}</Typography>
               </Box>
-            )}
 
-            {ticket.images && (
-              <Box sx={{ mb: 2 }}>
-                <Typography sx={{ color: theme.palette.text.secondary, fontWeight: 500, mb: 1 }}>
-                  Evidence:
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                  {Array.isArray(ticket.images) ? ticket.images.map((image, index) => (
-                    <img
-                      key={index}
-                      src={image}
-                      alt={`Violation evidence ${index + 1}`}
-                      style={{
-                        maxWidth: '200px',
-                        height: 'auto',
-                        borderRadius: '8px'
-                      }}
-                    />
-                  )) : (
-                    <img
-                      src={ticket.images}
-                      alt="Violation evidence"
-                      style={{
-                        maxWidth: '100%',
-                        height: 'auto',
-                        borderRadius: '8px'
-                      }}
-                    />
-                  )}
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">Fine</Typography>
+                <Typography>${selectedTicket.fine.toFixed(2)}</Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">Issue Date</Typography>
+                <Typography>{new Date(selectedTicket.issuedDate).toLocaleDateString()}</Typography>
+              </Box>
+
+              {selectedTicket.note && (
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">Note</Typography>
+                  <Typography sx={{ pl: 0 }}>{selectedTicket.note}</Typography>
                 </Box>
-              </Box>
-            )}
-          </Box>
-        ))}
+              )}
 
-        {tickets.length === 0 && (
-          <Typography variant="body1" textAlign="center">
-            No unpaid tickets found.
-          </Typography>
+              {selectedTicket.images && (
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>Evidence</Typography>
+                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    {Array.isArray(selectedTicket.images) ? (
+                      selectedTicket.images.map((image, index) => (
+                        <img
+                          key={index}
+                          src={image}
+                          alt={`Evidence ${index + 1}`}
+                          style={{
+                            maxWidth: '200px',
+                            height: 'auto',
+                            borderRadius: '8px'
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <img
+                        src={selectedTicket.images}
+                        alt="Evidence"
+                        style={{
+                          maxWidth: '200px',
+                          height: 'auto',
+                          borderRadius: '8px'
+                        }}
+                      />
+                    )}
+                  </Box>
+                </Box>
+              )}
+            </Stack>
+          </Box>
+        ) : (
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+            gap: 2
+          }}>
+            <Typography variant="h6" color="text.secondary">No Ticket Selected</Typography>
+            <Typography color="text.secondary">
+              Select a ticket from the list to view its details
+            </Typography>
+          </Box>
         )}
-      </Stack>
-    </>
+      </Box>
+    </Box>
   )
 }

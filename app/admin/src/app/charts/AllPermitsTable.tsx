@@ -20,13 +20,27 @@ export default function AllPermitsTable() {
   const [permits, setPermits] = useState<Permit[]>([])
   const [activeOnly, setActiveOnly] = useState(true)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     setLoading(true)
+    setError(null)
     getAllPermits(activeOnly)
       .then(setPermits)
+      .catch(err => {
+        void err;
+        setError('Failed to fetch permit data')
+      })
       .finally(() => setLoading(false))
   }, [activeOnly])
+
+  if (error) {
+    return (
+      <Box>
+        <Typography color="error">Error: {error}</Typography>
+      </Box>
+    )
+  }
 
   return (
     <Box>

@@ -15,6 +15,7 @@ export default defineConfig({
         'src/app/layout.tsx',
         'src/**/index.ts',
         '**/types.ts', 
+        '**/PermitReport.tsx',
       ],
     },
   },

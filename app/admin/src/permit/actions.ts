@@ -149,11 +149,6 @@ export async function getAllPermits(activeOnly = true): Promise<Permit[]> {
   });
 
   const result = await response.json();
-
-  if (result.errors) {
-    throw new Error(result.errors[0].message);
-  }
-
   return result.data.allPermits;
 }
 

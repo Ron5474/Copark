@@ -415,3 +415,23 @@ test('Admin can get a list of API users', async () => {
   expect(apiUsers[0]).toHaveProperty('email')
   expect(apiUsers[0]).toHaveProperty('role')
 })
+
+test('Admin can generate a report with ticket and permit summary', async () => {
+  const token = await loginAsAdmin();
+
+  const query = `
+    query {
+      generateReport
+    }
+  `;
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query })
+    .expect(200);
+
+  expect(response.body.errors).toBeUndefined();
+  expect(response.body.data.generateReport).toBeDefined();
+  expect(typeof response.body.data.generateReport).toBe('string');
+});

@@ -6,7 +6,7 @@ CREATE TABLE vehicle(
     data JSONB NOT NULL
 );
 
-CREATE UNIQUE INDEX unique_plate_state
+CREATE INDEX plate_state
   ON vehicle (
     LOWER(data->>'plate'),
     LOWER(data->>'state')

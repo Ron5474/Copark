@@ -125,6 +125,12 @@ export class NewLot {
 }
 
 @ObjectType()
+export class permitId {
+  @Field(() => ID)
+  id!: string
+}
+
+@ObjectType()
 export class Receipt {
 
   @Field(() => Number)

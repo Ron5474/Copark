@@ -296,10 +296,14 @@ test:permitService:
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
-    - cd microservice/PermitService
-    - rm -rf node_modules build
-    - npm ci
-    - npm run test
+
+    - cd microservice/AuthService && npm install
+    - npm run swagger
+
+    - echo "// dummy file to avoid import error" > microservice/PermitService/express.js
+    - cd ../../microservice/PermitService && rm -rf node_modules build
+    - cd ../../microservice/PermitService && npm ci
+    - cd ../../microservice/PermitService && npm run test
   rules:
     - changes: 
       - microservice/PermitService/**/*

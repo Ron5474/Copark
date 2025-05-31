@@ -191,7 +191,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                 {vehicles.map((v, i) => (
                   <FormControlLabel
                     key={i}
-                    value={v.state + ' ' + v.plate}
+                    value={v.id}
                     control={<Radio sx={{ transform: 'scale(1.2)' }} />}
                     label={
                       <Box sx={{ display: 'flex', flexDirection: 'column', ml: 1}}>

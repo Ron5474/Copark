@@ -32,6 +32,7 @@ export default function Review() {
 
   const checkout = async () => {
     const amount: number = parseFloat((price + serviceFee).toFixed(2))*100 // in cents
+    console.log(vehicle)
     const permitDetails = {
       type: "permit",
       vehicle: JSON.stringify(vehicle),

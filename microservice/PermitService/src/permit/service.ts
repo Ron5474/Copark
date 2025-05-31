@@ -18,6 +18,7 @@ import {
   Zone,
   ZoneInput,
   PermitReport,
+  permitId,
 } from './schema'
 
 
@@ -728,5 +729,22 @@ export class PermitService {
       openTime: data.weekday?.openTime || '00:00',
       closeTime: data.weekday?.closeTime || '23:59'
     }]
+  }
+
+  public async expirePermits(vehicleId: string): Promise<permitId[]> {
+    if (!vehicleId) {
+      throw new Error('Vehicle ID is required');
+    }
+    const result = await pool.query(
+      `UPDATE permit SET data = jsonb_set(data, '{expireDate}', to_jsonb(NOW())) WHERE vehicle = $1 RETURNING id`,
+      [vehicleId]
+    );
+
+    if (result.rowCount === 0) {
+      return [];
+    }
+    return result.rows.map(row => ({
+      id: row.id,
+    }));
   }
 }

@@ -106,7 +106,8 @@ export class VehicleService {
   //   )
   //   return {rowCount: res.rows.length, rows: res.rows};
   // }
-  private async vehicleExists(plate: string, state: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
+  private async vehicleExists(plate: string, state: string, userID?: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
+    if (!userID) {
     const res = await pool.query(
       `SELECT id
         FROM vehicle
@@ -114,14 +115,30 @@ export class VehicleService {
             AND LOWER(data->>'state') = LOWER($2)
             AND data->>'deleted' IS NULL`,
       [plate, state]
-    )
+    );
+
     return {rowCount: res.rows.length, rows: res.rows};
+  } else {
+    const res = await pool.query(
+      `SELECT id
+        FROM vehicle
+          WHERE LOWER(data->>'plate') = LOWER($1)
+            AND LOWER(data->>'state') = LOWER($2)
+            AND driver = $3
+            AND data->>'deleted' IS NULL`,
+      [plate, state, userID]
+    );
+
+    return {rowCount: res.rows.length, rows: res.rows};
+  }
   }
 
   public async removeVehicle(plate: string, state: string, userId: string, token: string): Promise<VehicleID> {
-    const existing = await this.vehicleExists(plate, state)
-
+    const existing = await this.vehicleExists(plate, state, userId)
     if ((existing?.rowCount ?? 0) === 0) {
+      throw new Error('Vehicle not found or not owned by user')
+    }
+    if (!existing) {
       throw new Error('Vehicle not found or not owned by user')
     }
 
@@ -151,14 +168,14 @@ export class VehicleService {
       },
       body: JSON.stringify({
         query: `
-          query GetPendingTickets($plate: String!) {
-            pendingTickets(plate: $plate) {
+          query GetPendingTickets($plate: String!, $state: String!) {
+            pendingTickets(plate: $plate, state: $state) {
               id,
               vehicle
             }
           }
         `,
-        variables: { plate }
+        variables: { plate, state }
       })
       
     });
@@ -168,12 +185,37 @@ export class VehicleService {
       throw new Error('Vehicle cannot be removed because it has pending tickets');
     }
 
+    // expire permits on this vehicle
+    const expirePermits = await fetch(`http://localhost:4003/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        query: `
+          mutation ExpirePermits($vehicleId: String!) {
+            expirePermits(vehicleId: $vehicleId) {
+              id
+            }
+          }
+        `,
+        variables: { vehicleId: existing.rows[0].id }
+      })
+    });
+    const expirePermitsData = await expirePermits.json();
+    if (expirePermitsData.errors) {
+      console.error('Error expiring permits: ', expirePermitsData.errors);
+      throw new Error('Failed to expire permits. Please try again later.');
+    }
+    
+
     const res = await pool.query(
       `UPDATE vehicle
         SET data = jsonb_set(data, '{deleted}', to_jsonb(NOW()))
           WHERE LOWER(data->>'plate') = LOWER($1)
             AND LOWER(data->>'state') = LOWER($2)
-            AND driver = $2 RETURNING id`,
+            AND driver = $3 RETURNING id`,
       [plate, state, userId]
     )
     if (res.rowCount === 0) {
@@ -329,6 +371,8 @@ export class VehicleService {
   //     nickname: row.data.nickname
   //   }
   // }
+
+
   public async findVehicleByPlate(
     plate: string,
     state: string

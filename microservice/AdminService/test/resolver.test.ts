@@ -413,7 +413,7 @@ test('Admin can generate a report with ticket and permit summary', async () => {
 
   const query = `
     query {
-      generateReport
+      generateReport(numDays: 30)
     }
   `;
 

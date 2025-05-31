@@ -209,16 +209,16 @@
     "add": {
       "add Vehicle": "Agregar vehículo",
       "license": {
-              "label": "Número de matrícula",
-              "required": "Se requiere el número de matrícula",
-              "constraint": "Debe tener entre 1 y 10 caracteres"
-            },
-            "country": "País",
-            "state": "Estado",
-            "nickname": "Apodo del vehículo",
-            "optional": "opcional",
-            "save": "Ahorrar"
+        "label": "Número de matrícula",
+        "required": "Se requiere el número de matrícula",
+        "constraint": "Debe tener entre 1 y 10 caracteres"
       },
+      "country": "País",
+      "state": "Estado",
+      "nickname": "Apodo del vehículo",
+      "optional": "opcional",
+      "save": "Ahorrar"
+    },
     "checkout": {
       "title": "¿Qué vehículo?",
       "continue": "Continuar"

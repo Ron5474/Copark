@@ -1,9 +1,12 @@
 import type React from "react"
-import { Container, Typography, Grid, Box, Button } from "@mui/material"
-import { DirectionsCar, ConfirmationNumber, ArrowForward, Smartphone } from "@mui/icons-material"
+import { Container, Typography, Grid, Box, } from "@mui/material"
+import { DirectionsCar, ConfirmationNumber,  Smartphone } from "@mui/icons-material"
 
+type Props = {
+  cta?: React.ReactNode
+}
 
-function HowItWorksSection() {
+function HowItWorksSection({ cta }: Props) {
   const steps = [
     {
       icon: <Smartphone sx={{ fontSize: 32, color: "#00BFA5" }} />,
@@ -23,7 +26,7 @@ function HowItWorksSection() {
   ]
 
   return (
-    <Box id="how-it-works" sx={{ py: 12, bgcolor: "grey.50" }}>
+    <Box id="how-it-works" sx={{ py: 12, bgcolor: "background.default" }}>
       <Container maxWidth="lg">
         <Box sx={{ textAlign: "center", mb: 8 }}>
           <Typography variant="h2" sx={{ mb: 2, fontSize: { xs: "2rem", md: "3rem" } }}>
@@ -63,21 +66,7 @@ function HowItWorksSection() {
           ))}
         </Grid>
         <Box sx={{ textAlign: "center", mt: 6 }}>
-          <Button
-            variant="contained"
-            size="large"
-            endIcon={<ArrowForward />}
-            sx={{
-                backgroundColor: "black",
-                color: "white",
-                "&:hover": {
-                backgroundColor: "#333",
-                },
-                px: 4,
-            }}
-          >
-            Get Started
-          </Button>
+          {cta}
         </Box>
       </Container>
     </Box>

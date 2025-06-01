@@ -24,14 +24,14 @@ function TestimonialSection() {
   ]
 
   return (
-    <Box id="testimonials" sx={{ py: 12, bgcolor: "grey.50" }}>
+    <Box id="testimonials" sx={{ py: 12, bgcolor: "background.default" }}>
       <Container maxWidth="lg">
         <Box sx={{ textAlign: "center", mb: 8 }}>
           <Typography variant="h2" sx={{ mb: 2, fontSize: { xs: "2rem", md: "3rem" } }}>
             What Our Users Say
           </Typography>
           <Typography variant="h6" sx={{ color: "text.secondary", maxWidth: 700, mx: "auto" }}>
-            Thousands of users trust CoPark for their parking permit needs. Here&apos;s what they have to say.
+            Users trust CoPark for their parking permit needs. Here&apos;s what they have to say.
           </Typography>
         </Box>
         <Grid container spacing={4}>

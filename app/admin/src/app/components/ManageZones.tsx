@@ -26,7 +26,7 @@ export default function ManageZones() {
     closeTime: '18:00'
   });
   const [error, setError] = useState<string>('');
-  const [editZone, setEditZone] = useState<Zone | null>(null);
+  const [editZone, setEditZone] = useState<Zone | undefined>();
   const [editDialog, setEditDialog] = useState(false);
 
   useEffect(() => {
@@ -54,26 +54,25 @@ export default function ManageZones() {
       }
     } catch (err) {
       void err;
-      setError(err instanceof Error ? err.message : 'Failed to create zone');
+      setError('Failed to create zone');
     }
   };
 
   const handleUpdateZone = async () => {
-    if (!editZone) return;
-    
     try {
       await updateZonePrice({
-        zone: editZone.zone,
-        hourly: editZone.hourly,
-        maxDuration: editZone.maxDuration,
-        openTime: editZone.openTime,
-        closeTime: editZone.closeTime
+        zone: editZone!.zone,
+        hourly: editZone!.hourly,
+        maxDuration: editZone!.maxDuration,
+        openTime: editZone!.openTime,
+        closeTime: editZone!.closeTime
       });
       setEditDialog(false);
       fetchZones();
-      setEditZone(null);
+      setEditZone(undefined);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update zone');
+      void err;
+      setError('Failed to update zone');
     }
   };
 
@@ -281,10 +280,14 @@ export default function ManageZones() {
               label="Hourly Rate"
               type="number"
               value={editZone?.hourly || 0}
-              onChange={(e) => setEditZone(editZone ? {
-                ...editZone,
-                hourly: parseFloat(e.target.value)
-              } : null)}
+              onChange={(e) => {
+                if (editZone) {
+                  setEditZone({
+                    ...editZone,
+                    hourly: parseFloat(e.target.value)
+                  });
+                }
+              }}
               fullWidth
             />
             <Box sx={{ display: 'flex', gap: 2 }}>
@@ -292,29 +295,41 @@ export default function ManageZones() {
                 label="Max Hours"
                 type="number"
                 value={editZone?.maxDuration.hours || 0}
-                onChange={(e) => setEditZone(editZone ? {
-                  ...editZone,
-                  maxDuration: {...editZone.maxDuration, hours: parseInt(e.target.value)}
-                } : null)}
+                onChange={(e) => {
+                  if (editZone) {
+                    setEditZone({
+                      ...editZone,
+                      maxDuration: {...editZone.maxDuration, hours: parseInt(e.target.value)}
+                    });
+                  }
+                }}
               />
               <TextField
                 label="Max Minutes"
-                type="number"
+                type="number" 
                 value={editZone?.maxDuration.minutes || 0}
-                onChange={(e) => setEditZone(editZone ? {
-                  ...editZone,
-                  maxDuration: {...editZone.maxDuration, minutes: parseInt(e.target.value)}
-                } : null)}
+                onChange={(e) => {
+                  if (editZone) {
+                    setEditZone({
+                      ...editZone,
+                      maxDuration: {...editZone.maxDuration, minutes: parseInt(e.target.value)}
+                    });
+                  }
+                }}
               />
             </Box>
             <TextField
               label="Open Time"
               type="time"
               value={editZone?.openTime || ''}
-              onChange={(e) => setEditZone(editZone ? {
-                ...editZone,
-                openTime: e.target.value
-              } : null)}
+              onChange={(e) => {
+                if (editZone) {
+                  setEditZone({
+                    ...editZone,
+                    openTime: e.target.value
+                  });
+                }
+              }}
               fullWidth
               InputLabelProps={{ shrink: true }}
             />
@@ -322,10 +337,14 @@ export default function ManageZones() {
               label="Close Time"
               type="time"
               value={editZone?.closeTime || ''}
-              onChange={(e) => setEditZone(editZone ? {
-                ...editZone,
-                closeTime: e.target.value
-              } : null)}
+              onChange={(e) => {
+                if (editZone) {
+                  setEditZone({
+                    ...editZone,
+                    closeTime: e.target.value
+                  });
+                }
+              }}
               fullWidth
               InputLabelProps={{ shrink: true }}
             />

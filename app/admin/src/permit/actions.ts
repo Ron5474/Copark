@@ -282,7 +282,7 @@ export async function getAllLotDetails(): Promise<LotGroup[]> {
     body: JSON.stringify({
       query: `
         query {
-          allLotDetails {
+          getLots {
             id
             title
             lots {
@@ -301,6 +301,6 @@ export async function getAllLotDetails(): Promise<LotGroup[]> {
     throw new Error(result.errors[0].message);
   }
 
-  return result.data.allLotDetails;
+  return result.data.getLots;
 }
 

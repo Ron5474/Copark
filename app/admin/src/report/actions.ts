@@ -1,4 +1,19 @@
-export async function fetchAdminReport(token: string, numDays: number): Promise<string> {
+import { cookies } from 'next/headers';
+
+const getAuthToken = async () => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('session')?.value;
+  return token;
+};
+
+export async function fetchAdminReport(numDays: number): Promise<string| undefined> {
+
+    const token = await getAuthToken();
+    if (!token) {
+      alert('No auth token found.');
+      return undefined;
+    }
+
   const response = await fetch('http://localhost:4000/graphql', {
     method: 'POST',
     headers: {

@@ -24,8 +24,8 @@ function wrapTextPreservingNewlines(text: string, maxCharsPerLine: number): stri
 }
 
 export async function generatePdf(
-  ticketData: TicketReport,
-  permitData: PermitReport,
+  ticketInfo: TicketReport,
+  permitInfo: PermitReport,
   numDays: number,
 ): Promise<string> {
   const pdfDoc = await PDFDocument.create();
@@ -50,8 +50,6 @@ page.drawText(dateRangeText, {
 y -= 40;
 
 //   console.log(ticketInfo, permitInfo);
-  const ticketInfo = ticketData.data.adminTicketReport;
-  const permitInfo = permitData.data.adminPermitReport;
   const ticketStatements: string[] = [
     `Ticket Summary:`,
     `Total Tickets: ${ticketInfo.totalTickets}`,

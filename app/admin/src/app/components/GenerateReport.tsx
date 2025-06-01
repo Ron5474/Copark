@@ -10,22 +10,15 @@ const downloadBase64Pdf = (base64: string) => {
 };
 
 
-const getAuthToken = async () => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('session')?.value;
-  return token;
-};
-
 export default function GenerateReportButton() {
   const [numDays, setNumDays] = useState(30);
 
   const handleClick = async () => {
-    const token = await getAuthToken();
-    if (!token) {
-      alert('No auth token found.');
+    const base64 = await fetchAdminReport(numDays);
+    if (!base64) {
+      alert('Failed to generate report. Please try again.');
       return;
     }
-    const base64 = await fetchAdminReport(token, numDays);
     downloadBase64Pdf(base64);
   };
 

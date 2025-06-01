@@ -148,7 +148,7 @@ export class AdminResolver {
     const permitJson = await permitRes.json()
     // console.log(permitJson)
 
-    const pdf = await generatePdf(ticketJson, permitJson, numDays)
+    const pdf = await generatePdf(ticketJson.data.adminTicketReport, permitJson.data.adminPermitReport, numDays)
 
     console.log(pdf)
     return pdf;

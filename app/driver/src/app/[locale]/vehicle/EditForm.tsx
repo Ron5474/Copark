@@ -160,7 +160,7 @@ export default function EditForm({ vehicle, close }: { vehicle: Vehicle, close: 
             await deleteVehicle(vehicle.plate, vehicle.state)
             close()
           } catch (error) {
-            setErrorMessage("Error deleting vehicle: " + error.message)
+            setErrorMessage("Error deleting vehicle: " + (error instanceof Error ? error.message : 'Unknown error'))
             setDeleting(false)
           }
         }}

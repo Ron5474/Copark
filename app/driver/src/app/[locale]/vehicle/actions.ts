@@ -136,8 +136,11 @@ export const editVehicle = async (vehicleEdit: EditVehicle): Promise<Vehicle> =>
   }
 }
 
-export const deleteVehicle = async (plate: string, state: string): Promise<boolean> => {
+export const deleteVehicle = async (plate: string, state?: string): Promise<boolean> => {
   try {
+    if (!plate || !state) {
+      throw new Error('Plate and state are required to delete a vehicle')
+    }
     const token = await getAuthToken()
 
     const response = await fetch(API_URL, {

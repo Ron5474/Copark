@@ -1,8 +1,6 @@
 import express, { Express } from 'express'
 import path from 'path'
-// import { createHandler } from 'graphql-http/lib/use/express'
-import * as graphqlHttp from "graphql-http/lib/use/express"
-const { createHandler } = graphqlHttp
+import { createHandler } from 'graphql-http/lib/use/express'
 import { renderPlaygroundPage } from 'graphql-playground-html'
 import 'reflect-metadata'
 import { buildSchema } from 'type-graphql'

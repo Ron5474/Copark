@@ -17,6 +17,7 @@ export default function Home({ onNavigate, children }: HomeProps) {
     { label: 'Manage Tickets', component: 'tickets' },
     { label: 'Manage Zones', component: 'zones' },
     { label: 'Generate Reports', component: 'reports' },
+    { label: 'Download PDF', component: 'pdf' }
   ];
 
   const drawerWidth = 240;

@@ -195,7 +195,7 @@ test('modifyTicket should throw an error when ticket ID does not match any recor
 
     await expect(ticketService.modifyTicket(modifiedTicket))
         .rejects
-        .toThrow('Ticket not found.');
+        .toThrow('Invalid or missing ticket ID');
 });
 
 test('deleteTicket should successfully delete a ticket', async () => {

@@ -1,7 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { Vehicle } from '../types'
+import { Vehicle, EditVehicle } from '../types'
 
 const API_URL = 'http://localhost:4001/graphql'
 
@@ -91,6 +91,47 @@ export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
     return result.data.registerVehicle
   } catch (error) {
     console.error('Error adding vehicle:', error)
+    throw error
+  }
+}
+
+export const editVehicle = async (vehicleEdit: EditVehicle): Promise<Vehicle> => {
+  try {
+    const token = await getAuthToken()
+
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation UpdateVehicle($input: UpdateVehicleInput!) {
+            updateVehicle(input: $input) {
+              id
+              plate
+              country
+              state
+              nickname
+            }
+          }
+        `,
+        variables: {
+          input: vehicleEdit,
+        },
+      }),
+    })
+
+    const result = await response.json()
+
+    if (result.errors) {
+      throw new Error('Failed to edit vehicle')
+    }
+
+    return result.data.registerVehicle
+  } catch (error) {
+    console.error('Error editing vehicle:', error)
     throw error
   }
 }

@@ -43,6 +43,9 @@ it('renders PermitCard after successful permit check', async () => {
   const user = userEvent.setup()
 
   await user.type(screen.getByLabelText('License Plate'), 'ABC123')
+  const field = screen.getByLabelText('Select a state')
+  await user.click(field)
+  await user.click(screen.getByText('California'))
   await user.click(screen.getByLabelText('Search License Plate'))
 
   await waitFor(() => {
@@ -65,6 +68,9 @@ it('renders No Permit Found', async () => {
   const user = userEvent.setup()
 
   await user.type(screen.getByLabelText('License Plate'), 'BAD999')
+  const field = screen.getByLabelText('Select a state')
+  await user.click(field)
+  await user.click(screen.getByText('California'))
   await user.click(screen.getByLabelText('Search License Plate'))
 
   await waitFor(() => {
@@ -96,7 +102,7 @@ it('throws if no session token is found', async () => {
 
   mockCookies.get.mockImplementationOnce(() => undefined)
 
-  await expect(() => checkPermit('NOAUTH')).rejects.toThrow(
+  await expect(() => checkPermit('NOAUTH', 'Some State')).rejects.toThrow(
     'Unauthorized: Missing session token'
   )
 })

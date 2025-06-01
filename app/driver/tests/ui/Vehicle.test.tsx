@@ -97,18 +97,21 @@ afterEach(() => {
 beforeEach(() => {
   vi.mocked(getVehicles).mockResolvedValue([
     {
+      id: '1',
       plate: 'ABC123',
       country: 'United States',
       state: 'California',
       nickname: 'My Car',
     },
     {
+      id: '2',
       plate: 'XYZ789',
       country: 'United States',
       state: 'New York',
       nickname: 'Work Car',
     },
     {
+      id: '3',
       plate: 'C0P4RK',
       country: 'United States',
       state: 'California',
@@ -210,7 +213,7 @@ it('Open and close AddForm dialog', async () => {
   if (backdrop) {
     await user.click(backdrop)
   }
-  await user.click(await screen.findByLabelText("Close vehicle form"))
+  await user.click(await screen.findByLabelText("Close form to add vehicle"))
 
   expect(screen.queryByLabelText("Submit vehicle")).toBeNull()
 })
@@ -250,13 +253,13 @@ it('Error if vehicle unchosen', async () => {
   expect(await screen.findByText('Please select a vehicle')).toBeDefined()
 })
 
-it('Edit vehicle button', async () => { // TODO edit this after edit vehicle is integrated
+it('Edit vehicle button', async () => {
   render(<MemberVehicle />)
   const user = userEvent.setup()
   await user.click(await screen.findByText("C0P4RK"))
   await user.click(await screen.findByText('Edit'))
 
-  expect(await screen.findByText('Your Vehicles')).toBeDefined()
+  expect(await screen.findByLabelText('Save changes')).toBeDefined()
 })
 
 it('Continues to next page', async () => {

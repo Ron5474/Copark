@@ -23,6 +23,7 @@ import CloseIcon from '@mui/icons-material/Close'
 
 import ZoneContext from '../../zone/Context'
 import AddForm from '../AddForm'
+import EditForm from '../EditForm'
 import Loader from '../../shared/Loader'
 import theme from '../../theme'
 import { Vehicle } from '../../types'
@@ -32,9 +33,11 @@ import { useTranslations } from 'next-intl'
 
 export default function MemberVehicles({ isCheckout = false }: { isCheckout?: boolean }) {
   const { setVehicle, next } = useContext(ZoneContext)
-  const [open, setOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [selectedVID, setSelectedVID] = useState<string | null>(null)
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null)
   const [isValidSelection, setIsValidSelection] = useState<boolean>(true)
   const [loading, setLoading] = useState(true)
   const t = useTranslations('garage')
@@ -59,19 +62,30 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
     })()
   }, [setSelectedVID, isCheckout])
 
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  const handleAddOpen = () => setAddOpen(true)
+  const handleAddClose = () => setAddOpen(false)
   const handleAdd = async () => {
-    setOpen(false)
+    setAddOpen(false)
     setLoading(true)
     setVehicles(await getVehicles())
+    setLoading(false)
+  }
+
+  const handleEditOpen = () => setEditOpen(true)
+  const handleEditClose = () => setEditOpen(false)
+  const handleEdit = async () => {
+    const res = await getVehicles()
+    setEditOpen(false)
+    setLoading(true)
+    setVehicles(res)
+    setSelectedVehicle(res.find((v: Vehicle) => v.id === (selectedVehicle as Vehicle).id) || null)
     setLoading(false)
   }
 
   const setDefaultVehicle = async (vid: string) => {
     const vehicle = vehicles.find(v => v.id === vid)
     if (vehicle && vehicle.id) {
-      // Assuming you have a function to set the default vehicle
+
       await updateDefaultVehicle(vehicle.id)
       setVehicles(await getVehicles())
     }
@@ -82,11 +96,12 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
       setIsValidSelection(false)
       return
     }
-    setVehicle(vehicles.find((v: Vehicle) => v.id === selectedVID))
+
     if (isCheckout)
       next()
-    else
-      console.log("edit")
+    else {
+      handleEditOpen()
+    }
   }
 
   return (
@@ -107,7 +122,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
           {isCheckout ? t("checkout.title") : t("title") }
         </Typography>
         <Button
-          onClick={handleOpen}
+          onClick={handleAddOpen}
           aria-label='Add a vehicle'
           sx={{
             padding: '8px 16px',
@@ -121,18 +136,18 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
         >
           + {t("add vehicle")}
         </Button>
-        {open && (
+        {(addOpen && (
           <Dialog
-            open={open}
+            open={addOpen}
             onClose={(event, reason) => {
-              if (reason !== 'backdropClick') handleClose()
+              if (reason !== 'backdropClick') handleAddClose()
             }}
             fullWidth
           >
             <DialogContent sx={{ p: 1, pb: 2, position: 'relative' }}>
               <IconButton
-                onClick={handleClose}
-                aria-label="Close vehicle form"
+                onClick={handleAddClose}
+                aria-label="Close form to edit vehicle"
                 sx={{
                   position: 'absolute',
                   top: 8,
@@ -149,7 +164,35 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
               <AddForm close={handleAdd}/>
             </DialogContent>
           </Dialog>
-        )}
+        )) || (editOpen && (
+          <Dialog
+            open={editOpen}
+            onClose={(event, reason) => {
+              if (reason !== 'backdropClick') handleEditClose()
+            }}
+            fullWidth
+          >
+            <DialogContent sx={{ p: 1, pb: 2, position: 'relative' }}>
+              <IconButton
+                onClick={handleEditClose}
+                aria-label="Close form to add vehicle"
+                sx={{
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                  zIndex: 1,
+                  backgroundColor: 'white',
+                  '&:hover': {
+                    backgroundColor: '#f0f0f0',
+                  },
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+              <EditForm close={handleEdit} vehicle={selectedVehicle as Vehicle}/>
+            </DialogContent>
+          </Dialog>
+        ))}
       </Box>
       <Box
         sx={{
@@ -185,6 +228,9 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                 value={selectedVID}
                 onChange={(event) => {
                   setSelectedVID(event.target.value)
+                  console.log("SELECTED:", event.target.value)
+                  setVehicle(vehicles.find((v: Vehicle) => v.id === event.target.value) as Vehicle)
+                  setSelectedVehicle(vehicles.find((v: Vehicle) => v.id === event.target.value) as Vehicle)
                   setIsValidSelection(true)
                 }}
               >
@@ -286,7 +332,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
               {t("prompt")}
             </Typography>
             <Button
-              onClick={handleOpen}
+              onClick={handleAddOpen}
               aria-label='Add a vehicle'
               sx={{
                 width: '100%',

@@ -25,7 +25,7 @@
       "install-payroll": "cd api/payroll && npm install",
       "install-registrar": "cd api/registrar && npm install",
       "install-emailService": "cd microservice/EmailService && npm install",
-      "install-pictureService": "cd microservice/EmailService && npm install",
+      "install-pictureService": "cd microservice/PictureService && npm install",
       "cis": "npm ci && npm run ci-auth && npm run ci-adminService && npm run ci-ticketService && npm run ci-vehicleService && npm run ci-permitService && npm run ci-admin && npm run ci-enforcement && npm run ci-driver && npm run ci-marketing && npm run ci-helloworld && npm run ci-campusPolice && npm run ci-payroll && npm run ci-registrar && npm run ci-paymentService && npm run ci-emailService && npm run ci-pictureService",
       "ci-auth": "cd microservice/AuthService && npm ci",
       "ci-adminService": "cd microservice/AdminService && npm ci",

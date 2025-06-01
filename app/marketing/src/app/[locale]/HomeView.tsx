@@ -13,6 +13,11 @@ import GetStartedButton from "./components/GetStartedButton";
 import HowToUseCard from "./components/UseCard";
 import { useTranslations } from "next-intl";
 import theme from "./theme";
+import TestimonialSection from "./components/TestimonialSection";
+import PricingSection from "./components/PermitOptionsSection";
+import HowItWorksSection from "./components/HowItWorksSection";
+import HeroSection from "./components/HeroSection";
+import FeaturesSection from "./components/FeaturesSection";
 
 function HomeView() {
   const t = useTranslations("landingPage");
@@ -101,6 +106,11 @@ function HomeView() {
       <HowToUseCard number={6} image="/assets/howV1.jpeg" description={t('How to use step 6')} variant="primary"/>
       </Box>
       </Box>
+      <HeroSection/>
+      <FeaturesSection/>
+      <HowItWorksSection/>
+      <PricingSection/>
+      <TestimonialSection/>
       <Footer />
     </Box>
     </>

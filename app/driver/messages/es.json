@@ -223,12 +223,21 @@
       "title": "¿Qué vehículo?",
       "continue": "Continuar"
     },
-    "delete": "Borrar",
+    "edit": {
+      "delete": "Borrar",
+      "warning": {
+        "title": "Advertencia",
+        "message": "La eliminación de su vehículo expirará automáticamente todos los permisos asociados y no será reembolsable."
+      },
+      "cancel": "Cancelar",
+      "edit": "Editar vehículo",
+      "nickname": "Apodo del vehículo",
+      "save": "Ahorrar"
+    },
     "title": "Sus vehículos",
     "add vehicle": "Agregar vehículo",
     "subtitle": "Preferencia de vehículo",
     "default": "por defecto",
-    "edit": "Editar vehículo",
     "noVehicles": "No hay vehículos todavía",
     "prompt": "Añade la información de tu vehículo para comenzar a estacionar",
     "setDefault": "Establecer como vehículo predeterminado",

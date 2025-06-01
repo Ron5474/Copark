@@ -1,27 +1,30 @@
 import type React from "react"
-import { Container, Typography, Grid, Box, } from "@mui/material"
-import { DirectionsCar, ConfirmationNumber,  Smartphone } from "@mui/icons-material"
+import { Container, Typography, Grid, Box } from "@mui/material"
+import { DirectionsCar, ConfirmationNumber, Smartphone } from "@mui/icons-material"
+import { useTranslations } from "next-intl"
 
 type Props = {
   cta?: React.ReactNode
 }
 
 function HowItWorksSection({ cta }: Props) {
+  const t = useTranslations("HowItWorksSection")
+
   const steps = [
     {
       icon: <Smartphone sx={{ fontSize: 32, color: "#00BFA5" }} />,
-      title: "1. Sign Up",
-      description: "Create your CoPark account using your email.",
+      title: t("step1.title"),
+      description: t("step1.description"),
     },
     {
       icon: <DirectionsCar sx={{ fontSize: 32, color: "#00BFA5" }} />,
-      title: "2. Add Your Vehicle",
-      description: "Enter your vehicle details and create a nickname for easy identification.",
+      title: t("step2.title"),
+      description: t("step2.description"),
     },
     {
-      icon: <ConfirmationNumber sx={{ fontSize: 32, color: "#00BFA5"}} />,
-      title: "3. Purchase Permits",
-      description: "Select your preferred permit type and complete your purchase with one click.",
+      icon: <ConfirmationNumber sx={{ fontSize: 32, color: "#00BFA5" }} />,
+      title: t("step3.title"),
+      description: t("step3.description"),
     },
   ]
 
@@ -30,10 +33,10 @@ function HowItWorksSection({ cta }: Props) {
       <Container maxWidth="lg">
         <Box sx={{ textAlign: "center", mb: 8 }}>
           <Typography variant="h2" sx={{ mb: 2, fontSize: { xs: "2rem", md: "3rem" } }}>
-            How CoPark Works
+            {t("heading")}
           </Typography>
           <Typography variant="h6" sx={{ color: "text.secondary", maxWidth: 700, mx: "auto" }}>
-            Getting started with CoPark is quick and easy. Follow these simple steps to manage your parking permits.
+            {t("subheading")}
           </Typography>
         </Box>
         <Grid container spacing={6}>

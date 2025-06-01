@@ -106,7 +106,7 @@ export class VehicleService {
   //   )
   //   return {rowCount: res.rows.length, rows: res.rows};
   // }
-  private async vehicleExists(plate: string, state: string, userID?: string): Promise<{ rowCount: number, rows: { id: string }[] } | null> {
+  private async vehicleExists(plate: string, state: string, userID?: string): Promise<{ rowCount: number, rows: { id: string }[] }> {
     if (!userID) {
     const res = await pool.query(
       `SELECT id
@@ -138,9 +138,9 @@ export class VehicleService {
     if ((existing?.rowCount ?? 0) === 0) {
       throw new Error('Vehicle not found or not owned by user')
     }
-    if (!existing) {
-      throw new Error('Vehicle not found or not owned by user')
-    }
+    // if (!existing) {
+    //   throw new Error('Vehicle not found or not owned by user')
+    // }
 
     const vehicles = await this.getMyVehicles(userId)
     
@@ -151,11 +151,7 @@ export class VehicleService {
       const defaultVehicle = await this.getDefaultVehicleId(userId)
       if (defaultVehicle?.plate === plate) {
         const removed = vehicles.filter(row => row.id !== defaultVehicle.id)
-        if (!removed || removed?.length === 0) {
-          throw new Error('Cannot delete the only default vehicle. Please add another vehicle as default first.')
-        } else {
           await this.setDefaultVehicle({ id: removed[0].id }, userId)
-        }
       }
     }
 
@@ -186,7 +182,7 @@ export class VehicleService {
     }
     
     // expire permits on this vehicle
-    const expirePermits = await fetch(`http://localhost:4003/graphql`, {
+    await fetch(`http://localhost:4003/graphql`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -203,11 +199,11 @@ export class VehicleService {
         variables: { vehicleId: existing.rows[0].id }
       })
     });
-    const expirePermitsData = await expirePermits.json();
-    if (expirePermitsData.errors) {
-      console.error('Error expiring permits: ', expirePermitsData.errors);
-      throw new Error('Failed to expire permits. Please try again later.');
-    }
+    // const expirePermitsData = await expirePermits.json();
+    // if (expirePermitsData.errors) {
+    //   console.error('Error expiring permits: ', expirePermitsData.errors);
+    //   throw new Error('Failed to expire permits. Please try again later.');
+    // }
     
 
     const res = await pool.query(
@@ -218,9 +214,9 @@ export class VehicleService {
             AND driver = $3 RETURNING id`,
       [plate, state, userId]
     )
-    if (res.rowCount === 0) {
-      throw new Error('Vehicle not found or not owned by user')
-    }
+    // if (res.rowCount === 0) {
+    //   throw new Error('Vehicle not found or not owned by user')
+    // }
     const rows = res.rows[0]
 
     return { id: rows.id}
@@ -232,7 +228,6 @@ export class VehicleService {
     if ((existing?.rowCount as number) > 0) {
       throw new Error('This license plate is already registered')
     }
-    try {
     const result = await pool.query(
       `INSERT INTO vehicle (driver, data) VALUES ($1, $2) RETURNING id`,
       [
@@ -258,10 +253,6 @@ export class VehicleService {
       default: defaultVehicle == null ? false : defaultVehicle.id == result.rows[0].id,
       ...input
     }
-     } catch (error) {
-    console.log('Error inserting vehicle:', error);
-    throw new Error('Failed to register vehicle. Please try again later.');
-    } 
   }
   
 

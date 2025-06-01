@@ -650,9 +650,6 @@ test('removeVehicle - deletes default when >1 vehicles exist', async () => {
       variables: vehicleInput
     })
 
-  const state1 = veh1.body.data.registerVehicle.state
-  const plate1 = veh1.body.data.registerVehicle.plate
-
   expect(veh1.body.data.registerVehicle.plate).toBe("TEST123")
 
   const deleteResponse = await supertest(server)
@@ -666,7 +663,7 @@ test('removeVehicle - deletes default when >1 vehicles exist', async () => {
           }
         }
       `,
-      variables: { plate: plate1, state: state1 }
+      variables: { plate: 'DERIK123', state: 'California' }
     })
 
   expect(deleteResponse.body.data.deleteVehicle).toHaveProperty('id')
@@ -677,5 +674,83 @@ test('removeVehicle - deletes default when >1 vehicles exist', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({ query: getDefaultVehiclequery })
 
-  expect(defaultResponse.body.data.getDefaultVehicle.plate).toBe("DERIK123")
+  expect(defaultResponse.body.data.getDefaultVehicle.plate).toBe("TEST123")
 });
+
+test('removing the only vehicle errors', async () => {
+  const token = await loginAs("driver", false)
+
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate: 'DERIK123', state: 'California' }
+    })
+
+  expect(deleteResponse.body.errors.length).toBe(1)
+  expect(deleteResponse.body.errors[0].message).toBe("Cannot delete the only default vehicle. Please add another vehicle as default first.")
+})
+
+test('Driver cannot delete a vehicle with an unpaid ticket', async () => {
+  const token = await loginAs("driver", false)
+  const enforcer = await loginAs("enforcement")
+
+  const veh = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: regVehicleQuery,
+      variables: vehicleInput
+    })
+
+  const state = veh.body.data.registerVehicle.state
+  const plate = veh.body.data.registerVehicle.plate
+
+  expect(veh.body.data.registerVehicle.plate).toBe("TEST123")
+
+  // Create a ticket for this vehicle
+  await supertest(ticketApp)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcer)
+    .send({
+      query: `
+        mutation CreateTicket($input: NewTicketInput!) {
+          createNewTicket(input: $input) {
+            id
+          }
+        }
+      `,
+      variables: {
+        input: {
+          plate: plate,
+          state: state,
+          reason: "Speeding",
+        }
+      }
+    })
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate, state }
+    })
+
+  expect(deleteResponse.body.errors.length).toBe(1)
+  expect(deleteResponse.body.errors[0].message).toBe("Vehicle cannot be removed because it has pending tickets")
+}, 10000)

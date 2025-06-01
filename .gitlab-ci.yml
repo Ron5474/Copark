@@ -227,7 +227,7 @@ build:auth:
 build:adminService:
   stage: build
   script:
-    - npm run install-adminService
+    - npm run installs
     - npm run build-adminService
   rules:
     - changes: 

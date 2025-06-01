@@ -97,13 +97,6 @@ export default function EnforcementDashboardView() {
               borderRadius: 3,
             }}
           >
-            <Typography
-              variant="subtitle1"
-              textAlign="center"
-              mb={2}
-            >
-              Enter Plate Details
-            </Typography>
 
             <ManualEntryCard />
           </Paper>

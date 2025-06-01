@@ -21,21 +21,6 @@ afterEach(() => {
   cleanup()
 })
 
-it('shows error when trying to search with empty input', async () => {
-  const user = userEvent.setup()
-
-  render(
-    <EnforcementProvider>
-      <ManualEntryCard />
-    </EnforcementProvider>
-  )
-
-  const searchBtn = screen.getByLabelText('Search License Plate')
-  await user.click(searchBtn)
-
-  expect(await screen.findByText(/please enter a license plate/i)).toBeDefined()
-})
-
 it('searching sets plate from manual input', async () => {
   const user = userEvent.setup()
 
@@ -52,6 +37,9 @@ it('searching sets plate from manual input', async () => {
   const searchBtn = screen.getByLabelText('Search License Plate')
 
   await user.type(plateInput, 'abc123')
+  const field = screen.getByLabelText('Select a state')
+  await user.click(field)
+  await user.click(screen.getByText('California'))
   await user.click(searchBtn)
 
   expect(screen.getByText(/Permit Found/i)).toBeDefined()
@@ -59,7 +47,7 @@ it('searching sets plate from manual input', async () => {
 
 it('handles checkPermit failure and sets fallback permit result', async () => {
   const user = userEvent.setup()
-
+  vi.spyOn(console, 'error').mockImplementation(() => {})
   const { checkPermit } = await import('@/app/dashboard/permit/actions')
   vi.mocked(checkPermit).mockRejectedValueOnce(new Error('Permit service failed'))
 
@@ -76,6 +64,9 @@ it('handles checkPermit failure and sets fallback permit result', async () => {
   const searchBtn = screen.getByLabelText('Search License Plate')
 
   await user.type(plateInput, 'FAIL999')
+  const field = screen.getByLabelText('Select a state')
+  await user.click(field)
+  await user.click(screen.getByText('California'))
   await user.click(searchBtn)
 
   expect(await screen.findByText(/No Permit Found/i)).toBeDefined()

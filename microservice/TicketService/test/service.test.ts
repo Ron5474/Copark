@@ -195,7 +195,7 @@ test('modifyTicket should throw an error when no fields are provided to update',
 
 //     await expect(ticketService.modifyTicket(modifiedTicket))
 //         .rejects
-//         .toThrow('Ticket not found.');
+//         .toThrow('Invalid or missing ticket ID');
 // });
 
 test('deleteTicket should successfully delete a ticket', async () => {

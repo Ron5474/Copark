@@ -11,7 +11,7 @@ import {
   TextField,
   Stack,
 } from '@mui/material';
-import { getZones, createZone } from '../../permit/actions';
+import { getZones, createZone, updateZonePrice } from '../../permit/actions';
 import { Zone } from '../../types';
 
 export default function ManageZones() {
@@ -26,6 +26,8 @@ export default function ManageZones() {
     closeTime: '18:00'
   });
   const [error, setError] = useState<string>('');
+  const [editZone, setEditZone] = useState<Zone | undefined>();
+  const [editDialog, setEditDialog] = useState(false);
 
   useEffect(() => {
     fetchZones();
@@ -52,7 +54,25 @@ export default function ManageZones() {
       }
     } catch (err) {
       void err;
-      setError(err instanceof Error ? err.message : 'Failed to create zone');
+      setError('Failed to create zone');
+    }
+  };
+
+  const handleUpdateZone = async () => {
+    try {
+      await updateZonePrice({
+        zone: editZone!.zone,
+        hourly: editZone!.hourly,
+        maxDuration: editZone!.maxDuration,
+        openTime: editZone!.openTime,
+        closeTime: editZone!.closeTime
+      });
+      setEditDialog(false);
+      fetchZones();
+      setEditZone(undefined);
+    } catch (err) {
+      void err;
+      setError('Failed to update zone');
     }
   };
 
@@ -129,25 +149,39 @@ export default function ManageZones() {
               }
             }}
           >
-            <Box>
-              <Typography
-                sx={{
-                  fontSize: '20px',
-                  fontWeight: 500,
-                  color: theme.palette.primary.dark
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: '20px',
+                    fontWeight: 500,
+                    color: theme.palette.primary.dark
+                  }}
+                >
+                  Zone {zone.zone}
+                </Typography>
+                <Typography sx={{ mb: 1 }}>
+                  <strong>Rate:</strong> ${zone.hourly}/hour
+                </Typography>
+                <Typography sx={{ mb: 1 }}>
+                  <strong>Max Duration:</strong> {zone.maxDuration.hours}h {zone.maxDuration.minutes}m
+                </Typography>
+                <Typography>
+                  <strong>Hours:</strong> {zone.openTime} - {zone.closeTime}
+                </Typography>
+              </Box>
+              <Button
+                onClick={() => {
+                  setEditZone(zone);
+                  setEditDialog(true);
+                }}
+                sx={{ 
+                  minWidth: 'auto',
+                  color: theme.palette.primary.main
                 }}
               >
-                Zone {zone.zone}
-              </Typography>
-              <Typography sx={{ mb: 1 }}>
-                <strong>Rate:</strong> ${zone.hourly}/hour
-              </Typography>
-              <Typography sx={{ mb: 1 }}>
-                <strong>Max Duration:</strong> {zone.maxDuration.hours}h {zone.maxDuration.minutes}m
-              </Typography>
-              <Typography>
-                <strong>Hours:</strong> {zone.openTime} - {zone.closeTime}
-              </Typography>
+                Edit
+              </Button>
             </Box>
           </Box>
         ))}
@@ -234,6 +268,101 @@ export default function ManageZones() {
             sx={{ bgcolor: theme.palette.primary.main }}
           >
             Create
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={editDialog} onClose={() => setEditDialog(false)}>
+        <DialogTitle>Edit Zone {editZone?.zone}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 2 }}>
+            <TextField
+              label="Hourly Rate"
+              type="number"
+              value={editZone?.hourly || 0}
+              onChange={(e) => {
+                if (editZone) {
+                  setEditZone({
+                    ...editZone,
+                    hourly: parseFloat(e.target.value)
+                  });
+                }
+              }}
+              fullWidth
+            />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label="Max Hours"
+                type="number"
+                value={editZone?.maxDuration.hours || 0}
+                onChange={(e) => {
+                  if (editZone) {
+                    setEditZone({
+                      ...editZone,
+                      maxDuration: {...editZone.maxDuration, hours: parseInt(e.target.value)}
+                    });
+                  }
+                }}
+              />
+              <TextField
+                label="Max Minutes"
+                type="number" 
+                value={editZone?.maxDuration.minutes || 0}
+                onChange={(e) => {
+                  if (editZone) {
+                    setEditZone({
+                      ...editZone,
+                      maxDuration: {...editZone.maxDuration, minutes: parseInt(e.target.value)}
+                    });
+                  }
+                }}
+              />
+            </Box>
+            <TextField
+              label="Open Time"
+              type="time"
+              value={editZone?.openTime || ''}
+              onChange={(e) => {
+                if (editZone) {
+                  setEditZone({
+                    ...editZone,
+                    openTime: e.target.value
+                  });
+                }
+              }}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              label="Close Time"
+              type="time"
+              value={editZone?.closeTime || ''}
+              onChange={(e) => {
+                if (editZone) {
+                  setEditZone({
+                    ...editZone,
+                    closeTime: e.target.value
+                  });
+                }
+              }}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Stack>
+          {error && (
+            <Typography color="error" sx={{ mt: 2, fontSize: '0.875rem' }}>
+              {error}
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialog(false)}>Cancel</Button>
+          <Button 
+            onClick={handleUpdateZone}
+            variant="contained"
+            sx={{ bgcolor: theme.palette.primary.main }}
+          >
+            Update
           </Button>
         </DialogActions>
       </Dialog>

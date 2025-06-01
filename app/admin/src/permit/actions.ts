@@ -90,8 +90,6 @@ export async function createZone(input: {
   return result.data.createZone;
 }
 
-
-
 export async function getZones(): Promise<Zone[]> {
   const token = await getAuthToken();
   const response = await fetch(API_URL, {
@@ -122,7 +120,6 @@ export async function getZones(): Promise<Zone[]> {
   return result.data.getZones;
 }
 
-
 export async function getAllPermits(activeOnly = true): Promise<Permit[]> {
   const token = await getAuthToken();
 
@@ -151,8 +148,6 @@ export async function getAllPermits(activeOnly = true): Promise<Permit[]> {
   const result = await response.json();
   return result.data.allPermits;
 }
-
-
 
 export async function getPermitStatsByZone(activeOnly = true): Promise<ZoneStat[]> {
   const token = await getAuthToken();
@@ -233,5 +228,45 @@ export async function getPermitReport(): Promise<PermitReport> {
 
   const json = await res.json()
   return json.data.adminPermitReport
+}
+
+export async function updateZonePrice(input: {
+  zone: string,
+  hourly?: number,
+  maxDuration?: { hours: number, minutes: number },
+  openTime?: string,
+  closeTime?: string
+}): Promise<Zone[]> {
+  const token = await getAuthToken();
+  
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query: `
+        mutation UpdateZonePrice($input: ZoneInput!) {
+          updateZonePrice(input: $input) {
+            zone
+            hourly
+            maxDuration {
+              hours
+              minutes
+            }
+            openTime
+            closeTime
+          }
+        }
+      `,
+      variables: {
+        input
+      }
+    }),
+  });
+
+  const result = await response.json();
+  return result.data.updateZonePrice;
 }
 

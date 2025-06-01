@@ -125,22 +125,49 @@ lint:vehicleService:
       - package.json
       - .gitlab-ci.yml
 
-# lint:ticketService:
-#   stage: quality
-#   script:
-#     - npm run install-ticketService
-#     - npm run lint-ticketService
-#   rules:
-#     - changes: 
-#       - microservices/TicketService/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+lint:ticketService:
+  stage: quality
+  script:
+    - npm run install-ticketService
+    - npm run lint-ticketService
+  rules:
+    - changes: 
+      - microservices/TicketService/**/*
+      - package.json
+      - .gitlab-ci.yml
 
-# lint:
-#   stage: quality 
-#   script:
-#     - npm run installs
-#     - npm run lint
+lint:permitService:
+  stage: quality
+  script:
+    - npm run install-permitService
+    - npm run lint-permitService
+  rules:
+    - changes: 
+      - microservices/PermitService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:emailService:
+  stage: quality
+  script:
+    - npm run install-emailService
+    - npm run lint-emailService
+  rules:
+    - changes: 
+      - microservices/EmailService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:pictureService:
+  stage: quality
+  script:
+    - npm run install-pictureService
+    - npm run lint-pictureService
+  rules:
+    - changes: 
+      - microservices/PictureService/**/*
+      - package.json
+      - .gitlab-ci.yml
 
 build:enforcement:
   stage: build
@@ -200,7 +227,7 @@ build:auth:
 build:adminService:
   stage: build
   script:
-    - npm run install-adminService
+    - npm run installs
     - npm run build-adminService
   rules:
     - changes: 
@@ -218,17 +245,50 @@ build:vehicleService:
       - microservice/VehicleService/**/*
       - package.json
       - .gitlab-ci.yml
+  
+build:permitService:
+  stage: build
+  script:
+    - npm run install-permitService
+    - npm run build-permitService
+  rules:
+    - changes: 
+      - microservice/PermitService/**/*
+      - package.json
+      - .gitlab-ci.yml
 
-# build:ticketService:
-#   stage: build
-#   script:
-#     - npm run install-ticketService
-#     - npm run build-ticketService
-#   rules:
-#     - changes:
-#       - microservices/TicketService/**/*
-#       - package.json
-#       - .gitlab-ci.yml
+build:ticketService:
+  stage: build
+  script:
+    - npm run install-ticketService
+    - npm run build-ticketService
+  rules:
+    - changes:
+      - microservices/TicketService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:emailService:
+  stage: build
+  script:
+    - npm run install-emailService
+    - npm run build-emailService
+  rules:
+    - changes:
+      - microservices/EmailService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:pictureService:
+  stage: build
+  script:
+    - npm run install-pictureService
+    - npm run build-pictureService
+  rules:
+    - changes:
+      - microservices/PictureService/**/*
+      - package.json
+      - .gitlab-ci.yml
 
 # build:
 #   stage: build

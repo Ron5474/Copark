@@ -87,6 +87,11 @@ COPY microservice/EmailService/build/ /home/copark/microservice/EmailService/bui
 COPY microservice/EmailService/package.json /home/copark/microservice/EmailService/package.json
 COPY microservice/EmailService/package-lock.json /home/copark/microservice/EmailService/package-lock.json
 
+# Copy Picture microservice
+COPY microservice/PictureService/build/ /home/copark/microservice/PictureService/build/
+COPY microservice/PictureService/package.json /home/copark/microservice/PictureService/package.json
+COPY microservice/PictureService/package-lock.json /home/copark/microservice/PictureService/package-lock.json
+
 # Copy the APIs
 COPY api/campusPolice/build/ /home/copark/api/campusPolice/build/
 COPY api/campusPolice/package.json /home/copark/api/campusPolice/package.json

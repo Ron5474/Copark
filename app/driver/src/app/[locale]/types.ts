@@ -20,6 +20,12 @@ export interface Vehicle {
   nickname?: string
 }
 
+export interface EditVehicle {
+  id: string
+  nickname?: string
+}
+
+
 export interface Duration{
   hours: number
   minutes: number

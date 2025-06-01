@@ -106,3 +106,16 @@ export interface PermitReport {
   zoneBreakdown: ZoneStat[];
   lotBreakdown: LotStat[];
 }
+
+export class Lot {
+  name!: string;
+  price!: string;
+  activeDate?: string;
+  expireDate?: string;
+}
+
+export interface LotGroup {
+  id: string;
+  title: string;
+  lots: Lot[];
+}

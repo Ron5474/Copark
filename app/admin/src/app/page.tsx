@@ -9,6 +9,7 @@ import ViewStatistics from './components/ViewStatistics';
 import ManageTicketChallenges from './components/ManageTicketChallenges';
 import ManageZones from './components/ManageZones';
 import GenerateReportButton from './components/GenerateReport';
+import ManageLots from './components/ManageLots';
 
 export default function Page() {
   const [currentComponent, setCurrentComponent] = useState<string>('statistics');
@@ -31,6 +32,8 @@ export default function Page() {
         return <Box>Generate Reports Component</Box>;
       case 'zones':
         return <ManageZones />;
+      case 'lots':
+        return <ManageLots />;
       case 'pdf':
         return <GenerateReportButton />;
     }

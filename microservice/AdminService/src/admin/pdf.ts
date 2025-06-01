@@ -32,13 +32,22 @@ export async function generatePdf(
   let page = pdfDoc.addPage([600, 800]);
   let y = 750;
 
-  page.drawText('Report for previous ' + numDays + ' days', {
+const endDate = new Date();
+const startDate = new Date();
+startDate.setDate(endDate.getDate() - numDays + 1);
+
+const formatDate = (date: Date) =>
+    `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+
+const dateRangeText = `Report for ${formatDate(startDate)} to ${formatDate(endDate)}`;
+
+page.drawText(dateRangeText, {
     x: 50,
     y: y,
     size: 18,
     color: rgb(0, 0, 0.6),
-  });
-  y -= 40;
+});
+y -= 40;
 
 //   console.log(ticketInfo, permitInfo);
   const ticketInfo = ticketData.data.adminTicketReport;

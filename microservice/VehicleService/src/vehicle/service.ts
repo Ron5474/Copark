@@ -135,7 +135,7 @@ export class VehicleService {
 
   public async removeVehicle(plate: string, state: string, userId: string, token?: string): Promise<VehicleID> {
     const existing = await this.vehicleExists(plate, state, userId)
-    if ((existing?.rowCount ?? 0) === 0) {
+    if (existing.rowCount === 0) {
       throw new Error('Vehicle not found or not owned by user')
     }
     // if (!existing) {

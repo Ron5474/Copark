@@ -189,7 +189,10 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
               >
                 <CloseIcon />
               </IconButton>
-              <EditForm close={handleEdit} vehicle={selectedVehicle as Vehicle}/>
+              <EditForm
+                close={handleEdit}
+                vehicle={selectedVehicle as Vehicle}
+              />
             </DialogContent>
           </Dialog>
         ))}
@@ -298,7 +301,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                 textTransform: 'none',
               }}
             >
-              {isCheckout ? t("checkout.continue") : t("edit")}
+              {isCheckout ? t("checkout.continue") : t("edit.edit")}
             </Button>
             {!isCheckout && selectedVID && (
               vehicles.find(v => v.id === selectedVID)?.default !== true

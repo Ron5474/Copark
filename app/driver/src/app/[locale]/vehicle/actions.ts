@@ -136,6 +136,44 @@ export const editVehicle = async (vehicleEdit: EditVehicle): Promise<Vehicle> =>
   }
 }
 
+export const deleteVehicle = async (plate: string, state: string): Promise<boolean> => {
+  try {
+    const token = await getAuthToken()
+
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation DeleteVehicle($plate: String!, $state: String!) {
+            deleteVehicle(plate: $plate, state: $state) {
+              id
+            }
+          }
+        `,
+        variables: {
+          plate,
+          state
+        },
+      }),
+    })
+
+    const result = await response.json()
+
+    if (result.errors) {
+      throw new Error(result.errors[0].message)
+    }
+
+    return result.data.registerVehicle
+  } catch (error) {
+    console.error('Error editing vehicle:', error)
+    throw error
+  }
+}
+
 export async function updateDefaultVehicle(vehicleId: string): Promise<Vehicle> {
   try {
     const token = await getAuthToken()
@@ -204,42 +242,3 @@ export async function getDefaultVehicle(): Promise<Vehicle | null> {
       return null
     }
 }
-
-export async function removeVehicle(plate: string, state?: string) {
-  if (!plate) {
-    throw new Error('Plate is required to delete a vehicle')
-  }
-  if (!state) {
-    throw new Error('State is required to delete a vehicle')
-  }
-    const token = await getAuthToken()
-
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        query: `
-          mutation DeleteVehicle($plate: String!, $state: String!) {
-            deleteVehicle(plate: $plate, state: $state) {
-              id
-            }
-          }
-        `,
-        variables: {
-          plate,
-          state,
-        },
-      }),
-    })
-    const result = await response.json()
-    if (result.errors) {
-      console.error('GraphQL errors:', result.errors)
-      throw new Error(result.errors[0]?.message || 'Failed to delete vehicle')
-    }
-    return result.data.deleteVehicle
-
-}
-  

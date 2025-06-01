@@ -23,7 +23,7 @@ import { editVehicle } from './actions'
 import { useTranslations } from 'next-intl'
 
 
-export default function EditForm({ vehicle, close }: { vehicle: Vehicle, close: {edit: () => void, delete: () => void} }) {
+export default function EditForm({ vehicle, close }: { vehicle: Vehicle, close: () => void }) {
   const [isValidEntry, setIsValidEntry] = useState<boolean>(true)
   const [nickname, setNickname] = useState<string | undefined>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -39,7 +39,7 @@ export default function EditForm({ vehicle, close }: { vehicle: Vehicle, close: 
     try {
       if (!isValidEntry) throw new Error('You can not enter the same nickname')
       await editVehicle({ id: vehicle.id as string, nickname })
-      close.edit()
+      close()
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong'
       setErrorMessage(message)
@@ -154,7 +154,7 @@ export default function EditForm({ vehicle, close }: { vehicle: Vehicle, close: 
           {t('add.save')}
         </Button>
       </Box>
-      {deleting && <DeleteAlert close={() => setDeleting(false)} onDelete={() => close.delete}/>}
+      {deleting && <DeleteAlert close={() => setDeleting(false)} onDelete={close}/>}
     </Box>
   )
 }

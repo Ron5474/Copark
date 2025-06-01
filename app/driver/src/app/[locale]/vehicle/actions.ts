@@ -204,3 +204,41 @@ export async function getDefaultVehicle(): Promise<Vehicle | null> {
       return null
     }
 }
+
+export async function removeVehicle(plate: string, state?: string) {
+  if (!plate) {
+    throw new Error('Plate is required to delete a vehicle')
+  }
+  if (!state) {
+    throw new Error('State is required to delete a vehicle')
+  }
+    const token = await getAuthToken()
+
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation DeleteVehicle($input: DeleteVehicleInput!) {
+            deleteVehicle(input: $input) {
+              id
+            }
+          }
+        `,
+        variables: {
+          input: { plate, state },
+        },
+      }),
+    })
+    const result = await response.json()
+    if (result.errors) {
+      console.error('GraphQL errors:', result.errors)
+      throw new Error(result.errors[0]?.message || 'Failed to delete vehicle')
+    }
+    return result.data.deleteVehicle
+
+}
+  

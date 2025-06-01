@@ -19,7 +19,7 @@ import {
 
 import theme from '../theme'
 import { Vehicle } from '../types'
-import { editVehicle } from './actions'
+import { editVehicle, removeVehicle } from './actions'
 import { useTranslations } from 'next-intl'
 
 
@@ -29,6 +29,23 @@ export default function EditForm({ vehicle, close = () => {} }: { vehicle: Vehic
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null) // new
   const t = useTranslations('garage')
+
+  const deleteVehicle = async () => {
+    if (vehicle && vehicle.id) {
+      try {
+        await removeVehicle(vehicle.plate, vehicle.state)
+        close()
+      } catch (err) {
+        const error = err instanceof Error ? err.message : 'Something went wrong'
+        setErrorMessage(error)
+        setIsLoading(false)
+      }
+    } else {
+      setErrorMessage('Vehicle is not selected')
+      setIsLoading(false)
+    }
+  }
+
 
   // new
   const submitEdit = async () => {
@@ -117,7 +134,11 @@ export default function EditForm({ vehicle, close = () => {} }: { vehicle: Vehic
         }}
       >
         <Button
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault()
+            setIsLoading(true)
+            deleteVehicle()
+            close()
           }}
           aria-label='Delete vehicle'
           sx={{

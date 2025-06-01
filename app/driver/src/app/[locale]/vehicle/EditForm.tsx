@@ -138,7 +138,6 @@ export default function EditForm({ vehicle, close = () => {} }: { vehicle: Vehic
             e.preventDefault()
             setIsLoading(true)
             deleteVehicle()
-            close()
           }}
           aria-label='Delete vehicle'
           sx={{

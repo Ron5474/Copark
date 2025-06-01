@@ -222,14 +222,15 @@ export async function removeVehicle(plate: string, state?: string) {
       },
       body: JSON.stringify({
         query: `
-          mutation DeleteVehicle($input: DeleteVehicleInput!) {
-            deleteVehicle(input: $input) {
+          mutation DeleteVehicle($plate: String!, $state: String!) {
+            deleteVehicle(plate: $plate, state: $state) {
               id
             }
           }
         `,
         variables: {
-          input: { plate, state },
+          plate,
+          state,
         },
       }),
     })

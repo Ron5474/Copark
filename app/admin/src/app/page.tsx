@@ -8,7 +8,7 @@ import ManageAPIUsers from './components/ManageAPIUsers';
 import ViewStatistics from './components/ViewStatistics';
 import ManageTicketChallenges from './components/ManageTicketChallenges';
 import ManageZones from './components/ManageZones';
-import GenerateReportButton from './components/generateReport';
+import GenerateReportButton from './components/GenerateReport';
 
 export default function Page() {
   const [currentComponent, setCurrentComponent] = useState<string>('statistics');

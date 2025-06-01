@@ -118,98 +118,102 @@
   "FeaturesSection": {
     "heading": "Parking Made Simple",
     "subheading": "CoPark streamlines the parking experience with powerful features designed for convenience and ease of use.",
-    "features": [
-      {
-        "title": "One-Click Purchase",
-        "description": "Buy permits instantly with our streamlined one-click purchase process.",
-        "details": "Your default vehicle is set during signup, so you can purchase permits with a single click fast, simple, and hassle-free."
-      },
-      {
-        "title": "Active Permit Tracking",
-        "description": "Easily view and manage all your active parking permits in one place.",
-        "details": "Never lose track of your permits again."
-      },
-      {
-        "title": "Vehicle Management",
-        "description": "Add multiple vehicles and customize their nicknames for easy identification.",
-        "details": "Switch between vehicles effortlessly and set your default vehicle."
-      },
-      {
-        "title": "Zone Permits",
-        "description": "Purchase permits by zone for hourly and minute-based parking needs.",
-        "details": "Zone system makes it easy to park in designated areas with flexible timing options."
-      },
-      {
-        "title": "Flexible Duration Options",
-        "description": "Choose from daily, quarterly, or yearly permits to fit your needs.",
-        "details": "Whether you need parking for a day or a year, CoPark has flexible options to accommodate your schedule."
-      },
-      {
-        "title": "Student Discounts",
-        "description": "10% off all permits for users with .edu email addresses.",
-        "details": "We support education by offering special discounts to students and faculty members with valid academic emails."
-      }
-    ]
+    "feature1": {
+      "title": "One-Click Purchase",
+      "description": "Buy permits instantly with our streamlined one-click purchase process.",
+      "details": "Your default vehicle is set during signup, so you can purchase permits with a single click fast, simple, and hassle-free."
+    },
+    "feature2": {
+      "title": "Active Permit Tracking",
+      "description": "Easily view and manage all your active parking permits in one place.",
+      "details": "Never lose track of your permits again."
+    },
+    "feature3": {
+      "title": "Vehicle Management",
+      "description": "Add multiple vehicles and customize their nicknames for easy identification.",
+      "details": "Switch between vehicles effortlessly and set your default vehicle."
+    },
+    "feature4": {
+      "title": "Zone Permits",
+      "description": "Purchase permits by zone for hourly and minute-based parking needs.",
+      "details": "Zone system makes it easy to park in designated areas with flexible timing options."
+    },
+    "feature5": {
+      "title": "Flexible Duration Options",
+      "description": "Choose from daily, quarterly, or yearly permits to fit your needs.",
+      "details": "Whether you need parking for a day or a year, CoPark has flexible options to accommodate your schedule."
+    },
+    "feature6": {
+      "title": "Student Discounts",
+      "description": "10% off all permits for users with .edu email addresses.",
+      "details": "We support education by offering special discounts to students and faculty members with valid academic emails."
+    }
   },
   "HowItWorksSection": {
     "heading": "How CoPark Works",
     "subheading": "Getting started with CoPark is quick and easy. Follow these simple steps to manage your parking permits.",
-    "steps": [
-      {
-        "title": "1. Sign Up",
-        "description": "Create your CoPark account using your email."
-      },
-      {
-        "title": "2. Add Your Vehicle",
-        "description": "Enter your vehicle details and create a nickname for easy identification."
-      },
-      {
-        "title": "3. Purchase Permits",
-        "description": "Select your preferred permit type and complete your purchase with one click."
-      }
-    ]
+    "step1": {
+      "title": "1. Sign Up",
+      "description": "Create your CoPark account using your email."
+    },
+    "step2": {
+      "title": "2. Add Your Vehicle",
+      "description": "Enter your vehicle details and create a nickname for easy identification."
+    },
+    "step3": {
+      "title": "3. Purchase Permits",
+      "description": "Select your preferred permit type and complete your purchase with one click."
+    }
   },
   "PermitSection": {
     "heading": "Flexible Permit Options",
     "subheading": "Choose the permit type that best fits your parking needs. Special discounts available for .edu email users.",
-    "plans": [
-      {
-        "title": "Daily Permits",
-        "description": "Perfect for occasional parking needs"
-      },
-      {
-        "title": "Quarterly Permits",
-        "description": "Best value for regular parkers"
-      },
-      {
-        "title": "Yearly Permits",
-        "description": "Maximum savings for daily parkers"
-      },
-      {
-        "title": "Zone Permits",
-        "description": "Pay as you park flexibility with hourly and minute based options"
-      }
-    ]
+    "plan1": {
+      "title": "Daily Permits",
+      "description": "Perfect for occasional parking needs"
+    },
+    "plan2": {
+      "title": "Quarterly Permits",
+      "description": "Best value for regular parkers"
+    },
+    "plan3": {
+      "title": "Yearly Permits",
+      "description": "Maximum savings for daily parkers"
+    },
+    "plan4": {
+      "title": "Zone Permits",
+      "description": "Pay as you park flexibility with hourly and minute based options"
+    }
   },
   "TestimonialSection": {
     "heading": "What Our Users Say",
     "subheading": "Users trust CoPark for their parking permit needs. Here's what they have to say.",
-    "testimonials": [
-      {
-        "name": "Jamie D.",
-        "initials": "JD",
-        "text": "CoPark has completely transformed how I manage parking permits. The one-click purchase feature saves me so much time, and I love being able to see all my active permits in one place."
-      },
-      {
-        "name": "Alex M.",
-        "initials": "AM",
-        "text": "As a student, the 10% discount with my .edu email is amazing! The zone parking feature is so convenient for when I need to park downtown for just a few hours."
-      },
-      {
-        "name": "Sarah K.",
-        "initials": "SK",
-        "text": "The vehicle management feature is fantastic. I can easily switch between my car and motorcycle when purchasing permits. The interface is clean and intuitive."
-      }
-    ]
+    "testimonial1": {
+      "name": "Jamie D.",
+      "initials": "JD",
+      "text": "CoPark has completely transformed how I manage parking permits. The one-click purchase feature saves me so much time, and I love being able to see all my active permits in one place."
+    },
+    "testimonial2": {
+      "name": "Alex M.",
+      "initials": "AM",
+      "text": "As a student, the 10% discount with my .edu email is amazing! The zone parking feature is so convenient for when I need to park downtown for just a few hours."
+    },
+    "testimonial3": {
+      "name": "Sarah K.",
+      "initials": "SK",
+      "text": "The vehicle management feature is fantastic. I can easily switch between my car and motorcycle when purchasing permits. The interface is clean and intuitive."
+    }
+  },
+  "Topbar": {
+    "features": "Features",
+    "howItWorks": "How It Works",
+    "permits": "Permits",
+    "testimonials": "Testimonials"
+  },
+  "GetStartedButton": {
+    "label": "Get Started"
+  },
+  "HomeView": {
+    "cta": "Get Started Now"
   }
 }

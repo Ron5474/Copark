@@ -117,100 +117,104 @@
   },
   "FeaturesSection": {
     "heading": "Estacionamiento Simplificado",
-    "subheading": "CoPark simplifica la experiencia de estacionamiento con funciones potentes diseñadas para tu comodidad.",
-    "features": [
-      {
-        "title": "Compra con un Clic",
-        "description": "Compra permisos al instante con nuestro proceso optimizado de un solo clic.",
-        "details": "Tu vehículo predeterminado se configura durante el registro, para que puedas comprar permisos rápida y fácilmente."
-      },
-      {
-        "title": "Seguimiento de Permisos Activos",
-        "description": "Consulta y gestiona todos tus permisos de estacionamiento activos en un solo lugar.",
-        "details": "Nunca pierdas de vista tus permisos nuevamente."
-      },
-      {
-        "title": "Gestión de Vehículos",
-        "description": "Agrega múltiples vehículos y personaliza sus apodos para identificarlos fácilmente.",
-        "details": "Cambia entre vehículos sin esfuerzo y establece uno como predeterminado."
-      },
-      {
-        "title": "Permisos por Zona",
-        "description": "Compra permisos por zona para estacionamientos por hora o por minutos.",
-        "details": "El sistema por zonas facilita estacionarte en áreas designadas con opciones de tiempo flexibles."
-      },
-      {
-        "title": "Opciones de Duración Flexibles",
-        "description": "Elige entre permisos diarios, trimestrales o anuales según tus necesidades.",
-        "details": "Ya sea por un día o un año, CoPark tiene opciones flexibles para adaptarse a tu horario."
-      },
-      {
-        "title": "Descuentos para Estudiantes",
-        "description": "10% de descuento en todos los permisos para usuarios con correos .edu.",
-        "details": "Apoyamos la educación ofreciendo descuentos especiales a estudiantes y personal educativo con correos académicos válidos."
-      }
-    ]
+    "subheading": "CoPark optimiza la experiencia de estacionamiento con funciones potentes diseñadas para tu comodidad y facilidad de uso.",
+    "feature1": {
+      "title": "Compra con Un Clic",
+      "description": "Compra permisos al instante con nuestro proceso simplificado de un solo clic.",
+      "details": "Tu vehículo predeterminado se configura durante el registro, así que puedes comprar permisos con un solo clic de forma rápida y sin complicaciones."
+    },
+    "feature2": {
+      "title": "Seguimiento de Permisos Activos",
+      "description": "Consulta y gestiona fácilmente todos tus permisos de estacionamiento activos en un solo lugar.",
+      "details": "Nunca pierdas de vista tus permisos nuevamente."
+    },
+    "feature3": {
+      "title": "Gestión de Vehículos",
+      "description": "Agrega varios vehículos y personaliza sus apodos para una identificación fácil.",
+      "details": "Cambia entre vehículos fácilmente y establece tu vehículo predeterminado."
+    },
+    "feature4": {
+      "title": "Permisos por Zona",
+      "description": "Compra permisos por zona para necesidades de estacionamiento por hora o por minuto.",
+      "details": "El sistema de zonas facilita estacionarse en áreas designadas con opciones de tiempo flexibles."
+    },
+    "feature5": {
+      "title": "Opciones de Duración Flexibles",
+      "description": "Elige entre permisos diarios, trimestrales o anuales según tus necesidades.",
+      "details": "Ya sea que necesites estacionamiento por un día o un año, CoPark tiene opciones flexibles para adaptarse a tu horario."
+    },
+    "feature6": {
+      "title": "Descuentos para Estudiantes",
+      "description": "10% de descuento en todos los permisos para usuarios con correos .edu.",
+      "details": "Apoyamos la educación ofreciendo descuentos especiales a estudiantes y profesores con correos académicos válidos."
+    }
   },
   "HowItWorksSection": {
     "heading": "Cómo Funciona CoPark",
-    "subheading": "Comenzar con CoPark es rápido y sencillo. Sigue estos simples pasos para gestionar tus permisos de estacionamiento.",
-    "steps": [
-      {
-        "title": "1. Regístrate",
-        "description": "Crea tu cuenta de CoPark usando tu correo electrónico."
-      },
-      {
-        "title": "2. Agrega Tu Vehículo",
-        "description": "Ingresa los detalles de tu vehículo y crea un apodo para identificarlo fácilmente."
-      },
-      {
-        "title": "3. Compra Permisos",
-        "description": "Selecciona tu tipo de permiso preferido y completa la compra con un solo clic."
-      }
-    ]
+    "subheading": "Comenzar con CoPark es rápido y fácil. Sigue estos simples pasos para gestionar tus permisos de estacionamiento.",
+    "step1": {
+      "title": "1. Regístrate",
+      "description": "Crea tu cuenta de CoPark usando tu correo electrónico."
+    },
+    "step2": {
+      "title": "2. Agrega tu Vehículo",
+      "description": "Ingresa los datos de tu vehículo y crea un apodo para identificarlo fácilmente."
+    },
+    "step3": {
+      "title": "3. Compra Permisos",
+      "description": "Selecciona el tipo de permiso que prefieras y completa la compra con un solo clic."
+    }
   },
   "PermitSection": {
     "heading": "Opciones Flexibles de Permiso",
     "subheading": "Elige el tipo de permiso que mejor se adapte a tus necesidades de estacionamiento. Descuentos especiales disponibles para usuarios con correos .edu.",
-    "plans": [
-      {
-        "title": "Permisos Diarios",
-        "description": "Perfecto para necesidades de estacionamiento ocasionales"
-      },
-      {
-        "title": "Permisos Trimestrales",
-        "description": "La mejor opción para quienes estacionan regularmente"
-      },
-      {
-        "title": "Permisos Anuales",
-        "description": "Máximos ahorros para quienes estacionan todos los días"
-      },
-      {
-        "title": "Permisos por Zona",
-        "description": "Flexibilidad de pago por uso con opciones por hora y minuto"
-      }
-    ]
+    "plan1": {
+      "title": "Permisos Diarios",
+      "description": "Perfecto para necesidades de estacionamiento ocasionales"
+    },
+    "plan2": {
+      "title": "Permisos Trimestrales",
+      "description": "La mejor opción para quienes estacionan regularmente"
+    },
+    "plan3": {
+      "title": "Permisos Anuales",
+      "description": "Máximos ahorros para quienes estacionan todos los días"
+    },
+    "plan4": {
+      "title": "Permisos por Zona",
+      "description": "Flexibilidad de pago por uso con opciones por hora y minuto"
+    }
   },
   "TestimonialSection": {
     "heading": "Lo Que Dicen Nuestros Usuarios",
     "subheading": "Los usuarios confían en CoPark para sus necesidades de permisos de estacionamiento. Esto es lo que dicen.",
-    "testimonials": [
-      {
-        "name": "Jamie D.",
-        "initials": "JD",
-        "text": "CoPark ha transformado completamente cómo administro mis permisos de estacionamiento. La función de compra con un solo clic me ahorra mucho tiempo, y me encanta poder ver todos mis permisos activos en un solo lugar."
-      },
-      {
-        "name": "Alex M.",
-        "initials": "AM",
-        "text": "¡Como estudiante, el descuento del 10% con mi correo .edu es increíble! La función de estacionamiento por zona es muy conveniente cuando necesito estacionar en el centro solo por unas horas."
-      },
-      {
-        "name": "Sarah K.",
-        "initials": "SK",
-        "text": "La función de gestión de vehículos es fantástica. Puedo cambiar fácilmente entre mi coche y mi motocicleta al comprar permisos. La interfaz es limpia e intuitiva."
-      }
-    ]
+    "testimonial1": {
+      "name": "Jamie D.",
+      "initials": "JD",
+      "text": "CoPark ha transformado completamente cómo administro mis permisos de estacionamiento. La función de compra con un solo clic me ahorra mucho tiempo, y me encanta poder ver todos mis permisos activos en un solo lugar."
+    },
+    "testimonial2": {
+      "name": "Alex M.",
+      "initials": "AM",
+      "text": "¡Como estudiante, el descuento del 10% con mi correo .edu es increíble! La función de estacionamiento por zona es muy conveniente cuando necesito estacionar en el centro solo por unas horas."
+    },
+    "testimonial3": {
+      "name": "Sarah K.",
+      "initials": "SK",
+      "text": "La función de gestión de vehículos es fantástica. Puedo cambiar fácilmente entre mi coche y mi motocicleta al comprar permisos. La interfaz es limpia e intuitiva."
+    }
+  },
+  "Topbar": {
+    "features": "Funciones",
+    "howItWorks": "Cómo Funciona",
+    "permits": "Permisos",
+    "testimonials": "Testimonios"
+  },
+  "GetStartedButton": {
+    "label": "Comenzar"
+  },
+  "HomeView": {
+    "cta": "Comienza Ahora"
   }
 
 }

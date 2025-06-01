@@ -10,18 +10,20 @@ import {
   ListItemText,
 } from "@mui/material"
 import { Check } from "@mui/icons-material"
+import { useTranslations } from "next-intl"
 
 type Props = {
   cta?: React.ReactNode
 }
 
 export default function HeroSection({ cta }: Props) {
+  const t = useTranslations("HeroSection")
 
   const benefits = [
-    "One-click permit purchases",
-    "10% discount for .edu email users",
-    "Easily manage multiple vehicles",
-    "Flexible permit durations",
+    t("benefit1"),
+    t("benefit2"),
+    t("benefit3"),
+    t("benefit4"),
   ]
 
   return (
@@ -30,21 +32,20 @@ export default function HeroSection({ cta }: Props) {
         <Grid size={{ xs: 12, lg: 6 }}>
           <Box sx={{ mb: 4 }}>
             <Typography variant="h1" sx={{ fontSize: { xs: "2.5rem", md: "3.5rem", lg: "4rem" }, mb: 3 }}>
-              Parking Permits{" "}
+              {t("heading") + " "}
               <Typography component="span" variant="inherit" sx={{ color: "#00BFA5" }}>
-                Made Easy
+                {t("highlight")}
               </Typography>
             </Typography>
             <Typography variant="h6" sx={{ color: "text.secondary", mb: 4, lineHeight: 1.6 }}>
-              Purchase and manage parking permits with just a few clicks. Daily, quarterly, yearly, and zone-based
-              options available through our web platform.
+              {t("subheading")}
             </Typography>
             <Box sx={{ display: "flex", gap: 2, mb: 4, flexDirection: { xs: "column", sm: "row" } }}>
               {cta}
             </Box>
             <Box sx={{ mt: 4 }}>
               <Typography variant="h5" sx={{ mb: 2 }}>
-                Why choose CoPark?
+                {t("whyChoose")}
               </Typography>
               <List dense>
                 {benefits.map((benefit, index) => (
@@ -63,7 +64,7 @@ export default function HeroSection({ cta }: Props) {
           <Box
             component="img"
             src="/assets/copark-phone.png"
-            alt="CoPark phone preview"
+            alt={t("imageAlt")}
             sx={{
               width: "100%",
               maxWidth: 400,

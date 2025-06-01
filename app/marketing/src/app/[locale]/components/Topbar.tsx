@@ -61,8 +61,10 @@ import {
 import MenuIcon from "@mui/icons-material/Menu"
 import theme from "../theme"
 import { useRouter } from "@/i18n/navigation"
+import { useTranslations } from "next-intl"
 
 const Topbar = () => {
+  const t = useTranslations("Topbar")
   const [mobileOpen, setMobileOpen] = useState(false)
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
   const router = useRouter()
@@ -71,10 +73,10 @@ const Topbar = () => {
   const primaryColorLight = theme.palette.primary.light
 
   const navItems = [
-    { label: "Features", id: "features" },
-    { label: "How It Works", id: "how-it-works" },
-    { label: "Permits", id: "permits" },
-    { label: "Testimonials", id: "testimonials" },
+    { label: t("features"), id: "features" },
+    { label: t("howItWorks"), id: "how-it-works" },
+    { label: t("permits"), id: "permits" },
+    { label: t("testimonials"), id: "testimonials" },
   ]
 
   const handleDrawerToggle = () => {

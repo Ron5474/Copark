@@ -50,16 +50,15 @@
 
 import { Button } from "@mui/material"
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import { useTranslations } from "next-intl"
 
 type Props = {
   label?: string
   onClick: () => void
 }
 
-export default function GetStartedButton({
-  label = "Get Started",
-  onClick,
-}: Props) {
+export default function GetStartedButton({ label, onClick }: Props) {
+  const t = useTranslations("GetStartedButton")
   return (
     <Button
       onClick={onClick}
@@ -75,7 +74,7 @@ export default function GetStartedButton({
         },
       }}
     >
-      {label}
+      {label ?? t("label")}
     </Button>
   )
 }

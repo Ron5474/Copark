@@ -79,7 +79,7 @@ export default function EditForm({ vehicle, close = () => {} }: { vehicle: Vehic
           marginTop: '1vh',
         }}
       >
-       {t('edit') + ' - ' + (vehicle.nickname || `${vehicle.state} ${vehicle.plate}`)}
+       {t('edit') + ' - ' + (vehicle?.nickname || `${vehicle.state} ${vehicle.plate}`)}
       </Typography>
         <Box sx={{marginTop: '2vh'}}>
           <Box sx={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
@@ -141,7 +141,7 @@ export default function EditForm({ vehicle, close = () => {} }: { vehicle: Vehic
             submitEdit()
           }}
           disabled={isLoading}
-          aria-label='Save'
+          aria-label='Save changes'
           sx={{
             flex: 1,
             fontSize: '1.15rem',

@@ -147,7 +147,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
             <DialogContent sx={{ p: 1, pb: 2, position: 'relative' }}>
               <IconButton
                 onClick={handleAddClose}
-                aria-label="Close form to edit vehicle"
+                aria-label="Close form to add vehicle"
                 sx={{
                   position: 'absolute',
                   top: 8,
@@ -175,7 +175,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
             <DialogContent sx={{ p: 1, pb: 2, position: 'relative' }}>
               <IconButton
                 onClick={handleEditClose}
-                aria-label="Close form to add vehicle"
+                aria-label="Close form to edit vehicle"
                 sx={{
                   position: 'absolute',
                   top: 8,
@@ -228,7 +228,6 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                 value={selectedVID}
                 onChange={(event) => {
                   setSelectedVID(event.target.value)
-                  console.log("SELECTED:", event.target.value)
                   setVehicle(vehicles.find((v: Vehicle) => v.id === event.target.value) as Vehicle)
                   setSelectedVehicle(vehicles.find((v: Vehicle) => v.id === event.target.value) as Vehicle)
                   setIsValidSelection(true)

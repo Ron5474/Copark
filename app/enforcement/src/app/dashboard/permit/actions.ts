@@ -7,10 +7,10 @@ const getAuthToken = async () => {
   return token
 }
 
-export async function checkPermit(plate: string) {
+export async function checkPermit(plate: string, state: string) {
   const query = `
-    query CheckedPermit($plate: String!) {
-      checkPermit(plate: $plate) {
+    query CheckedPermit($plate: String!, $state: String!) {
+      checkPermit(plate: $plate, state: $state) {
         type
         area
       }
@@ -27,7 +27,8 @@ export async function checkPermit(plate: string) {
     body: JSON.stringify({
       query,
       variables: {
-        plate
+        plate,
+        state
       },
     }),
   })

@@ -11,6 +11,9 @@ export class RecognizePlateResult {
   @Field(() => String)
   plate!: string
 
+  @Field(() => String)
+  state!: string
+
   @Field(() => Number)
   confidence!: number
 }

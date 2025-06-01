@@ -9,7 +9,7 @@ function FeaturesSection() {
       title: "One-Click Purchase",
       description: "Buy permits instantly with our streamlined one-click purchase process.",
       details:
-        "Save your payment details securely and purchase permits with a single click, making parking hassle-free.",
+        "Your default vehicle is set during signup, so you can purchase permits with a single click fast, simple, and hassle-free.",
     },
     {
       icon: <ConfirmationNumber sx={{ fontSize: 40, color: "#00BFA5" }} />,
@@ -48,7 +48,7 @@ function FeaturesSection() {
   ]
 
   return (
-    <Box id="features" sx={{ py: 12, bgcolor: "background.default" }}>
+    <Box id="features" sx={{ py: 12, bgcolor: "grey.50" }}>
       <Container maxWidth="lg">
         <Box sx={{ textAlign: "center", mb: 8 }}>
           <Typography variant="h2" sx={{ mb: 2, fontSize: { xs: "2rem", md: "3rem" } }}>

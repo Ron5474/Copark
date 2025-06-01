@@ -143,7 +143,7 @@ export class VehicleService {
     }
 
     const vehicles = await this.getMyVehicles(userId)
-
+    
     if ((vehicles.length) === 1) {
         // console.log('existing', existing)
         throw new Error('Cannot delete the only default vehicle. Please add another vehicle as default first.')
@@ -184,7 +184,7 @@ export class VehicleService {
     if (pendingTicketsData.data.pendingTickets.length > 0) {
       throw new Error('Vehicle cannot be removed because it has pending tickets');
     }
-
+    
     // expire permits on this vehicle
     const expirePermits = await fetch(`http://localhost:4003/graphql`, {
       method: 'POST',

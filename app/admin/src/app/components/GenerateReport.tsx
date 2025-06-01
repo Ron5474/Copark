@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { fetchAdminReport } from '../../report/actions';
-import { cookies } from 'next/headers';
 
 const downloadBase64Pdf = (base64: string) => {
   const link = document.createElement('a');

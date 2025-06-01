@@ -184,8 +184,11 @@ function DeleteAlert({ close, onDelete }: { close: () => void, onDelete: () => v
         onClose={handleClose}
       >
         <DialogContent>
+          <Typography gutterBottom variant='h5' /*sx={{ fontWeight: 500 }}*/>
+            {t('warning.title')}
+          </Typography>
           <Typography variant='body1'>
-            {t('warning')}
+          {t('warning.message')}
           </Typography>
         </DialogContent>
         <DialogActions>

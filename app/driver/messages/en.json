@@ -221,7 +221,10 @@
     },
     "edit": {
       "delete": "Delete",
-      "warning": "Warning",
+      "warning": {
+        "title": "Warning",
+        "message": "Deleting your vehicle will automatically expire all associated permits and will not be refundable."
+      },
       "cancel": "Cancel",
       "edit": "Edit",
       "nickname": "Nickname",

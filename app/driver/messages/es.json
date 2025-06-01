@@ -225,7 +225,10 @@
     },
     "edit": {
       "delete": "Borrar",
-      "warning": "Advertencia",
+      "warning": {
+        "title": "Advertencia",
+        "message": "La eliminación de su vehículo expirará automáticamente todos los permisos asociados y no será reembolsable."
+      },
       "cancel": "Cancelar",
       "edit": "Editar vehículo",
       "nickname": "Apodo del vehículo",

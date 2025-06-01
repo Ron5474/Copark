@@ -602,3 +602,80 @@ test('Driver cannot delete a vehicle without plate and state', async () => {
   expect(deleteResponse.body.errors.length).toBe(1)
   expect(deleteResponse.body.errors[0].message).toBe("Plate and state is required")
 })
+test('Driver cannot delete a vehicle without auth', async () => {
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate: "TEST123", state: "California" }
+    })
+
+  expect(deleteResponse.body.errors.length).toBe(1)
+})
+
+test('Delete a non-existent vehicle returns error', async () => {
+  const token = await loginAs("driver", false)
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate: "NONEXISTENT", state: "CA" }
+    })
+  expect(deleteResponse.body.errors.length).toBe(1)
+  expect(deleteResponse.body.errors[0].message).toBe("Vehicle not found or not owned by user")
+})
+
+test('removeVehicle - deletes default when >1 vehicles exist', async () => {
+  const token = await loginAs("driver", false)
+
+  const veh1 = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: regVehicleQuery,
+      variables: vehicleInput
+    })
+
+  const state1 = veh1.body.data.registerVehicle.state
+  const plate1 = veh1.body.data.registerVehicle.plate
+
+  expect(veh1.body.data.registerVehicle.plate).toBe("TEST123")
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate: plate1, state: state1 }
+    })
+
+  expect(deleteResponse.body.data.deleteVehicle).toHaveProperty('id')
+
+  // Check if the default vehicle is now DERIK123
+  const defaultResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: getDefaultVehiclequery })
+
+  expect(defaultResponse.body.data.getDefaultVehicle.plate).toBe("DERIK123")
+});

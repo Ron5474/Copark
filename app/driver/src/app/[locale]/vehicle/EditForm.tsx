@@ -107,26 +107,55 @@ export default function EditForm({ vehicle, close = () => {} }: { vehicle: Vehic
             onChange={(event) => setNickname(event.target.value)}
           />
         </Box>
-      <Button
-        onClick={(e) => {
-          e.preventDefault()
-          setIsLoading(true)
-          submitEdit()
-        }}
-        disabled={isLoading}
-        aria-label='Save'
+      <Box
         sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
           width: '100%',
           marginTop: '5vh',
-          alignSelf: 'end',
-          fontSize: '1.15rem',
-          color: 'white',
-          backgroundColor: theme.palette.primary.main,
-          textTransform: 'none',
+          gap: 2,
         }}
       >
-        {t('add.save')}
-      </Button>
+        <Button
+          onClick={() => {
+          }}
+          aria-label='Delete vehicle'
+          sx={{
+            flex: 1,
+            fontSize: '1.15rem',
+            textTransform: 'none',
+            color: 'white',
+            backgroundColor: theme.palette.error.main,
+            '&:hover': {
+              backgroundColor: theme.palette.error.dark,
+            },
+          }}
+        >
+          {t('delete')}
+        </Button>
+
+        <Button
+          onClick={(e) => {
+            e.preventDefault()
+            setIsLoading(true)
+            submitEdit()
+          }}
+          disabled={isLoading}
+          aria-label='Save'
+          sx={{
+            flex: 1,
+            fontSize: '1.15rem',
+            color: 'white',
+            backgroundColor: theme.palette.primary.main,
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: theme.palette.primary.dark,
+            },
+          }}
+        >
+          {t('add.save')}
+        </Button>
+      </Box>
     </Box>
   )
 }

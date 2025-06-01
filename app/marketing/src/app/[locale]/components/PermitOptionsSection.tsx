@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react"
 import {
   Box,
@@ -10,7 +8,7 @@ import {
   Grid
 } from "@mui/material"
 
-function PricingSection() {
+function PermitSection() {
   const plans = [
     {
       title: "Daily Permits",
@@ -31,7 +29,7 @@ function PricingSection() {
   ]
 
   return (
-    <Box id="pricing" sx={{ py: 12, bgcolor: "background.default" }}>
+    <Box id="permits" sx={{ py: 12, bgcolor: "grey.50" }}>
       <Container maxWidth="lg">
         <Box sx={{ textAlign: "center", mb: 8 }}>
           <Typography variant="h2" sx={{ mb: 2, fontSize: { xs: "2rem", md: "3rem" } }}>
@@ -63,4 +61,4 @@ function PricingSection() {
   )
 }
 
-export default PricingSection
+export default PermitSection

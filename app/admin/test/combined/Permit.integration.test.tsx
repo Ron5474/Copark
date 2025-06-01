@@ -441,3 +441,77 @@ it('successfully fetches and displays permit report statistics', async () => {
     expect(screen.getByText('Total Revenue ($)')).toBeDefined();
   });
 });
+
+it('successfully updates zone price and details', async () => {
+  render(
+    <ThemeProvider theme={theme}>
+      <ManageZones />
+    </ThemeProvider>
+  );
+
+  // Wait for initial zone data to load
+  await waitFor(() => {
+    expect(screen.getByText('Zone 1')).toBeDefined();
+  });
+
+  // Click edit button on the first zone
+  fireEvent.click(screen.getByText('Edit'));
+
+  // Update zone details
+  fireEvent.change(screen.getByLabelText('Hourly Rate'), { target: { value: '3.50' } });
+  fireEvent.change(screen.getByLabelText('Max Hours'), { target: { value: '3' } });
+  fireEvent.change(screen.getByLabelText('Max Minutes'), { target: { value: '30' } });
+  fireEvent.change(screen.getByLabelText('Open Time'), { target: { value: '07:00' } });
+  fireEvent.change(screen.getByLabelText('Close Time'), { target: { value: '19:00' } });
+
+  // Add mock implementation for updateZonePrice
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      const body = JSON.parse(options?.body as string);
+      
+      if (body.query.includes('updateZonePrice')) {
+        const updatedZone = body.variables.input;
+        zonesData = zonesData.map(zone => 
+          zone.zone === updatedZone.zone ? {
+            ...zone,
+            hourly: updatedZone.hourly,
+            maxDuration: updatedZone.maxDuration,
+            openTime: updatedZone.openTime,
+            closeTime: updatedZone.closeTime
+          } : zone
+        );
+
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: {
+              updateZonePrice: [{
+                zone: updatedZone.zone,
+                hourly: updatedZone.hourly,
+                maxDuration: updatedZone.maxDuration,
+                openTime: updatedZone.openTime,
+                closeTime: updatedZone.closeTime
+              }]
+            }
+          })
+        });
+      }
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
+
+  // Submit update
+  fireEvent.click(screen.getByText('Update'));
+
+  // Dialog should close after successful update
+  await waitFor(() => {
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  // Updated values should be visible in the zone list
+  await waitFor(() => {
+    expect(screen.getByText('$3.5/hour')).toBeDefined();
+    expect(screen.getByText('3h 30m')).toBeDefined();
+    expect(screen.getByText('07:00 - 19:00')).toBeDefined();
+  });
+});

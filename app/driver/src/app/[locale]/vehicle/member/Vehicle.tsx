@@ -82,6 +82,14 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
     setLoading(false)
   }
 
+  const handleDelete = async () => {
+    const res = await getVehicles()
+    setEditOpen(false)
+    setLoading(true)
+    setVehicles(res)
+    setLoading(false)
+  }
+
   const setDefaultVehicle = async (vid: string) => {
     const vehicle = vehicles.find(v => v.id === vid)
     if (vehicle && vehicle.id) {
@@ -189,7 +197,13 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
               >
                 <CloseIcon />
               </IconButton>
-              <EditForm close={handleEdit} vehicle={selectedVehicle as Vehicle}/>
+              <EditForm
+                close={{
+                  edit: handleEdit,
+                  delete: handleDelete
+                }}
+                vehicle={selectedVehicle as Vehicle}
+              />
             </DialogContent>
           </Dialog>
         ))}

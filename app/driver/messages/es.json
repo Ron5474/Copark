@@ -223,12 +223,17 @@
       "title": "¿Qué vehículo?",
       "continue": "Continuar"
     },
-    "delete": "Borrar",
+    "edit": {
+      "delete": "Borrar",
+      "warning": "Advertencia",
+      "cancel": "Cancelar",
+      "edit": "Editar vehículo",
+      "nickname": "Apodo del vehículo"
+    },
     "title": "Sus vehículos",
     "add vehicle": "Agregar vehículo",
     "subtitle": "Preferencia de vehículo",
     "default": "por defecto",
-    "edit": "Editar vehículo",
     "noVehicles": "No hay vehículos todavía",
     "prompt": "Añade la información de tu vehículo para comenzar a estacionar",
     "setDefault": "Establecer como vehículo predeterminado",

@@ -219,6 +219,13 @@
       "optional": "optional",
       "save": "Save"
     },
+    "edit": {
+      "delete": "Delete",
+      "warning": "Warning",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "nickname": "Nickname"
+    },
     "checkout": {
       "title": "Which Vehicle?",
       "continue": "Continue"
@@ -228,7 +235,6 @@
     "add vehicle": "Add Vehicle",
     "subtitle": "Vehicle Preference",
     "default": "default",
-    "edit": "Edit",
     "noVehicles": "No vehicles yet",
     "prompt": "Add your vehicle information to start parking",
     "setDefault": "Set as Default Vehicle",

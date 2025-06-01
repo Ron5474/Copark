@@ -9,6 +9,7 @@ import AllPermitsTable from '@/app/charts/AllPermitsTable';
 import PermitStatsByZone from '@/app/charts/PermitStatsByZone';
 import PermitStatsByLot from '@/app/charts/PermitStatsByLot';
 import ViewStatistics from '@/app/components/ViewStatistics';
+import { getAllLotDetails } from '@/permit/actions';
 
 // Mock data
 const mockZones = [
@@ -514,4 +515,71 @@ it('successfully updates zone price and details', async () => {
     expect(screen.getByText('3h 30m')).toBeDefined();
     expect(screen.getByText('07:00 - 19:00')).toBeDefined();
   });
+});
+
+it('successfully fetches lot details', async () => {
+  const mockLotDetails = [
+    {
+      id: 'daily',
+      title: 'Daily',
+      lots: [
+        { name: 'Lot A', price: '$15' },
+        { name: 'Lot B', price: '$10' }
+      ]
+    },
+    {
+      id: 'quarterly',
+      title: 'Quarterly', 
+      lots: [
+        { name: 'Lot A', price: '$150' },
+        { name: 'Lot B', price: '$100' }
+      ]
+    }
+  ];
+
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      const body = JSON.parse(options?.body as string);
+      if (body.query.includes('getLots')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: { getLots: mockLotDetails }
+          })
+        });
+      }
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
+
+  const result = await getAllLotDetails();
+
+  expect(result).toEqual(mockLotDetails);
+  expect(mockFetch).toHaveBeenCalledWith(
+    'http://localhost:4003/graphql',
+    expect.objectContaining({
+      method: 'POST',
+      headers: expect.objectContaining({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer mock-auth-token'
+      }),
+      body: expect.stringContaining('getLots')
+    })
+  );
+});
+
+it('handles error when fetching lot details', async () => {
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          errors: [{ message: 'Failed to fetch lot details' }]
+        })
+      });
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
+
+  await expect(getAllLotDetails()).rejects.toThrow('Failed to fetch lot details');
 });

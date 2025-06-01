@@ -1,9 +1,9 @@
 import { RecognizePlateInput, RecognizePlateResult } from './schema'
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai"
 
 export class PictureService {
   private genAI: GoogleGenerativeAI
-  private model: any
+  private model: GenerativeModel
 
   constructor() {
     if (!process.env.GOOGLE_GEMINI_KEY) throw Error('No API Key')
@@ -77,7 +77,7 @@ export class PictureService {
     return [matches[1], matches[2]]
   }
 
-  private parseGeminiResponse(text: string): any {
+  private parseGeminiResponse(text: string): {plate: string, state: string, confidence: number} {
     try {
       const jsonMatch = text.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
@@ -91,7 +91,7 @@ export class PictureService {
     }
   }
 
-  private parseTextResponse(text: string): any {
+  private parseTextResponse(text: string): {plate: string, state: string, confidence: number} {
     const plateMatch = text.match(/plate["\s:]*([A-Z0-9]+)/i)
     const stateMatch = text.match(/state["\s:]*([A-Z]{2,3})/i)
     const confidenceMatch = text.match(/confidence["\s:]*(\d+)/i)

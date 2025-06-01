@@ -170,8 +170,8 @@ export class VehicleResolver {
   ): Promise<VehicleID> {
     const token = request.headers.authorization?.split(' ')[1]
     const userId = (await this.getUserData(token)).id
-    if (!plate) {
-      throw new Error('Plate is required')
+    if (!plate || !state) {
+      throw new Error('Plate and state is required')
     }
     if (!token) {
       throw new Error('Token not provided')

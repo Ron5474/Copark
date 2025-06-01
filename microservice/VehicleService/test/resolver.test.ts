@@ -581,3 +581,24 @@ test('Driver removes a vehicle', async () => {
 
   expect(deleteResponse.body.data.deleteVehicle).toHaveProperty('id')
 })
+
+test('Driver cannot delete a vehicle without plate and state', async () => {
+  const token = await loginAs("driver", false)
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate: "", state: "" }
+    })
+
+  expect(deleteResponse.body.errors.length).toBe(1)
+  expect(deleteResponse.body.errors[0].message).toBe("Plate and state is required")
+})

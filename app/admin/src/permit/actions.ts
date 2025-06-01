@@ -1,6 +1,6 @@
 'use server'
 import { cookies } from 'next/headers';
-import { PermitsByDay, Zone, ZoneStat, LotStat, Permit, PermitReport } from '../types';
+import { PermitsByDay, Zone, ZoneStat, LotStat, Permit, PermitReport, LotGroup } from '../types';
 
 const API_URL = 'http://localhost:4003/graphql';
 
@@ -268,5 +268,39 @@ export async function updateZonePrice(input: {
 
   const result = await response.json();
   return result.data.updateZonePrice;
+}
+
+export async function getAllLotDetails(): Promise<LotGroup[]> {
+  const token = await getAuthToken();
+
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query: `
+        query {
+          allLotDetails {
+            id
+            title
+            lots {
+              name
+              price
+            }
+          }
+        }
+      `
+    }),
+  });
+
+  const result = await response.json();
+  
+  if (result.errors) {
+    throw new Error(result.errors[0].message);
+  }
+
+  return result.data.allLotDetails;
 }
 

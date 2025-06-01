@@ -578,7 +578,7 @@ test('Driver removes a vehicle', async () => {
       `,
       variables: { plate, state }
     })
-
+  console.log('Delete Body: ', deleteResponse.body)
   expect(deleteResponse.body.data.deleteVehicle).toHaveProperty('id')
 })
 

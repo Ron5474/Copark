@@ -1,49 +1,47 @@
 import type React from "react"
 import { Container, Typography, Grid, Card, CardContent, Box } from "@mui/material"
 import { CreditCard, ConfirmationNumber, DirectionsCar, LocationOn, Schedule, Email } from "@mui/icons-material"
+import { useTranslations } from "next-intl"
 
 function FeaturesSection() {
+  const t = useTranslations("FeaturesSection")
+
   const features = [
     {
       icon: <CreditCard sx={{ fontSize: 40, color: "#00BFA5" }} />,
-      title: "One-Click Purchase",
-      description: "Buy permits instantly with our streamlined one-click purchase process.",
-      details:
-        "Your default vehicle is set during signup, so you can purchase permits with a single click fast, simple, and hassle-free.",
+      title: t("feature1.title"),
+      description: t("feature1.description"),
+      details: t("feature1.details"),
     },
     {
       icon: <ConfirmationNumber sx={{ fontSize: 40, color: "#00BFA5" }} />,
-      title: "Active Permit Tracking",
-      description: "Easily view and manage all your active parking permits in one place.",
-      details: "Never lose track of your permits again.",
+      title: t("feature2.title"),
+      description: t("feature2.description"),
+      details: t("feature2.details"),
     },
     {
       icon: <DirectionsCar sx={{ fontSize: 40, color: "#00BFA5" }} />,
-      title: "Vehicle Management",
-      description: "Add multiple vehicles and customize their nicknames for easy identification.",
-      details:
-        "Switch between vehicles effortlessly and set your default vehicle.",
+      title: t("feature3.title"),
+      description: t("feature3.description"),
+      details: t("feature3.details"),
     },
     {
       icon: <LocationOn sx={{ fontSize: 40, color: "#00BFA5" }} />,
-      title: "Zone Permits",
-      description: "Purchase permits by zone for hourly and minute-based parking needs.",
-      details:
-        "Zone system makes it easy to park in designated areas with flexible timing options.",
+      title: t("feature4.title"),
+      description: t("feature4.description"),
+      details: t("feature4.details"),
     },
     {
       icon: <Schedule sx={{ fontSize: 40, color: "#00BFA5" }} />,
-      title: "Flexible Duration Options",
-      description: "Choose from daily, quarterly, or yearly permits to fit your needs.",
-      details:
-        "Whether you need parking for a day or a year, CoPark has flexible options to accommodate your schedule.",
+      title: t("feature5.title"),
+      description: t("feature5.description"),
+      details: t("feature5.details"),
     },
     {
       icon: <Email sx={{ fontSize: 40, color: "#00BFA5" }} />,
-      title: "Student Discounts",
-      description: "10% off all permits for users with .edu email addresses.",
-      details:
-        "We support education by offering special discounts to students and faculty members with valid academic emails.",
+      title: t("feature6.title"),
+      description: t("feature6.description"),
+      details: t("feature6.details"),
     },
   ]
 
@@ -52,10 +50,10 @@ function FeaturesSection() {
       <Container maxWidth="lg">
         <Box sx={{ textAlign: "center", mb: 8 }}>
           <Typography variant="h2" sx={{ mb: 2, fontSize: { xs: "2rem", md: "3rem" } }}>
-            Parking Made Simple
+            {t("heading")}
           </Typography>
           <Typography variant="h6" sx={{ color: "text.secondary", maxWidth: 700, mx: "auto" }}>
-            CoPark streamlines the parking experience with powerful features designed for convenience and ease of use.
+            {t("subheading")}
           </Typography>
         </Box>
         <Grid container spacing={4}>

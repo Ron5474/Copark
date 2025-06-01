@@ -125,15 +125,17 @@ import HowItWorksSection from "./components/HowItWorksSection";
 import HeroSection from "./components/HeroSection";
 import FeaturesSection from "./components/FeaturesSection";
 import ClientButtonWrapper from "./components/ClientButtonWrapper";
+import { useTranslations } from "next-intl"
 
 function HomeView() {
+  const t = useTranslations("HomeView")
   return (
     <>
       <CssBaseline />
       <Topbar />
       <Toolbar />
       <Box>
-        <HeroSection cta={<ClientButtonWrapper label="Get Started Now"/>}/>
+        <HeroSection cta={<ClientButtonWrapper label={t("cta")}/>}/>
         <FeaturesSection />
         <HowItWorksSection cta={<ClientButtonWrapper />} />
         <PermitSection />

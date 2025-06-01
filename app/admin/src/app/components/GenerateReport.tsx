@@ -7,9 +7,9 @@ const downloadBase64Pdf = (base64: string) => {
   link.click();
 };
 
-export default function GenerateReportButton({ base64 }: { base64: string }) {
+export default function GenerateReportButton() {
   return (
-    <button onClick={() => downloadBase64Pdf(base64)}>
+    <button onClick={() => downloadBase64Pdf()}>
       Download PDF Report
     </button>
   );

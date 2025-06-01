@@ -8,6 +8,7 @@ import ManageAPIUsers from './components/ManageAPIUsers';
 import ViewStatistics from './components/ViewStatistics';
 import ManageTicketChallenges from './components/ManageTicketChallenges';
 import ManageZones from './components/ManageZones';
+import GenerateReportButton from './components/generateReport';
 
 export default function Page() {
   const [currentComponent, setCurrentComponent] = useState<string>('statistics');
@@ -30,6 +31,8 @@ export default function Page() {
         return <Box>Generate Reports Component</Box>;
       case 'zones':
         return <ManageZones />;
+      case 'pdf':
+        return <GenerateReportButton />;
     }
   };
 

@@ -19,7 +19,7 @@ import {
 
 import theme from '../theme'
 import { Vehicle } from '../types'
-import { editVehicle } from './actions'
+import { editVehicle, deleteVehicle } from './actions'
 import { useTranslations } from 'next-intl'
 
 
@@ -151,10 +151,15 @@ export default function EditForm({ vehicle, close }: { vehicle: Vehicle, close: 
             },
           }}
         >
-          {t('add.save')}
+          {t('save')}
         </Button>
       </Box>
-      {deleting && <DeleteAlert close={() => setDeleting(false)} onDelete={close}/>}
+      {deleting && <DeleteAlert close={() => setDeleting(false)}
+        onDelete={() => {
+          deleteVehicle(vehicle.plate, vehicle.state)
+          close()
+        }}
+      />}
     </Box>
   )
 }

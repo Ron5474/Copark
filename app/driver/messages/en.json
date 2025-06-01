@@ -224,7 +224,8 @@
       "warning": "Warning",
       "cancel": "Cancel",
       "edit": "Edit",
-      "nickname": "Nickname"
+      "nickname": "Nickname",
+      "save": "Save"
     },
     "checkout": {
       "title": "Which Vehicle?",

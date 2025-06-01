@@ -228,7 +228,8 @@
       "warning": "Advertencia",
       "cancel": "Cancelar",
       "edit": "Editar vehículo",
-      "nickname": "Apodo del vehículo"
+      "nickname": "Apodo del vehículo",
+      "save": "Ahorrar"
     },
     "title": "Sus vehículos",
     "add vehicle": "Agregar vehículo",

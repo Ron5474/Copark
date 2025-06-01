@@ -301,7 +301,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
                 textTransform: 'none',
               }}
             >
-              {isCheckout ? t("checkout.continue") : t("edit")}
+              {isCheckout ? t("checkout.continue") : t("edit.edit")}
             </Button>
             {!isCheckout && selectedVID && (
               vehicles.find(v => v.id === selectedVID)?.default !== true

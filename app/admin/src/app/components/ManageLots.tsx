@@ -8,8 +8,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
-  Stack,
 } from '@mui/material';
 import { getAllLotDetails } from '../../permit/actions';
 import { LotGroup } from '../../types';

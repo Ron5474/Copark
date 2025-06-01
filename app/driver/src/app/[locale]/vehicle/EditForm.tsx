@@ -155,9 +155,14 @@ export default function EditForm({ vehicle, close }: { vehicle: Vehicle, close: 
         </Button>
       </Box>
       {deleting && <DeleteAlert close={() => setDeleting(false)}
-        onDelete={() => {
-          deleteVehicle(vehicle.plate, vehicle.state)
-          close()
+        onDelete={async () => {
+          try {
+            await deleteVehicle(vehicle.plate, vehicle.state)
+            close()
+          } catch (error) {
+            setErrorMessage("Error deleting vehicle: " + error.message)
+            setDeleting(false)
+          }
         }}
       />}
     </Box>

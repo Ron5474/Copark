@@ -194,6 +194,8 @@ export function mockNextIntl() {
           'garage.add.optional': 'optional',
           'garage.add.save': 'Save',
           'garage.edit.delete': 'Delete',
+          'garage.edit.warning.title': 'Warning',
+          'garage.edit.warning.message': 'Deleting your vehicle will automatically expire all associated permits and will not be refundable.',
           'garage.edit.cancel': 'Cancel',
           'garage.edit.edit': 'Edit',
           'garage.edit.nickname': 'Nickname',

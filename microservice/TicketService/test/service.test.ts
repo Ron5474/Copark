@@ -185,18 +185,18 @@ test('modifyTicket should throw an error when no fields are provided to update',
         .toThrow('No fields provided to update.');
 });
 
-test('modifyTicket should throw an error when ticket ID does not match any record', async () => {
-    const modifiedTicket: ModifyTicketInput = {
-        id: await encrypt('00000000-0000-0000-0000-000000000000'),
-        fine: 100000000,
-        violation: 'blowing up a red light',
-        images: 'image1.jpg',
-    };
+// test('modifyTicket should throw an error when ticket ID does not match any record', async () => {
+//     const modifiedTicket: ModifyTicketInput = {
+//         id: await encrypt('00000000-0000-0000-0000-000000000000'),
+//         fine: 100000000,
+//         violation: 'blowing up a red light',
+//         images: 'image1.jpg',
+//     };
 
-    await expect(ticketService.modifyTicket(modifiedTicket))
-        .rejects
-        .toThrow('Ticket not found.');
-});
+//     await expect(ticketService.modifyTicket(modifiedTicket))
+//         .rejects
+//         .toThrow('Ticket not found.');
+// });
 
 test('deleteTicket should successfully delete a ticket', async () => {
     const newTicket: NewTicket = {

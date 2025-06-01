@@ -518,3 +518,5 @@ test('Driver can get a list of their vehicles', async () => {
 
     expect(listResponse.body.data.getVehicleByUserId.length).toBe(1)
   })
+
+// test('Driver removes a vehicle', async () => {})

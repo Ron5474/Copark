@@ -59,7 +59,7 @@ export class PermitService {
     const durationMs = totalMinutes * 60 * 1000
     const expireDate = new Date(today.getTime() + durationMs).toISOString()
 
-    const durationType = 'hourly'
+    const durationType = 'zone'
 
     const data = {
       purchaseDate,

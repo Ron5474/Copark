@@ -257,6 +257,13 @@ mutation PurchaseLotPermit($input: PurchaseLotInput!) {
   }
 }`
 
+const expirePermitQuery = `
+mutation ExpirePermits($vehicleId: String!) {
+  expirePermits(vehicleId: $vehicleId) {
+    id
+  }
+}`
+
 const purchaseLotInput = {
   input: {
     plate: derikVehicleInput.input.plate,
@@ -643,6 +650,32 @@ test('Driver can purchase a lot permit in advance', async () => {
     })
 
   expect(confirmation.body.data.purchaseLotPermit.activeDate).not.toBe(now.toISOString())
+  
+  vi.useRealTimers()
+})
+
+test('Driver can expire their permits', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, vehicleId: driver.vid, paymentMethod: 'visa 4242'}}
+    })
+
+  const permit = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: expirePermitQuery,
+      variables: {vehicleId: driver.vid}
+    })
+
+  expect(permit.body.data.expirePermits[0].id).toBeDefined()
   
   vi.useRealTimers()
 })

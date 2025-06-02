@@ -68,6 +68,7 @@ export default function DashboardView() {
   const [activePermits, setActivePermits] = useState<Permit[]>([]);
   const [loading, setLoading] = useState(true);
   const [defaultVehicle, setDefaultVehicle] = useState<Vehicle | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -97,7 +98,9 @@ export default function DashboardView() {
   }, []);
 
   const toggleExpanded = (id: string) => {
+    setErrorMessage(null)
     setExpandedId((prev) => (prev === id ? null : id));
+    setSelectedLots({})
   };
 
   const handleLotChange = (permitId: string, lotName: string) => {
@@ -166,7 +169,7 @@ export default function DashboardView() {
                 }}
               >
                 <Typography fontWeight="bold" color="primary.main">
-                  {permit.area === "ANY" ? t("allLotsAccess") : permit.durationType.charAt(0).toUpperCase() + permit.durationType.slice(1) + " " + permit.area}
+                  {permit.durationType.charAt(0).toUpperCase() + permit.durationType.slice(1) + " " + (permit.area === "ANY" ? t("allLotsAccess") : permit.area)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {t("active")}: {new Date(permit.activeDate!).toLocaleDateString()}
@@ -244,7 +247,7 @@ export default function DashboardView() {
               </Box>
             )}
 
-            <Button
+            {/*<Button
               variant="contained"
               color="primary"
               sx={{
@@ -256,6 +259,7 @@ export default function DashboardView() {
               disabled={!selectedLots[permit.id]}
               onClick={() => {
                 if (selectedLots[permit.id]) {
+                  if (permit.area activePermits)
                   checkout(permit);
                 }
               }}
@@ -266,7 +270,47 @@ export default function DashboardView() {
               }
             >
               {t("purchase")}
-            </Button>
+            </Button> */}
+              <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                mt: 2,
+                borderRadius: "8px",
+                textTransform: "none",
+                color: "#fff",
+              }}
+              disabled={!selectedLots[permit.id]}
+              onClick={() => {
+                const selectedLot = selectedLots[permit.id];
+                const selectedArea = selectedLot?.slice(3); // Strip "lot" prefix
+
+                const isDuplicate = activePermits.some(
+                  (p) => p.area === selectedArea
+                );
+
+                if (isDuplicate) {
+                  setErrorMessage(`You already have a permit for ${selectedArea === "ANY" ? t("allLotsAccess") : `Lot ${selectedArea}`}`);
+                  return;
+                }
+
+                setErrorMessage(null); // Clear any old errors
+                checkout(permit);
+              }}
+              aria-label={
+                !selectedLots[permit.id]
+                ? `Purchase ${permit.title} permit disabled`
+                : `Purchase ${permit.title} permit enabled`
+              }
+              >
+              {t("purchase")}
+              </Button>
+
+              {errorMessage && (
+                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {errorMessage}
+                </Typography>
+              )}
           </Stack>
         </CardButton>
       ))}

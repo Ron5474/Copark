@@ -59,10 +59,13 @@ export class PermitService {
     const durationMs = totalMinutes * 60 * 1000
     const expireDate = new Date(today.getTime() + durationMs).toISOString()
 
+    const durationType = 'zone'
+
     const data = {
       purchaseDate,
       activeDate,
       expireDate,
+      durationType,
       receipt,
       paymentMethod: input.paymentMethod,
       transactionId: input.transactionId,
@@ -175,31 +178,34 @@ export class PermitService {
             p.id AS id,
             t.data->>'name' AS type,
             t.data->>'area' AS area,
+            p.data->>'durationType' AS "durationType",
             p.data->>'activeDate' AS "activeDate",
             p.data->>'expireDate' AS "expireDate"
           FROM permit p, type t 
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
-          AND $2 <= (p.data->>'activeDate')::timestamptz
+          AND $2 < (p.data->>'activeDate')::timestamptz
         ),
         active AS (
           SELECT DISTINCT ON (p.id) p.vehicle,
             p.id AS id,
             t.data->>'name' AS type,
             t.data->>'area' AS area,
+            p.data->>'durationType' AS "durationType",
             p.data->>'activeDate' AS "activeDate",
             p.data->>'expireDate' AS "expireDate"
           FROM permit p, type t 
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
           AND $2 >= (p.data->>'activeDate')::timestamptz
-          AND $2 <= (p.data->>'expireDate')::timestamptz
+          AND $2 < (p.data->>'expireDate')::timestamptz
         ),
         expired AS (
           SELECT DISTINCT ON (p.id) p.vehicle,
             p.id AS id,
             t.data->>'name' AS type,
             t.data->>'area' AS area,
+            p.data->>'durationType' AS "durationType",
             p.data->>'activeDate' AS "activeDate",
             p.data->>'expireDate' AS "expireDate"
           FROM permit p, type t 
@@ -245,7 +251,8 @@ export class PermitService {
         data->>'expireDate' AS expireDate,
         data->>'receipt' AS receipt,
         data->>'paymentMethod' AS paymentMethod,
-        data->>'area' AS area
+        data->>'area' AS area,
+        data->>'durationType' as durationType
       FROM permit
       ORDER BY data->>'activedate'
     `
@@ -259,6 +266,7 @@ export class PermitService {
         vehicle: row.vehicle,
         type: row.type,
         area: row.area,
+        durationType: row.durationType,
         activeDate: row.activeDate,
         expireDate: row.expireDate,
       }
@@ -279,11 +287,15 @@ export class PermitService {
 
   public async createNewZone(input: NewZone): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO Don't hardcode this
+
+    const { zone, ...inputWithoutZone } = input
+
     const data = {
+      ...inputWithoutZone,
       name: 'zone',
-      area: input.zone,
-      ...input
+      area: zone,
     }
+
     const { rows } = await pool.query(`
       INSERT INTO type (location, data)
       SELECT $2, $1
@@ -294,7 +306,7 @@ export class PermitService {
         AND data->>'name' = 'zone'
       )
       RETURNING id, data
-    `, [data, location, data.zone])
+    `, [data, location, zone])
   
     return (rows.length !== 0)
   }
@@ -366,6 +378,15 @@ export class PermitService {
 
   public async createNewLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
+
+    const { lot, ...inputWithoutLot } = input
+
+    const data = {
+      ...inputWithoutLot,
+      name: 'lot',
+      area: lot,
+    }
+
     const { rowCount } = await pool.query(`
       INSERT INTO type (location, data)
       SELECT $2, $1
@@ -376,7 +397,7 @@ export class PermitService {
         AND data->>'name' = 'lot'
       )
       RETURNING id, data
-    `, [input, location, input.lot])
+    `, [data, location, lot])
   
     return (rowCount as number) > 0
   }
@@ -427,6 +448,7 @@ export class PermitService {
       activeDate,
       expireDate,
       receipt,
+      durationType: input.duration,
       paymentMethod: input.paymentMethod,
       transactionId: input.transactionId,
     }
@@ -528,6 +550,7 @@ export class PermitService {
       SELECT 
         t.data->>'name' AS type,
         t.data->>'area' AS area,
+        p.data->>'durationType' as "durationType",
         p.data->>'purchaseDate' AS "purchaseDate",
         p.data->>'activeDate' AS "activeDate",
         p.data->>'expireDate' AS "expireDate"
@@ -731,20 +754,28 @@ export class PermitService {
     }]
   }
 
-  public async expirePermits(vehicleId: string): Promise<permitId[]> {
-    if (!vehicleId) {
-      throw new Error('Vehicle ID is required');
-    }
+  public async expirePermits(vehicleId: string, now=new Date().toISOString()): Promise<permitId[]> {
+    // Vehicle ID has to be defined, it is a required argument in this function.
+    // if (!vehicleId) {
+    //   throw new Error('Vehicle ID is required');
+    // }
     const result = await pool.query(
-      `UPDATE permit SET data = jsonb_set(data, '{expireDate}', to_jsonb(NOW())) WHERE vehicle = $1 RETURNING id`,
-      [vehicleId]
-    );
-
+      `
+      UPDATE permit
+      SET data = jsonb_set(data, '{expireDate}', to_jsonb($2))
+      WHERE vehicle = $1
+        AND (data->>'expireDate')::timestamptz > $2
+      RETURNING id
+      `,
+      [vehicleId, now]
+    )
+  
     if (result.rowCount === 0) {
-      return [];
+      return []
     }
+  
     return result.rows.map(row => ({
       id: row.id,
-    }));
+    }))
   }
 }

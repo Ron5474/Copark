@@ -13,6 +13,9 @@ export class Permit {
   area!: string
 
   @Field(() => String)
+  durationType!: string
+
+  @Field(() => String)
   purchaseDate?: string
 
   @Field(() => String)
@@ -256,10 +259,10 @@ export class Lot {
   @Field(() => String)
   price!: string
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   activeDate?: string
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   expireDate?: string
 }
 

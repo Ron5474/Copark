@@ -92,6 +92,7 @@ export type Permit = {
   vehicle: string
   type: string
   area: string
+  durationType: string
   purchaseDate?: string
   activeDate?: string
   expireDate: string

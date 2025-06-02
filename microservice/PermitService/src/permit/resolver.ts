@@ -393,6 +393,18 @@ export class PermitResolver {
     return purchaseMyZonePermit
   }
 
+  @Authorized('driver')
+  @Mutation(() => [permitId])
+  async expirePermits(
+    @Arg('vehicleId', () => String) vehicleId: string,
+  ): Promise<permitId[]> {
+    // Vehicle ID has to be defined. it is a required arg 
+    // if (!vehicleId) {
+    //   throw new Error('Vehicle ID is required')
+    // }
+    return await service.expirePermits(vehicleId)
+  }
+
   /*
   **********************************************************************************
   * Enforcement
@@ -563,16 +575,5 @@ export class PermitResolver {
     }
 
     return await service.isValidPermitPolice(vehicleId)
-  }
-
-  @Authorized('driver')
-  @Mutation(() => [permitId])
-  async expirePermits(
-    @Arg('vehicleId', () => String) vehicleId: string,
-  ): Promise<permitId[]> {
-    if (!vehicleId) {
-      throw new Error('Vehicle ID is required')
-    }
-    return await service.expirePermits(vehicleId)
   }
 }

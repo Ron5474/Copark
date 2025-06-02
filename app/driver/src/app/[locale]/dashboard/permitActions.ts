@@ -55,6 +55,7 @@ export const getMyPermits = async (): Promise<MyPermits> => {
               vehicle
               type
               area
+              durationType
               activeDate
               expireDate
             }
@@ -62,6 +63,7 @@ export const getMyPermits = async (): Promise<MyPermits> => {
               vehicle
               type
               area
+              durationType
               activeDate
               expireDate
             }
@@ -69,6 +71,7 @@ export const getMyPermits = async (): Promise<MyPermits> => {
               vehicle
               type
               area
+              durationType
               activeDate
               expireDate
             }

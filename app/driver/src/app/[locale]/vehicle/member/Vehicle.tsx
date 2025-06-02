@@ -56,13 +56,13 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
         vid = res.id
         if (isCheckout) {
           setSelectedVID(vid)
-          setVehicle(fetchedVehicles.find((v: Vehicle) => v.id === vid))
+          setVehicle((fetchedVehicles ?? []).find((v: Vehicle) => v.id === vid))
         }
       } else {
         vid = null
       }
     })()
-  }, [setSelectedVID, isCheckout])
+  }, [setSelectedVID, isCheckout, setVehicle])
 
   const handleAddOpen = () => setAddOpen(true)
   const handleAddClose = () => setAddOpen(false)

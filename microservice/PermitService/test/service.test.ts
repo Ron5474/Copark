@@ -181,6 +181,39 @@ test('admin create zone', async () => {
   }))
 })
 
+test('admin updates zone', async () => {
+  await permitService.createNewZone({
+    zone: 789,
+    weekday: {
+      hourly: 2.50,
+      maxDuration: {minutes: 30, hours: 1},
+      openTime: '07:00',
+      closeTime: '20:00'
+    },
+    weekend: {
+      hourly: 2.50,
+      maxDuration: {minutes: 30, hours: 1},
+      openTime: '07:00',
+      closeTime: '20:00'
+    }
+  })
+  expect(await permitService.updateZone({
+    zone: 789,
+    weekday: {
+      hourly: 600,
+      maxDuration: {minutes: 30, hours: 1},
+      openTime: '07:00',
+      closeTime: '20:00'
+    },
+    weekend: {
+      hourly: 600,
+      maxDuration: {minutes: 30, hours: 1},
+      openTime: '07:00',
+      closeTime: '20:00'
+    }
+  })).toBeTruthy()
+})
+
 test('admin creates zone that already exists', async () => {
   expect(await permitService.createNewZone({
     zone: 27,

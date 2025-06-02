@@ -349,6 +349,45 @@ query GetLots {
   }
 }`
 
+const getZonesQuery = `
+    query GetZones {
+      getZones {
+        zone
+        hourly
+        maxDuration {
+          hours
+          minutes
+        }
+        openTime
+        closeTime
+      }
+    }
+  `
+
+const createNewZoneInput = {
+  input: {
+    zone: 38212,
+    weekday: {
+      hourly: 3.50,
+      maxDuration: {
+        hours: 2,
+        minutes: 30
+      },
+      openTime: "08:00",
+      closeTime: "18:00"
+    },
+    weekend: {
+      hourly: 3.50,
+      maxDuration: {
+        hours: 2,
+        minutes: 30
+      },
+      openTime: "08:00",
+      closeTime: "18:00"
+    }
+  }
+}
+
 // const permitResolver = new PermitResolver()
 
 // test('Driver can\'t purchase a zone permit for wrong car', async () => {
@@ -855,25 +894,10 @@ test('Admin can get ticket stats grouped by day', async () => {
 test('Admin can get all zones', async () => {
   const { token } = await loginAs("admin")
 
-  const query = `
-    query GetZones {
-      getZones {
-        zone
-        hourly
-        maxDuration {
-          hours
-          minutes
-        }
-        openTime
-        closeTime
-      }
-    }
-  `
-
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query })
+    .send({ getZonesQuery })
     .expect(200)
 
   expect(response.body.errors).toBeUndefined()
@@ -895,14 +919,6 @@ test('Admin can create a new zone', async () => {
   const { token } = await loginAs("admin")
 
   // First get existing zones to find an unused number
-  const getZonesQuery = `
-    query GetZones {
-      getZones {
-        zone
-      }
-    }
-  `
-
   const existingZonesResponse = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
@@ -922,29 +938,8 @@ test('Admin can create a new zone', async () => {
     }
   `
 
-  const variables = {
-    input: {
-      zone: newZoneNumber,
-      weekday: {
-        hourly: 3.50,
-        maxDuration: {
-          hours: 2,
-          minutes: 30
-        },
-        openTime: "08:00",
-        closeTime: "18:00"
-      },
-      weekend: {
-        hourly: 3.50,
-        maxDuration: {
-          hours: 2,
-          minutes: 30
-        },
-        openTime: "08:00",
-        closeTime: "18:00"
-      }
-    }
-  }
+  const variables = createNewZoneInput
+  variables.input.zone = newZoneNumber
 
   const response = await supertest(server)
     .post('/graphql')
@@ -956,25 +951,10 @@ test('Admin can create a new zone', async () => {
   expect(response.body.data.createZone).toBe(true)
 
   // Verify the zone was created
-  const verifyQuery = `
-    query GetZones {
-      getZones {
-        zone
-        hourly
-        maxDuration {
-          hours
-          minutes
-        }
-        openTime
-        closeTime
-      }
-    }
-  `
-
   const verifyResponse = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query: verifyQuery })
+    .send({ query: getZonesQuery })
 
   const newZone = verifyResponse.body.data.getZones // eslint-disable-next-line
     .find((z: any) => z.zone === newZoneNumber.toString())
@@ -996,34 +976,10 @@ test('Admin can update a zone', async () => {
     }
   `
 
-  let variables = {
-    input: {
-      zone: 38212,
-      weekday: {
-        hourly: 3.50,
-        maxDuration: {
-          hours: 2,
-          minutes: 30
-        },
-        openTime: "08:00",
-        closeTime: "18:00"
-      },
-      weekend: {
-        hourly: 3.50,
-        maxDuration: {
-          hours: 2,
-          minutes: 30
-        },
-        openTime: "08:00",
-        closeTime: "18:00"
-      }
-    }
-  }
-
   await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query: mutation, variables })
+    .send({ query: mutation, variables: createNewZoneInput })
     .expect(200)
 
   const updateMutation = `
@@ -1032,11 +988,11 @@ test('Admin can update a zone', async () => {
     }
   `
 
-  variables = { 
+  const variables = { 
     input: {
-      ...variables.input, 
-      weekday: { ...variables.input.weekday, hourly: 600 },
-      weekend: { ...variables.input.weekend, hourly: 600 }
+      ...createNewZoneInput.input, 
+      weekday: { ...createNewZoneInput.input.weekday, hourly: 600 },
+      weekend: { ...createNewZoneInput.input.weekend, hourly: 600 }
     }
   }
 
@@ -1049,27 +1005,11 @@ test('Admin can update a zone', async () => {
   expect(response.body.errors).toBeUndefined();
   
   // Verify the zone was updated
-  const verifyQuery = `
-    query GetZones {
-      getZones {
-        zone
-        hourly
-        maxDuration {
-          hours
-          minutes
-        }
-        openTime
-        closeTime
-      }
-    }
-  `
-
   const verifyResponse = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query: verifyQuery })
+    .send({ query: getZonesQuery })
 
-    console.log("RESPONSE:", verifyResponse.body)
   const updatedZone = verifyResponse.body.data.getZones // eslint-disable-next-line
     .find((z: any) => z.zone === variables.input.zone.toString())
 
@@ -1481,17 +1421,6 @@ test('Admin can update zone price', async () => {
   const { token } = await loginAs("admin")
 
   // First, get an existing zone to update
-  const getZonesQuery = `
-    query GetZones {
-      getZones {
-        zone
-        hourly
-        maxDuration { hours minutes }
-        openTime
-        closeTime
-      }
-    }
-  `
   const zonesRes = await supertest(server)
     .post('/graphql')
     .set('Authorization', `Bearer ${token}`)

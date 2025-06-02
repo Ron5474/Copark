@@ -755,9 +755,10 @@ export class PermitService {
   }
 
   public async expirePermits(vehicleId: string): Promise<permitId[]> {
-    if (!vehicleId) {
-      throw new Error('Vehicle ID is required');
-    }
+    // Vehicle ID has to be defined, it is a required argument in this function.
+    // if (!vehicleId) {
+    //   throw new Error('Vehicle ID is required');
+    // }
     const result = await pool.query(
       `UPDATE permit SET data = jsonb_set(data, '{expireDate}', to_jsonb(NOW())) WHERE vehicle = $1 RETURNING id`,
       [vehicleId]

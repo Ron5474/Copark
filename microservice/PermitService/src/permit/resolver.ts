@@ -570,9 +570,10 @@ export class PermitResolver {
   async expirePermits(
     @Arg('vehicleId', () => String) vehicleId: string,
   ): Promise<permitId[]> {
-    if (!vehicleId) {
-      throw new Error('Vehicle ID is required')
-    }
+    // Vehicle ID has to be defined. it is a required arg 
+    // if (!vehicleId) {
+    //   throw new Error('Vehicle ID is required')
+    // }
     return await service.expirePermits(vehicleId)
   }
 }

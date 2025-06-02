@@ -310,6 +310,9 @@ export class LotStats {
   @Field(() => String)
   area!: string
 
+  @Field(() => String)
+  durationType!: string
+
   @Field(() => Number)
   totalPermits!: number
 }

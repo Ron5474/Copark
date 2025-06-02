@@ -304,3 +304,38 @@ export async function getAllLotDetails(): Promise<LotGroup[]> {
   return result.data.getLots;
 }
 
+export async function createLot(input: {
+  lot: string,
+  daily?: { price: number, expireDate?: string },
+  quarterly?: { price: number, expireDate?: string },
+  yearly?: { price: number, expireDate?: string }
+}): Promise<boolean> {
+  const token = await getAuthToken();
+
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query: `
+        mutation CreateLot($input: NewLot!) {
+          createLot(input: $input)
+        }
+      `,
+      variables: {
+        input
+      }
+    }),
+  });
+
+  const result = await response.json();
+  
+  if (result.errors) {
+    throw new Error(result.errors[0].message);
+  }
+
+  return result.data.createLot;
+}
+

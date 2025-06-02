@@ -378,11 +378,15 @@ export class PermitService {
 
   public async createNewLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
+
+    const { lot, ...inputWithoutLot } = input
+
     const data = {
-      ...input,
+      ...inputWithoutLot,
       name: 'lot',
-      area: input.lot
+      area: lot,
     }
+
     const { rowCount } = await pool.query(`
       INSERT INTO type (location, data)
       SELECT $2, $1
@@ -393,7 +397,7 @@ export class PermitService {
         AND data->>'name' = 'lot'
       )
       RETURNING id, data
-    `, [data, location, input.lot])
+    `, [data, location, lot])
   
     return (rowCount as number) > 0
   }

@@ -987,6 +987,100 @@ test('Admin can create a new zone', async () => {
   expect(newZone.closeTime).toBe("18:00")
 })
 
+test('Admin can update a zone', async () => {
+  const { token } = await loginAs("admin");
+
+  const mutation = `
+    mutation CreateZone($input: NewZone!) {
+      createZone(input: $input)
+    }
+  `
+
+  let variables = {
+    input: {
+      zone: 38212,
+      weekday: {
+        hourly: 3.50,
+        maxDuration: {
+          hours: 2,
+          minutes: 30
+        },
+        openTime: "08:00",
+        closeTime: "18:00"
+      },
+      weekend: {
+        hourly: 3.50,
+        maxDuration: {
+          hours: 2,
+          minutes: 30
+        },
+        openTime: "08:00",
+        closeTime: "18:00"
+      }
+    }
+  }
+
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: mutation, variables })
+    .expect(200)
+
+  const updateMutation = `
+    mutation UpdateZone($input: NewZone!) {
+      updateZone(input: $input)
+    }
+  `
+
+  variables = { 
+    input: {
+      ...variables.input, 
+      weekday: { ...variables.input.weekday, hourly: 600 },
+      weekend: { ...variables.input.weekend, hourly: 600 }
+    }
+  }
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: updateMutation, variables })
+    .expect(200)
+
+  expect(response.body.errors).toBeUndefined();
+  
+  // Verify the zone was updated
+  const verifyQuery = `
+    query GetZones {
+      getZones {
+        zone
+        hourly
+        maxDuration {
+          hours
+          minutes
+        }
+        openTime
+        closeTime
+      }
+    }
+  `
+
+  const verifyResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: verifyQuery })
+
+    console.log("RESPONSE:", verifyResponse.body)
+  const updatedZone = verifyResponse.body.data.getZones // eslint-disable-next-line
+    .find((z: any) => z.zone === variables.input.zone.toString())
+
+  expect(updatedZone).toBeDefined()
+  expect(updatedZone.hourly).toBe(600)
+  expect(updatedZone.maxDuration.hours).toBe(2)
+  expect(updatedZone.maxDuration.minutes).toBe(30)
+  expect(updatedZone.openTime).toBe("08:00")
+  expect(updatedZone.closeTime).toBe("18:00")
+});
+
 test('Admin can get all lots', async () => {
   const { token } = await loginAs("admin")
 
@@ -996,7 +1090,7 @@ test('Admin can get all lots', async () => {
     .send({ query: getLotsQuery })
     .expect(200)
 
-    console.log("LOT ERRORS:", response.body)
+    // console.log("LOT ERRORS:", response.body)
   expect(response.body.errors).toBeUndefined()
   const lots = response.body.data.getLots
   expect(Array.isArray(lots)).toBe(true)
@@ -1561,6 +1655,7 @@ test('Admin can update a lot', async () => {
   expect(updateRes.body.errors).toBeUndefined();
   // expect(updateRes.body.data.updateLot).toBe(true);
 });
+
 // need fixing
 // test('Admin sees correct permit summary in adminPermitReport', async () => {
 //   const { token } = await loginAs("admin")

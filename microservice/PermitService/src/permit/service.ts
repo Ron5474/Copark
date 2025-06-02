@@ -243,45 +243,49 @@ export class PermitService {
   public async getAllPermitsByDay(): Promise<PermitsByDay[]> {
     const permitQuery = `
       SELECT 
-        id,
-        vehicle,
-        type,
-        data->>'purchaseDate' AS purchaseDate,
-        data->>'activeDate' AS activeDate,
-        data->>'expireDate' AS expireDate,
-        data->>'receipt' AS receipt,
-        data->>'paymentMethod' AS paymentMethod,
-        data->>'area' AS area,
-        data->>'durationType' as durationType
-      FROM permit
-      ORDER BY data->>'activedate'
+        p.id,
+        p.vehicle,
+        p.type,
+        p.data->>'purchaseDate' AS purchaseDate,
+        p.data->>'activeDate' AS activeDate,
+        p.data->>'expireDate' AS expireDate,
+        p.data->>'receipt' AS receipt,
+        p.data->>'paymentMethod' AS paymentMethod,
+        t.data->>'name' AS area,
+        p.data->>'durationType' as durationType
+      FROM permit p
+      JOIN type t ON t.id = p.type
+      ORDER BY p.data->>'activeDate'
     `
 
     const permitResults = await pool.query(permitQuery)
     const permitsByDayMap: Record<string, Permit[]> = {}
 
     for (const row of permitResults.rows) {
+      console.log('row: ', row)
       const date = row.purchasedate.split('T')[0]
       const permit: Permit = {
         vehicle: row.vehicle,
         type: row.type,
         area: row.area,
-        durationType: row.durationType,
-        activeDate: row.activeDate,
-        expireDate: row.expireDate,
+        durationType: row.durationtype,
+        activeDate: row.activedate,
+        expireDate: row.expiredate,
       }
+      console.log('Permit in Row: ', permit)
 
       if (!permitsByDayMap[date]) {
         permitsByDayMap[date] = []
       }
       permitsByDayMap[date].push(permit)
+      console.log('Permits by day  in loop after row: ', permitsByDayMap)
     }
 
     const permitsByDay: PermitsByDay[] = Object.entries(permitsByDayMap).map(([date, permits]) => ({
       date,
       permits
     }))
-
+    // console.log('Permits By Day of 0: ', permitsByDay[1])
     return permitsByDay
   }
 
@@ -373,8 +377,6 @@ export class PermitService {
 
     return Object.values(lotMap)
   }
-
-
 
   public async createNewLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this

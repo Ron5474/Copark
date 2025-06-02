@@ -8,8 +8,13 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
+  InputAdornment,
+  OutlinedInput,
 } from '@mui/material';
-import { getAllLotDetails } from '../../permit/actions';
+import { createLot, getAllLotDetails } from '../../permit/actions';
 import { LotGroup } from '../../types';
 
 export default function ManageLots() {
@@ -18,6 +23,13 @@ export default function ManageLots() {
   const [openDialog, setOpenDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [selectedLot, setSelectedLot] = useState<{name: string, price: string} | undefined>();
+  const [newLot, setNewLot] = useState({
+    name: '',
+    daily: { price: 0 },
+    quarterly: { price: 0, expireDate: '' },
+    yearly: { price: 0, expireDate: '' }
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchLots();
@@ -29,6 +41,34 @@ export default function ManageLots() {
       setLots(data);
     } catch (err) {
       console.error('Failed to fetch lots:', err);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+      
+      await createLot({
+        lot: newLot.name,
+        daily: newLot.daily,
+        quarterly: newLot.quarterly,
+        yearly: newLot.yearly
+      });
+
+      setOpenDialog(false);
+      await fetchLots(); // Refresh lots list
+      
+      // Reset form
+      setNewLot({
+        name: '',
+        daily: { price: 0 },
+        quarterly: { price: 0, expireDate: '' },
+        yearly: { price: 0, expireDate: '' }
+      });
+    } catch (error) {
+      console.error('Failed to create lot:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -159,15 +199,91 @@ export default function ManageLots() {
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Add New Lot</DialogTitle>
         <DialogContent>
-          <Typography sx={{ mt: 2 }}>Coming soon...</Typography>
+          <TextField
+            fullWidth
+            label="Lot Name"
+            value={newLot.name}
+            onChange={(e) => setNewLot(prev => ({ ...prev, name: e.target.value }))}
+            margin="normal"
+          />
+          
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Daily Price</InputLabel>
+            <OutlinedInput
+              type="number"
+              startAdornment={<InputAdornment position="start">$</InputAdornment>}
+              value={newLot.daily.price}
+              onChange={(e) => setNewLot(prev => ({
+                ...prev,
+                daily: { ...prev.daily, price: Number(e.target.value) }
+              }))}
+              label="Daily Price"
+            />
+          </FormControl>
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Quarterly Price</InputLabel>
+            <OutlinedInput
+              type="number"
+              startAdornment={<InputAdornment position="start">$</InputAdornment>}
+              value={newLot.quarterly.price}
+              onChange={(e) => setNewLot(prev => ({
+                ...prev,
+                quarterly: { ...prev.quarterly, price: Number(e.target.value) }
+              }))}
+              label="Quarterly Price"
+            />
+          </FormControl>
+          
+          <TextField
+            fullWidth
+            label="Quarterly Expiration Date"
+            type="date"
+            value={newLot.quarterly.expireDate?.split('T')[0] || ''}
+            onChange={(e) => setNewLot(prev => ({
+              ...prev,
+              quarterly: { ...prev.quarterly, expireDate: `${e.target.value}T23:59:59-07:00` }
+            }))}
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+          />
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Yearly Price</InputLabel>
+            <OutlinedInput
+              type="number"
+              startAdornment={<InputAdornment position="start">$</InputAdornment>}
+              value={newLot.yearly.price}
+              onChange={(e) => setNewLot(prev => ({
+                ...prev,
+                yearly: { ...prev.yearly, price: Number(e.target.value) }
+              }))}
+              label="Yearly Price"
+            />
+          </FormControl>
+
+          <TextField
+            fullWidth
+            label="Yearly Expiration Date"
+            type="date"
+            value={newLot.yearly.expireDate?.split('T')[0] || ''}
+            onChange={(e) => setNewLot(prev => ({
+              ...prev,
+              yearly: { ...prev.yearly, expireDate: `${e.target.value}T23:59:59-07:00` }
+            }))}
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
           <Button 
             variant="contained"
+            onClick={handleSubmit}
+            disabled={isSubmitting || !newLot.name}
             sx={{ bgcolor: theme.palette.primary.main }}
           >
-            Create
+            {isSubmitting ? 'Creating...' : 'Create'}
           </Button>
         </DialogActions>
       </Dialog>

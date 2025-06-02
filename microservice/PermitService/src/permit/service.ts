@@ -35,7 +35,7 @@ interface LotDetails {
 }
 
 export class PermitService {
-  public async purchaseMyZonePermit(input: PurchaseZoneInput, now=new Date().toISOString()): Promise<Confirmation> {
+  public async purchaseMyZonePermit(input: PurchaseZoneInput, now = new Date().toISOString()): Promise<Confirmation> {
 
     const totalMinutes = (input.duration?.hours || 0) * 60 + (input.duration?.minutes || 0)
 
@@ -55,7 +55,7 @@ export class PermitService {
 
     const purchaseDate = today.toISOString()
     const activeDate = today.toISOString()
-    
+
     const durationMs = totalMinutes * 60 * 1000
     const expireDate = new Date(today.getTime() + durationMs).toISOString()
 
@@ -109,7 +109,7 @@ export class PermitService {
         (SELECT count FROM zone_exists_check) AS zone_exists,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
     `, [input.vehicleId, input.zone, data, input.transactionId, now])
-    
+
     const result = rows[0]
 
     if (result.duplicate_count > 0) {
@@ -135,7 +135,7 @@ export class PermitService {
     }
   }
 
-  public async getValidPermit(vid: string, now=new Date().toISOString()): Promise<CheckedPermit[]> {
+  public async getValidPermit(vid: string, now = new Date().toISOString()): Promise<CheckedPermit[]> {
     const result = await pool.query(`
       SELECT t.data
       FROM permit p
@@ -144,7 +144,7 @@ export class PermitService {
         AND $2 >= (p.data->>'activeDate')::timestamptz
         AND $2 <= (p.data->>'expireDate')::timestamptz
     `, [vid, now])
-  
+
     return result.rows.map(row => {
       return {
         type: row.data.name,
@@ -152,9 +152,9 @@ export class PermitService {
       }
     })
   }
-  
 
-  public async isValidPermitPolice(vid: string, now=new Date().toISOString()): Promise<IsValidPolice> {
+
+  public async isValidPermitPolice(vid: string, now = new Date().toISOString()): Promise<IsValidPolice> {
 
     const result = await pool.query(`
         SELECT data
@@ -170,7 +170,7 @@ export class PermitService {
     return { isValid: true }
   }
 
-  public async getMyPermits(vid: Vehicle[], now=new Date().toISOString()): Promise<MyPermits> {
+  public async getMyPermits(vid: Vehicle[], now = new Date().toISOString()): Promise<MyPermits> {
 
     const result = await pool.query(`
         WITH future AS (
@@ -224,7 +224,7 @@ export class PermitService {
     return result.rows[0]
   }
 
-  public async getZoneDetails(zone: string, currentDay=new Date().getDay()): Promise<ZoneDetails> {
+  public async getZoneDetails(zone: string, currentDay = new Date().getDay()): Promise<ZoneDetails> {
     const isWeekend = currentDay === 0 || currentDay === 6
 
     const result = await pool.query(`
@@ -235,7 +235,7 @@ export class PermitService {
       `,
       [zone]
     )
-    
+
     if (result.rowCount == 0) throw new Error(`Zone ${zone} not found`)
     return isWeekend ? result.rows[0].data.weekend : result.rows[0].data.weekday
   }
@@ -320,7 +320,7 @@ export class PermitService {
       `,
       [lot]
     )
-    
+
     if (result.rowCount == 0) throw new Error(`Lot type ${lot} not found`)
     return result.rows[0].data
   }
@@ -333,7 +333,7 @@ export class PermitService {
   //     `,
   //     []
   //   )
-    
+
   //   return result.rows.map((row) => row.data)
   // }
   public async getAllLotDetails(): Promise<LotGroup[]> {
@@ -404,7 +404,7 @@ export class PermitService {
 
   public async updateLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
-  
+
     const { rowCount } = await pool.query(`
       UPDATE type
       SET data = $1
@@ -412,11 +412,11 @@ export class PermitService {
       AND data->>'area' = $3
       AND data->>'name' = 'lot'
     `, [input, location, input.lot])
-  
+
     return (rowCount as number) > 0
   }
 
-  public async purchaseMyLotPermit(input: PurchaseLotInput, now=new Date()): Promise<Confirmation> {
+  public async purchaseMyLotPermit(input: PurchaseLotInput, now = new Date()): Promise<Confirmation> {
 
     const today = new Date()
 
@@ -439,7 +439,7 @@ export class PermitService {
     const activeDate = today < beginDate ?
       beginDate.toISOString() :
       purchaseDate
-    
+
     const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString()
     const expireDate = details?.expireDate ?? localMidnight
 
@@ -492,7 +492,7 @@ export class PermitService {
         (SELECT count FROM lot_exists_check) AS lot_exists,
         (SELECT row_to_json(i) FROM inserted i) AS inserted_row
     `, [input.vehicleId, input.lot, data, input.transactionId, now.toISOString()])
-    
+
     const result = rows[0]
 
     if (result.duplicate_count > 0) {
@@ -529,7 +529,7 @@ export class PermitService {
     return result.rows.map(row => {
       const weekdayData = row.data.weekday || {}
       const duration = weekdayData.maxDuration || { hours: 0, minutes: 0 }
-      
+
       return {
         zone: row.data.area,
         hourly: weekdayData.hourly || 0,
@@ -647,7 +647,7 @@ export class PermitService {
       totalPermits: parseInt(row.total),
     }))
   }
-  
+
   public async generatePermitReport(timeRange: { numDays: number }): Promise<PermitReport> {
     const now = new Date()
     const startDate = new Date(now)

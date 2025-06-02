@@ -284,7 +284,7 @@ export default function ManageZones() {
                 if (editZone) {
                   setEditZone({
                     ...editZone,
-                    hourly: parseFloat(e.target.value)
+                    hourly: Math.max(0, parseInt(e.target.value) || 0)
                   });
                 }
               }}
@@ -299,7 +299,10 @@ export default function ManageZones() {
                   if (editZone) {
                     setEditZone({
                       ...editZone,
-                      maxDuration: {...editZone.maxDuration, hours: parseInt(e.target.value)}
+                      maxDuration: {
+                        ...editZone.maxDuration,
+                        hours: Math.max(0, parseInt(e.target.value) || 0)
+                      }
                     });
                   }
                 }}
@@ -312,7 +315,10 @@ export default function ManageZones() {
                   if (editZone) {
                     setEditZone({
                       ...editZone,
-                      maxDuration: {...editZone.maxDuration, minutes: parseInt(e.target.value)}
+                      maxDuration: {
+                        ...editZone.maxDuration,
+                        minutes: Math.min(59, Math.max(0, parseInt(e.target.value) || 0))
+                      }
                     });
                   }
                 }}

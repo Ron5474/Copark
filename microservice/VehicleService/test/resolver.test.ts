@@ -5,21 +5,33 @@ import * as http from 'http'
 import db from './db'
 import { app, bootstrap } from '../src/app'
 import authApp from '../../AuthService/src/app'
+import {app as ticketApp, bootstrap as ticketBootstrap} from '../../TicketService/src/app'
+import {app as permitApp, bootstrap as permitBootstrap} from '../../PermitService/src/app'
 import { SignJWT } from 'jose'
 
 
 let server: http.Server
 let authServer: http.Server
+let ticketServer: http.Server
+let permitServer: http.Server
+
+const VEHICLE_PORT = 4001
 
 const AUTH_PORT = 3010
 const AUTH_SERVICE_URL = `http://localhost:${AUTH_PORT}`
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
 
+const TICKET_PORT = 4002
+// const TICKET_SERVICE_URL = `http://localhost:${TICKET_PORT}`
+
+const PERMIT_PORT = 4003
+// const PERMIT_SERVICE_URL = `http://localhost:${PERMIT_PORT}`
+
 beforeAll(async () => {
   // Start your GraphQL server
   server = http.createServer(app)
-  server.listen()
+  server.listen(VEHICLE_PORT)
   await bootstrap()
 
   // Start your Auth server
@@ -29,6 +41,24 @@ beforeAll(async () => {
       resolve()
     })
   })
+
+  // Start your Ticket server
+  ticketServer = http.createServer(ticketApp)
+  await new Promise<void>((resolve) => {
+    ticketServer.listen(TICKET_PORT, () => {
+      resolve()
+    })
+  })
+  await ticketBootstrap()
+
+  // Start your Permit server
+  permitServer = http.createServer(permitApp)
+  await new Promise<void>((resolve) => {
+    permitServer.listen(PERMIT_PORT, () => {
+      resolve()
+    })
+  })
+  await permitBootstrap()
 
   return
 })
@@ -519,4 +549,208 @@ test('Driver can get a list of their vehicles', async () => {
     expect(listResponse.body.data.getVehicleByUserId.length).toBe(1)
   })
 
-// test('Driver removes a vehicle', async () => {})
+test('Driver removes a vehicle', async () => {
+  const token = await loginAs("driver", false)
+
+  const veh = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: regVehicleQuery,
+      variables: vehicleInput
+    })
+
+  const state = veh.body.data.registerVehicle.state
+  const plate = veh.body.data.registerVehicle.plate
+
+  expect(veh.body.data.registerVehicle.plate).toBe("TEST123")
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate, state }
+    })
+  console.log('Delete Body: ', deleteResponse.body)
+  expect(deleteResponse.body.data.deleteVehicle).toHaveProperty('id')
+})
+
+test('Driver cannot delete a vehicle without plate and state', async () => {
+  const token = await loginAs("driver", false)
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate: "", state: "" }
+    })
+
+  expect(deleteResponse.body.errors.length).toBe(1)
+  expect(deleteResponse.body.errors[0].message).toBe("Plate and state is required")
+})
+test('Driver cannot delete a vehicle without auth', async () => {
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate: "TEST123", state: "California" }
+    })
+
+  expect(deleteResponse.body.errors.length).toBe(1)
+})
+
+test('Delete a non-existent vehicle returns error', async () => {
+  const token = await loginAs("driver", false)
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate: "NONEXISTENT", state: "CA" }
+    })
+  expect(deleteResponse.body.errors.length).toBe(1)
+  expect(deleteResponse.body.errors[0].message).toBe("Vehicle not found or not owned by user")
+})
+
+test('removeVehicle - deletes default when >1 vehicles exist', async () => {
+  const token = await loginAs("driver", false)
+
+  const veh1 = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: regVehicleQuery,
+      variables: vehicleInput
+    })
+
+  expect(veh1.body.data.registerVehicle.plate).toBe("TEST123")
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate: 'DERIK123', state: 'California' }
+    })
+
+  expect(deleteResponse.body.data.deleteVehicle).toHaveProperty('id')
+
+  // Check if the default vehicle is now DERIK123
+  const defaultResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: getDefaultVehiclequery })
+
+  expect(defaultResponse.body.data.getDefaultVehicle.plate).toBe("TEST123")
+});
+
+test('removing the only vehicle errors', async () => {
+  const token = await loginAs("driver", false)
+
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate: 'DERIK123', state: 'California' }
+    })
+
+  expect(deleteResponse.body.errors.length).toBe(1)
+  expect(deleteResponse.body.errors[0].message).toBe("Cannot delete the only default vehicle. Please add another vehicle as default first.")
+})
+
+test('Driver cannot delete a vehicle with an unpaid ticket', async () => {
+  const token = await loginAs("driver", false)
+  const enforcer = await loginAs("enforcement")
+
+  const veh = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ 
+      query: regVehicleQuery,
+      variables: vehicleInput
+    })
+
+  const state = veh.body.data.registerVehicle.state
+  const plate = veh.body.data.registerVehicle.plate
+
+  expect(veh.body.data.registerVehicle.plate).toBe("TEST123")
+
+  // Create a ticket for this vehicle
+  await supertest(ticketApp)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcer)
+    .send({
+      query: `
+        mutation CreateTicket($input: NewTicketInput!) {
+          createNewTicket(input: $input) {
+            id
+          }
+        }
+      `,
+      variables: {
+        input: {
+          plate: plate,
+          state: state,
+          reason: "Speeding",
+        }
+      }
+    })
+
+  const deleteResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({
+      query: `
+        mutation DeleteVehicle($plate: String!, $state: String!) {
+          deleteVehicle(plate: $plate, state: $state) {
+            id
+          }
+        }
+      `,
+      variables: { plate, state }
+    })
+
+  expect(deleteResponse.body.errors.length).toBe(1)
+  expect(deleteResponse.body.errors[0].message).toBe("Vehicle cannot be removed because it has pending tickets")
+}, 10000)

@@ -386,11 +386,14 @@ test:vehicleService:
     - export PGPASSWORD="$POSTGRES_PASSWORD"
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/VehicleService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/TicketService/sql/databases.sql
 
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
 
     - npm run installs

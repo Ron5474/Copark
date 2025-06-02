@@ -50,10 +50,11 @@ export class VehicleResolver {
   ): Promise<DefaultVehicleDetails> {
     const token = request.headers.authorization?.split(' ')[1]
     const userId = (await this.getUserData(token)).id
-    const defaultVehicle = await service.getDefaultVehicle(userId) 
+    const defaultVehicle = await service.getDefaultVehicle(userId)
     if (!defaultVehicle) {
-      throw new Error('No default vehicle found')
+      throw new Error('No default vehicle found for this user')
     }
+    
     return {
       id: defaultVehicle.id,
       plate: defaultVehicle.plate,
@@ -170,12 +171,10 @@ export class VehicleResolver {
   ): Promise<VehicleID> {
     const token = request.headers.authorization?.split(' ')[1]
     const userId = (await this.getUserData(token)).id
-    if (!plate) {
-      throw new Error('Plate is required')
+    if (!plate || !state) {
+      throw new Error('Plate and state is required')
     }
-    if (!token) {
-      throw new Error('Token not provided')
-    } 
+    
     return await service.removeVehicle(plate, state, userId, token)
   }
 }

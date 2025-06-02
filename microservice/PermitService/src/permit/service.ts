@@ -287,11 +287,15 @@ export class PermitService {
 
   public async createNewZone(input: NewZone): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO Don't hardcode this
+
+    const { zone, ...inputWithoutZone } = input
+
     const data = {
+      ...inputWithoutZone,
       name: 'zone',
-      area: input.zone,
-      ...input
+      area: zone,
     }
+
     const { rows } = await pool.query(`
       INSERT INTO type (location, data)
       SELECT $2, $1
@@ -302,7 +306,7 @@ export class PermitService {
         AND data->>'name' = 'zone'
       )
       RETURNING id, data
-    `, [data, location, data.zone])
+    `, [data, location, zone])
   
     return (rows.length !== 0)
   }
@@ -374,6 +378,11 @@ export class PermitService {
 
   public async createNewLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
+    const data = {
+      ...input,
+      name: 'lot',
+      area: input.lot
+    }
     const { rowCount } = await pool.query(`
       INSERT INTO type (location, data)
       SELECT $2, $1
@@ -384,7 +393,7 @@ export class PermitService {
         AND data->>'name' = 'lot'
       )
       RETURNING id, data
-    `, [input, location, input.lot])
+    `, [data, location, input.lot])
   
     return (rowCount as number) > 0
   }

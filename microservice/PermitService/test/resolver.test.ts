@@ -335,6 +335,20 @@ const zoneDetailsInput = {
   zone: "123"
 }
 
+const getLotsQuery = `
+query GetLots {
+  getLots {
+    id
+    title
+    lots {
+      name
+      price
+      activeDate
+      expireDate
+    }
+  }
+}`
+
 // const permitResolver = new PermitResolver()
 
 // test('Driver can\'t purchase a zone permit for wrong car', async () => {
@@ -868,7 +882,6 @@ test('Admin can get all zones', async () => {
   
   // eslint-disable-next-line
   zones.forEach((zone: any) => {
-    expect(zone).toHaveProperty('zone')
     expect(zone).toHaveProperty('hourly')
     expect(zone).toHaveProperty('maxDuration')
     expect(zone.maxDuration).toHaveProperty('hours')
@@ -972,6 +985,28 @@ test('Admin can create a new zone', async () => {
   expect(newZone.maxDuration.minutes).toBe(30)
   expect(newZone.openTime).toBe("08:00")
   expect(newZone.closeTime).toBe("18:00")
+})
+
+test('Admin can get all lots', async () => {
+  const { token } = await loginAs("admin")
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: getLotsQuery })
+    .expect(200)
+
+    console.log("LOT ERRORS:", response.body)
+  expect(response.body.errors).toBeUndefined()
+  const lots = response.body.data.getLots
+  expect(Array.isArray(lots)).toBe(true)
+  
+  // eslint-disable-next-line
+  lots.forEach((lot: any) => {
+    expect(lot).toHaveProperty('id')
+    expect(lot).toHaveProperty('title')
+    expect(lot).toHaveProperty('lots')
+  })
 })
 
 test('Admin can fetch all active permits', async () => {

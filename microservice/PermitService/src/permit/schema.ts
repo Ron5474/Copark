@@ -259,10 +259,10 @@ export class Lot {
   @Field(() => String)
   price!: string
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   activeDate?: string
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   expireDate?: string
 }
 

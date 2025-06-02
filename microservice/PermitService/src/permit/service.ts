@@ -640,6 +640,7 @@ export class PermitService {
         SELECT DISTINCT p.data->>'durationType' AS durationType
         FROM permit p
         WHERE p.data ? 'durationType'
+          AND p.data->>'durationType' <> 'zone'
       )
       SELECT 
         t.data->>'area' AS area,
@@ -670,6 +671,7 @@ export class PermitService {
     }
 
     const result = await pool.query(query, params)
+    console.log("result", result)
     return result.rows.map(row => ({
       area: row.area,
       durationType: row.durationtype,

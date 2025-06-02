@@ -1164,6 +1164,7 @@ interface ZoneStat {
 
 interface LotStat {
   area: string
+  durationType: string
   totalPermits: number
 }
 
@@ -1193,29 +1194,46 @@ interface LotStatsResponse {
 test('Admin sees correct zone and lot stats after inserting test data', async () => {
   const { token } = await loginAs("admin")
 
-  const now = new Date()
+  const now        = new Date()
   const purchaseDate = now.toISOString()
-  const activeDate = new Date(now.getTime() - 60 * 60 * 1000).toISOString() // 1hr ago
-  const expireDate = new Date(now.getTime() + 60 * 60 * 1000).toISOString() // 1hr later
+  const activeDate   = new Date(now.getTime() - 60 * 60 * 1000).toISOString() // 1 hr ago
+  const expireDate   = new Date(now.getTime() + 60 * 60 * 1000).toISOString() // 1 hr later
+
 
   const commonData = {
     purchaseDate,
     activeDate,
     expireDate,
     area: '111',
+    durationType: 'zone',
     receipt: { service: 0.5, subTotal: 2.5, total: 3.0 },
     paymentMethod: 'credit'
   }
 
   await pool.query(`
     INSERT INTO permit (vehicle, type, data) VALUES
+      -- two zone permits (area "111"), durationType="daily"
       ('11111111-1111-1111-1111-111111111111', '39f48f9f-2693-446b-ad98-f72298bc7bbe', $1),
       ('22222222-2222-2222-2222-222222222222', '39f48f9f-2693-446b-ad98-f72298bc7bbe', $1),
-      ('33333333-3333-3333-3333-333333333333', 'b7a7d5d0-1b8f-4b02-a012-5c667ef2ecb1', jsonb_set($1::jsonb, '{area}', '"A"')),
-      ('44444444-4444-4444-4444-444444444444', '93e3c80a-95ca-4f21-803a-2680b4d1994e', jsonb_set($1::jsonb, '{area}', '"B"'))
+
+      ('33333333-3333-3333-3333-333333333333',
+       'b7a7d5d0-1b8f-4b02-a012-5c667ef2ecb1',
+       jsonb_set(
+         jsonb_set($1::jsonb, '{area}',      '"A"'),
+                    '{durationType}', '"daily"'
+       )
+      ),
+
+      ('44444444-4444-4444-4444-444444444444',
+       '93e3c80a-95ca-4f21-803a-2680b4d1994e',
+       jsonb_set(
+         jsonb_set($1::jsonb, '{area}',      '"B"'),
+                    '{durationType}', '"daily"'
+       )
+      )
   `, [commonData])
 
-  // Step 2: Query zone stats
+  // ——— Step 2: Query zone stats ———
   const zoneStatsQuery = `
     query {
       allZoneStats(activeOnly: true) {
@@ -1232,14 +1250,14 @@ test('Admin sees correct zone and lot stats after inserting test data', async ()
   expect(zoneStatsRes.body.errors).toBeUndefined()
   const zoneData: ZoneStatsResponse = zoneStatsRes.body
 
-  const zone111 = zoneData.data.allZoneStats.find((z) => z.area === "111")
+  const zone111 = zoneData.data.allZoneStats.find(z => z.area === "111")
   expect(zone111?.totalPermits).toBe(2)
 
-  // Step 3: Query lot stats
   const lotStatsQuery = `
     query {
       allLotStats(activeOnly: true) {
         area
+        durationType
         totalPermits
       }
     }
@@ -1252,28 +1270,27 @@ test('Admin sees correct zone and lot stats after inserting test data', async ()
   expect(lotStatsRes.body.errors).toBeUndefined()
   const lotData: LotStatsResponse = lotStatsRes.body
 
-  const lotA = lotData.data.allLotStats.find((l) => l.area === "A")
-  const lotB = lotData.data.allLotStats.find((l) => l.area === "B")
+  const lotA = lotData.data.allLotStats.find(l => l.area === "A")
+  const lotB = lotData.data.allLotStats.find(l => l.area === "B")
 
   expect(lotA?.totalPermits).toBe(1)
   expect(lotB?.totalPermits).toBe(1)
 })
 
-
 test('Admin sees only active permits when using activeOnly: true', async () => {
   const { token } = await loginAs("admin")
 
   // Shared timestamps
-  const now = new Date()
-  const purchaseDate = now.toISOString()
+  const now           = new Date()
+  const purchaseDate  = now.toISOString()
 
-  const activeActiveDate = new Date(now.getTime() - 60 * 60 * 1000).toISOString() // 1 hour ago
-  const activeExpireDate = new Date(now.getTime() + 60 * 60 * 1000).toISOString() // 1 hour later
+  const activeActiveDate   = new Date(now.getTime() - 60 * 60 * 1000).toISOString() // 1 hour ago
+  const activeExpireDate   = new Date(now.getTime() + 60 * 60 * 1000).toISOString() // 1 hour later
 
   const inactiveActiveDate = new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString() // 2 hours ago
   const inactiveExpireDate = new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString() // 1 hour ago (expired)
 
-  // Active zone permit (area 27)
+  // Active zone permit (area 27) — no durationType needed for a zone
   const activeZoneData = {
     purchaseDate,
     activeDate: activeActiveDate,
@@ -1283,7 +1300,7 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
     paymentMethod: 'credit'
   }
 
-  // Inactive zone permit (area 101)
+  // Inactive zone permit (area 101) — again, no durationType is needed here
   const inactiveZoneData = {
     purchaseDate,
     activeDate: inactiveActiveDate,
@@ -1293,21 +1310,33 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
     paymentMethod: 'credit'
   }
 
-  // Inactive lot permit (area C)
+  // Inactive lot permit (area C) — we MUST add a durationType so that
+  // the lot‐CTE is not empty. Here we choose "daily".
   const inactiveLotData = {
     purchaseDate,
     activeDate: inactiveActiveDate,
     expireDate: inactiveExpireDate,
     area: 'C',
+    durationType: 'daily',      // ← new field
     receipt: { service: 0.5, subTotal: 2.5, total: 3.0 },
     paymentMethod: 'credit'
   }
 
   await pool.query(`
     INSERT INTO permit (vehicle, type, data) VALUES
-      ('55555555-5555-5555-5555-555555555555', 'f26adf21-f967-4283-8417-8e0db1ef14bd', $1),
-      ('66666666-6666-6666-6666-666666666666', '1d603a73-4b75-48d8-b677-48b81b7fa3f4', $2),
-      ('77777777-7777-7777-7777-777777777777', '1a6fc438-e678-426a-a5fd-44cd6740ffb2', $3)
+      ('55555555-5555-5555-5555-555555555555',
+         'f26adf21-f967-4283-8417-8e0db1ef14bd',  -- zone type for area "27"
+         $1
+      ),
+      ('66666666-6666-6666-6666-666666666666',
+         '1d603a73-4b75-48d8-b677-48b81b7fa3f4',  -- zone type for area "101"
+         $2
+      ),
+      (
+        '77777777-7777-7777-7777-777777777777',
+         '1a6fc438-e678-426a-a5fd-44cd6740ffb2',  -- lot type for area "C"
+         $3::jsonb
+      )
   `, [activeZoneData, inactiveZoneData, inactiveLotData])
 
   // Step 1: Query zone stats
@@ -1327,7 +1356,7 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
   expect(zoneStatsRes.body.errors).toBeUndefined()
   const zoneStats: ZoneStat[] = zoneStatsRes.body.data.allZoneStats
 
-  const zone27 = zoneStats.find(z => z.area === '27')
+  const zone27  = zoneStats.find(z => z.area === '27')
   const zone101 = zoneStats.find(z => z.area === '101')
 
   expect(zone27?.totalPermits).toBe(1)
@@ -1351,7 +1380,6 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
   const lotStats: LotStat[] = lotStatsRes.body.data.allLotStats
 
   const lotC = lotStats.find(l => l.area === 'C')
-
   expect(lotC?.totalPermits).toBe(0)
 })
 

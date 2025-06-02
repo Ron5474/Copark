@@ -315,6 +315,28 @@ export class PermitService {
     return (rows.length !== 0)
   }
 
+  public async updateZone(input: NewZone): Promise<boolean> {
+    const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
+  
+    const { zone, ...inputWithoutZone } = input
+
+    const data = {
+      ...inputWithoutZone,
+      name: 'zone',
+      area: zone,
+    }
+
+    const { rowCount } = await pool.query(`
+      UPDATE type
+      SET data = $1
+      WHERE location = $2
+      AND data->>'area' = $3
+      AND data->>'name' = 'zone'
+    `, [data, location, zone])
+  
+    return (rowCount as number) > 0
+  }
+
   public async getLotDetails(lot: string): Promise<LotDetails> {
     const result = await pool.query(`
         SELECT data

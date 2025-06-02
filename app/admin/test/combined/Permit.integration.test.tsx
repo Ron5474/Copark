@@ -373,8 +373,8 @@ it('successfully fetches and displays zone permit statistics', async () => {
 
 it('successfully fetches and displays lot permit statistics', async () => {
   const mockLotStats = [
-    { area: 'A', totalPermits: 10 },
-    { area: 'B', totalPermits: 5 }
+    { area: 'A', durationType: 'daily', totalPermits: 10 },
+    { area: 'B', durationType: 'yearly', totalPermits: 5 }
   ];
 
   mockFetch.mockImplementationOnce(async (url, options) => {

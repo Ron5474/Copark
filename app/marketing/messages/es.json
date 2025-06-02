@@ -208,7 +208,8 @@
     "features": "Funciones",
     "howItWorks": "Cómo Funciona",
     "permits": "Permisos",
-    "testimonials": "Testimonios"
+    "testimonials": "Testimonios",
+    "ChangeLanguage": "Inglés / EN" 
   },
   "GetStartedButton": {
     "label": "Comenzar"

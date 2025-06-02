@@ -60,7 +60,8 @@ import {
 } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
 import theme from "../theme"
-import { useRouter } from "@/i18n/navigation"
+import { useRouter, usePathname } from "@/i18n/navigation"
+import { useLocale } from "next-intl"
 import { useTranslations } from "next-intl"
 
 const Topbar = () => {
@@ -68,7 +69,8 @@ const Topbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
   const router = useRouter()
-
+  const locale = useLocale()
+  const pathname = usePathname()
   const primaryColorMain = theme.palette.primary.main
   const primaryColorLight = theme.palette.primary.light
 
@@ -82,7 +84,13 @@ const Topbar = () => {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
-
+  const handleLanguageChange = (lang: string) => {
+    if (lang === locale) return;
+     router.replace(
+      {pathname},
+      {locale: lang}
+    )
+  }
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
     if (element) {
@@ -104,6 +112,12 @@ const Topbar = () => {
           </ListItem>
         ))}
       </List>
+
+      <Box sx = {{ bottom: 0, mb: 2, position: "absolute", width: "100%", padding: "10px 0" }} onClick={() => handleLanguageChange(locale === "en" ? "es" : "en")}>
+        <Typography variant="body2" color="text.secondary" align="center">
+          {t("ChangeLanguage")}
+        </Typography>
+      </Box>
     </Box>
   )
 

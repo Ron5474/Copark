@@ -703,7 +703,7 @@ export class PermitService {
     }
 
     const result = await pool.query(query, params)
-    console.log("result", result)
+    // console.log("result", result)
     return result.rows.map(row => ({
       area: row.area,
       durationType: row.durationtype,

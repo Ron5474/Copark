@@ -59,10 +59,13 @@ export class PermitService {
     const durationMs = totalMinutes * 60 * 1000
     const expireDate = new Date(today.getTime() + durationMs).toISOString()
 
+    const durationType = 'hourly'
+
     const data = {
       purchaseDate,
       activeDate,
       expireDate,
+      durationType,
       receipt,
       paymentMethod: input.paymentMethod,
       transactionId: input.transactionId,
@@ -175,6 +178,7 @@ export class PermitService {
             p.id AS id,
             t.data->>'name' AS type,
             t.data->>'area' AS area,
+            p.data->>'durationType' AS "durationType",
             p.data->>'activeDate' AS "activeDate",
             p.data->>'expireDate' AS "expireDate"
           FROM permit p, type t 
@@ -187,6 +191,7 @@ export class PermitService {
             p.id AS id,
             t.data->>'name' AS type,
             t.data->>'area' AS area,
+            p.data->>'durationType' AS "durationType",
             p.data->>'activeDate' AS "activeDate",
             p.data->>'expireDate' AS "expireDate"
           FROM permit p, type t 
@@ -200,6 +205,7 @@ export class PermitService {
             p.id AS id,
             t.data->>'name' AS type,
             t.data->>'area' AS area,
+            p.data->>'durationType' AS "durationType",
             p.data->>'activeDate' AS "activeDate",
             p.data->>'expireDate' AS "expireDate"
           FROM permit p, type t 
@@ -245,7 +251,8 @@ export class PermitService {
         data->>'expireDate' AS expireDate,
         data->>'receipt' AS receipt,
         data->>'paymentMethod' AS paymentMethod,
-        data->>'area' AS area
+        data->>'area' AS area,
+        data->>'durationType' as durationType
       FROM permit
       ORDER BY data->>'activedate'
     `
@@ -259,6 +266,7 @@ export class PermitService {
         vehicle: row.vehicle,
         type: row.type,
         area: row.area,
+        durationType: row.durationType,
         activeDate: row.activeDate,
         expireDate: row.expireDate,
       }
@@ -427,6 +435,7 @@ export class PermitService {
       activeDate,
       expireDate,
       receipt,
+      durationType: input.duration,
       paymentMethod: input.paymentMethod,
       transactionId: input.transactionId,
     }
@@ -528,6 +537,7 @@ export class PermitService {
       SELECT 
         t.data->>'name' AS type,
         t.data->>'area' AS area,
+        p.data->>'durationType' as "durationType",
         p.data->>'purchaseDate' AS "purchaseDate",
         p.data->>'activeDate' AS "activeDate",
         p.data->>'expireDate' AS "expireDate"

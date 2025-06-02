@@ -284,7 +284,7 @@ export default function ManageZones() {
                 if (editZone) {
                   setEditZone({
                     ...editZone,
-                    hourly: Math.max(0, parseInt(e.target.value) || 0)
+                    hourly: Math.max(0, parseFloat(e.target.value) || 0)
                   });
                 }
               }}

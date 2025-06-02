@@ -87,6 +87,7 @@ export interface ZoneStat {
 
 export interface LotStat {
   area: string;
+    durationType: string;
   totalPermits: number;
 }
 

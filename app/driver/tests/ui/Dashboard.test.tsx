@@ -53,6 +53,7 @@ beforeEach(() => {
         vehicle: "ABC123",
         type: "Daily", 
         area: "Zone 5",
+        durationType: "Zone",
         activeDate: "2025-05-27T08:00:00Z",
         expireDate: "2025-05-27T18:00:00Z"
       }
@@ -62,6 +63,7 @@ beforeEach(() => {
         vehicle: "ABC123",
         type: "Yearly",
         area: "All Lots Access", 
+        durationType: "Yearly",
         activeDate: "2025-06-01T00:00:00Z",
         expireDate: "2026-05-31T23:59:59Z"
       }
@@ -71,6 +73,7 @@ beforeEach(() => {
         vehicle: "JKL654",
         type: "Daily",
         area: "Zone 3",
+        durationType: "Daily",
         activeDate: "2025-05-26T08:00:00Z", 
         expireDate: "2025-05-26T17:00:00Z"
       }

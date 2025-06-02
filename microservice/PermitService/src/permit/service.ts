@@ -760,15 +760,22 @@ export class PermitService {
     //   throw new Error('Vehicle ID is required');
     // }
     const result = await pool.query(
-      `UPDATE permit SET data = jsonb_set(data, '{expireDate}', to_jsonb(NOW())) WHERE vehicle = $1 RETURNING id`,
+      `
+      UPDATE permit
+      SET data = jsonb_set(data, '{expireDate}', to_jsonb(NOW()))
+      WHERE vehicle = $1
+        AND (data->>'expireDate')::timestamptz > NOW()
+      RETURNING id
+      `,
       [vehicleId]
-    );
-
+    )
+  
     if (result.rowCount === 0) {
-      return [];
+      return []
     }
+  
     return result.rows.map(row => ({
       id: row.id,
-    }));
+    }))
   }
 }

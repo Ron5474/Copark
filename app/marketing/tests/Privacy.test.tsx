@@ -7,24 +7,20 @@ const push = vi.fn()
 
 vi.mock('next-intl', () => ({
   useLocale: () => 'en',
-  useTranslations: () => ((key: string) => {
-    switch (key) {
-      case 'Do Not Sell My Personal Info':
-        return 'Do Not Sell My Personal Info';
-      case 'Privacy Policy':
-        return 'Privacy Policy';
-      case 'Terms of Service':
-        return 'Terms of Service';
-      case 'Contact Us':
-        return 'Contact Us';
-      case 'Dark Mode':
-        return 'Dark Mode';
-      case 'Rights Reserved':
-        return '© 2025 Copark. All rights reserved.';
-      default:
-        return key;
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      title: "Privacy Policy",
+      "content title": "Your Privacy Matters",
+      "Do Not Sell My Personal Info": "Do Not Sell My Personal Info",
+      "Privacy Policy": "Privacy Policy",
+      "Terms of Service": "Terms of Service",
+      "Contact Us": "Contact Us",
+      "Dark Mode": "Dark Mode",
+      "Rights Reserved": "© 2025 Copark. All rights reserved.",
     }
-  }),
+    return translations[key] || key
+  },
+
   NextIntlClientProvider: ({ children }: {children: React.ReactNode}) => children,
   createSharedPathnamesNavigation: () => ({
     useRouter: () => ({
@@ -36,9 +32,8 @@ vi.mock('next-intl', () => ({
 }))
 
 vi.mock('@/i18n/navigation', () => ({
-  useRouter: () => ({
-    push
-  })
+  useRouter: () => ({ push }),
+  usePathname: () => '/test',
 }))
 
 vi.mock('next/navigation', () => ({
@@ -74,7 +69,7 @@ afterEach(() => {
   vi.clearAllMocks()
 })
   
-  it('Renders Page', async () => {
-    render(<Page />)
-    await screen.findByText('Your Privacy Matters')
-  })
+it('Renders Page', async () => {
+  render(<Page />)
+  await screen.findByText('Your Privacy Matters')
+})

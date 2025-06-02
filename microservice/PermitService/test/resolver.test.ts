@@ -897,7 +897,7 @@ test('Admin can get all zones', async () => {
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ getZonesQuery })
+    .send({ query: getZonesQuery })
     .expect(200)
 
   expect(response.body.errors).toBeUndefined()

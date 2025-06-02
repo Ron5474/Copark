@@ -405,13 +405,21 @@ export class PermitService {
   public async updateLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
   
+    const { lot, ...inputWithoutLot } = input
+
+    const data = {
+      ...inputWithoutLot,
+      name: 'lot',
+      area: lot,
+    }
+
     const { rowCount } = await pool.query(`
       UPDATE type
       SET data = $1
       WHERE location = $2
       AND data->>'area' = $3
       AND data->>'name' = 'lot'
-    `, [input, location, input.lot])
+    `, [data, location, lot])
   
     return (rowCount as number) > 0
   }

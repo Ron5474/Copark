@@ -433,3 +433,22 @@ test('sendPermitEmail logs error when fetch fails', async () => {
 
   errorSpy.mockRestore()
 })
+
+test('Expiring current permit', async () => {
+  const now = new Date('2025-05-27T12:00:00Z')
+  vi.setSystemTime(now)
+  await permitService.purchaseMyLotPermit(lotPermitDetails, now)
+  await permitService.expirePermits(lotPermitDetails.vehicleId, now.toISOString())
+
+  expect((await permitService.getMyPermits([lotPermitDetails.vehicleId], now.toISOString())).active.length).toBe(0)
+  vi.useRealTimers()
+})
+
+test('Expiring no permits', async () => {
+  const now = new Date('2025-05-27T12:00:00Z')
+  vi.setSystemTime(now)
+  await permitService.expirePermits(lotPermitDetails.vehicleId, now.toISOString())
+
+  expect((await permitService.getMyPermits([lotPermitDetails.vehicleId], now.toISOString())).expired.length).toBe(0)
+  vi.useRealTimers()
+})

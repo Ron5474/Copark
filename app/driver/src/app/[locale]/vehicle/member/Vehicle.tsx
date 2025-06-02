@@ -43,8 +43,9 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
   const t = useTranslations('garage')
 
   useEffect(() => {
+    let fetchedVehicles
     (async () => {
-      const fetchedVehicles = await getVehicles()
+      fetchedVehicles = await getVehicles()
       setVehicles(fetchedVehicles)
       setLoading(false)
     })()
@@ -55,6 +56,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
         vid = res.id
         if (isCheckout) {
           setSelectedVID(vid)
+          setVehicle(fetchedVehicles.find((v: Vehicle) => v.id === vid))
         }
       } else {
         vid = null

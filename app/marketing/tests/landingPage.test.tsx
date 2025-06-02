@@ -38,9 +38,8 @@ beforeEach(() => {
   }))
 
   vi.mock('@/i18n/navigation', () => ({
-    useRouter: () => ({
-      push
-    })
+    useRouter: () => ({ push }),
+    usePathname: () => '/test',
   }))
 
   vi.mock('next/navigation', () => ({
@@ -59,5 +58,38 @@ beforeEach(() => {
 
 it('Renders', async () => {
   await render(<Home />);
-  expect(await screen.queryByLabelText('copark-logo')).not.toBeNull();
+  const logos = await screen.queryAllByLabelText('copark-logo')
+  expect(logos.length).toBeGreaterThan(0)
 });
+// it('renders Home component and displays content from HomeView', async () => {
+//   // Mock translations used in HomeView
+//   vi.doMock('next-intl', () => ({
+//     useTranslations: () => (ns: string) => {
+//       if (ns === 'HomeView') {
+//         return (key: string) => {
+//           if (key === 'cta') return 'Translated CTA'
+//           return key
+//         }
+//       }
+//       return () => ''
+//     },
+//   }))
+
+//   const { default: Home } = await import('../src/app/[locale]/page')
+//   render(<Home />)
+
+//   const cta = await screen.findByText(/translated cta/i)
+//   expect(cta).toBeTruthy()
+// })
+// import { render } from '@testing-library/react'
+// import { describe, it, expect } from 'vitest'
+
+// // Placeholder to avoid import errors; update with actual import path
+// const Home = () => <div>Home Placeholder</div>
+
+// describe('Home', () => {
+//   it('renders without crashing', () => {
+//     const { container } = render(<Home />)
+//     expect(container).toBeTruthy()
+//   })
+// })

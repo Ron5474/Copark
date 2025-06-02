@@ -1,6 +1,9 @@
 import type React from "react"
 import { Container, Typography, Grid, Box } from "@mui/material"
-import { DirectionsCar, ConfirmationNumber, Smartphone } from "@mui/icons-material"
+// import { DirectionsCar, ConfirmationNumber, Smartphone } from "@mui/icons-material"
+import DirectionsCar from "@mui/icons-material/DirectionsCar"
+import ConfirmationNumber from "@mui/icons-material/ConfirmationNumber"
+import Smartphone from "@mui/icons-material/Smartphone"
 import { useTranslations } from "next-intl"
 
 type Props = {

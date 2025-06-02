@@ -99,7 +99,7 @@ const Topbar = () => {
       </picture>
       <List>
         {navItems.map((item) => (
-          <ListItem key={item.id} onClick={() => scrollToSection(item.id)}>
+          <ListItem key={item.id} onClick={() => scrollToSection(item.id)} data-testid={`drawer-item-${item.id}`}>
             <ListItemText primary={item.label} />
           </ListItem>
         ))}
@@ -130,7 +130,7 @@ const Topbar = () => {
           </Box>
 
           {!isMobile && (
-            <Box sx={{ display: "flex", gap: 3, mr: 3 }}>
+            <Box data-testid="desktop-nav" sx={{ display: "flex", gap: 3, mr: 3 }}>
               {navItems.map((item) => (
                 <Button
                   key={item.id}
@@ -144,7 +144,7 @@ const Topbar = () => {
           )}
 
           {isMobile && (
-            <IconButton onClick={handleDrawerToggle} sx={{ color: "text.primary" }}>
+            <IconButton onClick={handleDrawerToggle} sx={{ color: "text.primary" }} aria-label="menu-icon">
               <MenuIcon />
             </IconButton>
           )}

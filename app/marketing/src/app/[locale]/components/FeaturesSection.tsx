@@ -1,6 +1,12 @@
 import type React from "react"
 import { Container, Typography, Grid, Card, CardContent, Box } from "@mui/material"
-import { CreditCard, ConfirmationNumber, DirectionsCar, LocationOn, Schedule, Email } from "@mui/icons-material"
+// import { CreditCard, ConfirmationNumber, DirectionsCar, LocationOn, Schedule, Email } from "@mui/icons-material"
+import CreditCard from "@mui/icons-material/CreditCard";
+import ConfirmationNumber from "@mui/icons-material/ConfirmationNumber";
+import DirectionsCar from "@mui/icons-material/DirectionsCar";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Schedule from "@mui/icons-material/Schedule";
+import Email from "@mui/icons-material/Email";
 import { useTranslations } from "next-intl"
 
 function FeaturesSection() {

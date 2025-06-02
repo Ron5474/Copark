@@ -21,6 +21,8 @@ vi.mock('next-intl', () => ({
         return 'Dark Mode';
       case 'Rights Reserved':
         return '© 2025 Copark. All rights reserved.';
+      case 'agreement':
+        return "By accessing or using Copark's parking management services, you agree to be bound by these Terms of Service."
       default:
         return key;
     }
@@ -36,10 +38,10 @@ vi.mock('next-intl', () => ({
 }))
 
 vi.mock('@/i18n/navigation', () => ({
-  useRouter: () => ({
-    push
-  })
+  useRouter: () => ({ push }),
+  usePathname: () => '/test'
 }))
+
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({

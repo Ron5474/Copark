@@ -17,7 +17,8 @@ import {
   Zone,
   ZoneStats,
   LotStats,
-  PermitReport
+  PermitReport,
+  permitId
 } from '../src/permit/schema'
 
 let server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
@@ -256,4 +257,12 @@ test('PermitReport schema loads correctly', () => {
   expect(report.totalRevenue).toBe(1234.56)
   expect(report.zoneBreakdown[0]).toBe(zone)
   expect(report.lotBreakdown[0]).toBe(lot)
+})
+
+test('permitId schema loads correctly', () => {
+  const pid = new permitId()
+  pid.id = "some id"
+
+  expect(pid).toBeDefined()
+  expect(pid.id).toBe('some id')
 })

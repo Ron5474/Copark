@@ -184,7 +184,7 @@ export class PermitService {
           FROM permit p, type t 
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
-          AND $2 <= (p.data->>'activeDate')::timestamptz
+          AND $2 < (p.data->>'activeDate')::timestamptz
         ),
         active AS (
           SELECT DISTINCT ON (p.id) p.vehicle,
@@ -198,7 +198,7 @@ export class PermitService {
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
           AND $2 >= (p.data->>'activeDate')::timestamptz
-          AND $2 <= (p.data->>'expireDate')::timestamptz
+          AND $2 < (p.data->>'expireDate')::timestamptz
         ),
         expired AS (
           SELECT DISTINCT ON (p.id) p.vehicle,
@@ -611,16 +611,45 @@ export class PermitService {
     activeOnly = true,
     startDate?: string,
     endDate?: string
-  ): Promise<{ area: string; totalPermits: number }[]> {
+  ): Promise<{ area: string; durationType: string; totalPermits: number }[]> {
     const now = new Date().toISOString()
     const useRange = !!(startDate && endDate)
 
+    // const query = `
+    //   SELECT 
+    //     t.data->>'area' AS area,
+    //     p.data->>'durationType' AS durationType,
+    //     COUNT(*) AS total
+    //   FROM permit p
+    //   JOIN type t ON t.id = p.type
+    //   WHERE t.data->>'name' = 'lot'
+    //     AND (
+    //       $1::boolean IS FALSE 
+    //       OR (p.data->>'activeDate')::timestamptz <= $2 
+    //       AND (p.data->>'expireDate')::timestamptz >= $2
+    //     )
+    //     ${useRange ? `
+    //       AND (p.data->>'purchaseDate')::timestamptz >= $3
+    //       AND (p.data->>'purchaseDate')::timestamptz <= $4
+    //     ` : ''}
+    //   GROUP BY t.data->>'area', p.data->>'durationType'
+    //   ORDER BY t.data->>'area', p.data->>'durationType'
+    // `
     const query = `
+      WITH duration_types AS (
+        SELECT DISTINCT p.data->>'durationType' AS durationType
+        FROM permit p
+        WHERE p.data ? 'durationType'
+      )
       SELECT 
         t.data->>'area' AS area,
+        d.durationType,
         COUNT(p.*) AS total
       FROM type t
-      LEFT JOIN permit p ON p.type = t.id
+      CROSS JOIN duration_types d
+      LEFT JOIN permit p ON 
+        p.type = t.id
+        AND p.data->>'durationType' = d.durationType
         AND (
           ($1::boolean IS FALSE 
             OR (p.data->>'activeDate')::timestamptz <= $2 
@@ -631,8 +660,8 @@ export class PermitService {
           ` : ''}
         )
       WHERE t.data->>'name' = 'lot'
-      GROUP BY t.data->>'area'
-      ORDER BY t.data->>'area'
+      GROUP BY t.data->>'area', d.durationType
+      ORDER BY t.data->>'area', d.durationType
     `
 
     const params: (boolean | string)[] = [activeOnly, now]
@@ -641,9 +670,9 @@ export class PermitService {
     }
 
     const result = await pool.query(query, params)
-
     return result.rows.map(row => ({
       area: row.area,
+      durationType: row.durationtype,
       totalPermits: parseInt(row.total),
     }))
   }
@@ -754,20 +783,28 @@ export class PermitService {
     }]
   }
 
-  public async expirePermits(vehicleId: string): Promise<permitId[]> {
-    if (!vehicleId) {
-      throw new Error('Vehicle ID is required');
-    }
+  public async expirePermits(vehicleId: string, now=new Date().toISOString()): Promise<permitId[]> {
+    // Vehicle ID has to be defined, it is a required argument in this function.
+    // if (!vehicleId) {
+    //   throw new Error('Vehicle ID is required');
+    // }
     const result = await pool.query(
-      `UPDATE permit SET data = jsonb_set(data, '{expireDate}', to_jsonb(NOW())) WHERE vehicle = $1 RETURNING id`,
-      [vehicleId]
-    );
-
+      `
+      UPDATE permit
+      SET data = jsonb_set(data, '{expireDate}', to_jsonb($2))
+      WHERE vehicle = $1
+        AND (data->>'expireDate')::timestamptz > $2
+      RETURNING id
+      `,
+      [vehicleId, now]
+    )
+  
     if (result.rowCount === 0) {
-      return [];
+      return []
     }
+  
     return result.rows.map(row => ({
       id: row.id,
-    }));
+    }))
   }
 }

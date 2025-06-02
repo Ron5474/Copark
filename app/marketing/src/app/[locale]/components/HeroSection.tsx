@@ -9,7 +9,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material"
-import { Check } from "@mui/icons-material"
+import Check from "@mui/icons-material/Check";
 import { useTranslations } from "next-intl"
 
 type Props = {

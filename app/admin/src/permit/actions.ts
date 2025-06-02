@@ -189,6 +189,7 @@ export async function getPermitStatsByLot(activeOnly = true): Promise<LotStat[]>
         query LotStats($activeOnly: Boolean) {
           allLotStats(activeOnly: $activeOnly) {
             area
+            durationType
             totalPermits
           }
         }

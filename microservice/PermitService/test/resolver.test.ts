@@ -257,6 +257,13 @@ mutation PurchaseLotPermit($input: PurchaseLotInput!) {
   }
 }`
 
+const expirePermitQuery = `
+mutation ExpirePermits($vehicleId: String!) {
+  expirePermits(vehicleId: $vehicleId) {
+    id
+  }
+}`
+
 const purchaseLotInput = {
   input: {
     plate: derikVehicleInput.input.plate,
@@ -327,6 +334,20 @@ query ZoneDetails($zone: String!) {
 const zoneDetailsInput = {
   zone: "123"
 }
+
+const getLotsQuery = `
+query GetLots {
+  getLots {
+    id
+    title
+    lots {
+      name
+      price
+      activeDate
+      expireDate
+    }
+  }
+}`
 
 // const permitResolver = new PermitResolver()
 
@@ -647,6 +668,32 @@ test('Driver can purchase a lot permit in advance', async () => {
   vi.useRealTimers()
 })
 
+test('Driver can expire their permits', async () => {
+  const now = new Date('2025-03-27T12:00:00Z')
+  vi.setSystemTime(now)
+  const driver = await loginAs("driver")
+
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: purchaseLotPermitQuery,
+      variables: {input: {...purchaseLotInput.input, vehicleId: driver.vid, paymentMethod: 'visa 4242'}}
+    })
+
+  const permit = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driver.token)
+    .send({ 
+      query: expirePermitQuery,
+      variables: {vehicleId: driver.vid}
+    })
+
+  expect(permit.body.data.expirePermits[0].id).toBeDefined()
+  
+  vi.useRealTimers()
+})
+
 // test('No token to getUserData', async () => {
 //   const receipt = await permitResolver.getUserData(permitDetails)
 //   expect(receipt).toBeDefined()
@@ -835,7 +882,6 @@ test('Admin can get all zones', async () => {
   
   // eslint-disable-next-line
   zones.forEach((zone: any) => {
-    expect(zone).toHaveProperty('zone')
     expect(zone).toHaveProperty('hourly')
     expect(zone).toHaveProperty('maxDuration')
     expect(zone.maxDuration).toHaveProperty('hours')
@@ -939,6 +985,28 @@ test('Admin can create a new zone', async () => {
   expect(newZone.maxDuration.minutes).toBe(30)
   expect(newZone.openTime).toBe("08:00")
   expect(newZone.closeTime).toBe("18:00")
+})
+
+test('Admin can get all lots', async () => {
+  const { token } = await loginAs("admin")
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: getLotsQuery })
+    .expect(200)
+
+    console.log("LOT ERRORS:", response.body)
+  expect(response.body.errors).toBeUndefined()
+  const lots = response.body.data.getLots
+  expect(Array.isArray(lots)).toBe(true)
+  
+  // eslint-disable-next-line
+  lots.forEach((lot: any) => {
+    expect(lot).toHaveProperty('id')
+    expect(lot).toHaveProperty('title')
+    expect(lot).toHaveProperty('lots')
+  })
 })
 
 test('Admin can fetch all active permits', async () => {

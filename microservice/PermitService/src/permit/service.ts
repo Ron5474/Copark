@@ -184,7 +184,7 @@ export class PermitService {
           FROM permit p, type t 
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
-          AND $2 <= (p.data->>'activeDate')::timestamptz
+          AND $2 < (p.data->>'activeDate')::timestamptz
         ),
         active AS (
           SELECT DISTINCT ON (p.id) p.vehicle,
@@ -198,7 +198,7 @@ export class PermitService {
           WHERE p.vehicle = ANY($1::uuid[]) AND 
           t.id = p.type 
           AND $2 >= (p.data->>'activeDate')::timestamptz
-          AND $2 <= (p.data->>'expireDate')::timestamptz
+          AND $2 < (p.data->>'expireDate')::timestamptz
         ),
         expired AS (
           SELECT DISTINCT ON (p.id) p.vehicle,
@@ -754,7 +754,7 @@ export class PermitService {
     }]
   }
 
-  public async expirePermits(vehicleId: string): Promise<permitId[]> {
+  public async expirePermits(vehicleId: string, now=new Date().toISOString()): Promise<permitId[]> {
     // Vehicle ID has to be defined, it is a required argument in this function.
     // if (!vehicleId) {
     //   throw new Error('Vehicle ID is required');
@@ -762,12 +762,12 @@ export class PermitService {
     const result = await pool.query(
       `
       UPDATE permit
-      SET data = jsonb_set(data, '{expireDate}', to_jsonb(NOW()))
+      SET data = jsonb_set(data, '{expireDate}', to_jsonb($2))
       WHERE vehicle = $1
-        AND (data->>'expireDate')::timestamptz > NOW()
+        AND (data->>'expireDate')::timestamptz > $2
       RETURNING id
       `,
-      [vehicleId]
+      [vehicleId, now]
     )
   
     if (result.rowCount === 0) {

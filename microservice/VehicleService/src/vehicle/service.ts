@@ -177,7 +177,7 @@ export class VehicleService {
     });
 
     const pendingTicketsData = await pendingTickets.json();
-    console.log('Pending Tickets: ', pendingTicketsData)
+    // console.log('Pending Tickets: ', pendingTicketsData)
     if (pendingTicketsData.data.pendingTickets.length > 0) {
       throw new Error('Vehicle cannot be removed because it has pending tickets');
     }

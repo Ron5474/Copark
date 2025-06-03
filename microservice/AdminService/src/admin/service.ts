@@ -305,7 +305,7 @@ export class AdminService {
     `;
 
     const result = await pool.query(query, [enforcerID]);
-    console.log('result', result.rows);
+    // console.log('result', result.rows);
 
     if (result.rows.length === 0) {
       return undefined;

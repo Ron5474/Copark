@@ -160,7 +160,7 @@ test('zoneDetails errors on wrong zone', async () => {
 
 test('getPermitsByDay returns permits by day bought', async () => {
   const permits = await permitService.getAllPermitsByDay()
-  expect(permits.length).toBe(1) // expects 1 from previous test
+  expect(permits.length).toBe(5) // expects 1 from previous test
 })
 
 test('admin create zone', async () => {
@@ -297,7 +297,7 @@ test('getAllPermits can return future permits', async () => {
   await permitService.purchaseMyLotPermit(lotPermitDetails)
 
   const permits = await permitService.getAllPermits(false)
-  expect(permits.length).toBe(2) // expects 1 from previous tests
+  expect(permits.length).toBe(9) // expects 1 from previous tests
 
   vi.useRealTimers()
 })
@@ -312,7 +312,7 @@ test('getAllPermits can return expired permits', async () => {
   vi.setSystemTime(future)
 
   const permits = await permitService.getAllPermits(false)
-  expect(permits.length).toBe(2) // expects 1 from previous tests
+  expect(permits.length).toBe(9) // expects 1 from previous tests
 
   vi.useRealTimers()
 })

@@ -165,35 +165,71 @@ export class PermitResolver {
       to: user.email,
       subject: 'Your CoPark Permit Confirmation',
       html: `
-        <div style="font-family: Arial, sans-serif max-width: 600px margin: auto padding: 24px border: 1px solid #eee border-radius: 10px box-shadow: 0 4px 12px rgba(0,0,0,0.1)">
-          <div style="text-align: center">
-            <h2 style="color: #2c3e50">Permit Purchase Confirmation</h2>
-          </div>
-          <p style="font-size: 16px color: #34495e">Hi <strong>${user.name}</strong>,</p>
-          <p style="font-size: 16px color: #34495e">
-            We're happy to let you know that your permit purchase was successful!
-          </p>
+       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); overflow: hidden; border: 1px solid #e8eaed;">
+  
+  <!-- Header Section -->
+  <div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); padding: 32px 24px; text-align: center;">
+    <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; line-height: 60px; text-align: center;">
+      <span style="color: white; font-size: 30px; font-weight: bold; vertical-align: middle;">✓</span>
+    </div>
+    <h2 style="color: white; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">Permit Purchase Confirmation</h2>
+  </div>
+  
+  <!-- Content Section -->
+  <div style="padding: 32px 24px;">
+    <p style="font-size: 18px; color: #2c3e50; margin-bottom: 8px; font-weight: 500;">Hi <strong>${user.name}</strong>,</p>
+    
+    <p style="font-size: 16px; color: #5a6c7d; line-height: 1.6; margin-bottom: 24px;">
+      We're happy to let you know that your permit purchase was successful!
+    </p>
+    
+    <!-- Details Card -->
+    <div style="background: linear-gradient(135deg, #f8f9ff 0%, #f1f4ff 100%); padding: 24px; border-radius: 12px; margin: 24px 0; border: 1px solid #e1e8ff; position: relative;">
+      <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); border-radius: 0 0 0 12px;"></div>
+      
+      <p style="margin: 0 0 12px 0; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.06); line-height: 1.5;">
+        <strong style="color: #374151;">Zone:</strong> <span style="color: #1f2937;">${input.zone}</span>
+      </p>
+      
+      <p style="margin: 0 0 12px 0; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.06); line-height: 1.5;">
+        <strong style="color: #374151;">Duration:</strong> <span style="color: #1f2937;">${durationString}</span>
+      </p>
+      
+      <p style="margin: 0 0 12px 0; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.06); line-height: 1.5;">
+        <strong style="color: #374151;">Vehicle Plate:</strong> <span style="color: #1f2937; font-family: 'Courier New', monospace; background: #f3f4f6; padding: 2px 6px; border-radius: 3px;">${plate}</span>
+      </p>
+      
+      <p style="margin: 0; line-height: 1.5;">
+        <strong style="color: #374151;">Payment Method:</strong> 
+        ${!showLogo 
+          ? brand 
+          : `<img src="${brand}" alt="${b}" style="height: 1em; vertical-align: baseline; border-radius: 3px; margin-left: 6px;" /><span style="color: #1f2937; margin-left: 4px;">${input.paymentMethod.split(" ")[1]}</span>`
+        }
+      </p>
+    </div>
+    
+    <!-- Support Section -->
+    <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 24px 0; text-align: center; border: 1px solid #e9ecef;">
+      <p style="font-size: 15px; color: #6c757d; margin: 0 0 4px 0;">
+        If you have any questions, feel free to contact our support team.
+      </p>
+    </div>
+    
+    <div style="text-align: center; margin: 24px 0;">
+      <p style="font-size: 16px; color: #495057; margin: 0;">
+        Thanks for using <strong style="color: #4CAF50; font-size: 18px;">CoPark</strong>
+      </p>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <div style="background: #f8f9fa; padding: 20px 24px; border-top: 1px solid #e9ecef;">
+    <p style="text-align: center; font-size: 13px; color: #6c757d; margin: 0;">
+      This is an automated message. Please do not reply.
+    </p>
+  </div>
+</div>
 
-          <div style="background-color: #f9f9f9 padding: 16px border-radius: 8px margin: 20px 0">
-            <p><strong>Zone:</strong> ${input.zone}</p>
-            <p><strong>Duration:</strong> ${durationString}</p>
-            <p><strong>Vehicle Plate:</strong> ${plate}</p>
-            <p><strong>Payment Method: ${!showLogo ? brand : `<img src=${brand} alt="${b}" style="height: 1em vertical-align: middle" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
-          </div>
-
-          <p style="font-size: 15px color: #7f8c8d">
-            If you have any questions, feel free to contact our support team.
-          </p>
-
-          <p style="font-size: 15px color: #7f8c8d">
-            Thanks for using <strong>CoPark</strong>
-          </p>
-
-          <hr style="margin: 24px 0 border: none border-top: 1px solid #ddd" />
-          <p style="text-align: center font-size: 12px color: #95a5a6">
-            This is an automated message. Please do not reply.
-          </p>
-        </div>
       `,
     })
 
@@ -358,35 +394,70 @@ export class PermitResolver {
       to: user.email,
       subject: 'Your CoPark Permit Confirmation',
       html: `
-        <div style="font-family: Arial, sans-serif max-width: 600px margin: auto padding: 24px border: 1px solid #eee border-radius: 10px box-shadow: 0 4px 12px rgba(0,0,0,0.1)">
-          <div style="text-align: center">
-            <h2 style="color: #2c3e50">Permit Purchase Confirmation</h2>
-          </div>
-          <p style="font-size: 16px color: #34495e">Hi <strong>${user.name}</strong>,</p>
-          <p style="font-size: 16px color: #34495e">
-            We're happy to let you know that your permit purchase was successful!
-          </p>
-
-          <div style="background-color: #f9f9f9 padding: 16px border-radius: 8px margin: 20px 0">
-            <p><strong>Lot:</strong> ${input.lot}</p>
-            <p><strong>Duration:</strong> ${durationString}</p>
-            <p><strong>Vehicle Plate:</strong> ${plate}</p>
-            <p><strong>Payment Method: ${!showLogo ? brand : `<img src=${brand} alt="${b}" style="height: 1em vertical-align: middle" /> ${input.paymentMethod.split(" ")[1]}`}</strong></p>
-          </div>
-
-          <p style="font-size: 15px color: #7f8c8d">
-            If you have any questions, feel free to contact our support team.
-          </p>
-
-          <p style="font-size: 15px color: #7f8c8d">
-            Thanks for using <strong>CoPark</strong>
-          </p>
-
-          <hr style="margin: 24px 0 border: none border-top: 1px solid #ddd" />
-          <p style="text-align: center font-size: 12px color: #95a5a6">
-            This is an automated message. Please do not reply.
-          </p>
-        </div>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); overflow: hidden; border: 1px solid #e8eaed;">
+  
+  <!-- Header Section -->
+  <div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); padding: 32px 24px; text-align: center;">
+    <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; line-height: 60px; text-align: center;">
+      <span style="color: white; font-size: 30px; font-weight: bold; vertical-align: middle;">✓</span>
+    </div>
+    <h2 style="color: white; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">Permit Purchase Confirmation</h2>
+  </div>
+  
+  <!-- Content Section -->
+  <div style="padding: 32px 24px;">
+    <p style="font-size: 18px; color: #2c3e50; margin-bottom: 8px; font-weight: 500;">Hi <strong>${user.name}</strong>,</p>
+    
+    <p style="font-size: 16px; color: #5a6c7d; line-height: 1.6; margin-bottom: 24px;">
+      We're happy to let you know that your permit purchase was successful!
+    </p>
+    
+    <!-- Details Card -->
+    <div style="background: linear-gradient(135deg, #f8f9ff 0%, #f1f4ff 100%); padding: 24px; border-radius: 12px; margin: 24px 0; border: 1px solid #e1e8ff; position: relative;">
+      <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); border-radius: 0 0 0 12px;"></div>
+      
+      <p style="margin: 0 0 12px 0; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.06); line-height: 1.5;">
+        <strong style="color: #374151;">Lot:</strong> <span style="color: #1f2937;">${input.lot}</span>
+      </p>
+      
+      <p style="margin: 0 0 12px 0; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.06); line-height: 1.5;">
+        <strong style="color: #374151;">Duration:</strong> <span style="color: #1f2937;">${durationString}</span>
+      </p>
+      
+      <p style="margin: 0 0 12px 0; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.06); line-height: 1.5;">
+        <strong style="color: #374151;">Vehicle Plate:</strong> <span style="color: #1f2937; font-family: 'Courier New', monospace; background: #f3f4f6; padding: 2px 6px; border-radius: 3px;">${plate}</span>
+      </p>
+      
+      <p style="margin: 0; line-height: 1.5;">
+        <strong style="color: #374151;">Payment Method:</strong> 
+        ${!showLogo 
+          ? brand 
+          : `<img src="${brand}" alt="${b}" style="height: 1em; vertical-align: baseline; border-radius: 3px; margin-left: 6px;" /><span style="color: #1f2937; margin-left: 4px;">${input.paymentMethod.split(" ")[1]}</span>`
+        }
+      </p>
+    </div>
+    
+    <!-- Support Section -->
+    <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 24px 0; text-align: center; border: 1px solid #e9ecef;">
+      <p style="font-size: 15px; color: #6c757d; margin: 0 0 4px 0;">
+        If you have any questions, feel free to contact our support team.
+      </p>
+    </div>
+    
+    <div style="text-align: center; margin: 24px 0;">
+      <p style="font-size: 16px; color: #495057; margin: 0;">
+        Thanks for using <strong style="color: #4CAF50; font-size: 18px;">CoPark</strong>
+      </p>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <div style="background: #f8f9fa; padding: 20px 24px; border-top: 1px solid #e9ecef;">
+    <p style="text-align: center; font-size: 13px; color: #6c757d; margin: 0;">
+      This is an automated message. Please do not reply.
+    </p>
+  </div>
+</div>
       `,
     })
 

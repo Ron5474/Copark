@@ -179,7 +179,7 @@ export class AdminResolver {
     })
 
     const ticketJson = await ticketRes.json()
-    console.log(ticketJson)
+    // console.log(ticketJson)
     // console.log(ticketJson)
         // Replace enforcer IDs with names in enforcerBreakdown
     if (
@@ -188,7 +188,7 @@ export class AdminResolver {
     ) {
       for (const breakdown of ticketJson.data.adminTicketReport.enforcerBreakdown) {
       const enforcerId = breakdown.enforcer;
-      console.log(enforcerId)
+      // console.log(enforcerId)
       const enforcer = await adminService.getEnforcerbyID(enforcerId);
       breakdown.enforcer = enforcer;
       // console.log(breakdown.enforcer)

@@ -18,13 +18,12 @@ export class PoliceController extends Controller {
   @Get('check')
   @Security('jwt', ['police'])
   public async checkPermitByPlate(
-    @Query() plate: string,
+    @Query() plate: string, @Query() state: string,
     @Request() request: express.Request & {user: SessionUser}
   ): Promise<boolean> {
-
     const vehicleQuery = `
-      query IsValidPermitByPolice($plate: String!) {
-        isValidPermitByPolice(input: $plate) {
+      query IsValidPermitByPolice($plate: String!, $state: String!) {
+        isValidPermitByPolice(plate: $plate, state: $state) {
           isValid
         }
       }
@@ -37,7 +36,7 @@ export class PoliceController extends Controller {
       },
       body: JSON.stringify({
         query: vehicleQuery,
-        variables: { plate: plate },
+        variables: { plate: plate, state: state },
       }),
     })
     const validPermit = await validPermitRes.json()

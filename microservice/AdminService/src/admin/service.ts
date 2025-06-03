@@ -167,6 +167,9 @@ export class AdminService {
         )
         RETURNING id
     `
+    if (credential.role === 'campusPolice') {
+      credential.role = 'police'
+    }
 
     const query = {
       text: insert,
@@ -194,7 +197,7 @@ export class AdminService {
       FROM account
       WHERE (data->'role' @> jsonb_build_array('payroll')
         OR data->'role' @> jsonb_build_array('registrar')
-        OR data->'role' @> jsonb_build_array('campusPolice'))
+        OR data->'role' @> jsonb_build_array('police'))
       AND data->>'accountStatus' != 'deleted'
       ORDER BY data->>'name';
     `

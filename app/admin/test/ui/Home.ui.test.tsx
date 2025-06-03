@@ -277,3 +277,13 @@ it('navigates to Manage Tickets section', async () => {
     expect(screen.getByText(/Active Challenges:/)).toBeDefined();
   });
 });
+
+it('navigates to Manage Lots section', async () => {
+  render(<Page />);
+  const manageLotsText = screen.getByText('Manage Lots');
+  const clickableItem = manageLotsText.closest('div');
+  fireEvent.click(clickableItem!);
+  await waitFor(() => {
+    expect(screen.getByText('Add New Lot')).toBeDefined();
+  });
+});

@@ -262,7 +262,7 @@ export class PermitService {
     const permitsByDayMap: Record<string, Permit[]> = {}
 
     for (const row of permitResults.rows) {
-      console.log('row: ', row)
+      // console.log('row: ', row)
       const date = row.purchasedate.split('T')[0]
       const permit: Permit = {
         vehicle: row.vehicle,
@@ -272,13 +272,13 @@ export class PermitService {
         activeDate: row.activedate,
         expireDate: row.expiredate,
       }
-      console.log('Permit in Row: ', permit)
+      // console.log('Permit in Row: ', permit)
 
       if (!permitsByDayMap[date]) {
         permitsByDayMap[date] = []
       }
       permitsByDayMap[date].push(permit)
-      console.log('Permits by day  in loop after row: ', permitsByDayMap)
+      // console.log('Permits by day  in loop after row: ', permitsByDayMap)
     }
 
     const permitsByDay: PermitsByDay[] = Object.entries(permitsByDayMap).map(([date, permits]) => ({

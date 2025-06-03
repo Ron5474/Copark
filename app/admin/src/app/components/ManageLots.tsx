@@ -65,15 +65,18 @@ export default function ManageLots() {
   };
 
   const handleEditClick = (lot: Lot, groupId: string) => {
-    const lotGroup = lots.find(group => group.id === groupId);
-    const lotData = lotGroup?.lots.find(l => l.name === lot.name);
+    // Find existing data for the lot across all groups
+    const quarterlyGroup = lots.find(group => group.id === 'quarterly');
+    const yearlyGroup = lots.find(group => group.id === 'yearly');
+    const quarterlyLot = quarterlyGroup?.lots.find(l => l.name === lot.name);
+    const yearlyLot = yearlyGroup?.lots.find(l => l.name === lot.name);
     
     setEditingLot({
       lot: lot.name,
       price: Number(lot.price.replace('$', '')),
       type: groupId,
-      quarterlyExpireDate: groupId === 'quarterly' ? (lotData?.expireDate || '') : '',
-      yearlyExpireDate: groupId === 'yearly' ? (lotData?.expireDate || '') : ''
+      quarterlyExpireDate: quarterlyLot?.expireDate || '',
+      yearlyExpireDate: yearlyLot?.expireDate || ''
     });
     setEditDialog(true);
   };
@@ -181,7 +184,7 @@ export default function ManageLots() {
                 fontWeight: 600
               }}
             >
-              {lotGroup.title}
+              {lotGroup.title.charAt(0).toUpperCase() + lotGroup.title.slice(1)} Lots
             </Typography>
             
             {lotGroup.lots.map((lot) => (

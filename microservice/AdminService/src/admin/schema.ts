@@ -1,6 +1,11 @@
 import { IsEmail } from "class-validator";
 import { Field, ObjectType, InputType, ID } from "type-graphql";
 
+@InputType()
+export class ReportDays {
+  @Field()
+  days!: number;
+}
 @ObjectType()
 export class User {
   @Field(() => ID)

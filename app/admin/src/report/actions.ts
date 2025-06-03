@@ -23,11 +23,11 @@ export async function fetchAdminReport(numDays: number): Promise<string| undefin
     },
     body: JSON.stringify({
       query: `
-        query GenerateReport($numDays: Number!) {
-          generateReport(numDays: $numDays)
+        query GenerateReport($input: ReportDays!) {
+          generateReport(input: $input)
         }
       `,
-      variables: { numDays }
+      variables: { input: { days: numDays } },
     }),
   });
 

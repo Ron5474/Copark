@@ -371,12 +371,13 @@ export class PermitService {
 
     const result = await pool.query(query)
     const lotMap: Record<string, LotGroup> = {}
-
+    const now = new Date();
     for (const row of result.rows) {
       const data = row.data
       const area = data.area
 
       for (const permitType of ['daily', 'quarterly', 'yearly'] as const) {
+        if (now < new Date(data[permitType].expireDate) || !data[permitType].expireDate) {
         if (!lotMap[permitType]) {
           lotMap[permitType] = {
             id: permitType,
@@ -384,7 +385,7 @@ export class PermitService {
             lots: []
           }
         }
-
+        
         lotMap[permitType].lots.push({
           name: `lot${area}`,
           price: `$${data[permitType].price}`,
@@ -394,6 +395,7 @@ export class PermitService {
             day: 'numeric'
           })
         })
+      }
       }
     }
 

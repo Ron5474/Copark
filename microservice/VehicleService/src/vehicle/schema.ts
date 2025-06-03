@@ -104,6 +104,6 @@ export class DefaultVehicleDetails {
   @Field(() => String)
   state!: string
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   nickname?: string
 }

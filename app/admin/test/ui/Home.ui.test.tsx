@@ -105,7 +105,7 @@ vi.mock('../../src/ticket/actions', () => ({
     {
       id: '2',
       vehicle: 'XYZ-789',
-      enforcer: 'enforcer-2', 
+      enforcer: 'enforcer-2',
       issuedDate: '2024-05-21T11:00:00Z',
       violation: 'Expired Permit',
       fine: 50.00,
@@ -240,11 +240,11 @@ it('navigates to Statistics section', async () => {
 
 it('navigates to Reports section', async () => {
   render(<Page />);
-  const reportsText = screen.getByText('Generate Reports');
+  const reportsText = screen.getByText('Download PDF');
   const clickableItem = reportsText.closest('div');
   fireEvent.click(clickableItem!);
   await waitFor(() => {
-    expect(screen.getByText('Generate Reports Component')).toBeDefined();
+    expect(screen.getByText('Number of days', { exact: false })).toBeDefined();
   });
 });
 

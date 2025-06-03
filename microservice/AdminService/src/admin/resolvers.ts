@@ -7,6 +7,7 @@ import {
   APIUser,
   APICredential,
   APIUserID,
+  ReportDays,
   // ReportDay
 } from "./schema";
 
@@ -145,8 +146,10 @@ export class AdminResolver {
   @Query(() => String)
   async generateReport(
     @Ctx() request: Request,
-    @Arg("numDays", () => Number) numDays: number
+    @Arg("input", () => ReportDays) input: ReportDays
   ): Promise<string> {
+    // console.log("Generating report for admin")
+    const numDays = input.days;
     const ticketQuery = `
       query AdminTicketReport {
         adminTicketReport(numDays: ${numDays}) {

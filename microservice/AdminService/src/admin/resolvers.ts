@@ -113,6 +113,17 @@ export class AdminResolver {
 
     const ticketJson = await ticketRes.json()
     // console.log(ticketJson)
+        // Replace enforcer IDs with names in enforcerBreakdown
+    if (
+      ticketJson?.data?.adminTicketReport?.enforcerBreakdown &&
+      Array.isArray(ticketJson.data.adminTicketReport.enforcerBreakdown)
+    ) {
+      for (const breakdown of ticketJson.data.adminTicketReport.enforcerBreakdown) {
+      const enforcerId = breakdown.enforcer;
+      const enforcer = await adminService.getEnforcerbyID(enforcerId);
+      breakdown.enforcer = enforcer;
+      }
+    }
 
     const permitQuery = `
       query AdminPermitReport {
@@ -146,11 +157,10 @@ export class AdminResolver {
     })
 
     const permitJson = await permitRes.json()
-    // console.log(permitJson)
 
     const pdf = await generatePdf(ticketJson.data.adminTicketReport, permitJson.data.adminPermitReport, numDays)
 
-    console.log(pdf)
+    // console.log(pdf)
     return pdf;
   }
 }

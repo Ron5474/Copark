@@ -13,24 +13,25 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./microservice/AuthService/sql/databases.sql:/docker-entrypoint-initdb.d/1.databases.sql
-      - ./microservice/AuthService/sql/schema.sql:/docker-entrypoint-initdb.d/2.schema.sql
-      - ./microservice/AuthService/sql/data.sql:/docker-entrypoint-initdb.d/3.data.sql
-      - ./microservice/AdminService/sql/databases.sql:/docker-entrypoint-initdb.d/4.databases.sql
-      - ./microservice/AdminService/sql/schema.sql:/docker-entrypoint-initdb.d/5.schema.sql
-      - ./microservice/AdminService/sql/data.sql:/docker-entrypoint-initdb.d/6.data.sql
-      - ./microservice/VehicleService/sql/databases.sql:/docker-entrypoint-initdb.d/7.databases.sql
-      - ./microservice/VehicleService/sql/schema.sql:/docker-entrypoint-initdb.d/8.schema.sql
-      - ./microservice/VehicleService/sql/data.sql:/docker-entrypoint-initdb.d/9.data.sql
-      - ./microservice/TicketService/sql/databases.sql:/docker-entrypoint-initdb.d/10.databases.sql
-      - ./microservice/TicketService/sql/schema.sql:/docker-entrypoint-initdb.d/11.schema.sql
-      - ./microservice/TicketService/sql/data.sql:/docker-entrypoint-initdb.d/12.data.sql
-      - ./microservice/PermitService/sql/databases.sql:/docker-entrypoint-initdb.d/13.databases.sql
-      - ./microservice/PermitService/sql/schema.sql:/docker-entrypoint-initdb.d/14.schema.sql
-      - ./microservice/PermitService/sql/data.sql:/docker-entrypoint-initdb.d/15.data.sql
-      - ./microservice/PaymentService/sql/databases.sql:/docker-entrypoint-initdb.d/16.databases.sql
-      - ./microservice/PaymentService/sql/schema.sql:/docker-entrypoint-initdb.d/17.schema.sql
-      - ./microservice/PaymentService/sql/data.sql:/docker-entrypoint-initdb.d/18.data.sql
+      - ./microservice/AuthService/sql/databases.sql:/docker-entrypoint-initdb.d/01databases.sql
+      - ./microservice/AuthService/sql/schema.sql:/docker-entrypoint-initdb.d/02schema.sql
+      - ./microservice/AuthService/sql/data.sql:/docker-entrypoint-initdb.d/03data.sql
+      - ./microservice/AdminService/sql/databases.sql:/docker-entrypoint-initdb.d/04databases.sql
+      - ./microservice/AdminService/sql/schema.sql:/docker-entrypoint-initdb.d/05schema.sql
+      - ./microservice/AdminService/sql/data.sql:/docker-entrypoint-initdb.d/06data.sql
+      - ./microservice/VehicleService/sql/databases.sql:/docker-entrypoint-initdb.d/07databases.sql
+      - ./microservice/VehicleService/sql/schema.sql:/docker-entrypoint-initdb.d/08schema.sql
+      - ./microservice/VehicleService/sql/data.sql:/docker-entrypoint-initdb.d/09data.sql
+      - ./microservice/TicketService/sql/databases.sql:/docker-entrypoint-initdb.d/10databases.sql
+      - ./microservice/TicketService/sql/schema.sql:/docker-entrypoint-initdb.d/11schema.sql
+      - ./microservice/TicketService/sql/data.sql:/docker-entrypoint-initdb.d/12data.sql
+      - ./microservice/PermitService/sql/databases.sql:/docker-entrypoint-initdb.d/13databases.sql
+      - ./microservice/PermitService/sql/schema.sql:/docker-entrypoint-initdb.d/14schema.sql
+      - ./microservice/PermitService/sql/data.sql:/docker-entrypoint-initdb.d/15data.sql
+      - ./microservice/PaymentService/sql/databases.sql:/docker-entrypoint-initdb.d/16databases.sql
+      - ./microservice/PaymentService/sql/schema.sql:/docker-entrypoint-initdb.d/17schema.sql
+      - ./microservice/PaymentService/sql/data.sql:/docker-entrypoint-initdb.d/18data.sql
+      - ./demo.sql:/docker-entrypoint-initdb.d/19demo.sql
     networks:
       - external-network
 

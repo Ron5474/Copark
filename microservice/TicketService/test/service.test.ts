@@ -34,7 +34,7 @@ async function encrypt(userId: string, key= encodedKey): Promise<string> {
 test('getTickets should return all unpaid tickets', async () => {
     const tickets = await ticketService.getTickets();
 
-    expect(tickets).toHaveLength(10);
+    expect(tickets).toHaveLength(16);
 });
 
 test('createTicket should successfully create a ticket with all fields', async () => {
@@ -272,7 +272,7 @@ test('getTicketsByDay should return tickets by day', async () => {
 test('getTicketsIssuedByEnforcer should return tickets issued by provided enforcer', async () => {
     const tickets = await ticketService.getTicketsPerDayFromEnforcer(await encrypt('431b3711-73bb-4c90-afcf-59116217c0db'));
 
-    expect(tickets).toHaveLength(1);
+    expect(tickets).toHaveLength(5);
 });
 
 test('getTicketsIssuedByEnforcer should return empty array for issued by badly provided enforcer', async () => {

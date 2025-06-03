@@ -6,3 +6,4 @@ scp -r -i ../coparkxyz.pem ./microservice/PaymentService/sql/ ubuntu@copark.spac
 scp -r -i ../coparkxyz.pem ./microservice/PermitService/sql/ ubuntu@copark.space:~/copark/microservice/PermitService/sql
 scp -r -i ../coparkxyz.pem ./microservice/TicketService/sql/ ubuntu@copark.space:~/copark/microservice/TicketService/sql
 scp -r -i ../coparkxyz.pem ./microservice/VehicleService/sql/ ubuntu@copark.space:~/copark/microservice/VehicleService/sql
+scp -i ../coparkxyz.pem ./demo.sql ubuntu@copark.space:~/copark

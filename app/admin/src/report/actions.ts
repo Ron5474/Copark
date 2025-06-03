@@ -23,7 +23,7 @@ export async function fetchAdminReport(numDays: number): Promise<string| undefin
     },
     body: JSON.stringify({
       query: `
-        query GenerateReport($numDays: Float!) {
+        query GenerateReport($numDays: Number!) {
           generateReport(numDays: $numDays)
         }
       `,

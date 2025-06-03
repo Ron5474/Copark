@@ -28,8 +28,6 @@ export default function Page() {
         return <ManageAPIUsers onNavigate={handleNavigate} />;
       case 'statistics':
         return <ViewStatistics />; // No onNavigate prop needed here
-      case 'reports':
-        return <Box>Generate Reports Component</Box>;
       case 'zones':
         return <ManageZones />;
       case 'lots':

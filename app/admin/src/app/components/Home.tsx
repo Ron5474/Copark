@@ -17,7 +17,6 @@ export default function Home({ onNavigate, children }: HomeProps) {
     { label: 'Manage Tickets', component: 'tickets' },
     { label: 'Manage Lots', component: 'lots' },
     { label: 'Manage Zones', component: 'zones' },
-    { label: 'Generate Reports', component: 'reports' },
     { label: 'Download PDF', component: 'pdf' }
   ];
 

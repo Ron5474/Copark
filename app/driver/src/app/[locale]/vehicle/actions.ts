@@ -226,7 +226,9 @@ export async function getDefaultVehicle(): Promise<Vehicle | null> {
         query: `query defaultVehicle {
                       getDefaultVehicle {
                         id,
-                        plate
+                        plate,
+                        state,
+                        nickname
                       }
                   }`
       })

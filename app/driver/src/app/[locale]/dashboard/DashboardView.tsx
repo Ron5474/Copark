@@ -242,7 +242,7 @@ export default function DashboardView() {
                   Default Vehicle: 
                 </Typography>
                 <Typography variant="body2">
-                  {defaultVehicle.plate}
+                  {defaultVehicle?.nickname ? `${defaultVehicle?.nickname} - ` : '' + `${defaultVehicle.state} ${defaultVehicle.plate}`}
                 </Typography>
               </Box>
             )}

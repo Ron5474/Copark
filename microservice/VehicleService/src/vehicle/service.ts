@@ -290,7 +290,7 @@ export class VehicleService {
     nickname?: string
   } | null> {
     const result = await pool.query(
-      `SELECT t1.vehicle AS vehicle, t2.data->>'plate' AS plate  FROM defaultVehicle t1, vehicle t2 WHERE t1.driver = $1 AND t1.vehicle = t2.id`,
+      `SELECT t1.vehicle AS vehicle, t2.data->>'plate' AS plate, t2.data->>'state' as state, t2.data->>'nickname' as nickname  FROM defaultVehicle t1, vehicle t2 WHERE t1.driver = $1 AND t1.vehicle = t2.id`,
       [userId]
     )
 

@@ -43,7 +43,6 @@ export default function ManageLots() {
       const data = await getLots();
       setLots(data);
     } catch (err) {
-      console.log(err);
       setError('Failed to fetch lots');
     }
   };
@@ -265,7 +264,7 @@ export default function ManageLots() {
       </Box>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Add New Lot</DialogTitle>
+        <DialogTitle>Create New Lot</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 2, minWidth: 300 }}>
             <TextField 

@@ -457,7 +457,7 @@ export class PermitResolver {
   @Authorized('admin')
   @Query(() => [LotGroup])
   async getLots(): Promise<LotGroup[]> {
-    return await service.getAllLotDetails()
+    return await service.adminGetAllLotDetails()
   }
 
   @Authorized(['admin'])

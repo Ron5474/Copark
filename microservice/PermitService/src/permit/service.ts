@@ -311,7 +311,7 @@ export class PermitService {
       )
       RETURNING id, data
     `, [data, location, zone])
-  
+
     return (rows.length !== 0)
   }
 
@@ -400,6 +400,45 @@ export class PermitService {
     return Object.values(lotMap)
   }
 
+  public async adminGetAllLotDetails(): Promise<LotGroup[]> {
+    const query = `
+      SELECT data
+      FROM type
+      WHERE data->>'name' = 'lot'
+      ORDER BY data->>'area'
+    `
+
+    const result = await pool.query(query)
+    const lotMap: Record<string, LotGroup> = {}
+
+    for (const row of result.rows) {
+      const data = row.data
+      const area = data.area
+
+      for (const permitType of ['daily', 'quarterly', 'yearly'] as const) {
+        if (!lotMap[permitType]) {
+          lotMap[permitType] = {
+            id: permitType,
+            title: permitType,
+            lots: []
+          }
+        }
+
+        lotMap[permitType].lots.push({
+          name: `${area}`,
+          price: `$${data[permitType].price}`,
+          expireDate: new Date(data[permitType].expireDate).toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
+        })
+      }
+    }
+
+    return Object.values(lotMap)
+  }
+
   public async createNewLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
 
@@ -422,12 +461,20 @@ export class PermitService {
       )
       RETURNING id, data
     `, [data, location, lot])
-  
+
     return (rowCount as number) > 0
   }
 
   public async updateLot(input: NewLot): Promise<boolean> {
     const location = 'd731ac38-5a5f-4cea-be89-cfc8ce69f1d5' // TODO: Don't hardcode this
+
+    const { lot, ...inputWithoutLot } = input
+
+    const data = {
+      ...inputWithoutLot,
+      name: 'lot',
+      area: lot,
+    }
 
     const { rowCount } = await pool.query(`
       UPDATE type
@@ -435,7 +482,7 @@ export class PermitService {
       WHERE location = $2
       AND data->>'area' = $3
       AND data->>'name' = 'lot'
-    `, [input, location, input.lot])
+    `, [data, location, lot])
 
     return (rowCount as number) > 0
   }
@@ -809,7 +856,7 @@ export class PermitService {
     }]
   }
 
-  public async expirePermits(vehicleId: string, now=new Date().toISOString()): Promise<permitId[]> {
+  public async expirePermits(vehicleId: string, now = new Date().toISOString()): Promise<permitId[]> {
     // Vehicle ID has to be defined, it is a required argument in this function.
     // if (!vehicleId) {
     //   throw new Error('Vehicle ID is required');
@@ -824,11 +871,11 @@ export class PermitService {
       `,
       [vehicleId, now]
     )
-  
+
     if (result.rowCount === 0) {
       return []
     }
-  
+
     return result.rows.map(row => ({
       id: row.id,
     }))

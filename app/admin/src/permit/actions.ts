@@ -271,9 +271,9 @@ export async function updateZonePrice(input: {
   return result.data.updateZonePrice;
 }
 
-export async function getAllLotDetails(): Promise<LotGroup[]> {
+export async function getLots(): Promise<LotGroup[]> {
   const token = await getAuthToken();
-
+  
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -282,13 +282,15 @@ export async function getAllLotDetails(): Promise<LotGroup[]> {
     },
     body: JSON.stringify({
       query: `
-        query {
+        query GetLots {
           getLots {
             id
             title
             lots {
               name
               price
+              activeDate
+              expireDate
             }
           }
         }
@@ -297,7 +299,7 @@ export async function getAllLotDetails(): Promise<LotGroup[]> {
   });
 
   const result = await response.json();
-  
+
   if (result.errors) {
     throw new Error(result.errors[0].message);
   }
@@ -307,12 +309,12 @@ export async function getAllLotDetails(): Promise<LotGroup[]> {
 
 export async function createLot(input: {
   lot: string,
-  daily?: { price: number, expireDate?: string },
-  quarterly?: { price: number, expireDate?: string },
-  yearly?: { price: number, expireDate?: string }
+  daily?: { price: number },
+  quarterly?: { price: number, expireDate: string },
+  yearly?: { price: number, expireDate: string }
 }): Promise<boolean> {
   const token = await getAuthToken();
-
+  
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -332,7 +334,7 @@ export async function createLot(input: {
   });
 
   const result = await response.json();
-  
+
   if (result.errors) {
     throw new Error(result.errors[0].message);
   }
@@ -342,12 +344,12 @@ export async function createLot(input: {
 
 export async function updateLot(input: {
   lot: string,
-  daily?: { price: number, expireDate?: string },
-  quarterly?: { price: number, expireDate?: string },
-  yearly?: { price: number, expireDate?: string }
+  daily?: { price: number },
+  quarterly?: { price: number, expireDate: string },
+  yearly?: { price: number, expireDate: string }
 }): Promise<boolean> {
   const token = await getAuthToken();
-
+  
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -367,11 +369,10 @@ export async function updateLot(input: {
   });
 
   const result = await response.json();
-  
+
   if (result.errors) {
     throw new Error(result.errors[0].message);
   }
 
   return result.data.updateLot;
 }
-

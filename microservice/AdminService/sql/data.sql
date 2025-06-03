@@ -73,12 +73,13 @@ VALUES (
   )
 );
 
+
 INSERT INTO account(id, data)
 VALUES (
   '8dc65233-c590-45b7-9b10-a5b049600901',
   jsonb_build_object(
-    'name', 'Enforcer 1',
-    'email', 'enforcer1@outlook.com',
+    'name', 'John Wick',
+    'email', 'babayaga@copark.com',
     'phone' , '123-456-7890',
     'pwhash', crypt('password1', gen_salt('bf')),
     'role', '["enforcement"]',
@@ -90,14 +91,39 @@ INSERT INTO account(id, data)
 VALUES (
   '431b3711-73bb-4c90-afcf-59116217c0db',
   jsonb_build_object(
-    'name', 'Enforcer 2',
-    'email', 'enforcer2@outlook.com',
+    'name', 'James Bond',
+    'email', 'bond007@copark.com',
     'phone' , '123-456-7890',
     'pwhash', crypt('password1', gen_salt('bf')),
     'role', '["enforcement"]',
     'accountStatus', 'active'
   )
 );
+-- INSERT INTO account(id, data)
+-- VALUES (
+--   '8dc65233-c590-45b7-9b10-a5b049600901',
+--   jsonb_build_object(
+--     'name', 'Enforcer 1',
+--     'email', 'enforcer1@outlook.com',
+--     'phone' , '123-456-7890',
+--     'pwhash', crypt('password1', gen_salt('bf')),
+--     'role', '["enforcement"]',
+--     'accountStatus', 'active'
+--   )
+-- );
+
+-- INSERT INTO account(id, data)
+-- VALUES (
+--   '431b3711-73bb-4c90-afcf-59116217c0db',
+--   jsonb_build_object(
+--     'name', 'Enforcer 2',
+--     'email', 'enforcer2@outlook.com',
+--     'phone' , '123-456-7890',
+--     'pwhash', crypt('password1', gen_salt('bf')),
+--     'role', '["enforcement"]',
+--     'accountStatus', 'active'
+--   )
+-- );
 
 INSERT INTO account(data)
 VALUES (

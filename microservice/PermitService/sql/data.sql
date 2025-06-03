@@ -332,7 +332,7 @@ INSERT INTO permit (vehicle, type, data) VALUES (
   )
 );
 
-
+-- changed it to R from 123 and the duration to daily
 INSERT INTO permit (vehicle, type, data) VALUES (
   '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
   'f1a4a8d3-8c3e-4e30-b37f-bf90cd41972b',
@@ -340,13 +340,13 @@ INSERT INTO permit (vehicle, type, data) VALUES (
     'purchaseDate', to_char((now() - interval '2 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
     'activeDate', to_char((now() - interval '2 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
     'expireDate', to_char((now() + interval '5 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-    'area', '123',
+    'area', 'R',
     'receipt', jsonb_build_object(
       'service', 0.50,
       'subTotal', 19.00,
       'total', 19.50
     ),
-    'durationType', 'lot',
+    'durationType', 'daily',
     'paymentMethod', 'credit'
   )
 );
@@ -358,13 +358,13 @@ INSERT INTO permit (vehicle, type, data) VALUES (
     'purchaseDate', to_char((now() - interval '10 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
     'activeDate', to_char((now() - interval '10 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
     'expireDate', to_char((now() + interval '355 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-    'area', '123',
+    'area', 'C',
     'receipt', jsonb_build_object(
       'service', 0.50,
       'subTotal', 200.00,
       'total', 200.50
     ),
-    'durationType', 'lot',
+    'durationType', 'yearly',
     'paymentMethod', 'credit'
   )
 );
@@ -377,13 +377,232 @@ INSERT INTO permit (vehicle, type, data) VALUES (
     'purchaseDate', to_char((now() - interval '10 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
     'activeDate', to_char((now() - interval '10 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
     'expireDate', to_char((now() + interval '355 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-    'area', '123',
+    'area', 'C',
     'receipt', jsonb_build_object(
       'service', 0.50,
       'subTotal', 200.00,
       'total', 200.50
     ),
-    'durationType', 'lot',
+    'durationType', 'yearly',
+    'paymentMethod', 'credit'
+  )
+);
+
+-- Additional data for lot ANY with duration yearly (5 purchases)
+INSERT INTO permit (vehicle, type, data) VALUES (
+  'd1cc6477-cc4d-42fa-adcc-1bf7ec54d849',
+  'e6a7230d-3842-4a11-96e4-6715e1185a25',  -- lot ANY
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '40 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '40 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '325 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'ANY',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 500.00,
+      'total', 500.50
+    ),
+    'durationType', 'yearly',
+    'paymentMethod', 'credit'
+  )
+);
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  'd818c096-5d9e-4e43-8a7d-c9a7a956ad7e',
+  'e6a7230d-3842-4a11-96e4-6715e1185a25',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '35 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '35 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '330 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'ANY',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 500.00,
+      'total', 500.50
+    ),
+    'durationType', 'yearly',
+    'paymentMethod', 'credit'
+  )
+);
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  'd2b79fce-8c97-44d9-99d3-43a96c803824',
+  'e6a7230d-3842-4a11-96e4-6715e1185a25',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '30 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '30 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '335 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'ANY',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 500.00,
+      'total', 500.50
+    ),
+    'durationType', 'yearly',
+    'paymentMethod', 'credit'
+  )
+);
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  'f4af720a-2a51-4f34-a165-21c65ec51af0',
+  'e6a7230d-3842-4a11-96e4-6715e1185a25',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '25 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '25 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '340 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'ANY',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 500.00,
+      'total', 500.50
+    ),
+    'durationType', 'yearly',
+    'paymentMethod', 'credit'
+  )
+);
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  'e222f227-04b7-4c80-a1b5-0a93d623e22f',
+  'e6a7230d-3842-4a11-96e4-6715e1185a25',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '20 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '20 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '345 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'ANY',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 500.00,
+      'total', 500.50
+    ),
+    'durationType', 'yearly',
+    'paymentMethod', 'credit'
+  )
+);
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  '6af1d0de-56d1-42c0-9603-2d3e74c3423c',
+  'e6a7230d-3842-4a11-96e4-6715e1185a25',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '15 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '15 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '75 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'ANY',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 200.00,
+      'total', 200.50
+    ),
+    'durationType', 'quarterly',
+    'paymentMethod', 'credit'
+  )
+);
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  'ff32e571-77ea-4021-92ac-09662a6aac98',
+  'e6a7230d-3842-4a11-96e4-6715e1185a25',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '15 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '15 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '75 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'ANY',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 15.00,
+      'total', 15.50
+    ),
+    'durationType', 'daily',
+    'paymentMethod', 'credit'
+  )
+);
+
+-- Additional data for lot A with duration quarterly (3 purchases)
+INSERT INTO permit (vehicle, type, data) VALUES (
+  '6af1d0de-56d1-42c0-9603-2d3e74c3423c',
+  'b7a7d5d0-1b8f-4b02-a012-5c667ef2ecb1',  -- lot A
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '15 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '15 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '75 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'A',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 150.00,
+      'total', 150.50
+    ),
+    'durationType', 'quarterly',
+    'paymentMethod', 'credit'
+  )
+);
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  'ff32e571-77ea-4021-92ac-09662a6aac98',
+  'b7a7d5d0-1b8f-4b02-a012-5c667ef2ecb1',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '10 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '10 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '80 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'A',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 150.00,
+      'total', 150.50
+    ),
+    'durationType', 'quarterly',
+    'paymentMethod', 'credit'
+  )
+);
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  '57955cc7-ac05-4d08-a934-6ba34daf70a2',
+  'b7a7d5d0-1b8f-4b02-a012-5c667ef2ecb1',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '5 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '5 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '85 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'A',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 150.00,
+      'total', 150.50
+    ),
+    'durationType', 'quarterly',
+    'paymentMethod', 'credit'
+  )
+);
+
+-- Additional data for lot B with duration daily (2 purchases)
+INSERT INTO permit (vehicle, type, data) VALUES (
+  '2bfe2b7d-68b5-4623-b86e-383a43cc8cc4',
+  '93e3c80a-95ca-4f21-803a-2680b4d1994e',  -- lot B
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '2 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '2 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'B',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 10.00,
+      'total', 10.50
+    ),
+    'durationType', 'daily',
+    'paymentMethod', 'credit'
+  )
+);
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  '734af2a0-dd4b-4f68-b3e4-b214842d0143',
+  '93e3c80a-95ca-4f21-803a-2680b4d1994e',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate',   to_char((now() - interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate',   to_char((now() + interval '1 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', 'B',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 10.00,
+      'total', 10.50
+    ),
+    'durationType', 'daily',
     'paymentMethod', 'credit'
   )
 );

@@ -239,7 +239,7 @@ export default function DashboardView() {
                 }}
               >
                 <Typography variant="subtitle2" color="primary.main">
-                  {t("default")}
+                  {t("default") + ':'}
                 </Typography>
                 <Typography variant="body2">
                   {(defaultVehicle?.nickname ? `${defaultVehicle?.nickname} - ` : '') + `${defaultVehicle.state} ${defaultVehicle.plate}`}

@@ -24,7 +24,8 @@ export class AuthService {
         FROM account
         WHERE data->>'email' = $1
         AND data->>'pwhash' = crypt($2::text, data->>'pwhash')
-        AND (data->>'deleted' IS NULL OR data->>'deleted' != 'true');
+        AND (data->>'deleted' IS NULL OR data->>'deleted' != 'true')
+        AND (data->>'accountStatus' = 'active');
       `,
       values: [credentials.email, credentials.password]
     }

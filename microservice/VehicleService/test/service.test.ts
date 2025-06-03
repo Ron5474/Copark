@@ -156,7 +156,7 @@ test('updateVehicle - updates nickname correctly', async () => {
   const vehicle = await new VehicleService().registerVehicle(mock_vehicle1, mock_driver1_ID)
   await new VehicleService().updateVehicle({id: vehicle.id, ...update_vehicle1}, mock_driver1_ID)
   const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)
-  console.log("VEHICLES:", vehicles)
+  // console.log("VEHICLES:", vehicles)
   expect(vehicles[0].nickname).toBe('My Vehicle')
 })
 
@@ -164,7 +164,7 @@ test('updateVehicle - removes nickname correctly', async () => {
   const vehicle = await new VehicleService().registerVehicle(mock_vehicle1, mock_driver1_ID)
   await new VehicleService().updateVehicle({id: vehicle.id}, mock_driver1_ID)
   const vehicles = await new VehicleService().getMyVehicles(mock_driver1_ID)
-  console.log("VEHICLES:", vehicles)
+  // console.log("VEHICLES:", vehicles)
   expect(vehicles[0].nickname).toBeUndefined()
 })
 

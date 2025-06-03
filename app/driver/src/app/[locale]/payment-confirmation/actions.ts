@@ -155,7 +155,7 @@ export async function addPermitDetails(
   });
 
   const result = await res.json();
-  console.log("result", result);
+  // console.log("result", result);
 
   if (await result.errors !== undefined) {
     throw new Error("Failed to save permit details");

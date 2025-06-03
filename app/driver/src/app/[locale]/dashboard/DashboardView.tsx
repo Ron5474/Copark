@@ -169,7 +169,7 @@ export default function DashboardView() {
                 }}
               >
                 <Typography fontWeight="bold" color="primary.main">
-                  {permit.durationType.charAt(0).toUpperCase() + permit.durationType.slice(1) + " " + (permit.area === "ANY" ? t("allLotsAccess") : permit.area)}
+                  {/*permit.durationType.charAt(0).toUpperCase() + permit.durationType.slice(1)*/ tp(permit.durationType) + " " + (permit.area === "ANY" ? t("allLotsAccess") : permit.area)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {t("active")}: {new Date(permit.activeDate!).toLocaleDateString()}

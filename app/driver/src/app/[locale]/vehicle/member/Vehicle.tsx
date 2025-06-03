@@ -73,7 +73,9 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
     setLoading(false)
   }
 
-  const handleEditOpen = () => setEditOpen(true)
+  const handleEditOpen = () => {
+    setSelectedVID(null)
+    setEditOpen(true)}
   const handleEditClose = () => setEditOpen(false)
   const handleEdit = async () => {
     const res = await getVehicles()

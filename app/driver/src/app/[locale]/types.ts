@@ -11,6 +11,11 @@ export interface User {
   accountStatus: string
 }
 
+export interface ErrorResponse {
+  message: string
+  type: 'error'
+}
+
 export interface Vehicle {
   id?: string
   plate: string

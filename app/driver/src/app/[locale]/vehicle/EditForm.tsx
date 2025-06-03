@@ -157,7 +157,12 @@ export default function EditForm({ vehicle, close }: { vehicle: Vehicle, close: 
       {deleting && <DeleteAlert close={() => setDeleting(false)}
         onDelete={async () => {
           try {
-            await deleteVehicle(vehicle.plate, vehicle.state)
+            const res = await deleteVehicle(vehicle.plate, vehicle.state)
+            if (typeof res !== 'boolean' && res.type === 'error') {
+              setErrorMessage("Error deleting vehicle: " + res.message)
+              setDeleting(false)
+              return
+            }
             close()
           } catch (error) {
             setErrorMessage("Error deleting vehicle: " + (error instanceof Error ? error.message : 'Unknown error'))

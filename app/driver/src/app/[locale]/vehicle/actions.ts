@@ -1,7 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { Vehicle, EditVehicle } from '../types'
+import { Vehicle, EditVehicle, ErrorResponse } from '../types'
 
 const API_URL = 'http://localhost:4001/graphql'
 
@@ -136,7 +136,7 @@ export const editVehicle = async (vehicleEdit: EditVehicle): Promise<Vehicle> =>
   }
 }
 
-export const deleteVehicle = async (plate: string, state?: string): Promise<boolean> => {
+export const deleteVehicle = async (plate: string, state?: string): Promise<boolean|ErrorResponse> => {
   try {
     if (!plate || !state) {
       throw new Error('Plate and state are required to delete a vehicle')
@@ -167,13 +167,18 @@ export const deleteVehicle = async (plate: string, state?: string): Promise<bool
     const result = await response.json()
 
     if (result.errors) {
-      throw new Error(result.errors[0].message)
+      return {
+        message: result.errors[0]?.message || 'Failed to delete vehicle',
+        type: 'error'
+      }
     }
 
     return result.data.registerVehicle
   } catch (error) {
-    console.error('Error editing vehicle:', error)
-    throw error
+    return {
+      message: error instanceof Error ? error.message : 'Failed to delete vehicle',
+      type: 'error'
+    }
   }
 }
 

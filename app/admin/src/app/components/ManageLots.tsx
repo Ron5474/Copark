@@ -84,23 +84,54 @@ export default function ManageLots() {
 
   const handleUpdate = async () => {
     try {
-      const lotGroup = lots.find(group => group.id === editingLot.type);
-      const originalLot = lotGroup?.lots.find(l => l.name === editingLot.lot);
+      // const lotGroup = lots.find(group => group.id === editingLot.type);
+      // const originalLot = lotGroup?.lots.find(l => l.name === editingLot.lot);
+
+      // const updateData = {
+      //   lot: editingLot.lot,
+      //   daily: { 
+      //     price: editingLot.type === 'daily' ? editingLot.price : Number(originalLot?.price.replace('$', ''))
+      //   },
+      //   quarterly: {
+      //     price: editingLot.type === 'quarterly' ? editingLot.price : Number(originalLot?.price.replace('$', '')),
+      //     expireDate: editingLot.quarterlyExpireDate
+      //   },
+      //   yearly: {
+      //     price: editingLot.type === 'yearly' ? editingLot.price : Number(originalLot?.price.replace('$', '')),
+      //     expireDate: editingLot.yearlyExpireDate
+      //   }
+      // };
 
       const updateData = {
         lot: editingLot.lot,
         daily: { 
-          price: editingLot.type === 'daily' ? editingLot.price : Number(originalLot?.price.replace('$', ''))
+          price:
+            editingLot.type === 'daily'
+              ? editingLot.price
+              : Number(
+                  lots.find(g => g.id === 'daily')?.lots.find(l => l.name === editingLot.lot)?.price.replace('$', '') || 0
+                )
         },
         quarterly: {
-          price: editingLot.type === 'quarterly' ? editingLot.price : Number(originalLot?.price.replace('$', '')),
+          price:
+            editingLot.type === 'quarterly'
+              ? editingLot.price
+              : Number(
+                  lots.find(g => g.id === 'quarterly')?.lots.find(l => l.name === editingLot.lot)?.price.replace('$', '') || 0
+                ),
           expireDate: editingLot.quarterlyExpireDate
         },
         yearly: {
-          price: editingLot.type === 'yearly' ? editingLot.price : Number(originalLot?.price.replace('$', '')),
+          price:
+            editingLot.type === 'yearly'
+              ? editingLot.price
+              : Number(
+                  lots.find(g => g.id === 'yearly')?.lots.find(l => l.name === editingLot.lot)?.price.replace('$', '') || 0
+                ),
           expireDate: editingLot.yearlyExpireDate
         }
       };
+
 
       await updateLot(updateData);
       setEditDialog(false);

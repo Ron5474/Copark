@@ -43,6 +43,7 @@ export default function ManageLots() {
       const data = await getLots();
       setLots(data);
     } catch (err) {
+      void err;
       setError('Failed to fetch lots');
     }
   };
@@ -59,6 +60,7 @@ export default function ManageLots() {
         yearly: { price: 0, expireDate: '' }
       });
     } catch (err) {
+      void err;
       setError('Failed to create lot');
     }
   };
@@ -111,6 +113,7 @@ export default function ManageLots() {
         yearlyExpireDate: '' 
       });
     } catch (err) {
+      void err;
       setError('Failed to update lot');
     }
   };

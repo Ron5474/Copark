@@ -166,14 +166,24 @@ it('handles dialog cancellation', async () => {
   // Test Add dialog
   fireEvent.click(screen.getByText('Add New Lot'));
   fireEvent.click(screen.getByText('Cancel'));
-  expect(screen.queryByText('Add New Lot')).toBeDefined();
+  expect(screen.queryByText('Create New Lot')).toBeDefined();
 
   // Test Edit dialog
   await waitFor(() => {
     const editButtons = screen.getAllByText('Edit');
     fireEvent.click(editButtons[0]);
   });
-  fireEvent.click(screen.getAllByText('Cancel')[1]); // Second cancel button is in edit dialog
+  
+  // Wait for edit dialog to open
+  await waitFor(() => {
+    expect(screen.getByText('Edit Lot Price')).toBeDefined();
+  });
+  
+  // Find and click the Cancel button in the edit dialog
+  const editDialogCancelButton = screen.getAllByText('Cancel').find(
+    button => button.closest('[role="dialog"]')?.innerHTML.includes('Edit Lot Price')
+  );
+  fireEvent.click(editDialogCancelButton!);
   
   await waitFor(() => {
     expect(screen.queryByText('Edit Lot Price')).toBeNull();

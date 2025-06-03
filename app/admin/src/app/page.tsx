@@ -1,6 +1,5 @@
 'use client';
 
-import { Box } from '@mui/material';
 import { useState } from 'react';
 import Home from './components/Home';
 import ManageEnforcement from './components/ManageEnforcement';

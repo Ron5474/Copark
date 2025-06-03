@@ -252,7 +252,7 @@ test('Admin can get all tickets', async () => {
     .send({ query })
     .expect(200)
   expect(response.body.errors).toBeUndefined()
-  expect(response.body.data.getTickets.length).toBe(10)
+  expect(response.body.data.getTickets.length).toBe(16)
 })
 
 test('Admin can modify a ticket with images', async () => {

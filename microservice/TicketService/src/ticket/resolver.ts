@@ -301,7 +301,7 @@ export class TicketResolver {
   async hasPendingTicket (
     @Arg("email", () => EmailInput) email: EmailInput,
   ): Promise<hasTicket> {
-    console.log('Checking for pending ticket for email:', email)
+    // console.log('Checking for pending ticket for email:', email)
 
     const response = await fetch(
       `http://localhost:3010/api/v0/auth/id?email=${encodeURIComponent(email.email)}`, 

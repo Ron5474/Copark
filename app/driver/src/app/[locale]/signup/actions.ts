@@ -31,7 +31,7 @@ export async function signUp(locale: string): Promise<void> {
 export async function setOnBoardingState(state: string): Promise<void> {
   const cookieStore= await cookies();
   const token = cookieStore.get(process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME as string)?.value;
-  console.log("Setting onboarding state to", state);
+  // console.log("Setting onboarding state to", state);
   const res = await fetch("http://localhost:3010/api/v0/auth/driver/onboarding", {
     method: "PUT",
     headers: {
@@ -45,5 +45,5 @@ export async function setOnBoardingState(state: string): Promise<void> {
     cookieStore.delete(process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME as string);
     throw new Error("Error setting onboarding state");
   }
-  console.log(res.status);
+  // console.log(res.status);
 }

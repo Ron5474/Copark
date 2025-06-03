@@ -13,7 +13,7 @@ const internalKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_S
 
 export class AuthService {
   public async authenticate(credentials: Credentials): Promise<User|undefined> {
-    console.log("Authenticating user with email:", credentials.email);
+    // console.log("Authenticating user with email:", credentials.email);
     const query = {
       text: `
         SELECT jsonb_build_object(
@@ -31,9 +31,9 @@ export class AuthService {
       values: [credentials.email, credentials.password]
     }
   
-    console.log("Query:");
+    // console.log("Query:");
     const { rows } = await pool.query(query)
-    console.log("Rows:")
+    // console.log("Rows:")
 
     if (rows.length > 0) {
       const user = rows[0].user

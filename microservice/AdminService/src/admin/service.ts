@@ -299,16 +299,13 @@ export class AdminService {
   // }
 
   public async getEnforcerbyID(enforcerID: string): Promise<string | undefined> {
-    const decryptedID = await this.decrypt(enforcerID);
-    if (!decryptedID) {
-      return undefined;
-    }
 
     const query = `
-      SELECT enforcer->>'name' AS name FROM ticket WHERE enforcer = $1 LIMIT 1
+      SELECT data->>'name' AS name FROM account WHERE id = $1
     `;
 
-    const result = await pool.query(query, [decryptedID]);
+    const result = await pool.query(query, [enforcerID]);
+    console.log('result', result.rows);
 
     if (result.rows.length === 0) {
       return undefined;

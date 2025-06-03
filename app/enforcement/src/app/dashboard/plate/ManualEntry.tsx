@@ -29,6 +29,7 @@ export default function ManualEntryCard() {
     setIsValidated,
     setPermitResult,
     setTitle,
+    setPlateState
   } = useEnforcement()
 
   useEffect(() => {
@@ -77,6 +78,7 @@ export default function ManualEntryCard() {
 
       setManualInput(detectedData.plate)
       setState(`${detectedData.state[0]}${detectedData.state.substring(1,).toLowerCase()}`)
+      setPlateState(detectedData.state)
       console.log('state: ', state)
       
       setCameraOpen(false)

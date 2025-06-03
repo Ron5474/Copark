@@ -75,7 +75,7 @@ export class TicketService {
 
     }
 
-    // console.log(tickets);
+    console.log(tickets);
     return tickets;
   }
 
@@ -134,6 +134,7 @@ export class TicketService {
       images: row.images,
       note: row.note,
     };
+    console.log('Created Ticket: ', ticket);
 
     return ticket;
   }
@@ -263,7 +264,7 @@ export class TicketService {
   `;
 
   const {rows} = await pool.query(query, [vehicleIDs]);
-  
+  console.log('Rows: ', rows);
   interface TicketRow {
     id: string;
     vehicle: string;

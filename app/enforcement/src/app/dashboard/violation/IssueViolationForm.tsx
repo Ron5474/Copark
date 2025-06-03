@@ -14,7 +14,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useState, useEffect } from 'react'
 import { useEnforcement } from '../context/Context'
 import { issueTicket } from './actions'
-import { toBase64 } from './toBase64'
+// import { toBase64 } from './toBase64'
 
 const reasons = [
   'No Valid Permit',
@@ -25,7 +25,7 @@ const reasons = [
 ]
 
 export default function IssueViolationForm({ onCancel }: { onCancel: () => void }) {
-  const { plate, setShowSuccess, setTitle } = useEnforcement()
+  const { plate, setShowSuccess, setTitle, plateState } = useEnforcement()
   const [reason, setReason] = useState('')
   const [note, setNote] = useState('')
   const [photo, setPhoto] = useState<File | null>(null)
@@ -59,13 +59,14 @@ export default function IssueViolationForm({ onCancel }: { onCancel: () => void 
     setLoading(true)
 
     try {
-      const base64Image = photo ? await toBase64(photo) : null
+      // const base64Image = photo ? await toBase64(photo) : null
 
       await issueTicket({
         plate: plate as string,
+        state: plateState, // Assuming state is fixed for this example
         reason,
         note: reason === 'Other' ? note : '',
-        images: base64Image,
+        images: photo,
       })
 
       setShowSuccess(true)

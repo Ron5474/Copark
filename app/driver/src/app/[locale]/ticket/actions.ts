@@ -39,6 +39,7 @@ export const getTickets = async (): Promise<Ticket[]> => {
     })
 
     const result = await response.json()
+    console.log('GraphQL GET TICKETS response:', result)
     
     if (result.errors) {
       console.error('GraphQL errors:', result.errors)

@@ -227,6 +227,7 @@ export class TicketResolver {
     const userEncrypted = await encrypt(userId, emailEncodedKey)
     
     const vehicleIDs: Vehicle[] = await this.getVehicleById(userEncrypted)
+    console.log('Vehicle IDs:', vehicleIDs)
 
     return await this.ticketService.getTicketsForVehicleID(vehicleIDs)
   }

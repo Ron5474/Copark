@@ -1,15 +1,17 @@
 'use server'
 
 import { cookies } from 'next/headers'
+// import { toBase64 } from './toBase64'
 
 type TicketInput = {
   plate: string
+  state: string
   reason: string
   note?: string
-  images?: string | null
+  images?: File | null
 }
 
-export async function issueTicket({ plate, reason, note, images }: TicketInput) {
+export async function issueTicket({ plate, state, reason, note, images }: TicketInput) {
   const cookieStore = cookies()
   const token = (await cookieStore).get('sessionEnf')?.value
 
@@ -30,6 +32,15 @@ export async function issueTicket({ plate, reason, note, images }: TicketInput) 
     }
   `
 
+  let base64Image: string | null = null
+  if (images) {
+    const arrayBuffer = await images.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    const base64 = buffer.toString('base64')
+    base64Image = `data:${images.type};base64,${base64}`
+  }
+
+
   const response = await fetch('http://localhost:4002/graphql', {
     method: 'POST',
     headers: {
@@ -41,9 +52,10 @@ export async function issueTicket({ plate, reason, note, images }: TicketInput) 
       variables: {
         input: {
           plate,
+          state,
           reason,
           note,
-          images,
+          images: base64Image,
         },
       },
     }),

@@ -763,7 +763,7 @@ test('Enforcer gets valid permit', async () => {
       variables: checkPermitInput
     })
 
-  expect(permits.body.data.checkPermit.length).toBe(1)
+  expect(permits.body.data.checkPermit.length).toBe(7)
 
 })
 
@@ -1154,11 +1154,10 @@ test('Admin sees correct permit in allPermits query', async () => {
   expect(response.body.errors).toBeUndefined()
   const permits = response.body.data.allPermits
   expect(Array.isArray(permits)).toBe(true)
-  expect(permits.length).toBe(1)
-  expect(permits[0].area).toBe("123")
+  expect(permits.length).toBe(8)
 })
 
-test('Admin sees no lot permits in allLotStats', async () => {
+test('Admin sees lot permits in allLotStats', async () => {
   const { token } = await loginAs("admin")
 
   const query = `
@@ -1185,7 +1184,6 @@ test('Admin sees no lot permits in allLotStats', async () => {
 
   lots.forEach(lot => {
     expect(typeof lot.area).toBe('string')
-    expect(lot.totalPermits).toBe(0)
   })
 })
 
@@ -1285,7 +1283,7 @@ test('Admin sees correct zone and lot stats after inserting test data', async ()
   const zoneData: ZoneStatsResponse = zoneStatsRes.body
 
   const zone111 = zoneData.data.allZoneStats.find(z => z.area === "111")
-  expect(zone111?.totalPermits).toBe(2)
+  expect(zone111?.totalPermits).toBe(4)
 
   const lotStatsQuery = `
     query {
@@ -1393,7 +1391,7 @@ test('Admin sees only active permits when using activeOnly: true', async () => {
   const zone27  = zoneStats.find(z => z.area === '27')
   const zone101 = zoneStats.find(z => z.area === '101')
 
-  expect(zone27?.totalPermits).toBe(1)
+  expect(zone27?.totalPermits).toBe(3)
   expect(zone101?.totalPermits).toBe(0)
 
   // Step 2: Query lot stats

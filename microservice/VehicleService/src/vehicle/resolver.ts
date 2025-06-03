@@ -55,10 +55,7 @@ export class VehicleResolver {
       throw new Error('No default vehicle found for this user')
     }
     
-    return {
-      id: defaultVehicle.id,
-      plate: defaultVehicle.plate,
-    }
+    return defaultVehicle
   }
 
   @Authorized('driver')

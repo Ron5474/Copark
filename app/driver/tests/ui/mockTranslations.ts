@@ -59,6 +59,7 @@ export function mockNextIntl() {
           'dashboard.area': 'Area',
           'dashboard.active': 'Active',
           'dashboard.expires': 'Expires',
+          'dashboard.default': 'Default Vehicle',
     
           // Bottom Navigation
           'bottomNav.home': 'Home',

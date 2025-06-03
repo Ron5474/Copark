@@ -132,7 +132,7 @@
 // }
 
 
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, PDFPage } from 'pdf-lib';
 import { TicketReport } from '../../../TicketService/src/ticket/schema';
 import { PermitReport } from '../../../PermitService/src/permit/schema';
 
@@ -164,7 +164,7 @@ function wrapTextPreservingNewlines(text: string, maxCharsPerLine: number): stri
 }
 
 function drawProgressBar(
-  page: any,
+  page: PDFPage,
   x: number,
   y: number,
   width: number,
@@ -203,7 +203,7 @@ function drawProgressBar(
 }
 
 function drawPieChart(
-  page: any,
+  page: PDFPage,
   centerX: number,
   centerY: number,
   radius: number,
@@ -250,7 +250,7 @@ function drawPieChart(
 }
 
 function drawBarChart(
-  page: any,
+  page: PDFPage,
   x: number,
   y: number,
   width: number,
@@ -289,7 +289,7 @@ function drawBarChart(
 }
 
 function drawStatCard(
-  page: any,
+  page: PDFPage,
   x: number,
   y: number,
   width: number,

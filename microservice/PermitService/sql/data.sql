@@ -350,3 +350,40 @@ INSERT INTO permit (vehicle, type, data) VALUES (
     'paymentMethod', 'credit'
   )
 );
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '1a6fc438-e678-426a-a5fd-44cd6740ffb2',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '10 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate', to_char((now() - interval '10 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate', to_char((now() + interval '355 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', '123',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 200.00,
+      'total', 200.50
+    ),
+    'durationType', 'lot',
+    'paymentMethod', 'credit'
+  )
+);
+
+
+INSERT INTO permit (vehicle, type, data) VALUES (
+  'b69c877b-cfde-430c-8856-a2354d2e0d06',
+  '1a6fc438-e678-426a-a5fd-44cd6740ffb2',
+  jsonb_build_object(
+    'purchaseDate', to_char((now() - interval '10 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'activeDate', to_char((now() - interval '10 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'expireDate', to_char((now() + interval '355 day'), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'area', '123',
+    'receipt', jsonb_build_object(
+      'service', 0.50,
+      'subTotal', 200.00,
+      'total', 200.50
+    ),
+    'durationType', 'lot',
+    'paymentMethod', 'credit'
+  )
+);

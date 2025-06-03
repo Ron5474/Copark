@@ -56,6 +56,7 @@ export default function ManualEntryCard() {
     try {
       const result = await checkPermit(trimmed, state)
       setPlate(trimmed)
+      setPlateState(state)
       setPermitResult(result)
       setIsValidated(true)
     } catch (err) {

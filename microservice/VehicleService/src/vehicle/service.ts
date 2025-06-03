@@ -91,7 +91,7 @@ export class VehicleService {
 
     if (result.rowCount === 0) return []
 
-    // console.log('result.rows', result.rows)
+    console.log('result.rows', result.rows)
 
     return (result.rows.map(row => ({
       // id: await this.encrypt(row.id),
@@ -372,6 +372,7 @@ export class VehicleService {
     plate: string,
     state: string
   ): Promise<Vehicle | null> {
+    console.log('Finding vehicle by plate:', plate, 'and state:', state);
     const result = await pool.query(
       `SELECT id, data
         FROM vehicle
@@ -383,6 +384,7 @@ export class VehicleService {
     );
 
     if (result.rowCount === 0) return null;
+    console.log('result', result)
     const row = result.rows[0];
     return {
       id:       row.id,

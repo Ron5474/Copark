@@ -80,6 +80,7 @@ export class TicketService {
   }
 
   public async createTicket(newTicket: NewTicket): Promise<Ticket> {
+    try {
     // console.log('Enforcer Token: ', newTicket.enforcer)
     const enforcerId = await this.decryptUser(newTicket.enforcer);
     // console.log('Enforcer ID: ', enforcerId)
@@ -90,6 +91,7 @@ export class TicketService {
 
     const issuedDate = new Date().toISOString();
     const ticketStatus = 'unpaid';
+    console.log('New Ticket: ', vehicleId);
 
     const insertQuery = `
       INSERT INTO ticket (vehicle, enforcer, data)
@@ -136,7 +138,10 @@ export class TicketService {
     };
     console.log('Created Ticket: ', ticket);
 
-    return ticket;
+    return ticket;} catch (error) {
+      console.log(error);
+      throw new Error("Failed to create ticket: " + error);
+    }
   }
 
   public async modifyTicket(input: ModifyTicketInput): Promise<Ticket | null> {

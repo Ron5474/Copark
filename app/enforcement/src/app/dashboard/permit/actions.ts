@@ -8,6 +8,7 @@ const getAuthToken = async () => {
 }
 
 export async function checkPermit(plate: string, state: string) {
+  console.log("CHECKING PERMIT FOR PLATE: ", plate, " STATE: ", state)
   const query = `
     query CheckedPermit($plate: String!, $state: String!) {
       checkPermit(plate: $plate, state: $state) {

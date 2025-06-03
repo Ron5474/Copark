@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from 'react';
 import { fetchAdminReport } from '../../report/actions';
 import { Button, TextField, Box, Typography } from '@mui/material';

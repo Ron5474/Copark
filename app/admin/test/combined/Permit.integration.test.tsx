@@ -9,7 +9,7 @@ import AllPermitsTable from '@/app/charts/AllPermitsTable';
 import PermitStatsByZone from '@/app/charts/PermitStatsByZone';
 import PermitStatsByLot from '@/app/charts/PermitStatsByLot';
 import ViewStatistics from '@/app/components/ViewStatistics';
-import { getAllLotDetails, createLot } from '@/permit/actions';
+import { getLots, createLot, updateLot } from '@/permit/actions';
 
 // Mock data
 const mockZones = [
@@ -552,7 +552,7 @@ it('successfully fetches lot details', async () => {
     return Promise.reject(new Error(`Unhandled fetch to ${url}`));
   });
 
-  const result = await getAllLotDetails();
+  const result = await getLots();
 
   expect(result).toEqual(mockLotDetails);
   expect(mockFetch).toHaveBeenCalledWith(
@@ -581,7 +581,7 @@ it('handles error when fetching lot details', async () => {
     return Promise.reject(new Error(`Unhandled fetch to ${url}`));
   });
 
-  await expect(getAllLotDetails()).rejects.toThrow('Failed to fetch lot details');
+  await expect(getLots()).rejects.toThrow('Failed to fetch lot details');
 });
 
 it('successfully creates a new lot', async () => {
@@ -650,4 +650,72 @@ it('handles error when creating lot', async () => {
     lot: 'D1',
     daily: { price: 15 }
   })).rejects.toThrow('Failed to create lot');
+});
+
+it('successfully updates an existing lot', async () => {
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      const body = JSON.parse(options?.body as string);
+      if (body.query.includes('updateLot')) {
+        const input = body.variables.input;
+        expect(input).toEqual({
+          lot: 'D1',
+          daily: { price: 20 },
+          quarterly: { 
+            price: 200,
+            expireDate: '2024-12-31T23:59:59-07:00'
+          }
+        });
+        
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            data: { updateLot: true }
+          })
+        });
+      }
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
+
+  const result = await updateLot({
+    lot: 'D1',
+    daily: { price: 20 },
+    quarterly: { 
+      price: 200,
+      expireDate: '2024-12-31T23:59:59-07:00' 
+    }
+  });
+
+  expect(result).toBe(true);
+  expect(mockFetch).toHaveBeenCalledWith(
+    'http://localhost:4003/graphql',
+    expect.objectContaining({
+      method: 'POST',
+      headers: expect.objectContaining({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer mock-auth-token'
+      }),
+      body: expect.stringContaining('updateLot')
+    })
+  );
+});
+
+it('handles error when updating lot', async () => {
+  mockFetch.mockImplementationOnce(async (url, options) => {
+    if (url === 'http://localhost:4003/graphql') {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          errors: [{ message: 'Failed to update lot' }]
+        })
+      });
+    }
+    return Promise.reject(new Error(`Unhandled fetch to ${url}`));
+  });
+
+  await expect(updateLot({
+    lot: 'D1',
+    daily: { price: 20 }
+  })).rejects.toThrow('Failed to update lot');
 });

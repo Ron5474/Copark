@@ -154,7 +154,8 @@ export default function CameraCapture({
       open={open}
       onClose={handleClose}
       maxWidth="sm"
-      fullWidth
+      fullScreen
+      // fullWidth
       PaperProps={{
         sx: { borderRadius: 3 }
       }}

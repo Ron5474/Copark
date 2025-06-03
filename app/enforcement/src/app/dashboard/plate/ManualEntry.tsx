@@ -72,7 +72,7 @@ export default function ManualEntryCard() {
       const detectedData = await scanPlate(imageDataURL)
       
       if (!detectedData.plate || detectedData.plate.trim() === '') {
-        throw new Error('No license plate detected in the image')
+        throw new Error('No license plate detected in the image. Please try again or enter manually.')
       }
 
       setManualInput(detectedData.plate)

@@ -42,7 +42,8 @@
     "expiredPermits": "Permisos Vencidos",
     "area": "Área",
     "active": "Activo",
-    "expires": "Vence"
+    "expires": "Vence",
+    "default": "Vehículo Predeterminado"
   },
   "bottomNav": {
     "home": "Inicio",

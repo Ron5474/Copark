@@ -37,7 +37,7 @@ export class registrarController extends Controller {
       },
       body: JSON.stringify({
         query: hasPendingTicketQuery,
-        variables: { email: email },
+        variables:  {email: { email: email }},
       }),
     })
     const result = await hasTicketRes.json()

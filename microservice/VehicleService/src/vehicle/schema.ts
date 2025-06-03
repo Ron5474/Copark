@@ -100,4 +100,10 @@ export class DefaultVehicleDetails {
 
   @Field(() => String)
   plate!: string
+
+  @Field(() => String)
+  state!: string
+
+  @Field(() => String, { nullable: true })
+  nickname?: string
 }

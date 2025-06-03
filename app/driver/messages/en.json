@@ -42,7 +42,8 @@
     "expiredPermits": "Expired Permits",
     "area": "Area",
     "active": "Active",
-    "expires": "Expires"
+    "expires": "Expires",
+    "default": "Default Vehicle"
   },
   "bottomNav": {
     "home": "Home",

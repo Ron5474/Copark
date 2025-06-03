@@ -478,6 +478,14 @@ export class PermitResolver {
 
   @Authorized(['admin'])
   @Mutation(() => Boolean)
+  async updateZone(
+    @Arg("input", () => NewZone) input: NewZone,
+  ): Promise<boolean> {
+    return await service.updateZone(input)
+  }
+
+  @Authorized(['admin'])
+  @Mutation(() => Boolean)
   async updateLot(
     @Arg("input", () => NewLot) input: NewLot,
   ): Promise<boolean> {

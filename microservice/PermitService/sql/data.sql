@@ -255,6 +255,7 @@ INSERT INTO permit (vehicle, type, data) VALUES (
       'subTotal', 2.45,
       'total', 2.95
     ),
+    'durationType', 'zone',
     'paymentMethod', 'credit'
   )
 );

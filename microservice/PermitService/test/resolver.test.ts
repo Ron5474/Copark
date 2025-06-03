@@ -349,6 +349,45 @@ query GetLots {
   }
 }`
 
+const getZonesQuery = `
+    query GetZones {
+      getZones {
+        zone
+        hourly
+        maxDuration {
+          hours
+          minutes
+        }
+        openTime
+        closeTime
+      }
+    }
+  `
+
+const createNewZoneInput = {
+  input: {
+    zone: 38212,
+    weekday: {
+      hourly: 3.50,
+      maxDuration: {
+        hours: 2,
+        minutes: 30
+      },
+      openTime: "08:00",
+      closeTime: "18:00"
+    },
+    weekend: {
+      hourly: 3.50,
+      maxDuration: {
+        hours: 2,
+        minutes: 30
+      },
+      openTime: "08:00",
+      closeTime: "18:00"
+    }
+  }
+}
+
 // const permitResolver = new PermitResolver()
 
 // test('Driver can\'t purchase a zone permit for wrong car', async () => {
@@ -855,25 +894,10 @@ test('Admin can get ticket stats grouped by day', async () => {
 test('Admin can get all zones', async () => {
   const { token } = await loginAs("admin")
 
-  const query = `
-    query GetZones {
-      getZones {
-        zone
-        hourly
-        maxDuration {
-          hours
-          minutes
-        }
-        openTime
-        closeTime
-      }
-    }
-  `
-
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query })
+    .send({ query: getZonesQuery })
     .expect(200)
 
   expect(response.body.errors).toBeUndefined()
@@ -895,14 +919,6 @@ test('Admin can create a new zone', async () => {
   const { token } = await loginAs("admin")
 
   // First get existing zones to find an unused number
-  const getZonesQuery = `
-    query GetZones {
-      getZones {
-        zone
-      }
-    }
-  `
-
   const existingZonesResponse = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
@@ -922,29 +938,8 @@ test('Admin can create a new zone', async () => {
     }
   `
 
-  const variables = {
-    input: {
-      zone: newZoneNumber,
-      weekday: {
-        hourly: 3.50,
-        maxDuration: {
-          hours: 2,
-          minutes: 30
-        },
-        openTime: "08:00",
-        closeTime: "18:00"
-      },
-      weekend: {
-        hourly: 3.50,
-        maxDuration: {
-          hours: 2,
-          minutes: 30
-        },
-        openTime: "08:00",
-        closeTime: "18:00"
-      }
-    }
-  }
+  const variables = createNewZoneInput
+  variables.input.zone = newZoneNumber
 
   const response = await supertest(server)
     .post('/graphql')
@@ -956,25 +951,10 @@ test('Admin can create a new zone', async () => {
   expect(response.body.data.createZone).toBe(true)
 
   // Verify the zone was created
-  const verifyQuery = `
-    query GetZones {
-      getZones {
-        zone
-        hourly
-        maxDuration {
-          hours
-          minutes
-        }
-        openTime
-        closeTime
-      }
-    }
-  `
-
   const verifyResponse = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query: verifyQuery })
+    .send({ query: getZonesQuery })
 
   const newZone = verifyResponse.body.data.getZones // eslint-disable-next-line
     .find((z: any) => z.zone === newZoneNumber.toString())
@@ -987,6 +967,60 @@ test('Admin can create a new zone', async () => {
   expect(newZone.closeTime).toBe("18:00")
 })
 
+test('Admin can update a zone', async () => {
+  const { token } = await loginAs("admin");
+
+  const mutation = `
+    mutation CreateZone($input: NewZone!) {
+      createZone(input: $input)
+    }
+  `
+
+  await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: mutation, variables: createNewZoneInput })
+    .expect(200)
+
+  const updateMutation = `
+    mutation UpdateZone($input: NewZone!) {
+      updateZone(input: $input)
+    }
+  `
+
+  const variables = { 
+    input: {
+      ...createNewZoneInput.input, 
+      weekday: { ...createNewZoneInput.input.weekday, hourly: 600 },
+      weekend: { ...createNewZoneInput.input.weekend, hourly: 600 }
+    }
+  }
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: updateMutation, variables })
+    .expect(200)
+
+  expect(response.body.errors).toBeUndefined();
+  
+  // Verify the zone was updated
+  const verifyResponse = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: getZonesQuery })
+
+  const updatedZone = verifyResponse.body.data.getZones // eslint-disable-next-line
+    .find((z: any) => z.zone === variables.input.zone.toString())
+
+  expect(updatedZone).toBeDefined()
+  expect(updatedZone.hourly).toBe(600)
+  expect(updatedZone.maxDuration.hours).toBe(2)
+  expect(updatedZone.maxDuration.minutes).toBe(30)
+  expect(updatedZone.openTime).toBe("08:00")
+  expect(updatedZone.closeTime).toBe("18:00")
+});
+
 test('Admin can get all lots', async () => {
   const { token } = await loginAs("admin")
 
@@ -996,7 +1030,7 @@ test('Admin can get all lots', async () => {
     .send({ query: getLotsQuery })
     .expect(200)
 
-    console.log("LOT ERRORS:", response.body)
+    // console.log("LOT ERRORS:", response.body)
   expect(response.body.errors).toBeUndefined()
   const lots = response.body.data.getLots
   expect(Array.isArray(lots)).toBe(true)
@@ -1387,17 +1421,6 @@ test('Admin can update zone price', async () => {
   const { token } = await loginAs("admin")
 
   // First, get an existing zone to update
-  const getZonesQuery = `
-    query GetZones {
-      getZones {
-        zone
-        hourly
-        maxDuration { hours minutes }
-        openTime
-        closeTime
-      }
-    }
-  `
   const zonesRes = await supertest(server)
     .post('/graphql')
     .set('Authorization', `Bearer ${token}`)
@@ -1561,6 +1584,7 @@ test('Admin can update a lot', async () => {
   expect(updateRes.body.errors).toBeUndefined();
   // expect(updateRes.body.data.updateLot).toBe(true);
 });
+
 // need fixing
 // test('Admin sees correct permit summary in adminPermitReport', async () => {
 //   const { token } = await loginAs("admin")

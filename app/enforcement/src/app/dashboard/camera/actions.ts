@@ -47,7 +47,6 @@ export const scanPlate = async (imageDataURL: string): Promise<{plate: string, s
     }
 
     const vehicleData = data.data?.recognizePlate
-    if (!vehicleData.plate) throw new Error('No plate detected')
 
     return vehicleData
   } catch (err) {

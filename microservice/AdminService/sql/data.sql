@@ -9,7 +9,7 @@ VALUES (
     'phone' , '123-456-7890',
     'pwhash', crypt('password1', gen_salt('bf')),
     'role', '["admin"]',
-    'accountStatus', 'inactive'
+    'accountStatus', 'active'
   )
 );
 
@@ -86,8 +86,9 @@ VALUES (
   )
 );
 
-INSERT INTO account(data)
+INSERT INTO account(id, data)
 VALUES (
+  '431b3711-73bb-4c90-afcf-59116217c0db',
   jsonb_build_object(
     'name', 'Enforcer 2',
     'email', 'enforcer2@outlook.com',

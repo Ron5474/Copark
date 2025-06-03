@@ -141,3 +141,87 @@ VALUES (
     'challengeReason', 'this is a reason for the challenge (bad reason, will be rejected)'
   )
 );
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '431b3711-73bb-4c90-afcf-59116217c0db',
+  jsonb_build_object(
+    'issuedDate', NOW() - INTERVAL '2 day',
+    'violation', 'destroying the sun',
+    'fine', 2,
+    'ticketStatus', 'unpaid',
+    'images', '[]',
+    'note', 'HE OBLITERATED THE SUN'
+  )
+);
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '431b3711-73bb-4c90-afcf-59116217c0db',
+  jsonb_build_object(
+    'issuedDate', NOW() - INTERVAL '3 day',
+    'violation', 'jaywalking',
+    'fine', 10,
+    'ticketStatus', 'unpaid',
+    'images', '[]',
+    'note', 'Crossed the street illegally'
+  )
+);
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '431b3711-73bb-4c90-afcf-59116217c0db',
+  jsonb_build_object(
+    'issuedDate', NOW() - INTERVAL '4 day',
+    'violation', 'illegal u-turn',
+    'fine', 75,
+    'ticketStatus', 'unpaid',
+    'images', '[]',
+    'note', 'Performed u-turn at no u-turn sign'
+  )
+);
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '431b3711-73bb-4c90-afcf-59116217c0db',
+  jsonb_build_object(
+    'issuedDate', NOW() - INTERVAL '4 day',
+    'violation', 'smuggling illegal goods',
+    'fine', 75,
+    'ticketStatus', 'unpaid',
+    'images', '[]',
+    'note', 'yohoho, this is a pirate ship, we smuggle illegal goods'
+  )
+);
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '8dc65233-c590-45b7-9b10-a5b049600901',
+  jsonb_build_object(
+    'issuedDate', NOW() - INTERVAL '4 day',
+    'violation', 'drinking and driving',
+    'fine', 200,
+    'ticketStatus', 'unpaid',
+    'images', '[]',
+    'note', 'Alcohol test was positive, driver was under the influence'
+  )
+);
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
+  '2351f78f-6c7f-4e0a-a1cf-5d79baedf2f5',
+  '431b3711-73bb-4c90-afcf-59116217c0db',
+  jsonb_build_object(
+    'issuedDate', NOW() - INTERVAL '5 day',
+    'violation', 'running a red light',
+    'fine', 150,
+    'ticketStatus', 'unpaid',
+    'images', '[]',
+    'note', 'Did not stop at red light'
+  )
+);

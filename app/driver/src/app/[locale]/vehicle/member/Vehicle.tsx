@@ -74,7 +74,6 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
   }
 
   const handleEditOpen = () => {
-    setSelectedVID(null)
     setEditOpen(true)}
   const handleEditClose = () => setEditOpen(false)
   const handleEdit = async () => {
@@ -83,6 +82,7 @@ export default function MemberVehicles({ isCheckout = false }: { isCheckout?: bo
     setLoading(true)
     setVehicles(res)
     setSelectedVehicle(res.find((v: Vehicle) => v.id === (selectedVehicle as Vehicle).id) || null)
+    setSelectedVID(res.find((v: Vehicle) => v.id === (selectedVehicle as Vehicle).id)?.id || null)
     setLoading(false)
   }
 

@@ -55,7 +55,8 @@
     "daily": "Daily",
     "quarterly": "Quarterly",
     "yearly": "Yearly",
-    "lot": "Lot "
+    "lot": "Lot ",
+    "zone": "Zone"
   },
   "zone": {
     "title": "Where are you parking?",

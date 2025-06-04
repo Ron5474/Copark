@@ -55,7 +55,8 @@
     "daily": "Diario",
     "quarterly": "Trimestral",
     "yearly": "Anual",
-    "lot": "Lote "
+    "lot": "Lote ",
+    "zone": "Zona"
   },
   "zone": {
     "title": "¿Dónde estás estacionando?",

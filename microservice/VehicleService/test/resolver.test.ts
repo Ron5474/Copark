@@ -1,4 +1,5 @@
 import { test, beforeAll, afterAll, expect, beforeEach } from 'vitest'
+// @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 import * as http from 'http'
 
@@ -382,12 +383,14 @@ test('Enforcer can directly create an unregistered vehicle', async () => {
           createUnregisteredVehicle(input: $input) {
             id
             plate
+            state
           }
         }
       `,
       variables: {
         input: {
-          plate: "COVERAGE999"
+          plate: "COVERAGE999",
+          state: "California"
         }
       }
     })
@@ -754,3 +757,34 @@ test('Driver cannot delete a vehicle with an unpaid ticket', async () => {
   expect(deleteResponse.body.errors.length).toBe(1)
   expect(deleteResponse.body.errors[0].message).toBe("Vehicle cannot be removed because it has pending tickets")
 }, 10000)
+
+test('Driver tries to get default vehicle with none', async () => {
+  const token = await  new SignJWT(driver)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('30m')
+      .sign(encodedKey)
+
+  // Sign up
+  await supertest(AUTH_SERVICE_URL)
+    .post('/api/v0/auth/driver/signup')
+    .send({ authToken: token })
+  
+  const response = await supertest(AUTH_SERVICE_URL)
+    .put('/api/v0/auth/driver/onboarding')
+    .set('Authorization', `Bearer ${token}`)
+    .send({newState: 'complete'})
+
+  const validStatuses = [200, 201, 204];
+  if (!validStatuses.includes(response.status)) {
+    throw new Error(`Login failed with status ${response.status}`)
+  }
+
+  const defaultVeh = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query: getDefaultVehiclequery })
+    .expect(200)
+
+  expect(defaultVeh.body.errors[0].message).toBe('No default vehicle found for this user')
+})

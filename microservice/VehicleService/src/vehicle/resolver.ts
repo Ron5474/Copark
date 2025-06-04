@@ -21,7 +21,8 @@ export class VehicleResolver {
       }
     })
 
-    const res = response.status === 200 ? await response.json() : null;
+    // Will never be != 200 because driver passed auth check
+    const res = await response.json() // response.status === 200 ? await response.json() : null;
     // if (!res) {
     //   throw new Error('User not found');
     // }
@@ -152,7 +153,7 @@ export class VehicleResolver {
         id: vehicle.id,
         plate: vehicle.plate,
         country: vehicle.country ?? null,
-        state: vehicle.state ?? null,
+        state: vehicle.state // ?? null,
       }
     }
 

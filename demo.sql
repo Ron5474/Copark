@@ -49,7 +49,7 @@ INSERT INTO vehicle(id, driver, data) VALUES (
   jsonb_build_object(
     'plate', 'NOPERMIT',
     'country', 'United States',
-    'state', 'California',
+    'state', 'Californnia',
     'nickname', 'No Permit Vehicle'
   )
 );

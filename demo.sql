@@ -32,8 +32,8 @@ INSERT INTO vehicle(id, driver, data) VALUES (
   'd49e13bf-0796-42c5-b45d-be6633f9d7e2',
   jsonb_build_object(
     'plate', 'HASPERMIT',
-    'country', 'US',
-    'state', 'CA',
+    'country', 'United States',
+    'state', 'California',
     'nickname', 'Permit Vehicle'
   )
 );
@@ -48,8 +48,8 @@ INSERT INTO vehicle(id, driver, data) VALUES (
   '07a30268-d2cf-4220-b036-0c0eaaf50a75',
   jsonb_build_object(
     'plate', 'NOPERMIT',
-    'country', 'US',
-    'state', 'CA',
+    'country', 'United States',
+    'state', 'Californnia',
     'nickname', 'No Permit Vehicle'
   )
 );

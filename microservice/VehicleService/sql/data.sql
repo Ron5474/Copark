@@ -7,8 +7,8 @@ INSERT INTO vehicle (driver, data) VALUES
     'e314f688-d150-411e-aa4f-4b0e6e56319d',
     jsonb_build_object(
       'plate', '7XYZ123',
-      'country', 'US',
-      'state', 'CA',
+      'country', 'United States',
+      'state', 'California',
       'nickname', 'Work car'
     )
   );
@@ -19,8 +19,8 @@ INSERT INTO vehicle (id, driver, data) VALUES
   '39f48f9f-2693-446b-ad98-8e0db1ef14bd',
   jsonb_build_object(
     'plate', '7RON123',
-    'country', 'US',
-    'state', 'CA',
+    'country', 'United States',
+    'state', 'California',
     'nickname', 'School car'
   )
 );
@@ -30,8 +30,8 @@ INSERT INTO vehicle (driver, data) VALUES
     '4c0d7053-7bab-4494-8d42-d7384d983809',
     jsonb_build_object(
       'plate', '4BRY123',
-      'country', 'US',
-      'state', 'CA',
+      'country', 'United States',
+      'state', 'California',
       'nickname', 'Motorbike'
     )
   );
@@ -41,8 +41,8 @@ INSERT INTO vehicle (driver, data) VALUES
     'f26adf21-f967-4283-8417-f72298bc7bbe',
     jsonb_build_object(
       'plate', '8ABC456',
-      'country', 'US',
-      'state', 'CA',
+      'country', 'United States',
+      'state', 'California',
       'nickname', 'Daily driver'
     )
   );
@@ -52,8 +52,8 @@ INSERT INTO vehicle (driver, data) VALUES
     '307ae958-ac4b-4842-aece-4c81d80443dd',
     jsonb_build_object(
       'plate', '9LMN789',
-      'country', 'US',
-      'state', 'NV',
+      'country', 'United States',
+      'state', 'Nevada',
       'nickname', 'Truck'
     )
   );
@@ -64,8 +64,8 @@ INSERT INTO vehicle (id, driver, data) VALUES
     '0f99f921-594e-4387-9d05-e6e80d8aa54a',
     jsonb_build_object(
       'plate', '7ABC123',
-      'country', 'US',
-      'state', 'NY',
+      'country', 'United States',
+      'state', 'New York',
       'nickname', 'Flying car'
     )
   );
@@ -76,8 +76,8 @@ INSERT INTO vehicle (id, driver, data) VALUES
     'b1eab387-1000-4ee3-a746-d59366e44f06',
     jsonb_build_object(
       'plate', 'JCDE544',
-      'country', 'US',
-      'state', 'NY',
+      'country', 'United States',
+      'state', 'New York',
       'nickname', 'Hunka junk'
     )
   );

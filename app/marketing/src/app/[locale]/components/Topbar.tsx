@@ -149,6 +149,7 @@ const Topbar = () => {
                 <Button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
+                  aria-label={`nav-${item.id}`}
                   sx={{ color: "text.primary" }}
                 >
                   {item.label}

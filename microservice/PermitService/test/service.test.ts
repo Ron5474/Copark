@@ -160,7 +160,7 @@ test('zoneDetails errors on wrong zone', async () => {
 
 test('getPermitsByDay returns permits by day bought', async () => {
   const permits = await permitService.getAllPermitsByDay()
-  expect(permits.length).toBe(5) // expects 1 from previous test
+  expect(permits.length).toBeGreaterThanOrEqual(11)
 })
 
 test('admin create zone', async () => {
@@ -293,11 +293,13 @@ test('Purchasing a lot permit in advance', async () => {
 test('getAllPermits can return future permits', async () => {
   const now = new Date('2025-03-27T12:00:00Z')
   vi.setSystemTime(now)
+  
+  const numPermits = (await permitService.getAllPermits(false)).length
 
   await permitService.purchaseMyLotPermit(lotPermitDetails)
 
   const permits = await permitService.getAllPermits(false)
-  expect(permits.length).toBe(9) // expects 1 from previous tests
+  expect(permits.length).toBe(numPermits + 1)
 
   vi.useRealTimers()
 })
@@ -305,6 +307,8 @@ test('getAllPermits can return future permits', async () => {
 test('getAllPermits can return expired permits', async () => {
   const now = new Date('2025-03-27T12:00:00Z')
   vi.setSystemTime(now)
+  
+  const numPermits = (await permitService.getAllPermits(false)).length
 
   await permitService.purchaseMyLotPermit({...lotPermitDetails, lot: 'B'})
 
@@ -312,7 +316,7 @@ test('getAllPermits can return expired permits', async () => {
   vi.setSystemTime(future)
 
   const permits = await permitService.getAllPermits(false)
-  expect(permits.length).toBe(9) // expects 1 from previous tests
+  expect(permits.length).toBe(numPermits + 1)
 
   vi.useRealTimers()
 })

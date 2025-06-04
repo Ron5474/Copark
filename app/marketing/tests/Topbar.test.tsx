@@ -7,6 +7,7 @@ const push = vi.fn()
 beforeEach(() => {
   vi.mock('@/i18n/navigation', () => ({
     useRouter: () => ({ push }),
+    usePathname: () => '/test',
   }))
 
   vi.mock('next/navigation', () => ({

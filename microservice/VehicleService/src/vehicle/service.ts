@@ -34,7 +34,8 @@ export class VehicleService {
 
     return Promise.all(result.rows.map(async row => ({
       id: row.id,
-      default: defaultVehicle == null ? false : defaultVehicle.id == row.id,
+      // if there's no default vehicle, then there's no vehicle and returns [] ^^
+      default: (defaultVehicle as Vehicle).id == row.id,
       plate: row.data.plate,
       country: row.data.country,
       state: row.data.state,
@@ -248,10 +249,12 @@ export class VehicleService {
     if (parseInt(vehicles.rows[0].count) == 1) {
       await this.setDefaultVehicle({ id:  result.rows[0].id }, userId)
     }
-    const defaultVehicle = await this.getDefaultVehicleId(userId)
+    // Don't waste computation
+    // const defaultVehicle = await this.getDefaultVehicleId(userId)
     return {
       id: result.rows[0].id,
-      default: defaultVehicle == null ? false : defaultVehicle.id == result.rows[0].id,
+      // Default vehicle will never be null at this point
+      default: parseInt(vehicles.rows[0].count) == 1, // (defaultVehicle as Vehicle).id == result.rows[0].id,
       ...input
     }
   }
@@ -308,13 +311,13 @@ export class VehicleService {
   private async getDefaultVehicleId(userId: string): Promise<{
     id: string
     plate: string
-  } | null> {
+  }/* | null*/> { // This is never called while it's null. Everywhere assumes there is at least one vehicle
     const result = await pool.query(
       `SELECT t1.vehicle AS vehicle, t2.data->>'plate' AS plate  FROM defaultVehicle t1, vehicle t2 WHERE t1.driver = $1 AND t1.vehicle = t2.id`,
       [userId]
     )
 
-    if (result.rowCount === 0) return null
+    // if (result.rowCount === 0) return null
 
     const row = result.rows[0]
     return {

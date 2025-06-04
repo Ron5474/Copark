@@ -70,8 +70,8 @@ export class CreatedVehicle {
   @Field(() => String, { nullable: true })
   country?: string
 
-  @Field(() => String, { nullable: true })
-  state?: string
+  @Field(() => String)
+  state!: string
 }
 
 
@@ -83,8 +83,8 @@ export class createdVehicleInput {
   @Field(() => String, { nullable: true })
   country?: string;
 
-  @Field(() => String, { nullable: true })
-  state?: string;
+  @Field(() => String)
+  state!: string;
 }
 
 @InputType()

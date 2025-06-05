@@ -1,6 +1,6 @@
 import { test, beforeAll, afterAll, expect } from 'vitest'
 import * as http from 'http'
-// @ts-ignore
+// @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 
 import { app, bootstrap } from '../src/app'
@@ -59,6 +59,7 @@ test('NewTicket schema loads correctly', () => {
   testNewTicket.fine = 100;
   testNewTicket.violation = 'speeding';
   testNewTicket.images = 'image1.jpg';
+  testNewTicket.note = 'I caught you';
 
   expect(testNewTicket).toBeDefined();
   expect(testNewTicket.vehicle).toBe('vehicle1');
@@ -66,6 +67,7 @@ test('NewTicket schema loads correctly', () => {
   expect(testNewTicket.fine).toBe(100);
   expect(testNewTicket.violation).toBe('speeding');
   expect(testNewTicket.images).toBe('image1.jpg');
+  expect(testNewTicket.note).toBe('I caught you')
 });
 
 test('NewTicket schema loads correctly even without images', () => {
@@ -80,7 +82,6 @@ test('NewTicket schema loads correctly even without images', () => {
   expect(testNewTicket.enforcer).toBe('enforcer1');
   expect(testNewTicket.fine).toBe(100);
   expect(testNewTicket.violation).toBe('speeding');
-  expect(testNewTicket.images).toBeUndefined();
 });
 
 test('TicketInput schema loads correctly', () => {

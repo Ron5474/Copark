@@ -3,9 +3,10 @@ import { Field, ObjectType, InputType, ID } from "type-graphql";
 
 @InputType()
 export class ReportDays {
-  @Field()
+  @Field(() => Number)
   days!: number;
 }
+
 @ObjectType()
 export class User {
   @Field(() => ID)

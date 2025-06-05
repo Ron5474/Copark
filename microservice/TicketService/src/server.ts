@@ -1,9 +1,12 @@
 import * as dotenv from 'dotenv'
 import { resolve } from 'path'
 
-const isBuilt = __dirname.includes('/build') || __dirname.includes('\\build');
-const p = resolve(__dirname, isBuilt ? '../../../.prod.env': '../../../.env')
-dotenv.config({ path: p})
+export function getEnvPath(dir: string): string {
+  const isBuilt = dir.includes('/build') || dir.includes('\\build')
+  return resolve(dir, isBuilt ? '../../../.prod.env' : '../../../.env')
+}
+const p = getEnvPath(__dirname)
+dotenv.config({ path: p })
 
 import { app, bootstrap } from './app'
 

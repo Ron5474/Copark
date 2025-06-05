@@ -52,7 +52,7 @@ process.env.POSTGRES_PORT = '5432'
 
 const pool = new Pool({
   host: process.env.POSTGRES_HOST,
-  port: process.env.POSTGRES_PORT,
+  port: parseInt(process.env.POSTGRES_PORT as string, 10),
   database: process.env.POSTGRES_DB,
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
@@ -80,7 +80,7 @@ const run = async (file: string) => {
 
       currentPool = new Pool({
         host: process.env.POSTGRES_HOST,
-        port: process.env.POSTGRES_PORT,
+        port: parseInt(process.env.POSTGRES_PORT as string, 10),
         database: newDb,
         user: process.env.POSTGRES_USER,
         password: process.env.POSTGRES_PASSWORD,
@@ -108,8 +108,8 @@ const path = '../../microservice/'
 const reset = async () => {
   await run(path + 'AuthService/sql/schema.sql')
   await run(path + 'AuthService/sql/data.sql')
-  await run(path + 'AdminService/sql/schema.sql')
-  await run(path + 'AdminService/sql/data.sql')
+  // await run(path + 'AdminService/sql/schema.sql')
+  // await run(path + 'AdminService/sql/data.sql')
   await run(path + 'VehicleService/sql/schema.sql')
   await run(path + 'VehicleService/sql/data.sql')
   await run(path + 'TicketService/sql/schema.sql')

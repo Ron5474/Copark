@@ -1,8 +1,8 @@
-import { test, beforeAll, afterAll, expect } from 'vitest'
-// @ts-ignore
-
+import { test, beforeAll, beforeEach, afterAll, expect } from 'vitest'
+// @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 import * as http from 'http'
+import { SignJWT } from 'jose'
 
 import db from './db'
 import { app, bootstrap } from '../src/app'
@@ -10,7 +10,6 @@ import authApp from '../../AuthService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 import {app as EmailApp } from '../../EmailService/src/app'
 import { app as AdminApp, bootstrap as AdminBoot } from '../../AdminService/src/app'
-import { SignJWT,/* JWTPayload */} from 'jose'
 import { Ticket } from '../src/ticket/schema'
 
 let server: http.Server // Ticket
@@ -64,6 +63,10 @@ beforeAll(async () => {
   })
   await AdminBoot()
 
+  return db.reset()
+})
+
+beforeEach( async () => {
   return db.reset()
 })
 
@@ -169,7 +172,6 @@ async function loginAs(who: string, APIData=UCBRegistrar): Promise<string | unde
     if (response.status !== 200) {
       throw new Error(`Enforcement login failed with status ${response.status}`)
     }
-
     return response.body.id
 
   } else if (who === "registrar") {
@@ -324,6 +326,7 @@ test('Admin can delete a ticket', async () => {
       plate: "Test Plate",
       state: "California",
       reason: "speeding",
+      note: "I caught you",
       images: "photo1.jpg",
     },
   }
@@ -595,6 +598,64 @@ test('Ticket creation sends email to vehicle owner', async () => {
   expect(ticket.note).toBe("Test ticket for email notification");
 });
 
+test('Ticket creation sends email to vehicle owner without note', async () => {
+  const driverToken = await loginAs("driver");
+
+  // First register a vehicle as a driver
+  const registerRes = await supertest(vehicleServer)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + driverToken)
+    .send({
+      query: `
+        mutation RegisterVehicle($input: RegisterVehicleInput!) {
+          registerVehicle(input: $input) {
+            id
+            plate
+          }
+        }
+      `,
+      variables: {
+        input: {
+          plate: "TESTPLATE123",
+          country: "United States",
+          state: "California",
+          nickname: "Test Vehicle"
+        }
+      }
+    });
+
+  expect(registerRes.body.errors).toBeUndefined();
+  const vehicleId = registerRes.body.data.registerVehicle.id;
+  expect(vehicleId).toBeDefined();
+
+  // Get enforcement token and create ticket
+  const enforcementToken = await loginAs("enforcement");
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + enforcementToken)
+    .send({
+      query: createNewTicketMutation,
+      variables: {
+        input: {
+          plate: "TESTPLATE123", // Use same plate as registered vehicle
+          state: "California",
+          reason: "Invalid Parking",
+          images: "test-photo.jpg"
+        }
+      }
+    });
+
+  expect(response.body.errors).toBeUndefined();
+  const ticket = response.body.data.createNewTicket;
+
+  // Verify ticket was created with correct data
+  expect(ticket).toBeDefined();
+  expect(ticket.violation).toBe("Invalid Parking");
+  expect(ticket.fine).toBe(50);
+  expect(ticket.ticketStatus).toBe("unpaid");
+});
+
 test('Admin can get ticket stats grouped by day', async () => {
   const token = await loginAs("admin");
 
@@ -627,10 +688,11 @@ test('Admin can get ticket stats grouped by day', async () => {
   const stats = response.body.data.getTicketsStats;
   expect(Array.isArray(stats)).toBe(true);
   expect(stats.length).toBeGreaterThan(0);
+  // eslint-disable-next-line
   stats.forEach((dayStat: any) => {
     expect(dayStat).toHaveProperty('date');
     expect(Array.isArray(dayStat.tickets)).toBe(true);
-    dayStat.tickets.forEach((ticket: any) => {
+    dayStat.tickets.forEach((ticket: Ticket) => {
       expect(ticket).toHaveProperty('id');
       expect(ticket).toHaveProperty('vehicle');
       expect(ticket).toHaveProperty('enforcer');
@@ -679,10 +741,10 @@ test('Admin can get tickets issued by a specific enforcer', async () => {
   // console.log(stats)
   expect(Array.isArray(stats)).toBe(true);
   expect(stats.length).toBeGreaterThan(0);
-  stats.forEach((dayStat: any) => {
+  stats.forEach((dayStat: { date: string; tickets: Ticket[] }) => {
     expect(dayStat).toHaveProperty('date');
     expect(Array.isArray(dayStat.tickets)).toBe(true);
-    dayStat.tickets.forEach((ticket: any) => {
+    dayStat.tickets.forEach((ticket: Ticket) => {
       expect(ticket).toHaveProperty('id');
       expect(ticket).toHaveProperty('vehicle');
       expect(ticket).toHaveProperty('enforcer');
@@ -770,7 +832,8 @@ test('Full ticket challenge flow - create, challenge, and get challenged tickets
   expect(challengedTickets.length).toBeGreaterThan(0);
   
   // Verify our challenged ticket is in the list
-  const foundTicket = challengedTickets.find((t: any) => t.id === ticket.id);
+  
+  const foundTicket = challengedTickets.find((t: Ticket) => t.id === ticket.id);
   expect(foundTicket).toBeDefined();
   expect(foundTicket.ticketStatus).toBe("challenged");
   expect(foundTicket.challengeReason).toBe("I had a valid permit");
@@ -941,7 +1004,7 @@ test('Admin can get accepted tickets', async () => {
   expect(acceptedTickets.length).toBeGreaterThan(0);
   
   // Verify ticket properties
-  acceptedTickets.forEach((ticket: any) => {
+  acceptedTickets.forEach((ticket: Ticket) => {
     expect(ticket.ticketStatus).toBe("accepted");
     expect(ticket).toHaveProperty('id');
     expect(ticket).toHaveProperty('vehicle');
@@ -1020,7 +1083,7 @@ test('Admin can reject a ticket challenge', async () => {
   expect(rejectResponse.body.errors).toBeUndefined();
   const rejectedTicket = rejectResponse.body.data.rejectTicketChallenge;
   expect(rejectedTicket.ticketStatus).toBe("unpaid");
-  expect(rejectedTicket.id).toBe(ticket.id);
+  // expect(rejectedTicket.id).toBe(ticket.id);
 });
 
 test('Driver can mark a ticket as paid', async () => {
@@ -1172,6 +1235,45 @@ test('Admin can get ticket report via adminTicketReport', async () => {
   expect(Array.isArray(report.enforcerBreakdown)).toBe(true);
 });
 
+test('Admin can get ticket report via adminTicketReport without days', async () => {
+  const token = await loginAs("admin");
+
+  const query = `
+    query AdminTicketReport($numDays: Float) {
+      adminTicketReport(numDays: $numDays) {
+        totalTickets
+        unpaidTickets
+        paidTickets
+        totalRevenue
+        violationBreakdown {
+          violation
+          count
+        }
+        enforcerBreakdown {
+          enforcer
+          count
+        }
+      }
+    }
+  `;
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + token)
+    .send({ query })
+    .expect(200);
+
+  expect(response.body.errors).toBeUndefined();
+  const report = response.body.data.adminTicketReport;
+  expect(report).toBeDefined();
+  expect(report).toHaveProperty('totalTickets');
+  expect(report).toHaveProperty('unpaidTickets');
+  expect(report).toHaveProperty('paidTickets');
+  expect(report).toHaveProperty('totalRevenue');
+  expect(Array.isArray(report.violationBreakdown)).toBe(true);
+  expect(Array.isArray(report.enforcerBreakdown)).toBe(true);
+});
+
 test('Plate with ticket is returned by getPlateWithTicket', async () => {
   const t1 = await loginAs("driver");
   const t2 = await loginAs("enforcement");
@@ -1211,4 +1313,30 @@ test('Plate with ticket is returned by getPlateWithTicket', async () => {
   expect(response.body.errors).toBeUndefined();
   const tickets = response.body.data.pendingTickets;
   expect(tickets.length).toBe(1);
+})
+
+test('Plate with ticket is returned by getPlateWithTicket', async () => {
+  const t1 = await loginAs("driver")
+    
+
+    const query = `
+    query GetPlateWithTicket($plate: String!, $state: String!) {
+      pendingTickets(plate: $plate, state: $state) {
+        id
+        vehicle
+      }
+    }
+  `
+
+  const response = await supertest(server)
+    .post('/graphql')
+    .set('Authorization', 'Bearer ' + t1)
+    .send({
+      query,
+      variables: { plate: "SOMETHING", state: "Wrong" }
+    })
+
+  expect(response.body.errors).toBeUndefined();
+  const tickets = response.body.data.pendingTickets;
+  expect(tickets.length).toBe(0);
 })

@@ -26,6 +26,7 @@ afterAll(() => server.close())
 it('sends correct mutation and returns ticket data', async () => {
   const result = await issueTicket({
     plate: 'TEST123',
+    state: '',
     reason: 'No Valid Permit',
     note: 'Parked in loading zone',
     images: null,
@@ -47,6 +48,7 @@ it('throws an error if mutation fails', async () => {
   await expect(() =>
     issueTicket({
       plate: '???',
+      state: '',
       reason: 'No Valid Permit',
       images: null,
     })
@@ -67,6 +69,7 @@ it('throws if no session token is found', async () => {
   await expect(() =>
     issueTicket({
       plate: 'XYZ999',
+      state: '',
       reason: 'Expired Permit',
       images: null,
     })
@@ -79,8 +82,43 @@ it('throws a GraphQL error from ticket service', async () => {
   await expect(() =>
     issueTicket({
       plate: 'ERROR123',
+      state: '',
       reason: 'Expired Permit',
       images: null,
     })
   ).rejects.toThrow('Ticket service internal error')
 })
+
+it('converts File to base64 and sends it in mutation', async () => {
+  const dummyContent = 'test-image-content'
+  const file = new File([dummyContent], 'photo.png', { type: 'image/png' })
+
+  file.arrayBuffer = async () => {
+    const uint8 = new TextEncoder().encode(dummyContent)
+
+    const buffer = new ArrayBuffer(uint8.length)
+    new Uint8Array(buffer).set(uint8)
+    return buffer
+  }
+
+  const bufferSpy = vi.spyOn(Buffer, 'from')
+
+  const result = await issueTicket({
+    plate: 'IMG123',
+    state: 'California',
+    reason: 'Blocking Driveway',
+    note: '',
+    images: file,
+  })
+
+  expect(result).toMatchObject({
+    id: 'abc123',
+    issuedDate: '2024-05-18',
+    violation: 'Blocking Driveway',
+    fine: 75,
+    ticketStatus: 'PENDING',
+  })
+
+  expect(bufferSpy).toHaveBeenCalledWith(expect.any(ArrayBuffer))
+})
+

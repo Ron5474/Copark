@@ -1,8 +1,8 @@
 import { test, beforeAll, afterAll, expect } from 'vitest'
-// @ts-ignore
-
+// @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 import * as http from 'http'
+import { SignJWT } from 'jose'
 
 import db from './db'
 import { app, bootstrap } from '../src/app'
@@ -10,7 +10,6 @@ import authApp from '../../AuthService/src/app'
 import { app as VehicleApp, bootstrap as VehicleBoot } from '../../VehicleService/src/app'
 import {app as EmailApp } from '../../EmailService/src/app'
 import { app as AdminApp, bootstrap as AdminBoot } from '../../AdminService/src/app'
-import { SignJWT,/* JWTPayload */} from 'jose'
 import { Ticket } from '../src/ticket/schema'
 
 let server: http.Server // Ticket
@@ -169,7 +168,6 @@ async function loginAs(who: string, APIData=UCBRegistrar): Promise<string | unde
     if (response.status !== 200) {
       throw new Error(`Enforcement login failed with status ${response.status}`)
     }
-
     return response.body.id
 
   } else if (who === "registrar") {
@@ -627,10 +625,11 @@ test('Admin can get ticket stats grouped by day', async () => {
   const stats = response.body.data.getTicketsStats;
   expect(Array.isArray(stats)).toBe(true);
   expect(stats.length).toBeGreaterThan(0);
+  // eslint-disable-next-line
   stats.forEach((dayStat: any) => {
     expect(dayStat).toHaveProperty('date');
     expect(Array.isArray(dayStat.tickets)).toBe(true);
-    dayStat.tickets.forEach((ticket: any) => {
+    dayStat.tickets.forEach((ticket: Ticket) => {
       expect(ticket).toHaveProperty('id');
       expect(ticket).toHaveProperty('vehicle');
       expect(ticket).toHaveProperty('enforcer');
@@ -679,10 +678,10 @@ test('Admin can get tickets issued by a specific enforcer', async () => {
   // console.log(stats)
   expect(Array.isArray(stats)).toBe(true);
   expect(stats.length).toBeGreaterThan(0);
-  stats.forEach((dayStat: any) => {
+  stats.forEach((dayStat: { date: string; tickets: Ticket[] }) => {
     expect(dayStat).toHaveProperty('date');
     expect(Array.isArray(dayStat.tickets)).toBe(true);
-    dayStat.tickets.forEach((ticket: any) => {
+    dayStat.tickets.forEach((ticket: Ticket) => {
       expect(ticket).toHaveProperty('id');
       expect(ticket).toHaveProperty('vehicle');
       expect(ticket).toHaveProperty('enforcer');
@@ -770,7 +769,8 @@ test('Full ticket challenge flow - create, challenge, and get challenged tickets
   expect(challengedTickets.length).toBeGreaterThan(0);
   
   // Verify our challenged ticket is in the list
-  const foundTicket = challengedTickets.find((t: any) => t.id === ticket.id);
+  
+  const foundTicket = challengedTickets.find((t: Ticket) => t.id === ticket.id);
   expect(foundTicket).toBeDefined();
   expect(foundTicket.ticketStatus).toBe("challenged");
   expect(foundTicket.challengeReason).toBe("I had a valid permit");
@@ -941,7 +941,7 @@ test('Admin can get accepted tickets', async () => {
   expect(acceptedTickets.length).toBeGreaterThan(0);
   
   // Verify ticket properties
-  acceptedTickets.forEach((ticket: any) => {
+  acceptedTickets.forEach((ticket: Ticket) => {
     expect(ticket.ticketStatus).toBe("accepted");
     expect(ticket).toHaveProperty('id');
     expect(ticket).toHaveProperty('vehicle');

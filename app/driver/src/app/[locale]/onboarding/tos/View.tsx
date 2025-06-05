@@ -119,6 +119,7 @@ export default function OnboardView() {
         
         <Button
           variant="contained"
+          aria-label="submit-tos-button"
           fullWidth
           sx={{ mt: 2, textTransform: 'none', color: 'white', fontSize: '1.15rem' }}
           disabled={!accepted}

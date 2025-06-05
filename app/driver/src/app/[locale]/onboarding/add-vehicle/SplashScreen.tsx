@@ -72,7 +72,9 @@ export default function SplashScreen() {
         width: '100%',
         padding: 2,
       }}>
-      <Button sx={{
+      <Button
+      aria-label="add-vehicle-button"
+      sx={{
         backgroundColor: (theme) => theme.palette.primary.main,
         color: "white",
         borderRadius: '15px',

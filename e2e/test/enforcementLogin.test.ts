@@ -44,3 +44,11 @@ test('Enforcement Can Login Successfully', async () => {
   await continueButton?.click();
   expect(await page.waitForSelector(`::-p-text(Dashboard)`)).toBeDefined();
 }, 10000);
+
+test('Enforcement Shows Error on Incorrect Credentials', async () => {
+  await typeText(`::-p-text(Your Email)`, 'babayaga@copark.com');
+  await typeText('::-p-text(Password)', 'password');
+  const continueButton = await page.waitForSelector(`::-p-aria(login-button)`);
+  await continueButton?.click();
+  expect(await page.waitForSelector(`::-p-text(Invalid credentials)`)).toBeDefined();
+}, 10000);

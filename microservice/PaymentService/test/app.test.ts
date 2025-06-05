@@ -1,10 +1,11 @@
 import {test, expect, beforeAll, afterAll, beforeEach} from 'vitest'
+// @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 import * as http from 'http'
 import db from './db'
 
 import authApp from '../../AuthService/src/app'
-import app from '../src/app'
+import { app } from '../src/app'
 import { SignJWT } from 'jose'
 
 const driver = {

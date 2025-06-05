@@ -133,8 +133,8 @@
 
 
 import { PDFDocument, rgb, StandardFonts, PDFPage } from 'pdf-lib';
-import { TicketReport } from '../../../TicketService/src/ticket/schema';
-import { PermitReport } from '../../../PermitService/src/permit/schema';
+import { TicketReport } from './schema';
+import { PermitReport } from './schema';
 
 interface ChartData {
   labels: string[];

@@ -75,3 +75,12 @@ test('Enforcement Can Search a License Plate', async () => {
   await click(`::-p-aria(Search License Plate)`);
   expect(await page.waitForSelector(`::-p-text(No Permit Found)`)).toBeDefined();
 }, 10000);
+
+test('Enforcement Can Search Valid License Plate', async () => {
+  await login('babayaga@copark.com', 'password1')
+  await typeText(`::-p-text(License Plate Number)`, 'YAQUOB');
+  await click('::-p-text(Select State)');
+  await click(`::-p-text(California)`);
+  await click(`::-p-aria(Search License Plate)`);
+  expect(await page.waitForSelector(`::-p-text(No Permit Found)`)).toBeDefined();
+}, 10000);

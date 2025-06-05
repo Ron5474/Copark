@@ -227,7 +227,7 @@ export class TicketResolver {
     const userEncrypted = await encrypt(userId, emailEncodedKey)
     
     const vehicleIDs: Vehicle[] = await this.getVehicleById(userEncrypted)
-    console.log('Vehicle IDs:', vehicleIDs)
+    // console.log('Vehicle IDs:', vehicleIDs)
 
     return await this.ticketService.getTicketsForVehicleID(vehicleIDs)
   }
@@ -263,7 +263,7 @@ export class TicketResolver {
       @Ctx() request: Request
     ): Promise<Ticket> {
       const { plate, state } = input
-      console.log('Creating new ticket for plate:', plate, 'and state:', state)
+      // console.log('Creating new ticket for plate:', plate, 'and state:', state)
       const vehicleQuery = `
         mutation FindOrCreateVehicleByPlate($plate: String!, $state: String!) {
           findOrCreateVehicleByPlate(plate: $plate, state: $state) {
@@ -284,7 +284,7 @@ export class TicketResolver {
       });
       const vehicleJson = await vehicleRes.json();
       const vehicleId = vehicleJson?.data?.findOrCreateVehicleByPlate?.id;
-      console.log('Vehicle ID:', vehicleId)
+      // console.log('Vehicle ID:', vehicleId)
 
       const ticket = await this.ticketService.createTicket({
       enforcer: (request.headers.authorization as string).split(' ')[1],

@@ -75,7 +75,7 @@ export class TicketService {
 
     }
 
-    console.log(tickets);
+    // console.log(tickets);
     return tickets;
   }
 
@@ -91,7 +91,7 @@ export class TicketService {
 
     const issuedDate = new Date().toISOString();
     const ticketStatus = 'unpaid';
-    console.log('New Ticket: ', vehicleId);
+    // console.log('New Ticket: ', vehicleId);
 
     const insertQuery = `
       INSERT INTO ticket (vehicle, enforcer, data)
@@ -136,10 +136,10 @@ export class TicketService {
       images: row.images,
       note: row.note,
     };
-    console.log('Created Ticket: ', ticket);
+    // console.log('Created Ticket: ', ticket);
 
     return ticket;} catch (error) {
-      console.log(error);
+      console.error(error);
       throw new Error("Failed to create ticket: " + error);
     }
   }
@@ -269,7 +269,7 @@ export class TicketService {
   `;
 
   const {rows} = await pool.query(query, [vehicleIDs]);
-  console.log('Rows: ', rows);
+  // console.log('Rows: ', rows);
   interface TicketRow {
     id: string;
     vehicle: string;

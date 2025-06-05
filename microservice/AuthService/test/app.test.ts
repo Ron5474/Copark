@@ -1,4 +1,5 @@
 import {test, beforeAll, afterAll, beforeEach, vi} from 'vitest'
+// @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 import * as http from 'http'
 
@@ -41,8 +42,7 @@ test('Check throws error w/o authorization', async () => {
 })
 
 test('Send Invalid Body Throws error', async () => {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  vi.spyOn(console, 'log').mockImplementation(() => {})
+  vi.spyOn(console, 'log').mockImplementation(() => undefined)
     await supertest(server)
       .post('/api/v0/auth/check')
       .set('Authorization', `Bearer ${validJWT}`)

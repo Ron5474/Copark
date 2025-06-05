@@ -5,10 +5,10 @@ let browser: Browser;
 let page: Page;
 
 beforeEach(async () => {
-  console.log('Launching browser...');
+  // console.log('Launching browser...');
   browser = await puppeteer.launch({
-    headless: false,
-    slowMo: 20,
+    headless: true,
+    // slowMo: 20,
     defaultViewport: null,
     args: ['--start-maximized'],
   });
@@ -16,7 +16,7 @@ beforeEach(async () => {
   if (!browser) {
     throw new Error('Browser failed to launch');
   }
-  console.log('Browser launched successfully');
+  // console.log('Browser launched successfully');
 
   page = await browser.newPage();
   await page.setBypassCSP(true)

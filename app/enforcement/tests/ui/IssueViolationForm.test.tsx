@@ -89,10 +89,17 @@ it('converts photo to base64 and submits with image', async () => {
   await userEvent.click(submit)
 
   await waitFor(() => {
-    expect(issueTicket).toHaveBeenCalled()
-    const calledArgs = vi.mocked(issueTicket).mock.calls[0][0]
-    expect(calledArgs.images).toMatch(/^data:image\/png;base64,/)
-  })
+  expect(issueTicket).toHaveBeenCalledWith(
+    expect.objectContaining({
+      plate: 'ABC123',
+      reason: 'No Valid Permit',
+      note: '',
+      state: '',
+      images: expect.any(File),
+    })
+  )
+})
+
 })
 
 it('includes custom note when reason is "Other"', async () => {
@@ -241,7 +248,8 @@ it('calls issueTicket on successful submission', async () => {
       plate: 'ABC123',
       reason: 'No Valid Permit',
       note: '',
-      images: expect.any(String),
+      state: '',
+      images: expect.any(File),
     })
   })
 })

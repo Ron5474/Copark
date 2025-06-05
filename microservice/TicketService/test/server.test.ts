@@ -10,7 +10,7 @@ vi.mock('../src/app', async () => {
   };
 });
 
-vi.spyOn(console, 'log').mockImplementation(() => {});
+vi.spyOn(console, 'log').mockImplementation(() => undefined);
 
 test('Server starts and calls bootstrap', async () => {
   const listenSpy = vi.spyOn(http.Server.prototype, 'listen').mockImplementation(function (this: http.Server, port, callback) {

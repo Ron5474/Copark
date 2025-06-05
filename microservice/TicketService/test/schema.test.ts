@@ -1,6 +1,6 @@
 import { test, beforeAll, afterAll, expect } from 'vitest'
 import * as http from 'http'
-// @ts-ignore
+// @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 
 import { app, bootstrap } from '../src/app'

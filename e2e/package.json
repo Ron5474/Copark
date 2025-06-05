@@ -1,0 +1,27 @@
+{
+  "name": "copark-e2etest",
+  "type": "module",
+  "version": "4.0.0",
+  "description": "COPARK - End to End Test",
+  "author": "Copark Inc. <coparkspace@gmail.com>",
+  "license": "UNLICENSED",
+  "repository": "none",
+  "devDependencies": {
+    "dotenv": "*",
+    "eslint": "*",
+    "eslint-config-google": "*",
+    "eslint-plugin-jsdoc": "*", 
+    "express": "*",
+    "puppeteer": "*",
+    "supertest": "*",
+    "vitest": "*",
+    "vite-plugin-eslint": "*"
+  },
+  "scripts": {
+    "docker": "docker compose -f ../docker-compose.db.yml --profile dev down && docker compose -f ../docker-compose.db.yml --profile dev up -d",
+    "build": "cd ../frontend && npm run build",
+    "e2e": "vitest run --no-file-parallelism --testTimeout=3000",
+    "test": "(npm run docker) && (npm run e2e)",
+    "lint": "eslint test --no-inline-config --max-warnings 0"
+  }
+}

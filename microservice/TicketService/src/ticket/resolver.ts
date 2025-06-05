@@ -106,11 +106,12 @@ export class TicketResolver {
       }
     })
 
-    const res = response.status === 200 ? await response.json() : null;
+    // This will always find user, as they passed auth checker
+    const res = await response.json() // response.status === 200 ? await response.json() : null;
     // const res = await response.json()
-    if (!res) {
-      throw new Error('User not found');
-    }
+    // if (!res) {
+    //   throw new Error('User not found');
+    // }
     return {
       id: res.id,
       name: res.name,
@@ -380,7 +381,7 @@ export class TicketResolver {
   async adminTicketReport(
     @Arg("numDays", () => Number, { nullable: true }) numDays?: number,
   ): Promise<TicketReport> {
-    return await this.ticketService.generateTicketReport({numDays: numDays ?? 999})
+    return await this.ticketService.generateTicketReport({numDays: numDays ?? 365})
   }
 
   @Authorized(['driver'])

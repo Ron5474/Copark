@@ -604,7 +604,7 @@ export class PermitResolver {
   async adminPermitReport(
     @Arg("numDays", () => Number, { nullable: true }) numDays?: number,
   ): Promise<PermitReport> {
-    return await service.generatePermitReport({numDays: numDays ?? 999})
+    return await service.generatePermitReport({numDays: numDays ?? 365})
   }
 
   @Authorized(['admin'])

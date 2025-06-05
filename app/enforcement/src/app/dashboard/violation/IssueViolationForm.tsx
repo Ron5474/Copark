@@ -14,7 +14,6 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useState, useEffect } from 'react'
 import { useEnforcement } from '../context/Context'
 import { issueTicket } from './actions'
-// import { toBase64 } from './toBase64'
 
 const reasons = [
   'No Valid Permit',
@@ -59,7 +58,6 @@ export default function IssueViolationForm({ onCancel }: { onCancel: () => void 
     setLoading(true)
 
     try {
-      // const base64Image = photo ? await toBase64(photo) : null
 
       await issueTicket({
         plate: plate as string,

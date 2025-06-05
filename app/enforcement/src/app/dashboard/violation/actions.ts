@@ -1,7 +1,6 @@
 'use server'
 
 import { cookies } from 'next/headers'
-// import { toBase64 } from './toBase64'
 
 type TicketInput = {
   plate: string

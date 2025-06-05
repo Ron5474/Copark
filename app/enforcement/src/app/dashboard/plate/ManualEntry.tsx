@@ -36,7 +36,6 @@ export default function ManualEntryCard() {
     setTitle('Dashboard')
   }, [setTitle])
 
-  const [inputError, setInputError] = useState(false)
   const [cameraOpen, setCameraOpen] = useState(false)
   const [isProcessingCamera, setIsProcessingCamera] = useState(false)
   const [cameraError, setCameraError] = useState<string>('')
@@ -45,13 +44,6 @@ export default function ManualEntryCard() {
 
   const handleSearch = async () => {
     const trimmed = manualInput.trim().toUpperCase()
-
-    if (!trimmed) {
-      setInputError(true)
-      return
-    }
-
-    setInputError(false)
 
     try {
       const result = await checkPermit(trimmed, state)
@@ -154,7 +146,6 @@ export default function ManualEntryCard() {
               value={manualInput}
               onChange={(e) => {
                 setManualInput(e.target.value.toUpperCase())
-                setInputError(false)
               }}
               sx={{ 
                 textAlign: 'center',
@@ -170,12 +161,6 @@ export default function ManualEntryCard() {
               }}
             />
           </FormControl>
-
-          {inputError && (
-            <Typography color="error" variant="caption" sx={{ mt: 1, display: 'block' }}>
-              Please enter a license plate number
-            </Typography>
-          )}
 
           <TextField
             select

@@ -20,8 +20,9 @@
   "scripts": {
     "docker": "docker compose -f ../docker-compose.db.yml --profile dev down && docker compose -f ../docker-compose.db.yml --profile dev up -d",
     "build": "cd ../frontend && npm run build",
+    "run-dev": "cd ../ && npm run dev",
     "e2e": "vitest run --no-file-parallelism --testTimeout=3000",
-    "test": "(npm run docker) && (npm run e2e)",
+    "test": "(npm run dev-root) && (npm run docker) && (npm run e2e)",
     "lint": "eslint test --no-inline-config --max-warnings 0"
   }
 }

@@ -163,9 +163,24 @@ test('modifyTicket should throw an error for invalid ticket ID', async () => {
         images: 'image213.jpg',
     };
 
+    // console.log("ID:", ticket.id)
     await expect(ticketService.modifyTicket(modifiedTicket))
         .rejects
         .toThrow('Invalid or missing ticket ID.');
+});
+
+test('modifyTicket should throw an error for wrong ticket ID', async () => {
+    const modifiedTicket: ModifyTicketInput = {
+        id: await encrypt('12341234-0000-0000-0000-000000000000'),
+        vehicle: '12341234-0000-0000-0000-000000000000',
+        fine: 9,
+        violation: 'vaporizing a small child',
+        images: 'image213.jpg',
+    };
+
+    await expect(ticketService.modifyTicket(modifiedTicket))
+        .rejects
+        .toThrow('Ticket not found.');
 });
 
 test('modifyTicket should throw an error when no fields are provided to update', async () => {

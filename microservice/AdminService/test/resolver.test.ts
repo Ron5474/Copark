@@ -412,15 +412,19 @@ test('Admin can generate a report with ticket and permit summary', async () => {
   const token = await loginAsAdmin();
 
   const query = `
-    query {
-      generateReport(numDays: 30)
+    query GenerateReport($input: ReportDays!) {
+      generateReport(input: $input)
     }
   `;
+
+  const variables = {
+    input: { days: 30 }
+  };
 
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query })
+    .send({ query, variables })
     .expect(200);
 
   expect(response.body.errors).toBeUndefined();

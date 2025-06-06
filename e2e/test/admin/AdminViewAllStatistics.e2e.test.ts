@@ -7,8 +7,8 @@ let page: Page;
 beforeEach(async () => {
   // console.log('Launching browser...');
   browser = await puppeteer.launch({
-    headless: true,
-    // slowMo: 0,
+    headless: false,
+    slowMo: 10,
     defaultViewport: null,
     args: ['--start-maximized'],
   });
@@ -43,7 +43,6 @@ const typeText = async (selector: string, text: string) => {
   input?.dispose();
 };
 
-
 test('Admin can log in and navigate to View Statistics tab', async () => {
   // Fill in login form
   await typeText('input[name="email"]', 'jxiong0822@outlook.com');
@@ -56,4 +55,13 @@ test('Admin can log in and navigate to View Statistics tab', async () => {
   // Wait for the statistics header to appear and check its text
   const header = await page.waitForSelector('h4', { timeout: 10000 });
   expect(await header?.evaluate(node => node.textContent)).toMatch(/Statistics/i);
+
+  await click('text=Tickets by Day');
+  await click('text=Tickets by Enforcer');
+  await page.$('text/Enforcer 1');
+  await click('text=Permits by Day');
+  await click('text=Permits by Zone');
+  await click('text=Permits by Lot');
+  await click('text=All Permits');
+
 },20000);

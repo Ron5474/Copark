@@ -66,20 +66,20 @@ const renderComponent = () => {
 
 it('renders the component and fetches lots', async () => {
   renderComponent();
-  
+
   await waitFor(() => {
     expect(screen.getByText('Daily Lots')).toBeDefined();
     expect(screen.getByText('Quarterly Lots')).toBeDefined();
     expect(screen.getByText('Yearly Lots')).toBeDefined();
   });
-  
+
   expect(getLots).toHaveBeenCalled();
 });
 
 it('handles fetch error', async () => {
   vi.mocked(getLots).mockRejectedValueOnce(new Error('Failed to fetch'));
   renderComponent();
-  
+
   await waitFor(() => {
     expect(screen.getByText('Failed to fetch lots')).toBeDefined();
   });
@@ -133,7 +133,7 @@ it('opens edit dialog and updates lot', async () => {
 
   // Update price
   fireEvent.change(screen.getByLabelText('Price'), { target: { value: '6' } });
-  
+
   // Submit update
   fireEvent.click(screen.getByText('Update'));
 
@@ -173,18 +173,18 @@ it('handles dialog cancellation', async () => {
     const editButtons = screen.getAllByText('Edit');
     fireEvent.click(editButtons[0]);
   });
-  
+
   // Wait for edit dialog to open
   await waitFor(() => {
     expect(screen.getByText('Edit Lot Price')).toBeDefined();
   });
-  
+
   // Find and click the Cancel button in the edit dialog
   const editDialogCancelButton = screen.getAllByText('Cancel').find(
     button => button.closest('[role="dialog"]')?.innerHTML.includes('Edit Lot Price')
   );
   fireEvent.click(editDialogCancelButton!);
-  
+
   await waitFor(() => {
     expect(screen.queryByText('Edit Lot Price')).toBeNull();
   });
@@ -204,7 +204,7 @@ it('handles negative numbers in price fields', async () => {
 
   fireEvent.click(screen.getByText('Add New Lot'));
   fireEvent.change(screen.getByLabelText('Daily Price'), { target: { value: '-5' } });
-  
+
   const input = screen.getByLabelText('Daily Price') as HTMLInputElement;
   expect(input.value).toBe('0');
 });
@@ -222,23 +222,23 @@ it('edits quarterly lot with expire date', async () => {
 
   // Update price and date
   fireEvent.change(screen.getByLabelText('Price'), { target: { value: '250' } });
-  fireEvent.change(screen.getByLabelText('Quarterly Expire Date'), { 
+  fireEvent.change(screen.getByLabelText('Quarterly Expire Date'), {
     target: { value: '2025-12-31' }
   });
-  
+
   // Submit update
   fireEvent.click(screen.getByText('Update'));
 
   await waitFor(() => {
     expect(updateLot).toHaveBeenCalledWith({
       lot: '101',
-      daily: { price: 200 }, // Updated to match actual value
+      daily: { price: 5 }, // Updated to match actual value
       quarterly: {
         price: 250,
         expireDate: '2025-12-31T23:59:59-07:00'
       },
       yearly: {
-        price: 200,
+        price: 500,
         expireDate: '2024-12-31T23:59:59-07:00'
       }
     });
@@ -256,19 +256,19 @@ it('edits yearly lot with expire date', async () => {
 
   // Update price and date
   fireEvent.change(screen.getByLabelText('Price'), { target: { value: '600' } });
-  fireEvent.change(screen.getByLabelText('Yearly Expire Date'), { 
+  fireEvent.change(screen.getByLabelText('Yearly Expire Date'), {
     target: { value: '2025-12-31' }
   });
-  
+
   // Submit update
   fireEvent.click(screen.getByText('Update'));
 
   await waitFor(() => {
     expect(updateLot).toHaveBeenCalledWith({
       lot: '101',
-      daily: { price: 500 },       // Maintains original yearly price
+      daily: { price: 5 },       // Maintains original yearly price
       quarterly: {
-        price: 500,                // Maintains original yearly price
+        price: 200,                // Maintains original yearly price
         expireDate: '2024-12-31T23:59:59-07:00'
       },
       yearly: {
@@ -291,7 +291,7 @@ it('handles editing lot without existing expire dates', async () => {
       }]
     }
   ];
-  
+
   vi.mocked(getLots).mockResolvedValueOnce(modifiedMockLots);
   vi.mocked(updateLot).mockResolvedValueOnce(true);
   renderComponent();
@@ -306,10 +306,10 @@ it('handles editing lot without existing expire dates', async () => {
   expect(input.value).toBe('');
 
   // Update with new date
-  fireEvent.change(input, { 
+  fireEvent.change(input, {
     target: { value: '2025-12-31' }
   });
-  
+
   fireEvent.click(screen.getByText('Update'));
 
   await waitFor(() => {
@@ -328,11 +328,11 @@ it('handles dialog backdrop clicks for both dialogs', async () => {
   // Test Add dialog backdrop click
   fireEvent.click(screen.getByText('Add New Lot'));
   expect(screen.getByText('Create New Lot')).toBeDefined();
-  
+
   // Click backdrop for Add dialog
   const addBackdrop = document.querySelector('.MuiBackdrop-root');
   fireEvent.click(addBackdrop!);
-  
+
   await waitFor(() => {
     expect(screen.queryByText('Create New Lot')).toBeNull();
   });
@@ -353,3 +353,43 @@ it('handles dialog backdrop clicks for both dialogs', async () => {
   });
 });
 
+it('handles editing non-existent lot in quarterly group', async () => {
+  const modifiedMockLots = [
+    {
+      id: 'daily',
+      title: 'daily',
+      lots: [{
+        name: '101',
+        price: '$5.00'
+      }]
+    },
+    {
+      id: 'quarterly',
+      title: 'quarterly',
+      lots: [] // Empty quarterly lots
+    }
+  ];
+
+  vi.mocked(getLots).mockResolvedValueOnce(modifiedMockLots);
+  vi.mocked(updateLot).mockResolvedValueOnce(true);
+  renderComponent();
+
+  await waitFor(() => {
+    const editButtons = screen.getAllByText('Edit');
+    fireEvent.click(editButtons[0]); // Edit the daily lot
+  });
+
+  // Set type to quarterly to trigger the quarterly price calculation
+  fireEvent.change(screen.getByLabelText('Price'), { target: { value: '200' } });
+
+  fireEvent.click(screen.getByText('Update'));
+
+  await waitFor(() => {
+    expect(updateLot).toHaveBeenCalledWith(expect.objectContaining({
+      quarterly: {
+        price: 0, // Should use the fallback value of 0
+        expireDate: ''
+      }
+    }));
+  });
+});

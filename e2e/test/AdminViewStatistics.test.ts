@@ -7,8 +7,8 @@ let page: Page;
 beforeEach(async () => {
   // console.log('Launching browser...');
   browser = await puppeteer.launch({
-    headless: false,
-    slowMo: 20,
+    headless: true,
+    // slowMo: 0,
     defaultViewport: null,
     args: ['--start-maximized'],
   });
@@ -53,14 +53,6 @@ test('Admin can log in and navigate to View Statistics tab', async () => {
   // Wait for dashboard/home to load
   await page.waitForSelector('h4', { timeout: 10000 }); // Wait for a heading to appear
 
-  // Click on the "View Statistics" navigation item
-  const statisticsNav = await page.$$('label');
-  const statisticsLabel = await Promise.all(
-    statisticsNav.map(async label => {
-      const text = await (await label.getProperty('textContent')).jsonValue();
-      return { label, text };
-    })
-  );
   // Wait for the statistics header to appear and check its text
   const header = await page.waitForSelector('h4', { timeout: 10000 });
   expect(await header?.evaluate(node => node.textContent)).toMatch(/Statistics/i);

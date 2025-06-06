@@ -159,19 +159,6 @@ export class AuthService {
       } else {
         if (payload.name && payload.email && payload.picture && payload.sub) {
           const payloadObj = payload as unknown as OauthLoginData;
-          // console.log("Payload", payload);
-          // if  (payload.iss?.includes("google")) {
-          //   try {
-          //     const ticket = await oAuthClient.verifyIdToken({
-          //       idToken: token,
-          //       audience: process.env.GOOGLE_CLIENT_ID,
-          //     });
-          //     ticket.getPayload(); // will throw if token is invalid or revoked
-          //   } catch {
-          //       throw new Error("Unauthorized (invalid Google token)");
-          //   }
-          // } 
-
           const uid: OauthLoginData = {
             type: "OauthUserData",
             name: payloadObj.name,

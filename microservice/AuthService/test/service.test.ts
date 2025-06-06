@@ -9,7 +9,7 @@
 #######################################################################
 */
 
-import {test, afterAll, expect, vi, beforeEach} from 'vitest'
+import {test, afterAll, expect, vi, beforeEach, describe, afterEach} from 'vitest'
 
 import db from './db'
 import {AuthService} from '../src/auth/service'
@@ -268,12 +268,83 @@ test('driverSignup returns "first-vehicle" if onboardingStatus is first-vehicle'
     sub: "oauth2|testsub"
   };
 
-  // First query returns no rows (simulate not inserted)
   vi.spyOn(pool, 'query')
     .mockResolvedValueOnce({ rows: [] } as any)
-    // Second query returns onboardingStatus as 'first-vehicle'
     .mockResolvedValueOnce({ rows: [{ status: 'first-vehicle' }] } as any);
 
   const result = await authService.driverSignup(data);
   expect(result).toBe('first-vehicle');
+});
+
+describe('AuthService.check edge cases', () => {
+  let AuthServiceLocal: typeof AuthService;
+  let jwtVerifyMock: any;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    jwtVerifyMock = vi.fn();
+    vi.doMock('jose', () => ({ jwtVerify: jwtVerifyMock }));
+    // Dynamically import after mocking
+    AuthServiceLocal = (await import('../src/auth/service')).AuthService;
+  });
+
+  afterEach(() => {
+    vi.resetModules();
+    vi.unmock('jose');
+  });
+
+  test('check throws "Invalid token payload" if payload.id is not a string', async () => {
+    jwtVerifyMock.mockResolvedValueOnce({ payload: { id: 123 } });
+    const authService = new AuthServiceLocal();
+    await expect(authService.check('Bearer sometoken', ['admin'])).rejects.toThrow('Unauthorized3');
+  });
+
+  test('check throws "Unauthorized1" if getUserById returns null', async () => {
+    jwtVerifyMock.mockResolvedValueOnce({ payload: { id: 'user-id' } });
+    const authService = new AuthServiceLocal();
+    vi.spyOn(authService, 'getUserById' as keyof AuthService).mockResolvedValueOnce(null);
+    await expect(authService.check('Bearer sometoken', ['admin'])).rejects.toThrow('Unauthorized3');
+  });
+
+  test('check throws "Unauthorized1" if getOauthUser returns null', async () => {
+    jwtVerifyMock.mockResolvedValueOnce({
+      payload: { name: 'n', email: 'e', picture: 'p', sub: 's' }
+    });
+    const authService = new AuthServiceLocal();
+    vi.spyOn(authService, 'getOauthUser' as keyof AuthService).mockResolvedValueOnce(null);
+    await expect(authService.check('Bearer sometoken', ['admin'])).rejects.toThrow('Unauthorized3');
+  });
+
+  test('check throws "Invalid token payload" if payload is missing required oauth fields', async () => {
+    jwtVerifyMock.mockResolvedValueOnce({ payload: { name: 'n', email: 'e' } });
+    const authService = new AuthServiceLocal();
+    await expect(authService.check('Bearer sometoken', ['admin'])).rejects.toThrow('Unauthorized3');
+  });
+});
+
+test('getUserById returns user object if found', async () => {
+  const authService = new AuthService();
+  const mockUser = {
+    id: 'user-123',
+    data: { name: 'Test User', email: 'test@example.com', role: ['admin'] }
+  };
+  vi.spyOn(pool, 'query').mockResolvedValueOnce({ rows: [mockUser] } as any);
+
+  // @ts-ignore: Accessing private method for test
+  const result = await authService['getUserById']('user-123');
+  expect(result).toEqual({
+    id: 'user-123',
+    name: 'Test User',
+    email: 'test@example.com',
+    role: ['admin'],
+  });
+});
+
+test('getUserById returns undefined if user not found', async () => {
+  const authService = new AuthService();
+  vi.spyOn(pool, 'query').mockResolvedValueOnce({ rows: [] } as any);
+
+  // @ts-ignore: Accessing private method for test
+  const result = await authService['getUserById']('not-found');
+  expect(result).toBeUndefined();
 });

@@ -1,5 +1,4 @@
 import { test, beforeAll, afterAll, expect } from 'vitest'
-// @ts-ignore
 import supertest from 'supertest'
 import * as http from 'http'
 import killPort from 'kill-port'
@@ -44,7 +43,7 @@ beforeAll(async () => {
   // Force kill anything on AUTH_PORT
   try {
     await killPort(AUTH_PORT)
-  } catch (error) {
+  } catch {
     console.log(`No process was running on port ${AUTH_PORT}`)
   }
 

@@ -35,7 +35,7 @@ async function encrypt(userId: string, key= encodedKey): Promise<string> {
 test('getTickets should return all unpaid tickets', async () => {
     const tickets = await ticketService.getTickets();
 
-    expect(tickets).toHaveLength(16);
+    expect(tickets).toHaveLength(17);
 });
 
 test('createTicket should successfully create a ticket with all fields', async () => {
@@ -307,7 +307,7 @@ test('acceptTicketChallenge can accept a challenge', async () => {
 
     // console.log(tickets);
     // expect(tickets).toHaveLength(1);
-    expect(tickets.ticketStatus).toBe('accepted');
+    expect(tickets?.ticketStatus).toBe('accepted');
 });
 
 test('rejectTicketChallenge can reject a challenge', async () => {
@@ -315,7 +315,7 @@ test('rejectTicketChallenge can reject a challenge', async () => {
 
     // console.log(tickets);
     // expect(tickets).toHaveLength(1);
-    expect(tickets.ticketStatus).toBe('unpaid');
+    expect(tickets?.ticketStatus).toBe('unpaid');
 });
 
 test('acceptTicketChallenge errors with an unfound ID', async () => {

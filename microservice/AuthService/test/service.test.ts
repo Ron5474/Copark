@@ -205,3 +205,75 @@ test('getIDByEmail returns undefined for invalid email', async () => {
 
   expect(result).toBeNull();
 });
+
+test('setOnBoardingState throws error if userId is undefined', async () => {
+  const authService = new AuthService();
+  await expect(authService.setOnBoardingState(undefined, 'completed')).rejects.toThrow('Unauthorized');
+});
+
+test('decryptOauth returns undefined and logs error for invalid token', async () => {
+  const authService = new AuthService();
+  // Patch jwtVerify to throw an error
+  const jose = require('jose');
+  const jwtVerifySpy = vi.spyOn(jose, 'jwtVerify').mockRejectedValueOnce(new Error('Invalid token'));
+
+  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+  const result = await authService.decryptOauth('bad.token.value');
+  expect(result).toBeUndefined();
+  expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Error in decryptOauth:'), expect.any(Error));
+
+  logSpy.mockRestore();
+  jwtVerifySpy.mockRestore();
+});
+
+test('decryptOauth returns undefined and logs error for invalid token payload', async () => {
+  const authService = new AuthService();
+  const jose = require('jose');
+  const jwtVerifySpy = vi.spyOn(jose, 'jwtVerify').mockResolvedValueOnce({
+    payload: { name: 'Test', email: 'test@example.com' }
+  });
+
+  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+  const result = await authService.decryptOauth('fake.token.without.required.fields');
+  console.log(result);
+  expect(result).toBeUndefined();
+  expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Error in decryptOauth:'), expect.any(Error));
+
+  logSpy.mockRestore();
+  jwtVerifySpy.mockRestore();
+});
+
+test('activeDriver throws error if userId is undefined', async () => {
+  const authService = new AuthService();
+  await expect(authService.activeDriver(undefined)).rejects.toThrow('Unauthorized');
+});
+
+test('activeDriver returns undefined if no user found', async () => {
+  const authService = new AuthService();
+  vi.spyOn(pool, 'query').mockResolvedValueOnce({ rows: [] } as any);
+
+  const result = await authService.activeDriver('some-user-id');
+  expect(result).toBeUndefined();
+});
+
+test('driverSignup returns "first-vehicle" if onboardingStatus is first-vehicle', async () => {
+  const authService = new AuthService();
+  const data: OauthLoginData = {
+    type: "OauthUserData",
+    name: "Test User",
+    email: "testuser@example.com",
+    picture: "http://example.com/pic.jpg",
+    sub: "oauth2|testsub"
+  };
+
+  // First query returns no rows (simulate not inserted)
+  vi.spyOn(pool, 'query')
+    .mockResolvedValueOnce({ rows: [] } as any)
+    // Second query returns onboardingStatus as 'first-vehicle'
+    .mockResolvedValueOnce({ rows: [{ status: 'first-vehicle' }] } as any);
+
+  const result = await authService.driverSignup(data);
+  expect(result).toBe('first-vehicle');
+});

@@ -291,19 +291,20 @@ export class AuthService {
   }
 
   public async decryptOauth(token: string): Promise<OauthLoginData|undefined> {
-    try {
-      const { payload } = await jwtVerify(token, encodedKey);
-      if (payload.name && payload.email && payload.picture && payload.sub) {
-        const uid = payload as unknown as OauthLoginData;
-        return {type: "OauthUserData", name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub };
-      } else {
-        throw new Error("Invalid token payload");
-      }
-    } catch (err) {
-      console.log("Error in decryptOauth:", err);
-      return undefined;
+  try {
+    const { payload } = await jwtVerify(token, encodedKey);
+    if (payload.name && payload.email && payload.picture && payload.sub) {
+      const uid = payload as unknown as OauthLoginData;
+      return {type: "OauthUserData", name: uid.name, email: uid.email, picture: uid.picture, sub: uid.sub };
+    // } else {
+    //   console.log("Error in decryptOauth: Invalid token payload");
+    //   return undefined;
     }
+  } catch (err) {
+    console.log("Error in decryptOauth:", err);
+    return undefined;
   }
+}
 
   public async setOnBoardingState(userId: string|undefined, newState: string): Promise<void> {
     if (userId === undefined) {

@@ -43,11 +43,6 @@ stages:
 # default:
 #   allow_failure: false
 
-# .test_template: &test_template
-#   stage: test
-#   before_script:
-#     - npm installs
-
 lint:enforcement:
   stage: quality
   script:

@@ -17,6 +17,19 @@ VALUES (
 
 INSERT INTO ticket (vehicle, enforcer, data)
 VALUES (
+  'e314f688-d150-411e-aa4f-4b0e6e56319d',
+  '8dc65233-c590-45b7-9b10-a5b049600901',
+  jsonb_build_object(
+    'issuedDate', NOW() - INTERVAL '1 minute',
+    'violation', 'accidental speeding',
+    'fine', 500,
+    'ticketStatus', 'accepted',
+    'images', '[]'
+  )
+);
+
+INSERT INTO ticket (vehicle, enforcer, data)
+VALUES (
   'f26adf21-f967-4283-8417-f72298bc7bbe',
   '8dc65233-c590-45b7-9b10-a5b049600901',
   jsonb_build_object(

@@ -7,7 +7,7 @@ import { resolve } from 'path'
 dotenv.config({ path: resolve(__dirname, '../../../.env') })
 
 // console.log(resolve(__dirname, '../../../.env'))
-process.env.POSTGRES_PORT = '5433'
+// process.env.POSTGRES_PORT = '5433'
 
 const pool = new Pool({
   host: 'localhost',

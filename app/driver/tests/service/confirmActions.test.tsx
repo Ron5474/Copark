@@ -12,6 +12,21 @@ vi.mock('stripe', () => {
         sessions: {
           retrieve: vi.fn().mockResolvedValue({
             payment_status: 'paid',
+            payment_intent: {
+              id: 'pi_123456789',
+              amount: 1000,
+              currency: 'usd',
+              status: 'succeeded',
+              payment_method: {
+                card: {
+                  brand: 'Visa',
+                  last4: '4242',
+                },
+              },
+            },
+            metadata: {
+              itemType: 'zone', // or 'lot' based on your test case
+            },
             // add any other fields your app expects
           }),
         },
@@ -317,3 +332,82 @@ it('get transaction details', async () => {
     type: 'zone',
   });
 });
+
+it('getting default vehicle errors', async () => {
+  vehicleServer.use(
+    http.post(`http://localhost:${vehiclePort}/graphql`, async (): Promise<HttpResponse<object>> => {
+      return HttpResponse.json(
+        { errors: [{ message: 'Failed to get default vehicle' }] },
+        { status: 400 }
+      );
+    })
+  );
+
+  const paymentDetails = {
+    id: 'pi_123456789',
+    amount: 1000,
+    currency: 'usd',
+    status: 'succeeded',
+    payment_method: 'Visa 4242',
+    type: 'lot',
+  };
+
+  const permit: PermitDetails = {
+    type: 'permit',
+    permitType: 'lot',
+    vehicle: JSON.stringify({ id: 'vehicle_123', plate: 'ABC123', state: 'California', nickname: 'My Car' }),
+    lot: '123',
+    duration: '30',
+  };
+
+  await expect(actions.addPermitDetails(paymentDetails, permit)).rejects.toThrow("Failed to fetch default Vehicle");
+})
+
+it('invalid permit type', async () => {
+  const paymentDetails = {
+    id: 'pi_123456789',
+    amount: 1000,
+    currency: 'usd',
+    status: 'succeeded',
+    payment_method: 'Visa 4242',
+    type: 'invalid_type', // Invalid permit type
+  };
+  const permit: PermitDetails = {
+    type: 'permit',
+    permitType: 'invalid_type', // Invalid permit type
+    vehicle: JSON.stringify({ id: 'vehicle_123', plate: 'ABC123', state: 'California', nickname: 'My Car' }),
+    zone: 'Zone A',
+    duration: '30',
+  };
+
+  await expect(actions.addPermitDetails(paymentDetails, permit)).rejects.toThrow("Permit Type not resolved");
+});
+
+it('invalid ticket type', async () => {
+  const ticketDetails = {
+    type: 'invalid_ticket', // Invalid ticket type
+    ticketId: 'ticket_123',
+    ticketFine: 50,
+  };
+
+  await expect(actions.addTicketDetails(ticketDetails)).rejects.toThrow("Invalid ticket type");
+});
+
+it('invalid ticket details', async () => {
+  ticketServer.use(
+    http.post(`http://localhost:${ticketPort}/graphql`, async (): Promise<HttpResponse<object>> => {
+      return HttpResponse.json(
+        { errors: [{ message: 'Failed to save ticket details' }] },
+        { status: 200 }
+      );
+    })
+  );
+
+  const ticketDetails = {
+    type: 'ticket',
+    ticketId: '', // Invalid ticket ID
+    ticketFine: 50,
+  };
+
+  await expect(actions.addTicketDetails(ticketDetails)).rejects.toThrow("Failed to save ticket details: Failed to save ticket details");
+})

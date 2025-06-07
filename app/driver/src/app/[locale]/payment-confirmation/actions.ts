@@ -32,7 +32,7 @@ export async function getTransactionDetails(sessionId: string): Promise<PaymentD
 
 export async function addPaymentDetails(
   details: PaymentDetails
-): Promise<void> {
+): Promise<string> {
   const { id, amount, currency, status, payment_method, type } = details;
   
   const res = await fetch("http://localhost:3014/api/v0/payment/complete", {
@@ -54,6 +54,7 @@ export async function addPaymentDetails(
   if (res.status !== 201 && res.status !== 200 && res.status !== 204) {
     throw new Error("Failed to save payment details");
   }
+  return "Payment details saved successfully";
 }
 
 export async function addPermitDetails(

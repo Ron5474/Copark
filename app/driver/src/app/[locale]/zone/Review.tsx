@@ -17,6 +17,7 @@ import {
 
 import ZoneContext from './Context'
 import { Payment } from '../shared/actions'
+import { useLocale } from 'next-intl'
 // import AddForm from '../AddForm'
 // import Loader from '../shared/Loader'
 // import theme from '../theme'
@@ -25,6 +26,7 @@ import { Payment } from '../shared/actions'
 
 
 export default function Review() {
+  const locale = useLocale()
   const { zoneNumber, /*zoneDetails,*/ duration, durationString, price, vehicle } = useContext(ZoneContext)
   const serviceFee = price ? 0.5 : 0
   
@@ -48,7 +50,7 @@ export default function Review() {
     sessionStorage.setItem('paymentDetails', JSON.stringify(paymentDetails))
    
     // TODO: Get information on the permit style chosen and add the type and itemName accordingly
-    await Payment("daily" ,"Daily Parking Permit", amount, `Parking permit for zone #${zoneNumber} in ${tempLocation}`, "USD");
+    await Payment(locale, "daily" ,"Daily Parking Permit", amount, `Parking permit for zone #${zoneNumber} in ${tempLocation}`, "USD");
   }
 
   return (

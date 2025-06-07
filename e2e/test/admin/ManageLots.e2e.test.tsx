@@ -6,7 +6,7 @@ let page: Page;
 
 beforeEach(async () => {
     browser = await puppeteer.launch({
-        headless: true,
+        headless: false,
         slowMo: 20,
         defaultViewport: null,
         args: ['--start-maximized'],
@@ -53,12 +53,12 @@ test('renders Manage Lots and fetches lots', async () => {
 
 test('opens add dialog and creates new lot', async () => {
     await click('text=Add New Lot');
-    await typeText('[aria-label="Lot ID"] input', '102');
-    await typeText('[aria-label="Daily Price"] input', '5');
-    await typeText('[aria-label="Quarterly Price"] input', '200');
-    await typeText('[aria-label="Quarterly Expire Date"] input', '2024-12-31');
-    await typeText('[aria-label="Yearly Price"] input', '500');
-    await typeText('[aria-label="Yearly Expire Date"] input', '2024-12-31');
+    await typeText('[aria-label="Lot ID Input"] input', '102');
+    await typeText('[aria-label="Daily Price Input"] input', '5');
+    await typeText('[aria-label="Quarterly Price Input"] input', '200');
+    await typeText('[aria-label="Quarterly Expire Date Create Input"] input', '2024-12-31');
+    await typeText('[aria-label="Yearly Price Input"] input', '500');
+    await typeText('[aria-label="Yearly Expire Date Create Input"] input', '2024-12-31');
     await click('text=Create');
     await page.waitForSelector('text=102');
 }, 20000);

@@ -93,17 +93,17 @@ it('opens add dialog and creates new lot', async () => {
   fireEvent.click(screen.getByText('Add New Lot'));
 
   // Fill form
-  const inputLotId = within(screen.getByLabelText('Lot ID')).getByRole('textbox') as HTMLInputElement;
-  const containerDaily = screen.getByLabelText('Daily Price');
+  const inputLotId = within(screen.getByLabelText('Lot ID Input')).getByRole('textbox') as HTMLInputElement;
+  const containerDaily = screen.getByLabelText('Daily Price Input');
   const inputDaily = within(containerDaily).getByRole('spinbutton') as HTMLInputElement;
   
-  const containerQuarterly = screen.getByLabelText('Quarterly Price');
+  const containerQuarterly = screen.getByLabelText('Quarterly Price Input');
   const inputQuarterly = within(containerQuarterly).getByRole('spinbutton') as HTMLInputElement;
-  const containerYearly = screen.getByLabelText('Yearly Price');
+  const containerYearly = screen.getByLabelText('Yearly Price Input');
   const inputYearly = within(containerYearly).getByRole('spinbutton') as HTMLInputElement;
-  const containerQuarterlyDate = screen.getByLabelText('Quarterly Expire Date Create');
+  const containerQuarterlyDate = screen.getByLabelText('Quarterly Expire Date Create Input');
   const inputQuarterlyDate = containerQuarterlyDate.querySelector('input[type="date"]') as HTMLInputElement
-  const containerYearlyDate = screen.getByLabelText('Yearly Expire Date Create');
+  const containerYearlyDate = screen.getByLabelText('Yearly Expire Date Create Input');
   const inputYearlyDate = containerYearlyDate.querySelector('input[type="date"]') as HTMLInputElement
   
   fireEvent.change(inputLotId, { target: { value: '102' } });
@@ -127,7 +127,7 @@ it('handles create lot error', async () => {
   renderComponent();
 
   fireEvent.click(screen.getByText('Add New Lot'));
-  const container = screen.getByLabelText('Lot ID');
+  const container = screen.getByLabelText('Lot ID Input');
   const inputLotId = within(container).getByRole('textbox') as HTMLInputElement;
   fireEvent.change(inputLotId, { target: { value: '102' } });
   fireEvent.click(screen.getByText('Create'));
@@ -223,7 +223,7 @@ it('handles negative numbers in price fields', async () => {
   renderComponent();
 
   fireEvent.click(screen.getByText('Add New Lot'));
-  const containerDaily = screen.getByLabelText('Daily Price');
+  const containerDaily = screen.getByLabelText('Daily Price Input');
   const inputDaily = within(containerDaily).getByRole('spinbutton') as HTMLInputElement;
   fireEvent.change(inputDaily, { target: { value: '-5' } });
 
@@ -247,7 +247,7 @@ it('edits quarterly lot with expire date', async () => {
   const input = within(container).getByRole('spinbutton');
   fireEvent.change(input, { target: { value: '250' } });
 
-  const containerQuarterly = screen.getByLabelText('Quarterly Expire Date');
+  const containerQuarterly = screen.getByLabelText('Quarterly Expire Date Input');
   const inputQuarterly = containerQuarterly.querySelector('input[type="date"]') as HTMLInputElement
 
   fireEvent.change(inputQuarterly, {
@@ -287,7 +287,7 @@ it('edits yearly lot with expire date', async () => {
   const input = within(container).getByRole('spinbutton');
   fireEvent.change(input, { target: { value: '600' } });
 
-  const containerYearly = screen.getByLabelText('Yearly Expire Date');
+  const containerYearly = screen.getByLabelText('Yearly Expire Date Input');
   const inputYearly = containerYearly.querySelector('input[type="date"]') as HTMLInputElement
   fireEvent.change(inputYearly, {
     target: { value: '2025-12-31' }
@@ -335,7 +335,7 @@ it('handles editing lot without existing expire dates', async () => {
   });
 
   // Verify default empty values for expire dates
-  const input = screen.getByLabelText('Quarterly Expire Date');
+  const input = screen.getByLabelText('Quarterly Expire Date Input');
   const dateInput = input.querySelector('input[type="date"]') as HTMLInputElement
   console.log(dateInput.outerHTML)
   expect(dateInput.value).toBe('');

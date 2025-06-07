@@ -42,6 +42,7 @@ variables:
 stages:
   - quality
   - build
+  - setup-db
   - test
   - setup-env-variables
   - conatainerize
@@ -355,6 +356,28 @@ build:pictureService:
       - package.json
       - .gitlab-ci.yml
 
+setup-db:
+  script:
+    - apt-get update && apt-get install -y postgresql-client
+    - until pg_isready -h postgres -p 5432; do sleep 1; done
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/AuthService/sql/databases.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/AuthService/sql/schema.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/AuthService/sql/data.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/AdminService/sql/databases.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/AdminService/sql/schema.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/AdminService/sql/data.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/VehicleService/sql/databases.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/VehicleService/sql/schema.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/VehicleService/sql/data.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/TicketService/sql/databases.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "../microservice/TicketService/sql/schema.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/TicketService/sql/data.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/PermitService/sql/databases.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/PermitService/sql/schema.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/PermitService/sql/data.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/PaymentService/sql/databases.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/PaymentService/sql/schema.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/PaymentService/sql/data.sql"
 
 test:campusPoliceAPI:
   stage: test
@@ -433,17 +456,6 @@ test:enforcement:
 test:auth:
   stage: test
   script:
-    - apt-get update && apt-get install -y postgresql-client
-    - until pg_isready -h postgres -p 5432; do sleep 1; done
-    - export PGPASSWORD="$POSTGRES_PASSWORD"
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/VehicleService/sql/databases.sql
-
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
     - npm run ci-auth
     - npm run test-auth
   rules:

@@ -16,13 +16,18 @@ export default function GenerateReportButton() {
 
   const handleClick = async () => {
     setLoading(true);
-    const base64 = await fetchAdminReport(numDays);
-    setLoading(false);
-    if (!base64) {
+    try {
+      const base64 = await fetchAdminReport(numDays);
+      setLoading(false);
+      if (!base64) {
+        throw new Error('No report data returned');
+      }
+      downloadBase64Pdf(base64);
+    } catch (error) {
+      setLoading(false);
+      // console.error('Error generating report:', error);
       alert('Failed to generate report. Please try again.');
-      return;
     }
-    downloadBase64Pdf(base64);
   };
 
   return (

@@ -111,7 +111,7 @@
         "lint-campusPolice": "cd api/campusPolice && npm run lint",
         "lint-payroll": "cd api/payroll && npm run lint",
         "lint-registrar": "cd api/registrar && npm run lint",
-        "test": "npm run test-driver && npm run test-admin && npm run test-enforcement && npm run test-AdminService && npm run test-auth && npm run test-VehicleService && npm run test-PermitService && npm run test-ticketService && npm run test-emailService && npm run test-PictureService && npm run test-PaymentService && npm run test-marketing",
+        "test": "npm run test-driver && npm run test-admin && npm run test-enforcement && npm run test-AdminService && npm run test-auth && npm run test-VehicleService && npm run test-PermitService && npm run test-ticketService && npm run test-emailService && npm run test-PictureService && npm run test-PaymentService && npm run test-marketing && npm run test-campusPolice && npm run test-payroll && npm run test-registrar",
         "test-admin": "cd app/admin && npm run test",
         "test-driver": "cd app/driver && npm run test",
         "test-enforcement": "cd app/enforcement && npm run test",
@@ -123,6 +123,9 @@
         "test-emailService": "cd microservice/EmailService && npm run test",
         "test-PictureService": "cd microservice/PictureService && npm run test",
         "test-PaymentService": "cd microservice/PaymentService && npm run test",
+        "test-campusPolice": "cd api/campusPolice && npm run test",
+        "test-payroll": "cd api/payroll && npm run test",
+        "test-registrar": "cd api/registrar && npm run test",
         "test-marketing": "cd app/marketing && npm run test"
     },
     "devDependencies": {

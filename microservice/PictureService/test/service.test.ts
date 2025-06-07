@@ -16,6 +16,20 @@ afterAll(() => {
 
 const pictureService = new PictureService()
 
+test('PictureService throws error when GOOGLE_GEMINI_KEY is not set', () => {
+  const originalEnv = process.env.GOOGLE_GEMINI_KEY
+  
+  // Remove the environment variable
+  delete process.env.GOOGLE_GEMINI_KEY
+  
+  // Expect constructor to throw
+  expect(() => new PictureService()).toThrow('No API Key')
+  
+  // Restore the original environment variable
+  process.env.GOOGLE_GEMINI_KEY = originalEnv
+})
+
+
 test('recognizing a plate works', async () => {
   const plate = await pictureService.recognizePlate({ image: plateBase64 })
   expect(plate).toBeDefined()

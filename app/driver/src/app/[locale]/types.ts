@@ -58,7 +58,7 @@ export interface PermitDetails {
   permitType: string;
   zone?: string;
   lot?: string;
-  vehicle?: Vehicle;
+  vehicle?: Vehicle | string;
   duration?: Duration | string | null; 
 }
 

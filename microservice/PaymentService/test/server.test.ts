@@ -3,8 +3,7 @@ import * as http from 'http';
 
 import { getEnvPath } from '../src/server'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-vi.spyOn(console, 'log').mockImplementation(() => {});
+vi.spyOn(console, 'log').mockImplementation(() => undefined);
 
 // test('Server starts and logs startup messages', async () => {
 //   const listenSpy = vi.spyOn(http.Server.prototype, 'listen').mockImplementation(function (this: http.Server, port, callback) {

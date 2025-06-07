@@ -77,8 +77,8 @@ test('Enforcer can extract plate from image', async () => {
   // expect(response.body.data.recognizePlate.confidence).toBeGreaterThanOrEqual(0)
 }, 6000)
 
-test('Cannot extract plate from image without token', async () => {
-  const token = await loginAsEnforcer()
+
+test('Throws Error When Authorization not set', async () => {
 
   const response = await supertest(pictureServer)
     .post('/graphql')
@@ -97,4 +97,52 @@ test('Cannot extract plate from image without token', async () => {
     })
 
   expect(response.status).toBe(200)
+  expect(response.body.errors).toBeDefined()
+  // console.log(response.body)
+  // expect(response.body.data.recognizePlate.plate).toBeTypeOf('string')
+  // expect(response.body.data.recognizePlate.confidence).toBeGreaterThanOrEqual(0)
 }, 6000)
+
+
+test('Throws Error When Authorization is random', async () => {
+
+  const response = await supertest(pictureServer)
+    .post('/graphql')
+    .set('Authorization', `Bearer randomToken`)
+    .send({
+      query: `
+        mutation Recognize($input: RecognizePlateInput!) {
+          recognizePlate(input: $input) {
+            plate
+            confidence
+          }
+        }
+      `,
+      variables: {
+        input: { image: plateBase64}
+      }
+    })
+
+  expect(response.status).toBe(200)
+  expect(response.body.errors).toBeDefined()
+  // console.log(response.body)
+  // expect(response.body.data.recognizePlate.plate).toBeTypeOf('string')
+  // expect(response.body.data.recognizePlate.confidence).toBeGreaterThanOrEqual(0)
+}, 6000)
+
+test('Can query ping and get pong response', async () => {
+  const token = await loginAsEnforcer()
+  const response = await supertest(pictureServer)
+    .post('/graphql')
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      query: `
+        query {
+          ping
+        }
+      `,
+    })
+
+  expect(response.status).toBe(200)
+  expect(response.body.data.ping).toBe('pong')
+})

@@ -30,17 +30,20 @@ interface Server {
   use: (...handlers: import('msw').RequestHandler[]) => void
 }
 
-const auth = (server: Server, failLogin=false): void => {
+const auth = (server: Server, failLogin=false, stage='tos'): void => {
   server.use(
     http.get(authURL + '/driver/id', async (): Promise<HttpResponse<string>> => {
       return HttpResponse.json("auth-token")
     }),
 
-    http.post(authURL + '/driver/login', async (): Promise<HttpResponse<string>> => {
+    http.post(authURL + '/driver/login', async (): Promise<HttpResponse<object>> => {
       if (failLogin) {
         return new HttpResponse(null, {status: 401})
       } else {
-        return HttpResponse.json("auth-token")
+        return new HttpResponse(
+          {
+            onboardingState: stage,
+          }, {status: 200})
       }
     }),
 
@@ -75,6 +78,7 @@ const auth = (server: Server, failLogin=false): void => {
     http.post('http://localhost:3000/driver/api/auth/signout', async () => {
       return HttpResponse.json("Signed out successfully");
     }),
+    
 
     http.all('http://localhost:3000/*', async () => {
       return HttpResponse.json({ message: "Mocked response" });

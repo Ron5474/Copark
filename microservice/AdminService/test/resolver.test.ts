@@ -5,6 +5,7 @@ import killPort from 'kill-port'
 
 import db from './db'
 import { app, bootstrap } from '../src/app'
+import {app as emailApp} from '../../EmailService/src/app'
 import authApp from '../../AuthService/src/app'
 import { app as ticketApp, bootstrap as ticketBoot } from '../../TicketService/src/app'
 import { app as permitApp, bootstrap as permitBoot } from '../../PermitService/src/app'
@@ -12,8 +13,10 @@ import { app as permitApp, bootstrap as permitBoot } from '../../PermitService/s
 const AUTH_PORT = 3010
 const TICKET_PORT = 4002
 const PERMIT_PORT = 4003
+const EMAIL_PORT = 3015
 
 let server: http.Server
+let emailServer: http.Server
 let ticketServer: http.Server
 let permitServer: http.Server
 let authServer: http.Server
@@ -25,6 +28,11 @@ beforeAll(async () => {
   server = http.createServer(app)
   server.listen()
   await bootstrap()
+
+  emailServer = http.createServer(emailApp)
+  await new Promise<void>((resolve) => {
+    emailServer.listen(EMAIL_PORT, () => resolve())
+  })
 
   // Start TicketService
   ticketServer = http.createServer(ticketApp)
@@ -349,7 +357,7 @@ test('Admin can add a payroll organization', async () => {
     .set('Authorization', 'Bearer ' + token)
     .send({ query: mutation })
     .expect(200)
-
+  console.log('Errors: ', response.body)
   expect(response.body.errors).toBeUndefined()
   expect(response.body.data.addAPIUser.id).toBeDefined()
 })

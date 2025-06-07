@@ -24,6 +24,7 @@ export async function userLoginAttempt(locale: string): Promise<string|undefined
   }
 
   const data = await res.json();
+  console.log("User data:", data);
   if (data?.onboardingState !== "complete") {
     if (data?.onboardingState === "tos") {
       return await redirect({

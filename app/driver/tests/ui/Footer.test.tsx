@@ -39,6 +39,7 @@ beforeEach(() => {
     }),
     usePathname: () => '/onboarding',
     useLocale: () => mockLocale,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Link: ({ children, href, ...props }: { children: React.ReactNode, href: string, [key: string]: any }) => (
       <a href={href} {...props}>{children}</a>
     ),

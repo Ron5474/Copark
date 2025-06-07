@@ -31,6 +31,14 @@ variables:
   NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
   NEXTAUTH_URL: ${NEXTAUTH_URL}
   NEXT_PUBLIC_AUTH_COOKIE_NAME: ${NEXT_PUBLIC_AUTH_COOKIE_NAME}
+  EMAIL_USER: ${EMAIL_USER}
+  EMAIL_PASS: ${EMAIL_PASS}
+  EMAIL_HOST: ${EMAIL_HOST}
+  EMAIL_PORT: ${EMAIL_PORT}
+  SMTP_PORT: ${SMTP_PORT}
+  GOOGLE_GEMINI_KEY: ${GOOGLE_GEMINI_KEY}
+  STRIPE_SECRET: ${STRIPE_SECRET}
+  STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
 
 stages:
   - quality
@@ -164,6 +172,72 @@ lint:pictureService:
       - package.json
       - .gitlab-ci.yml
 
+lint:campusPoliceAPI:
+  stage: quality
+  script:
+    - npm run install-campusPolice
+    - npm run lint-campusPolice
+  rules:
+    - changes: 
+      - api/campusPolice/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:registrarAPI:
+  stage: quality
+  script:
+    - npm run install-registrar
+    - npm run lint-registrar
+  rules:
+    - changes: 
+      - api/registrar/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:payrollAPI:
+  stage: quality
+  script:
+    - npm run install-payroll
+    - npm run lint-payroll
+  rules:
+    - changes: 
+      - api/payroll/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:campusPoliceAPI:
+  stage: build
+  script:
+    - npm run install-campusPolice
+    - npm run build-campusPolice
+  rules:
+    - changes: 
+      - api/campusPolice/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:registrarAPI:
+  stage: build
+  script:
+    - npm run install-registrar
+    - npm run build-registrar
+  rules:
+    - changes: 
+      - api/registrar/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:payrollAPI:
+  stage: build
+  script:
+    - npm run install-payroll
+    - npm run build-payroll
+  rules:
+    - changes: 
+      - api/payroll/**/*
+      - package.json
+      - .gitlab-ci.yml
+
 build:enforcement:
   stage: build
   script:
@@ -286,6 +360,36 @@ build:pictureService:
       - .gitlab-ci.yml
 
 
+test:campusPoliceAPI:
+  stage: test
+  script:
+    - cd api/campusPolice && npm install && npm test
+  rules:
+    - changes: 
+      - api/campusPolice/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+test:registrarAPI:
+  stage: test
+  script:
+    - cd api/registrar && npm install && npm test
+  rules:
+    - changes: 
+      - api/registrar/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+test:payrollAPI:
+  stage: test
+  script:
+    - cd api/payroll && npm install && npm test
+  rules:
+    - changes: 
+      - api/payroll/**/*
+      - package.json
+      - .gitlab-ci.yml
+
 test:enforcement:
   script:
     - cd app/enforcement && npm install && npm test
@@ -363,12 +467,21 @@ test:paymentService:
     - until pg_isready -h postgres -p 5432; do sleep 1; done
     - export PGPASSWORD="$POSTGRES_PASSWORD"
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/VehicleService/sql/databases.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/PaymentService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/TicketService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/PermitService/sql/databases.sql
 
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/PaymentService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/PaymentService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f microservice/PaymentService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f microservice/PaymentService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
 
     - npm run installs
@@ -448,8 +561,8 @@ test:ticketService:
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/TicketService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/TicketService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
 
     - npm run installs

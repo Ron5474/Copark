@@ -1,11 +1,10 @@
 import {test, beforeAll, afterAll, beforeEach, vi} from 'vitest'
-// @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 import * as http from 'http'
 
 import * as authService from '../src/auth/service'
 import  db from './db'
-import app from '../src/app'
+import { app } from '../src/app'
 
 const validJWT = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkcml2ZXItaWQtMTIzIiwiZW1haWwiOiJkcml2ZXJAYm9va3MuY29tIiwicGljdHVyZSI6Imh0dHBzOi8vd3d3Lmdvb2dsZS5jb20vaW1nIiwibmFtZSI6IkZha2UgRHJpdmVyIiwiaWF0IjoxNzQ2ODM2ODUzLCJleHAiOjE5MDQ2MjQ4NTN9.YipxWgvsQIRpjSoIbnNla741EI1klV5Fkf2A5mlhpMY"
 

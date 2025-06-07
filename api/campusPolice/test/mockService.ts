@@ -11,7 +11,7 @@ const auth = (server: Server, failPost=false): void => {
   server.use(
     http.post(authURL + '/check', async ({ request }): Promise<HttpResponse<object>> => {
       const authHeader = request.headers.get('Authorization')
-      const token = authHeader.split(' ')[1]
+      const token = authHeader?.split(' ')[1]
       if (!token) return new HttpResponse(null, {status: 401})
       if (!failPost) {
         return HttpResponse.json({

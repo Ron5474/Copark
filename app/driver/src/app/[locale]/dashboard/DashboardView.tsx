@@ -37,6 +37,7 @@ import { useTranslations } from "next-intl";
 import { DashboardContext } from "./context";
 import type { LotGroup, Permit, Vehicle } from "../types";
 import { Payment } from "../shared/actions";
+import { useLocale } from "next-intl";
 
 function formatPermitDuration(permit: Permit): string {
   const start = new Date(permit.activeDate!);
@@ -60,6 +61,7 @@ export default function DashboardView() {
   const t = useTranslations("dashboard");
   const tp = useTranslations("permits");
   const context = useContext(DashboardContext);
+  const locale = useLocale();
 
   // const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>("active");
@@ -130,6 +132,7 @@ export default function DashboardView() {
 
     if (selectedLot) {
       await Payment(
+        locale,
         "permit",
         selectedLot,
         paymentDetails.price,

@@ -31,12 +31,13 @@ afterAll(() => {
 })
 
 const findByPlateInput = {
-  plate: "TEST123"
+  plate: "TEST123",
+  state: "California"
 }
 
 test('Police can look-up cars using plate number', async () => {
   const response = await supertest(server)
-    .get(`/api/v0/police/check?plate=${findByPlateInput.plate}`)
+    .get(`/api/v0/police/check?plate=${findByPlateInput.plate}&state=${findByPlateInput.state}`)
     .set('Authorization', 'Bearer fake-token')
     .expect(200)
   expect(response.body).toBe(true)
@@ -44,20 +45,27 @@ test('Police can look-up cars using plate number', async () => {
 
 test('Police cannot look up plates W/O Authorization', async () => {
   await supertest(server)
-    .get(`/api/v0/police/check?plate=${findByPlateInput.plate}`)
+    .get(`/api/v0/police/check?plate=${findByPlateInput.plate}&state=${findByPlateInput.state}`)
     .expect(401)
 })
 
 test('Police cannot look up plates if /auth/check fails', async () => {
   auth(mockServer, true) //fail auth/check endpoint
   await supertest(server)
-    .get(`/api/v0/police/check?plate=${findByPlateInput.plate}`)
+    .get(`/api/v0/police/check?plate=${findByPlateInput.plate}&state=${findByPlateInput.state}`)
     .set('Authorization', 'Bearer fake-token')
     .expect(401)
 })
 
 
 test('GET /docs page swagger UI', async () => {
+  await supertest(server)
+    .get(`/api/v0/docs/`)
+    .expect(404)
+})
+
+test('GET /docs page swagger UI', async () => {
+  process.env.API_DOCS = 'true' //enable docs for test
   await supertest(server)
     .get(`/api/v0/docs/`)
     .expect(200)

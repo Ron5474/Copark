@@ -32,7 +32,7 @@ export async function getTransactionDetails(sessionId: string): Promise<PaymentD
 
 export async function addPaymentDetails(
   details: PaymentDetails
-): Promise<void> {
+): Promise<string> {
   const { id, amount, currency, status, payment_method, type } = details;
   
   const res = await fetch("http://localhost:3014/api/v0/payment/complete", {
@@ -54,6 +54,7 @@ export async function addPaymentDetails(
   if (res.status !== 201 && res.status !== 200 && res.status !== 204) {
     throw new Error("Failed to save payment details");
   }
+  return "Payment details saved successfully";
 }
 
 export async function addPermitDetails(
@@ -111,7 +112,7 @@ export async function addPermitDetails(
 
     const vehicle = await vehicleRes.json();
     if (await vehicle.errors !== undefined) {
-      throw new Error(`Failed to fetch default Vehicle: ${vehicle.errors[0]}`);
+      throw new Error(`Failed to fetch default Vehicle`);
     }
 
     permitQuery = `mutation PurchasePermit($input: PurchaseLotInput!) {
@@ -175,7 +176,6 @@ export async function addTicketDetails(
   if (TicketDetails.type !== "ticket") {
     throw new Error("Invalid ticket type");
   }
-  try {
     const { ticketId } = TicketDetails;
     const res = await fetch("http://localhost:4002/graphql", {
       method: "POST",
@@ -207,8 +207,4 @@ export async function addTicketDetails(
     if (result.errors) {
       throw new Error(`Failed to save ticket details: ${result.errors[0].message}`);
     }
-  } catch (error) {
-    console.error("Error adding ticket details:", error);
-    throw new Error("Failed to save ticket details");
-  }
 }

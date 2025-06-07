@@ -50,7 +50,7 @@
     "scripts": {
         "bstart": "npm run build && npm run start",
         "start": "node build/src/server.js",
-        "build": "tsc",
+        "build": "npm run swagger && tsc",
         "predev": "npm run swagger",
         "dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
         "swagger": "tsoa spec-and-routes",

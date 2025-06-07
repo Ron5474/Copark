@@ -38,7 +38,6 @@ export const scanPlate = async (imageDataURL: string): Promise<{plate: string, s
       throw new Error(error.error || 'GraphQL service error')
     }
 
-    console.log('I am done with request')
     const data = await response.json()
 
     // Handle GraphQL errors

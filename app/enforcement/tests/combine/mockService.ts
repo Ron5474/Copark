@@ -3,6 +3,7 @@ import { http, HttpResponse } from 'msw'
 const authURL = 'http://localhost:3010/api/v0/auth'
 const permitURL = 'http://localhost:4003/graphql'
 const ticketURL = 'http://localhost:4002/graphql'
+const pictureURL = 'http://localhost:4004/graphql'
 
 const authHandlers = {
   success: http.post(authURL + '/login', async ({ request }) => {
@@ -165,4 +166,68 @@ const ticketHandlers = {
 
 }
 
-export { authHandlers, permitHandlers, ticketHandlers }
+const pictureHandlers = {
+  success: http.post(pictureURL, async ({ request }) => {
+    const body = await request.json()
+
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'query' in body &&
+      typeof body.query === 'string' &&
+      body.query.includes('recognizePlate')
+    ) {
+      return HttpResponse.json({
+        data: {
+          recognizePlate: {
+            plate: '7COPARK',
+            state: 'CA',
+          },
+        },
+      })
+    }
+
+    return HttpResponse.json({ errors: [{ message: 'Unknown mutation' }] }, { status: 400 })
+  }),
+
+  graphqlError: http.post(pictureURL, async ({ request }) => {
+    const body = await request.json()
+
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'query' in body &&
+      typeof body.query === 'string' &&
+      body.query.includes('recognizePlate')
+    ) {
+      return HttpResponse.json({
+        errors: [{ message: 'Image is too blurry' }],
+      }, { status: 200 })
+    }
+
+    return HttpResponse.json({ errors: [{ message: 'Unknown mutation' }] }, { status: 400 })
+  }),
+
+  failure: http.post(pictureURL, async ({ request }) => {
+    const body = await request.json()
+
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'query' in body &&
+      typeof body.query === 'string' &&
+      body.query.includes('recognizePlate')
+    ) {
+      return HttpResponse.json(
+        { error: 'GraphQL service crashed' },
+        { status: 500 }
+      )
+    }
+
+    return HttpResponse.json({ error: 'Unknown error' }, { status: 500 })
+  }),
+}
+
+
+
+export { authHandlers, permitHandlers, ticketHandlers, pictureHandlers }

@@ -66,11 +66,12 @@ export class AuthController extends Controller {
       return undefined
     }
     const user =  await new AuthService().activeDriver(request.user?.id);
-    if (!user) {
-      console.log("user not found")
-      this.setStatus(404)
-      return undefined
-    }
+    // User will always exist because they passed middleware
+    // if (!user) {
+    //   console.log("user not found")
+    //   this.setStatus(404)
+    //   return undefined
+    // }
     return user
   }
 

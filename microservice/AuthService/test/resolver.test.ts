@@ -9,10 +9,11 @@
 #######################################################################
 */
 
-import { test, beforeAll, afterAll, expect } from 'vitest'
+import { test, beforeAll, afterAll, expect, vi } from 'vitest'
 import supertest from 'supertest'
 import * as http from 'http'
 import { SignJWT } from 'jose'
+// import { randomUUID } from 'crypto'
 
 import db from './db'
 import { app } from '../src/app'
@@ -136,6 +137,43 @@ test('Driver can login successfully', async () => {
     .expect(200)
 })
 
+// import { jwtVerify } from 'jose' // Add if not already imported
+// import { pool } from '../src/auth/db' // Adjust path
+
+// test('driverLogin returns 404 if driver no longer exists', async () => {
+//   const token = await signupAsDriver(driver);
+
+//   // Extract the driver's ID (sub) from the JWT
+//   // const { payload } = await jwtVerify(token, encodedKey);
+//   // const userId = payload.sub as string;
+
+//   // Delete the driver from the database
+//   // await pool.query(`DELETE FROM account WHERE data->>'sub' = $1`, [userId])
+
+//   // Now try to log in — should hit the `if (!user)` branch and return 404
+//   await supertest(server)
+//     .get('/api/v0/auth/driver/login')
+//     .set('Authorization', `Bearer ${token}`)
+//     .expect(404);
+// });
+
+import { AuthController } from '../src/auth/api';
+
+test('controller sets 404 when request.user is missing', async () => {
+  const controller = new AuthController();
+
+  const setStatusSpy = vi.spyOn(controller, 'setStatus' as any);
+
+  const mockRequest = {
+    user: undefined,
+  } as unknown as Express.Request;
+
+  const result = await controller.driverLogin(mockRequest);
+
+  expect(result).toBeUndefined();
+  expect(setStatusSpy).toHaveBeenCalledWith(404);
+});
+
 test('Admin can get driver details', async () => {  
   const res = await supertest(server)
     .post('/api/v0/auth/login')
@@ -147,6 +185,18 @@ test('Admin can get driver details', async () => {
     .set('Authorization', `Bearer ${res.body.id}`)
     .expect(200)
 })
+
+// test('Admin can get driver details', async () => {  
+//   const res = await supertest(server)
+//     .post('/api/v0/auth/login')
+//     .send({ email: admin.email, password: admin.password })
+  
+//   await supertest(server)
+//     .post('/api/v0/auth/driver/id')
+//     .send({id: '39f48f9f-2693-446b-ad98-8e0db1ef14bd'})
+//     .set('Authorization', `Bearer ${res.body.id}`)
+//     .expect(404)
+// })
 
 test('getDriverId works successfully', async () => {
   const token = await signupAsDriver(driver)

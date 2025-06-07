@@ -49,7 +49,7 @@ export const getMyPermits = async (): Promise<MyPermits> => {
     },
     body: JSON.stringify({
       query: `
-        query {
+        query GetMyPermits {
           myPermits {
             active {
               vehicle

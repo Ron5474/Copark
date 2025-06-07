@@ -46,7 +46,5 @@ export async function Payment(
   
   if (data.url) {
     redirect(data.url);
-  }
-  
-  return "Payment attempt successful";
+  }  
 }

@@ -12,7 +12,6 @@ const getAuthToken = async () => {
 }
 
 export const getTickets = async (): Promise<Ticket[]> => {
-  try {
     const token = await getAuthToken()
 
     const response = await fetch(API_URL, {
@@ -23,7 +22,7 @@ export const getTickets = async (): Promise<Ticket[]> => {
       },
       body: JSON.stringify({
         query: `
-          query {
+          query getMyTickets {
             getMyTickets {
                 id
                 vehicle
@@ -43,18 +42,13 @@ export const getTickets = async (): Promise<Ticket[]> => {
     
     if (result.errors) {
       console.error('GraphQL errors:', result.errors)
-      throw new Error(result.errors[0].message)
+      throw new Error('Failed to fetch tickets')
     }
 
     return result.data.getMyTickets
-  } catch (error) {
-    console.error('Error fetching vehicles:', error)
-    throw error
-  }
 }
 
 export const challengeTicket = async (ticketID: string, reason: string): Promise<Ticket[]> => {
-  try {
     const token = await getAuthToken()
 
     const response = await fetch(API_URL, {
@@ -84,12 +78,8 @@ export const challengeTicket = async (ticketID: string, reason: string): Promise
     
     if (result.errors) {
       console.error('GraphQL errors:', result.errors)
-      throw new Error(result.errors[0].message)
+      throw new Error('Failed to challenge ticket')
     }
 
     return result.data.challengeTicket
-  } catch (error) {
-    console.error('Error challenging ticket:', error)
-    throw error
-  }
 }

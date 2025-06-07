@@ -302,12 +302,14 @@ export default function ManageLots() {
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 2, minWidth: 300 }}>
             <TextField 
-              label="Lot ID"
+              label='Lot ID'
+              aria-label='Lot ID Input'
               value={newLot.lot}
               onChange={(e) => setNewLot({...newLot, lot: e.target.value})}
             />
             <TextField 
               label="Daily Price"
+              aria-label="Daily Price Input"
               type="number"
               inputProps={{ min: 0 }}
               value={newLot.daily.price}
@@ -318,6 +320,7 @@ export default function ManageLots() {
             />
             <TextField 
               label="Quarterly Price"
+              aria-label="Quarterly Price Input"
               type="number"
               inputProps={{ min: 0 }}
               value={newLot.quarterly.price}
@@ -331,6 +334,7 @@ export default function ManageLots() {
             />
             <TextField 
               label="Quarterly Expire Date"
+              aria-label="Quarterly Expire Date Create Input"
               type="date"
               value={newLot.quarterly.expireDate?.split('T')[0]}
               onChange={(e) => setNewLot({
@@ -341,9 +345,10 @@ export default function ManageLots() {
                 }
               })}
               InputLabelProps={{ shrink: true }}
-            />
+              />
             <TextField 
               label="Yearly Price"
+              aria-label="Yearly Price Input"
               type="number"
               inputProps={{ min: 0 }}
               value={newLot.yearly.price}
@@ -357,6 +362,7 @@ export default function ManageLots() {
             />
             <TextField 
               label="Yearly Expire Date"
+              aria-label="Yearly Expire Date Create Input"
               type="date"
               value={newLot.yearly.expireDate?.split('T')[0]}
               onChange={(e) => setNewLot({
@@ -391,7 +397,7 @@ export default function ManageLots() {
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 2, minWidth: 300 }}>
             <TextField 
-              label="Price"
+              aria-label="Price"
               type="number"
               inputProps={{ min: 0 }}
               value={editingLot.price}
@@ -403,6 +409,7 @@ export default function ManageLots() {
             {editingLot.type === 'quarterly' && (
               <TextField 
                 label="Quarterly Expire Date"
+                aria-label="Quarterly Expire Date Input"
                 type="date"
                 value={editingLot.quarterlyExpireDate?.split('T')[0]}
                 onChange={(e) => setEditingLot({
@@ -415,6 +422,7 @@ export default function ManageLots() {
             {editingLot.type === 'yearly' && (
               <TextField 
                 label="Yearly Expire Date"
+                aria-label="Yearly Expire Date Input"
                 type="date"
                 value={editingLot.yearlyExpireDate?.split('T')[0]}
                 onChange={(e) => setEditingLot({

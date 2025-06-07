@@ -285,13 +285,7 @@ build:pictureService:
       - package.json
       - .gitlab-ci.yml
 
-# build:
-#   stage: build
-#   script:
-#     - npm run installs
-#     - npm run build
 
-# Uncomment this @Yaquob
 test:enforcement:
   script:
     - cd app/enforcement && npm install && npm test
@@ -300,17 +294,6 @@ test:enforcement:
       - app/enforcement/**/*
       - package.json
       - .gitlab-ci.yml
-
-# test:vehicleService:
-#   stage: test
-#   script:
-#     - npm run install-vehicleService
-#     - npm run test-VehicleService
-#   rules:
-#     - changes: 
-#       - microservices/VehicleService/**/*
-#       - package.json
-#       - .gitlab-ci.yml
 
 test:auth:
   stage: test
@@ -369,6 +352,50 @@ test:permitService:
   rules:
     - changes: 
       - microservice/PermitService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+
+test:paymentService:
+  stage: test
+  script:
+    - apt-get update && apt-get install -y postgresql-client
+    - until pg_isready -h postgres -p 5432; do sleep 1; done
+    - export PGPASSWORD="$POSTGRES_PASSWORD"
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/PaymentService/sql/databases.sql
+
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/PaymentService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/PaymentService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
+
+    - npm run installs
+    - npm run ci-auth
+    - npm run build-auth
+
+    - npm run ci-paymentService
+    - npm run build-paymentService
+
+    - npm run test-PaymentService
+  rules:
+    - changes: 
+      - microservice/PaymentService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+
+test:emailService:
+  stage: test
+  script:
+    - npm run install-emailService
+    - npm run build-emailService
+
+    - npm run test-emailService
+  rules:
+    - changes: 
+      - microservice/EmailService/**/*
       - package.json
       - .gitlab-ci.yml
 
@@ -445,6 +472,48 @@ test:ticketService:
   rules:
     - changes: 
       - microservice/TicketService/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+test:adminService:
+  stage: test
+  script:
+    - apt-get update && apt-get install -y postgresql-client
+    - until pg_isready -h postgres -p 5432; do sleep 1; done
+    - export PGPASSWORD="$POSTGRES_PASSWORD"
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/VehicleService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AdminService/sql/databases.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/TicketService/sql/databases.sql
+
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/TicketService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/TicketService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
+
+    - npm run installs
+    - npm run ci-auth
+    - npm run build-auth
+
+    - npm run ci-vehicleService
+    - npm run build-vehicleService
+
+    - npm run ci-emailService
+    - npm run build-emailService
+
+    - npm run ci-adminService
+    - npm run build-adminService
+
+    - npm run ci-ticketService
+    - npm run build-ticketService
+
+    - npm run test-adminService
+  rules:
+    - changes: 
+      - microservice/AdminService/**/*
       - package.json
       - .gitlab-ci.yml
 

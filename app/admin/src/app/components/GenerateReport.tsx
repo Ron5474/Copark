@@ -24,6 +24,7 @@ export default function GenerateReportButton() {
       }
       downloadBase64Pdf(base64);
     } catch (error) {
+      void error;
       setLoading(false);
       // console.error('Error generating report:', error);
       alert('Failed to generate report. Please try again.');

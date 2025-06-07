@@ -152,7 +152,7 @@ export const deleteVehicle = async (plate: string, state?: string): Promise<bool
 
     if (result.errors) {
       return {
-        message: result.errors[0]?.message || 'Failed to delete vehicle',
+        message: result.errors[0]?.message,
         type: 'error'
       }
     }
@@ -187,7 +187,7 @@ export async function updateDefaultVehicle(vehicleId: string): Promise<Vehicle> 
 
     if (result.errors) {
       console.error('GraphQL errors:', result.errors)
-      throw new Error(result.errors[0]?.message || 'Failed to update default vehicle')
+      throw new Error(result.errors[0]?.message)
     }
 
     return result.data.updateDefaultVehicle

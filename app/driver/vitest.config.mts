@@ -18,7 +18,8 @@ export default defineConfig({
         'src/**/layout.tsx',
         'src/**/types.ts',
         'src/i18n/*',
-        'src/app/api/**/route.ts'
+        'src/app/api/**/route.ts',
+        'src/middleware.ts',
       ],
     },
   },

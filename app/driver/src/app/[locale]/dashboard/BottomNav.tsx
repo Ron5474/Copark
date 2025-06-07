@@ -207,9 +207,9 @@ const handleChange = (event: React.SyntheticEvent, newValue: number) => {
             "& .Mui-selected": { color: "#00796b" },
           }}
         >
-          <BottomNavigationAction label={t('home')} icon={<HomeIcon />} />
-          <BottomNavigationAction label={t('tickets')} icon={<ConfirmationNumberIcon />} />
-          <BottomNavigationAction label='Settings' icon={<SettingsIcon />} onClick={handleSettingsClick}/>
+          <BottomNavigationAction aria-label="home" label={t('home')} icon={<HomeIcon />} />
+          <BottomNavigationAction aria-label="tickets" label={t('tickets')} icon={<ConfirmationNumberIcon />} />
+          <BottomNavigationAction aria-label="settings" label='Settings' icon={<SettingsIcon />} onClick={handleSettingsClick}/>
         </BottomNavigation>
       </Paper>
 
@@ -226,7 +226,7 @@ const handleChange = (event: React.SyntheticEvent, newValue: number) => {
           horizontal: 'center',
         }}
       >
-        <MenuItem onClick={() => handleLanguageChange(locale === 'en' ? 'es' : 'en')}>
+        <MenuItem aria-label="change-lang" onClick={() => handleLanguageChange(locale === 'en' ? 'es' : 'en')}>
           {locale === 'en' ? (
             <>
             <picture>

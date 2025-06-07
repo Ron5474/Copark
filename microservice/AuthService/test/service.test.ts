@@ -191,6 +191,14 @@ test('AuthService Check() throws error for admin using driver role', async () =>
   await expect(new AuthService().check(`Bearer ${user?.id}`, ["driver"])).rejects.toThrow('Unauthorized3')
 })
 
+// test('AuthService Check() throws error for driver using admin role', async () => {
+//   // eslint-disable-next-line @typescript-eslint/no-empty-function
+//   vi.spyOn(console, 'error').mockImplementation(() => {})
+
+//   const user = await new AuthService().authenticate(driver)
+//   await expect(new AuthService().check(`Bearer ${user?.id}`, ["admin"])).rejects.toThrow('Unauthorized3')
+// })
+
 test('AuthService Check() throws error for driver with invalid JWT', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})

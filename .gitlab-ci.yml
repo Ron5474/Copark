@@ -657,7 +657,7 @@ test:adminService:
     - npm run ci-ticketService
     - npm run build-ticketService
 
-    - npm run test-adminService
+    - npm run test-AdminService
   rules:
     - changes: 
       - microservice/AdminService/**/*

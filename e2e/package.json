@@ -10,12 +10,12 @@
     "dotenv": "*",
     "eslint": "*",
     "eslint-config-google": "*",
-    "eslint-plugin-jsdoc": "*", 
+    "eslint-plugin-jsdoc": "*",
     "express": "*",
     "puppeteer": "*",
     "supertest": "*",
-    "vitest": "*",
-    "vite-plugin-eslint": "*"
+    "vite-plugin-eslint": "*",
+    "vitest": "*"
   },
   "scripts": {
     "docker": "docker compose -f ../docker-compose.db.yml --profile dev down && docker compose -f ../docker-compose.db.yml --profile dev up -d",
@@ -24,5 +24,11 @@
     "e2e": "vitest run --no-file-parallelism --testTimeout=3000",
     "test": "(npm run dev-root) && (npm run docker) && (npm run e2e)",
     "lint": "eslint test --no-inline-config --max-warnings 0"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.52.0",
+    "playwright": "^1.52.0",
+    "playwright-extra": "^4.3.6",
+    "playwright-extra-plugin-stealth": "^0.0.1"
   }
 }

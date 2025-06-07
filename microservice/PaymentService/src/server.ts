@@ -4,7 +4,7 @@ import { resolve } from 'path';
 
 export function getEnvPath(dir: string): string {
   const isBuilt = dir.includes('/build') || dir.includes('\\build')
-  return resolve(dir, isBuilt ? '../../../../.prod.env' : '../../../../.env')
+  return resolve(dir, isBuilt ? '../../../../.prod.env' : '../../../.env')
 }
 const p = getEnvPath(__dirname)
 dotenv.config({ path: p})

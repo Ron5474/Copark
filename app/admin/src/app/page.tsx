@@ -26,7 +26,7 @@ export default function Page() {
       case 'api_users':
         return <ManageAPIUsers onNavigate={handleNavigate} />;
       case 'statistics':
-        return <ViewStatistics />; // No onNavigate prop needed here
+        return <ViewStatistics />;
       case 'zones':
         return <ManageZones />;
       case 'lots':

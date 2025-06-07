@@ -6,7 +6,7 @@ let page: Page;
 
 beforeEach(async () => {
     browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         slowMo: 20,
         defaultViewport: null,
         args: ['--start-maximized'],

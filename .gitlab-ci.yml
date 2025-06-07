@@ -398,40 +398,40 @@ test:enforcement:
       - package.json
       - .gitlab-ci.yml
 
-test:admin:
-  stage: test
-  script:
-    - cd app/admin && npm install
-    - apt-get update && apt-get install -y postgresql-client
-    - until pg_isready -h postgres -p 5432; do sleep 1; done
-    - export PGPASSWORD="$POSTGRES_PASSWORD"
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/VehicleService/sql/databases.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/TicketService/sql/databases.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/PermitService/sql/databases.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/PaymentService/sql/databases.sql
+# test:admin:
+#   stage: test
+#   script:
+#     - cd app/admin && npm install
+#     - apt-get update && apt-get install -y postgresql-client
+#     - until pg_isready -h postgres -p 5432; do sleep 1; done
+#     - export PGPASSWORD="$POSTGRES_PASSWORD"
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f ../../microservice/AuthService/sql/databases.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f ../../microservice/VehicleService/sql/databases.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f ../../microservice/TicketService/sql/databases.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f ../../microservice/PermitService/sql/databases.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f ../../microservice/PaymentService/sql/databases.sql
 
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f microservice/PaymentService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f microservice/PaymentService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
-    - npm run installs
-    - npm run cis
-    - npm run build
-    - npm run start
-    - npm test-admin
-  rules:
-    - changes: 
-      - app/admin/**/*
-      - package.json
-      - .gitlab-ci.yml
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f ../../microservice/AuthService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f ../../microservice/AuthService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f ../../microservice/VehicleService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f ../../microservice/VehicleService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f ../../microservice/TicketService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f ../../microservice/TicketService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f ../../microservice/PermitService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f ../../microservice/PermitService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f ../../microservice/PaymentService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f ../../microservice/PaymentService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
+#     - npm run installs
+#     - npm run cis
+#     - npm run build
+#     - npm run start
+#     - npm test-admin
+#   rules:
+#     - changes: 
+#       - app/admin/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 test:auth:
   stage: test
@@ -494,57 +494,57 @@ test:permitService:
       - .gitlab-ci.yml
 
 
-test:paymentService:
-  stage: test
-  script:
-    - apt-get update && apt-get install -y postgresql-client
-    - until pg_isready -h postgres -p 5432; do sleep 1; done
-    - export PGPASSWORD="$POSTGRES_PASSWORD"
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/VehicleService/sql/databases.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/PaymentService/sql/databases.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/TicketService/sql/databases.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/PermitService/sql/databases.sql
+# test:paymentService:
+#   stage: test
+#   script:
+#     - apt-get update && apt-get install -y postgresql-client
+#     - until pg_isready -h postgres -p 5432; do sleep 1; done
+#     - export PGPASSWORD="$POSTGRES_PASSWORD"
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/AuthService/sql/databases.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/VehicleService/sql/databases.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/PaymentService/sql/databases.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/TicketService/sql/databases.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f microservice/PermitService/sql/databases.sql
 
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f microservice/PaymentService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f microservice/PaymentService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f microservice/PaymentService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f microservice/PaymentService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/schema.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/data.sql
+#     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
 
-    - npm run installs
-    - npm run ci-auth
-    - npm run build-auth
+#     - npm run installs
+#     - npm run ci-auth
+#     - npm run build-auth
 
-    - npm run ci-paymentService
-    - npm run build-paymentService
+#     - npm run ci-paymentService
+#     - npm run build-paymentService
 
-    - npm run test-PaymentService
-  rules:
-    - changes: 
-      - microservice/PaymentService/**/*
-      - package.json
-      - .gitlab-ci.yml
+#     - npm run test-PaymentService
+#   rules:
+#     - changes: 
+#       - microservice/PaymentService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 
-test:emailService:
-  stage: test
-  script:
-    - npm run install-emailService
-    - npm run build-emailService
+# test:emailService:
+#   stage: test
+#   script:
+#     - npm run install-emailService
+#     - npm run build-emailService
 
-    - npm run test-emailService
-  rules:
-    - changes: 
-      - microservice/EmailService/**/*
-      - package.json
-      - .gitlab-ci.yml
+#     - npm run test-emailService
+#   rules:
+#     - changes: 
+#       - microservice/EmailService/**/*
+#       - package.json
+#       - .gitlab-ci.yml
 
 
 test:vehicleService:

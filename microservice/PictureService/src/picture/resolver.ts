@@ -11,9 +11,6 @@ export class PictureResolver {
   async recognizePlate(
     @Arg('input', () => RecognizePlateInput) input: RecognizePlateInput
   ): Promise<RecognizePlateResult> {
-    if (!input.image || !input.image.startsWith('data:image')) {
-      throw new Error('Invalid image input')
-    }
     // console.log("Base64 length:", input.image.length)
     // console.log("Image prefix:", input.image.substring(0, 30))
 

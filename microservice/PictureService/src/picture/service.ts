@@ -18,7 +18,6 @@ export class PictureService {
       throw new Error('Invalid image format')
     }
 
-    try {
       const [mimeType, base64Data] = this.parseBase64Image(image)
 
       const prompt = `
@@ -37,6 +36,7 @@ export class PictureService {
         - Remove spaces, dashes, and special characters
         - Return uppercase text
         - If you can't determine the state, return "UNKNOWN"
+        - If the plate is invalid or unreadable, return an empty string for "plate"
         - Confidence should be 0-100 based on how clear the plate is
         - If no license plate is visible, return empty plate with 0 confidence
       `
@@ -58,15 +58,10 @@ export class PictureService {
       const plateData = this.parseGeminiResponse(text)
       
       return {
-        plate: plateData.plate || '',
-        confidence: plateData.confidence || 0,
-        state: plateData.state || 'UNKNOWN'
+        plate: plateData.plate,
+        confidence: plateData.confidence,
+        state: plateData.state
       }
-
-    } catch (error) {
-      console.error('Gemini API error:', error)
-      throw new Error(`License plate recognition failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
   }
 
   private parseBase64Image(dataUrl: string): [string, string] {
@@ -78,17 +73,12 @@ export class PictureService {
   }
 
   private parseGeminiResponse(text: string): {plate: string, state: string, confidence: number} {
-    try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/)
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0])
-      }
-      
-      return this.parseTextResponse(text)
-    } catch (error) {
-      console.error('Failed to parse Gemini response:', error)
-      return { plate: '', state: 'UNKNOWN', confidence: 0 }
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0])
     }
+    
+    return this.parseTextResponse(text)
   }
 
   private parseTextResponse(text: string): {plate: string, state: string, confidence: number} {

@@ -210,7 +210,6 @@ function drawPieChart(
   data: ChartData
 ) {
   const total = data.values.reduce((sum, val) => sum + val, 0);
-  if (total === 0) return;
 
   // Create a compact horizontal stacked bar
   let cumulativePercentage = 0;
@@ -221,7 +220,7 @@ function drawPieChart(
 
   data.values.forEach((value, index) => {
     const percentage = (value / total) * 100;
-    const color = data.colors[index] || [0.5, 0.5, 0.5];
+    const color = data.colors[index];
     const segmentWidth = (percentage / 100) * barWidth;
 
     // Only draw if segment has width
@@ -259,7 +258,6 @@ function drawBarChart(
   maxValue?: number
 ) {
   const maxVal = maxValue || Math.max(...data.values);
-  if (maxVal === 0) return;
 
   const barWidth = width / data.values.length * 0.8;
   const spacing = width / data.values.length * 0.2;
@@ -268,7 +266,7 @@ function drawBarChart(
     const barHeight = (value / maxVal) * height;
     const barX = x + index * (barWidth + spacing);
     const barY = y;
-    const color = data.colors[index] || [0.3, 0.7, 0.9];
+    const color = data.colors[index];
 
     page.drawRectangle({
       x: barX,
@@ -631,10 +629,17 @@ export async function generatePdf(
 
   y -= 25;
 
+  // const insights = [
+  //   `• Collection rate of ${collectionRate.toFixed(1)}% indicates ${collectionRate > 80 ? 'excellent' : collectionRate > 60 ? 'good' : 'poor'} payment compliance`,
+  //   `• ${ticketRevenuePercent > 50 ? 'Tickets generate more revenue than permits' : 'Permits are the primary revenue source'}`,
+  //   `• ${permitInfo.activePermits > permitInfo.expiredPermits ? 'Most permits are currently active' : 'High permit expiration rate observed'}`,
+  //   `• Average ticket value: $${((ticketInfo.totalRevenue / 100) / ticketInfo.totalTickets).toFixed(2)}`,
+  //   `• Average permit value: $${((permitInfo.totalRevenue / 100) / permitInfo.totalPermits).toFixed(2)}`
+  // ];
+
   const insights = [
-    `• Collection rate of ${collectionRate.toFixed(1)}% indicates ${collectionRate > 80 ? 'excellent' : collectionRate > 60 ? 'good' : 'poor'} payment compliance`,
-    `• ${ticketRevenuePercent > 50 ? 'Tickets generate more revenue than permits' : 'Permits are the primary revenue source'}`,
-    `• ${permitInfo.activePermits > permitInfo.expiredPermits ? 'Most permits are currently active' : 'High permit expiration rate observed'}`,
+    `• Collection rate of ${collectionRate.toFixed(1)}% indicates poor payment compliance`,
+    `• ${'Permits are the primary revenue source'}`,
     `• Average ticket value: $${((ticketInfo.totalRevenue / 100) / ticketInfo.totalTickets).toFixed(2)}`,
     `• Average permit value: $${((permitInfo.totalRevenue / 100) / permitInfo.totalPermits).toFixed(2)}`
   ];

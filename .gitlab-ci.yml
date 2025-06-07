@@ -31,6 +31,14 @@ variables:
   NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
   NEXTAUTH_URL: ${NEXTAUTH_URL}
   NEXT_PUBLIC_AUTH_COOKIE_NAME: ${NEXT_PUBLIC_AUTH_COOKIE_NAME}
+  EMAIL_USER: ${EMAIL_USER}
+  EMAIL_PASS: ${EMAIL_PASS}
+  EMAIL_HOST: ${EMAIL_HOST}
+  EMAIL_PORT: ${EMAIL_PORT}
+  SMTP_PORT: ${SMTP_PORT}
+  GOOGLE_GEMINI_KEY: ${GOOGLE_GEMINI_KEY}
+  STRIPE_SECRET: ${STRIPE_SECRET}
+  STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
 
 stages:
   - quality
@@ -372,10 +380,10 @@ test:paymentService:
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/PaymentService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/PaymentService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/TicketService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/TicketService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f microservice/PaymentService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PAYMENT_DB" -f microservice/PaymentService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_PERMIT_DB" -f microservice/PermitService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
@@ -457,8 +465,8 @@ test:ticketService:
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/AuthService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/schema.sql
     - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_VEHICLE_DB" -f microservice/VehicleService/sql/data.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/TicketService/sql/schema.sql
-    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_AUTH_DB" -f microservice/TicketService/sql/data.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/schema.sql
+    - psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_TICKET_DB" -f microservice/TicketService/sql/data.sql
     - psql -h postgres -U "$POSTGRES_USER" -d postgres -c '\l'
 
     - npm run installs

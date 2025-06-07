@@ -9,11 +9,7 @@ const getAuthToken = async () => {
 
 export async function fetchAdminReport(numDays: number): Promise<string| undefined> {
 
-    const token = await getAuthToken();
-    if (!token) {
-      alert('No auth token found.');
-      return undefined;
-    }
+  const token = await getAuthToken();
 
   const response = await fetch('http://localhost:4000/graphql', {
     method: 'POST',

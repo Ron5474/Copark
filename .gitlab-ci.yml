@@ -172,6 +172,72 @@ lint:pictureService:
       - package.json
       - .gitlab-ci.yml
 
+lint:campusPoliceAPI:
+  stage: quality
+  script:
+    - npm run install-campusPolice
+    - npm run lint-campusPolice
+  rules:
+    - changes: 
+      - api/campusPolice/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:registrarAPI:
+  stage: quality
+  script:
+    - npm run install-registrar
+    - npm run lint-registrar
+  rules:
+    - changes: 
+      - api/registrar/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+lint:payrollAPI:
+  stage: quality
+  script:
+    - npm run install-payroll
+    - npm run lint-payroll
+  rules:
+    - changes: 
+      - api/payroll/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:campusPoliceAPI:
+  stage: build
+  script:
+    - npm run install-campusPolice
+    - npm run build-campusPolice
+  rules:
+    - changes: 
+      - api/campusPolice/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:registrarAPI:
+  stage: build
+  script:
+    - npm run install-registrar
+    - npm run build-registrar
+  rules:
+    - changes: 
+      - api/registrar/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+build:payrollAPI:
+  stage: build
+  script:
+    - npm run install-payroll
+    - npm run build-payroll
+  rules:
+    - changes: 
+      - api/payroll/**/*
+      - package.json
+      - .gitlab-ci.yml
+
 build:enforcement:
   stage: build
   script:
@@ -293,6 +359,36 @@ build:pictureService:
       - package.json
       - .gitlab-ci.yml
 
+
+test:campusPoliceAPI:
+  stage: test
+  script:
+    - cd api/campusPolice && npm install && npm test
+  rules:
+    - changes: 
+      - api/campusPolice/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+test:registrarAPI:
+  stage: test
+  script:
+    - cd api/registrar && npm install && npm test
+  rules:
+    - changes: 
+      - api/registrar/**/*
+      - package.json
+      - .gitlab-ci.yml
+
+test:payrollAPI:
+  stage: test
+  script:
+    - cd api/payroll && npm install && npm test
+  rules:
+    - changes: 
+      - api/payroll/**/*
+      - package.json
+      - .gitlab-ci.yml
 
 test:enforcement:
   script:

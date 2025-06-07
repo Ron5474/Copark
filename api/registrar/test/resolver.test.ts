@@ -53,8 +53,14 @@ test('Registrar cannot look up employee outstanding ticket if /auth/check fails'
     .expect(401)
 })
 
+test('GET /docs page swagger UI returns 404', async () => {
+  await supertest(server)
+    .get(`/api/v0/docs/`)
+    .expect(404)
+})
 
 test('GET /docs page swagger UI', async () => {
+  process.env.API_DOCS = 'true' //enable docs for test
   await supertest(server)
     .get(`/api/v0/docs/`)
     .expect(200)

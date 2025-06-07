@@ -5,7 +5,6 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/lib/AuthConfig";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getLocale } from "next-intl/server";
 
 export async function getUser(): Promise<Session|undefined> {
   const session = await getServerSession(authOptions);
@@ -16,6 +15,7 @@ export async function getUser(): Promise<Session|undefined> {
 }
 
 export async function Payment(
+  locale: string,
   paymentType: string,
   item: string,
   amount: number,
@@ -38,7 +38,7 @@ export async function Payment(
       description: description,
       image: image,
       currency: currency,
-      locale: await getLocale()
+      locale: locale
     }),
   })
   

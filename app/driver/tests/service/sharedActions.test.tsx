@@ -1,4 +1,4 @@
-import { vi, it, expect } from 'vitest';
+import { vi, it, expect, type Mock } from 'vitest';
 import * as actions from '@/app/[locale]/shared/actions';
 import {http, HttpHandler, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
@@ -15,6 +15,24 @@ function payment(server: { use: (...handlers: HttpHandler[]) => void; listen: ()
     })
   )
     };
+
+
+vi.mock('next-auth/next', () => ({
+  getServerSession: vi.fn().mockResolvedValue({
+    user: {
+      id: '12345',
+      name: 'Test User',
+      email: 'hello',
+    },
+    expires: '2023-10-01T00:00:00.000Z',
+    csrfToken: 'mock-csrf-token-123',
+  }),
+}));
+
+vi.mock('next/navigation', () => ({
+  getLocale: () => 'en',
+  redirect: vi.fn()
+}));
 
 vi.mock('@/i18n/navigation', () => {
   const mockRedirect = vi.fn();
@@ -50,11 +68,44 @@ vi.mock('next/headers', () => {
 it('Should initiate payment successfully', async () => {
   payment(server);
   server.listen();
-  const { redirect } = await import('@/i18n/navigation');
+  const { redirect } = await import('next/navigation');
 
-  await actions.Payment('permit', '12345', 500, 'some description', 'USD');
-  expect(redirect).toHaveBeenCalledWith({
-    href: 'https://mocked-payment-url.com',
-    locale: 'en'
-  });
+  await actions.Payment('en', 'permit', '12345', 500, 'some description', 'USD');
+  expect(redirect).toHaveBeenCalledWith('https://mocked-payment-url.com');
 });
+
+it('getUser should return user data', async () => {
+ vi.mock('next-auth/next', () => ({
+    getServerSession: vi.fn().mockResolvedValue({
+      user: {
+        id: '12345',
+        name: 'Test User',
+        email: 'hello',
+      },
+      expires: '2023-10-01T00:00:00.000Z',
+      csrfToken: 'mock-csrf-token-123',
+    }),
+  }));
+
+  server.listen();
+  const user = await actions.getUser();
+  
+  expect(user).toEqual({
+    user: {
+    id: '12345',
+    name: 'Test User',
+    email: 'hello'
+  },
+    expires: expect.any(String),
+    csrfToken: 'mock-csrf-token-123',
+  });
+})
+
+it('getUser should return null if no user is found', async () => {
+  const { getServerSession } = await import('next-auth/next');
+ (getServerSession as Mock).mockResolvedValue(null);
+  server.listen();
+  const user = await actions.getUser();
+  
+  expect(user).toBeUndefined();
+})

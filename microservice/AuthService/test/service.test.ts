@@ -160,6 +160,15 @@ test('AuthService Check() works fine with correct admin JWT', async () => {
   expect((new_user as SessionUser).id).toMatch(uuidRegex)
 })
 
+// test('AuthService Check() driver using admin token', async () => {
+//   // eslint-disable-next-line @typescript-eslint/no-empty-function
+//   vi.spyOn(console, 'error').mockImplementation(() => {})
+//   // eslint-disable-next-line @typescript-eslint/no-empty-function
+//   vi.spyOn(console, 'log').mockImplementation(() => {})
+//   const user = await new AuthService().authenticate(admin)
+//   await expect(new AuthService().check(`Bearer ${user}`, ["police"])).rejects.toThrow('Unauthorized3')
+// })
+
 test('AuthService Check() throws error for invalid driver', async () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, 'error').mockImplementation(() => {})

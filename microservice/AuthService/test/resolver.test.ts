@@ -15,7 +15,7 @@ import * as http from 'http'
 import { SignJWT } from 'jose'
 
 import db from './db'
-import app from '../src/app'
+import { app } from '../src/app'
 
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET)
 let server: http.Server

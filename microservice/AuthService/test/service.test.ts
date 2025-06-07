@@ -17,6 +17,8 @@ import { OauthUser, SessionUser } from '../src'
 import { OauthLoginData } from '../src/auth'
 import { pool } from '../src/auth/db'
 
+import { AuthController } from '../src/auth/api';
+
 vi.mock('server-only', () => ({}))
 
 const driver: OauthLoginData = {
@@ -75,6 +77,24 @@ test('OAuth user with id throws error', async () => {
   vi.spyOn(console, 'error').mockImplementation(() => {})
   await expect(new AuthService().driverSignup(fake_driver)).rejects.toThrow('Unauthorized')
 })
+
+test('returns 400 if decryptOauth returns undefined', async () => {
+  // Arrange
+  const controller = new AuthController();
+
+  // Mock decryptOauth to return undefined
+  vi.spyOn(AuthService.prototype, 'decryptOauth').mockResolvedValueOnce(undefined);
+
+  // Spy on setStatus to verify it was called with 400
+  const setStatusSpy = vi.spyOn(controller, 'setStatus' as any); // if setStatus is protected/private
+
+  // Act
+  const result = await controller.driverSignup({ authToken: 'invalid.token' });
+
+  // Assert
+  expect(result).toBeUndefined();
+  expect(setStatusSpy).toHaveBeenCalledWith(400);
+});
 
 test('OAuth User unauthorized if pool.query fails', async () => {
   const auth = new AuthService()

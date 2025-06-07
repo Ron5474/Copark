@@ -40,4 +40,5 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next: NextFunction) 
 }
 app.use(errorHandler)
 
-export default app
+// export default app
+export { app }

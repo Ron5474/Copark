@@ -47,9 +47,6 @@ stages:
   - conatainerize
   - deploy
 
-# default:
-#   allow_failure: false
-
 lint:enforcement:
   stage: quality
   script:

@@ -8,11 +8,12 @@ import Paper from '@mui/material/Paper'
 import { Payment } from '../shared/actions'
 import { useTicketState } from './TicketContext'
 import theme from '../theme'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 
 export default function IndividualTicketButtons() {
   const { currentTicket, setCurrentView } = useTicketState()
   const t = useTranslations('ticket')
+  const locale = useLocale();
 
   const handleViewChange = (view: string) => {
     setCurrentView(view)
@@ -31,7 +32,7 @@ export default function IndividualTicketButtons() {
     }
     sessionStorage.setItem('paymentDetails', JSON.stringify(paymentDetails))
     sessionStorage.setItem('ticketDetails', JSON.stringify(permitDetails))
-    await Payment("ticket", "Ticket Payment", amount, `Payment for Ticket ${currentTicket?.id.substring(0, 5)}`, "USD")
+    await Payment(locale, "ticket", "Ticket Payment", amount, `Payment for Ticket ${currentTicket?.id.substring(0, 5)}`, "USD")
   }
 
   return (

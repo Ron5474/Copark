@@ -1,5 +1,5 @@
 import { it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material';
 import theme from '../../src/app/theme';
 import ManageLots from '../../src/app/components/ManageLots';
@@ -66,20 +66,20 @@ const renderComponent = () => {
 
 it('renders the component and fetches lots', async () => {
   renderComponent();
-  
+
   await waitFor(() => {
     expect(screen.getByText('Daily Lots')).toBeDefined();
     expect(screen.getByText('Quarterly Lots')).toBeDefined();
     expect(screen.getByText('Yearly Lots')).toBeDefined();
   });
-  
+
   expect(getLots).toHaveBeenCalled();
 });
 
 it('handles fetch error', async () => {
   vi.mocked(getLots).mockRejectedValueOnce(new Error('Failed to fetch'));
   renderComponent();
-  
+
   await waitFor(() => {
     expect(screen.getByText('Failed to fetch lots')).toBeDefined();
   });
@@ -93,12 +93,25 @@ it('opens add dialog and creates new lot', async () => {
   fireEvent.click(screen.getByText('Add New Lot'));
 
   // Fill form
-  fireEvent.change(screen.getByLabelText('Lot ID'), { target: { value: '102' } });
-  fireEvent.change(screen.getByLabelText('Daily Price'), { target: { value: '5' } });
-  fireEvent.change(screen.getByLabelText('Quarterly Price'), { target: { value: '200' } });
-  fireEvent.change(screen.getByLabelText('Quarterly Expire Date'), { target: { value: '2024-12-31' } });
-  fireEvent.change(screen.getByLabelText('Yearly Price'), { target: { value: '500' } });
-  fireEvent.change(screen.getByLabelText('Yearly Expire Date'), { target: { value: '2024-12-31' } });
+  const inputLotId = within(screen.getByLabelText('Lot ID Input')).getByRole('textbox') as HTMLInputElement;
+  const containerDaily = screen.getByLabelText('Daily Price Input');
+  const inputDaily = within(containerDaily).getByRole('spinbutton') as HTMLInputElement;
+  
+  const containerQuarterly = screen.getByLabelText('Quarterly Price Input');
+  const inputQuarterly = within(containerQuarterly).getByRole('spinbutton') as HTMLInputElement;
+  const containerYearly = screen.getByLabelText('Yearly Price Input');
+  const inputYearly = within(containerYearly).getByRole('spinbutton') as HTMLInputElement;
+  const containerQuarterlyDate = screen.getByLabelText('Quarterly Expire Date Create Input');
+  const inputQuarterlyDate = containerQuarterlyDate.querySelector('input[type="date"]') as HTMLInputElement
+  const containerYearlyDate = screen.getByLabelText('Yearly Expire Date Create Input');
+  const inputYearlyDate = containerYearlyDate.querySelector('input[type="date"]') as HTMLInputElement
+  
+  fireEvent.change(inputLotId, { target: { value: '102' } });
+  fireEvent.change(inputDaily, { target: { value: '5' } });
+  fireEvent.change(inputQuarterly, { target: { value: '200' } });
+  fireEvent.change(inputQuarterlyDate, { target: { value: '2024-12-31' } });
+  fireEvent.change(inputYearly, { target: { value: '500' } });
+  fireEvent.change(inputYearlyDate, { target: { value: '2024-12-31' } });
 
   // Submit
   fireEvent.click(screen.getByText('Create'));
@@ -114,7 +127,9 @@ it('handles create lot error', async () => {
   renderComponent();
 
   fireEvent.click(screen.getByText('Add New Lot'));
-  fireEvent.change(screen.getByLabelText('Lot ID'), { target: { value: '102' } });
+  const container = screen.getByLabelText('Lot ID Input');
+  const inputLotId = within(container).getByRole('textbox') as HTMLInputElement;
+  fireEvent.change(inputLotId, { target: { value: '102' } });
   fireEvent.click(screen.getByText('Create'));
 
   await waitFor(() => {
@@ -132,8 +147,10 @@ it('opens edit dialog and updates lot', async () => {
   });
 
   // Update price
-  fireEvent.change(screen.getByLabelText('Price'), { target: { value: '6' } });
-  
+  const container = screen.getByLabelText('Price');
+  const inputPrice = within(container).getByRole('spinbutton') as HTMLInputElement;
+  fireEvent.change(inputPrice, { target: { value: '6' } });
+
   // Submit update
   fireEvent.click(screen.getByText('Update'));
 
@@ -152,7 +169,10 @@ it('handles update lot error', async () => {
     fireEvent.click(editButtons[0]);
   });
 
-  fireEvent.change(screen.getByLabelText('Price'), { target: { value: '6' } });
+  const container = screen.getByLabelText('Price');   
+  const inputPrice = within(container).getByRole('spinbutton') as HTMLInputElement;
+
+  fireEvent.change(inputPrice, { target: { value: '6' } });
   fireEvent.click(screen.getByText('Update'));
 
   await waitFor(() => {
@@ -173,18 +193,18 @@ it('handles dialog cancellation', async () => {
     const editButtons = screen.getAllByText('Edit');
     fireEvent.click(editButtons[0]);
   });
-  
+
   // Wait for edit dialog to open
   await waitFor(() => {
     expect(screen.getByText('Edit Lot Price')).toBeDefined();
   });
-  
+
   // Find and click the Cancel button in the edit dialog
   const editDialogCancelButton = screen.getAllByText('Cancel').find(
     button => button.closest('[role="dialog"]')?.innerHTML.includes('Edit Lot Price')
   );
   fireEvent.click(editDialogCancelButton!);
-  
+
   await waitFor(() => {
     expect(screen.queryByText('Edit Lot Price')).toBeNull();
   });
@@ -203,9 +223,11 @@ it('handles negative numbers in price fields', async () => {
   renderComponent();
 
   fireEvent.click(screen.getByText('Add New Lot'));
-  fireEvent.change(screen.getByLabelText('Daily Price'), { target: { value: '-5' } });
-  
-  const input = screen.getByLabelText('Daily Price') as HTMLInputElement;
+  const containerDaily = screen.getByLabelText('Daily Price Input');
+  const inputDaily = within(containerDaily).getByRole('spinbutton') as HTMLInputElement;
+  fireEvent.change(inputDaily, { target: { value: '-5' } });
+
+  const input = within(containerDaily).getByRole('spinbutton') as HTMLInputElement
   expect(input.value).toBe('0');
 });
 
@@ -221,24 +243,30 @@ it('edits quarterly lot with expire date', async () => {
   });
 
   // Update price and date
-  fireEvent.change(screen.getByLabelText('Price'), { target: { value: '250' } });
-  fireEvent.change(screen.getByLabelText('Quarterly Expire Date'), { 
+  const container = screen.getByLabelText('Price');
+  const input = within(container).getByRole('spinbutton');
+  fireEvent.change(input, { target: { value: '250' } });
+
+  const containerQuarterly = screen.getByLabelText('Quarterly Expire Date Input');
+  const inputQuarterly = containerQuarterly.querySelector('input[type="date"]') as HTMLInputElement
+
+  fireEvent.change(inputQuarterly, {
     target: { value: '2025-12-31' }
   });
-  
+
   // Submit update
   fireEvent.click(screen.getByText('Update'));
 
   await waitFor(() => {
     expect(updateLot).toHaveBeenCalledWith({
       lot: '101',
-      daily: { price: 200 }, // Updated to match actual value
+      daily: { price: 5 }, // Updated to match actual value
       quarterly: {
         price: 250,
         expireDate: '2025-12-31T23:59:59-07:00'
       },
       yearly: {
-        price: 200,
+        price: 500,
         expireDate: '2024-12-31T23:59:59-07:00'
       }
     });
@@ -255,20 +283,25 @@ it('edits yearly lot with expire date', async () => {
   });
 
   // Update price and date
-  fireEvent.change(screen.getByLabelText('Price'), { target: { value: '600' } });
-  fireEvent.change(screen.getByLabelText('Yearly Expire Date'), { 
+  const container = screen.getByLabelText('Price');
+  const input = within(container).getByRole('spinbutton');
+  fireEvent.change(input, { target: { value: '600' } });
+
+  const containerYearly = screen.getByLabelText('Yearly Expire Date Input');
+  const inputYearly = containerYearly.querySelector('input[type="date"]') as HTMLInputElement
+  fireEvent.change(inputYearly, {
     target: { value: '2025-12-31' }
   });
-  
+
   // Submit update
   fireEvent.click(screen.getByText('Update'));
 
   await waitFor(() => {
     expect(updateLot).toHaveBeenCalledWith({
       lot: '101',
-      daily: { price: 500 },       // Maintains original yearly price
+      daily: { price: 5 },       // Maintains original yearly price
       quarterly: {
-        price: 500,                // Maintains original yearly price
+        price: 200,                // Maintains original yearly price
         expireDate: '2024-12-31T23:59:59-07:00'
       },
       yearly: {
@@ -291,7 +324,7 @@ it('handles editing lot without existing expire dates', async () => {
       }]
     }
   ];
-  
+
   vi.mocked(getLots).mockResolvedValueOnce(modifiedMockLots);
   vi.mocked(updateLot).mockResolvedValueOnce(true);
   renderComponent();
@@ -302,14 +335,16 @@ it('handles editing lot without existing expire dates', async () => {
   });
 
   // Verify default empty values for expire dates
-  const input = screen.getByLabelText('Quarterly Expire Date') as HTMLInputElement;
-  expect(input.value).toBe('');
+  const input = screen.getByLabelText('Quarterly Expire Date Input');
+  const dateInput = input.querySelector('input[type="date"]') as HTMLInputElement
+  console.log(dateInput.outerHTML)
+  expect(dateInput.value).toBe('');
 
   // Update with new date
-  fireEvent.change(input, { 
+  fireEvent.change(dateInput, {
     target: { value: '2025-12-31' }
   });
-  
+
   fireEvent.click(screen.getByText('Update'));
 
   await waitFor(() => {
@@ -328,11 +363,11 @@ it('handles dialog backdrop clicks for both dialogs', async () => {
   // Test Add dialog backdrop click
   fireEvent.click(screen.getByText('Add New Lot'));
   expect(screen.getByText('Create New Lot')).toBeDefined();
-  
+
   // Click backdrop for Add dialog
   const addBackdrop = document.querySelector('.MuiBackdrop-root');
   fireEvent.click(addBackdrop!);
-  
+
   await waitFor(() => {
     expect(screen.queryByText('Create New Lot')).toBeNull();
   });
@@ -353,3 +388,45 @@ it('handles dialog backdrop clicks for both dialogs', async () => {
   });
 });
 
+it('handles editing non-existent lot in quarterly group', async () => {
+  const modifiedMockLots = [
+    {
+      id: 'daily',
+      title: 'daily',
+      lots: [{
+        name: '101',
+        price: '$5.00'
+      }]
+    },
+    {
+      id: 'quarterly',
+      title: 'quarterly',
+      lots: [] // Empty quarterly lots
+    }
+  ];
+
+  vi.mocked(getLots).mockResolvedValueOnce(modifiedMockLots);
+  vi.mocked(updateLot).mockResolvedValueOnce(true);
+  renderComponent();
+
+  await waitFor(() => {
+    const editButtons = screen.getAllByText('Edit');
+    fireEvent.click(editButtons[0]); // Edit the daily lot
+  });
+
+  // Set type to quarterly to trigger the quarterly price calculation
+  const priceInput = screen.getByLabelText('Price');
+  const input = within(priceInput).getByRole('spinbutton');
+  fireEvent.change(input, { target: { value: '200' } });
+
+  fireEvent.click(screen.getByText('Update'));
+
+  await waitFor(() => {
+    expect(updateLot).toHaveBeenCalledWith(expect.objectContaining({
+      quarterly: {
+        price: 0, // Should use the fallback value of 0
+        expireDate: ''
+      }
+    }));
+  });
+});

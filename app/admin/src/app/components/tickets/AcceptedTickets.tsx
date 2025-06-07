@@ -51,11 +51,15 @@ export function AcceptedTickets({ tickets, error }: AcceptedTicketsProps) {
         pr: 2,
         py: 2
       }}>
-        <Typography sx={{ mb: 2 }}>Accepted Tickets: {tickets.length}</Typography>
+        <Typography 
+          sx={{ mb: 2 }}
+          data-testid="ticket-count"
+        >Accepted Tickets: {tickets.length}</Typography>
         <List sx={{ overflowY: 'auto', maxHeight: '100%' }}>
           {tickets.map((ticket) => (
             <ListItem
               key={ticket.id}
+              data-testid="vehicle-id"
               onClick={() => setSelectedTicket(ticket)}
               sx={{
                 cursor: 'pointer',
@@ -78,6 +82,7 @@ export function AcceptedTickets({ tickets, error }: AcceptedTicketsProps) {
                     </Typography>
                     <Chip
                       label="ACCEPTED"
+                      data-testid="status-chip"
                       size="small"
                       sx={{
                         bgcolor: theme.palette.success.main,

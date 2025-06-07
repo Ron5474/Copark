@@ -77,63 +77,84 @@ export class APIUser {
   accountStatus!: string
 }
 
-// @ObjectType()
-// export class Ticket {
-//   @Field(() => ID)
-//   id!: string;
+@ObjectType()
+export class ViolationBreakdown {
+  @Field(() => String)
+  violation!: string;
 
-//   @Field(() => String)  
-//   vehicle!: string;
+  @Field(() => Number)
+  count!: number;
+}
 
-//   @Field(() => String)  
-//   enforcer!: string;
+@ObjectType()
+export class EnforcerBreakdown {
+  @Field(() => String)
+  enforcer!: string;
 
-//   @Field(() => Date)  
-//   issuedDate!: Date;
+  @Field(() => Number)
+  count!: number;
+}
 
-//   @Field(() => String)  
-//   violation!: string;
 
-//   @Field(() => Number)  
-//   fine!: number;
+@ObjectType()
+export class TicketReport {
+  @Field(() => Number)
+  totalTickets!: number;
 
-//   @Field(() => String)  
-//   ticketStatus!: string;
+  @Field(() => Number)
+  unpaidTickets!: number;
 
-//   @Field(() => String, { nullable: true })  
-//   images?: string;
+  @Field(() => Number)
+  paidTickets!: number;
 
-//   @Field(() => String, { nullable: true })
-//   note?: string;
-// }
+  @Field(() => Number)
+  totalRevenue!: number;
 
-// @ObjectType()
-// export class Permit {
+  @Field(() => [ViolationBreakdown])
+  violationBreakdown!: ViolationBreakdown[];
 
-//   @Field(() => String)
-//   vehicle!: string
+  @Field(() => [EnforcerBreakdown])
+  enforcerBreakdown!: EnforcerBreakdown[];
+}
 
-//   @Field(() => String)
-//   type!: string
+@ObjectType()
+export class ZoneStats {
+  @Field(() => String)
+  area!: string
 
-//   @Field(() => String)
-//   area!: string
+  @Field(() => Number)
+  totalPermits!: number
+}
 
-//   @Field(() => String)
-//   activeDate!: string
+@ObjectType()
+export class LotStats {
+  @Field(() => String)
+  area!: string
 
-//   @Field(() => String)
-//   expireDate!: string
-// }
+  @Field(() => String)
+  durationType!: string
 
-// @ObjectType()
-// export class ReportDay {
-//   @Field(() => String)
-//   date!: string;
+  @Field(() => Number)
+  totalPermits!: number
+}
 
-//   @Field(() => [Ticket])
-//   tickets?: Ticket[];
+@ObjectType()
+export class PermitReport {
+  @Field(() => Number)
+  totalPermits!: number
 
-//   @Field(() => [Permit])
-//   permits?: Permit[];
-// }
+  @Field(() => Number)
+  activePermits!: number
+
+  @Field(() => Number)
+  expiredPermits!: number
+
+  @Field(() => Number)
+  totalRevenue!: number
+
+  @Field(() => [ZoneStats])
+  zoneBreakdown!: ZoneStats[]
+
+  @Field(() => [LotStats])
+  lotBreakdown!: LotStats[]
+}

@@ -1,9 +1,10 @@
-import {test, expect, beforeAll, afterAll, beforeEach} from 'vitest'
+import {test, expect, beforeAll, afterAll, beforeEach, vi} from 'vitest'
 // @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 import * as http from 'http'
 import db from './db'
 
+import * as authService from '../src/payment/auth'
 import authApp from '../../AuthService/src/app'
 import { app } from '../src/app'
 import { SignJWT } from 'jose'
@@ -57,6 +58,7 @@ afterAll(() => {
   authServer.close()
 })
 
+// const validJWT = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkcml2ZXItaWQtMTIzIiwiZW1haWwiOiJkcml2ZXJAYm9va3MuY29tIiwicGljdHVyZSI6Imh0dHBzOi8vd3d3Lmdvb2dsZS5jb20vaW1nIiwibmFtZSI6IkZha2UgRHJpdmVyIiwiaWF0IjoxNzQ2ODM2ODUzLCJleHAiOjE5MDQ2MjQ4NTN9.YipxWgvsQIRpjSoIbnNla741EI1klV5Fkf2A5mlhpMY"
 const invalidDriverJWT = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyMGVjMDYxLTI5NTctNGMzYi1iMTkzLWM4YjQwMTM4ZThmMSIsImlhdCI6MTc0NzA2NzM2NSwiZXhwIjoxOTA0ODU1MzY1fQ.pPIDRd0PtW97OkgD03LqeS9LI9TCRq7CwXpoDdM7K3k"
 
 async function signupAsDriver(): Promise<string> {
@@ -104,6 +106,12 @@ async function login(): Promise<string | undefined> {
 
     return token
   }
+
+test('Get docs page', async () => {
+    await supertest(server)
+      .get('/api/v0/docs/')
+      .expect(200)
+})
 
 test('Post /api/v0/payment/pay - should return 302', async () => {
   const token = await login()
@@ -212,4 +220,22 @@ test('Post /api/v0/payment/complete - same transaction twice returns 200', async
     })
 
   expect(secondResponse.status).toBe(200)
+})
+
+test('Throw Internal Server Error', async () => {
+    vi.spyOn(authService.AuthService.prototype, 'check').mockImplementation(() => {
+        throw new Error()
+    })
+  
+    const token = await login();
+    await supertest(app)
+      .post('/api/v0/payment/complete')
+      .set('Authorization', `${token}`)
+      .send(sessionDetails)
+      .expect(500)
+    // await supertest(server)
+    //   .post('/api/v0/auth/check')
+    //   .set('Authorization', `Bearer ${validJWT}`)
+    //   .send(["driver"])
+    //   .expect(500)
 })

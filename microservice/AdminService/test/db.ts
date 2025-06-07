@@ -6,11 +6,11 @@ import { resolve } from 'path'
 
 dotenv.config({ path: resolve(__dirname, '../../../.env') })
 
-process.env.POSTGRES_PORT = '5433'
+process.env.POSTGRES_PORT = '5432'
 
 const pool = new Pool({
-  host: 'localhost',
-  port: 5433,
+  host: process.env.POSTGRES_HOST,
+  port: 5432,
   database: process.env.POSTGRES_DB,
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
@@ -37,8 +37,8 @@ const run = async (file: string) => {
       // }
 
       currentPool = new Pool({
-        host: 'localhost',
-        port: 5433,
+        host: process.env.POSTGRES_HOST,
+        port: 5432,
         database: newDb,
         user: process.env.POSTGRES_USER,
         password: process.env.POSTGRES_PASSWORD,

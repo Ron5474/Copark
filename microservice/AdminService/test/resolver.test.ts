@@ -1,5 +1,4 @@
 import { test, beforeAll, afterAll, expect } from 'vitest'
-// @ts-ignore
 import supertest from 'supertest'
 import * as http from 'http'
 import killPort from 'kill-port'
@@ -44,7 +43,7 @@ beforeAll(async () => {
   // Force kill anything on AUTH_PORT
   try {
     await killPort(AUTH_PORT)
-  } catch (error) {
+  } catch {
     console.log(`No process was running on port ${AUTH_PORT}`)
   }
 
@@ -412,15 +411,19 @@ test('Admin can generate a report with ticket and permit summary', async () => {
   const token = await loginAsAdmin();
 
   const query = `
-    query {
-      generateReport(numDays: 30)
+    query GenerateReport($input: ReportDays!) {
+      generateReport(input: $input)
     }
   `;
+
+  const variables = {
+    input: { days: 30 }
+  };
 
   const response = await supertest(server)
     .post('/graphql')
     .set('Authorization', 'Bearer ' + token)
-    .send({ query })
+    .send({ query, variables })
     .expect(200);
 
   expect(response.body.errors).toBeUndefined();

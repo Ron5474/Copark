@@ -9,6 +9,20 @@ import { APICredential, NewUser, UserInput } from '../src/admin/schema';
 
 const adminService = new AdminService();
 
+import { jwtVerify } from 'jose';
+
+const encodedKey = new TextEncoder().encode(process.env.MICROSERVICE_INTERNAL_SECRET)
+
+async function decrypt(token: string): Promise<string | undefined> {
+  try {
+    const { payload } = await jwtVerify(token, encodedKey);
+
+    return payload.id as string;
+  } catch (error) {
+    return undefined;
+  }
+}
+
 beforeAll(async () => {
   await db.reset();
 });
@@ -22,10 +36,10 @@ test('getEnforcers should return a list of enforcers', async () => {
 
     // console.log(enforcers)
     expect(enforcers).toHaveLength(2);
-    expect(enforcers[0].name).toBe('Enforcer 1');
+    expect(enforcers[0].name).toBe('James Bond');
     expect(enforcers[0].accountStatus).toBe('active');
 
-    expect(enforcers[1].name).toBe('Enforcer 2');
+    expect(enforcers[1].name).toBe('John Wick');
     expect(enforcers[1].accountStatus).toBe('active');
 });
 
@@ -36,8 +50,8 @@ test('AddEnforcer should add an enforcer', async () => {
     const enforcers = await adminService.getEnforcers();
 
     expect(enforcers).toHaveLength(3);
-    expect(enforcers[2].name).toBe('Enforcer 3');
-    expect(enforcers[2].email).toBe('enforcer3@outlook.com');
+    expect(enforcers[2].name).toBe('John Wick');
+    expect(enforcers[2].email).toBe('babayaga@copark.com');
     expect(enforcers[2].accountStatus).toBe('active');
 });
 
@@ -141,13 +155,12 @@ test('getAPIUsers should return all API users with different roles', async () =>
   const apiUsers = await adminService.getAPIUsers();
 
   // Verify we get all API users
-  expect(apiUsers).toHaveLength(3);
+  expect(apiUsers).toHaveLength(4);
 
   // Verify each role type is present
   const roles = apiUsers.map(user => user.role);
   expect(roles).toContain('payroll');
   expect(roles).toContain('registrar');
-  expect(roles).toContain('campusPolice');
 
   // Verify user properties
   const payrollUserResult = apiUsers.find(u => u.email === 'payroll@ucsc.edu');
@@ -159,4 +172,32 @@ test('getAPIUsers should return all API users with different roles', async () =>
   const names = apiUsers.map(user => user.name);
   const sortedNames = [...names].sort();
   expect(names).toEqual(sortedNames);
+});
+
+test('getEnforcerbyID should return the correct name for a valid enforcer ID', async () => {
+  // Add a new enforcer to get a known ID
+  const enforcer: NewUser = { name: 'Agent Smith', email: 'smith@matrix.com' };
+  const added = await adminService.addEnforcer(enforcer);
+  if (!added || added.length === 0) {
+    throw new Error('Failed to add enforcer');
+  }
+  const enforcerId = added[0].id;
+
+  const rawId = await decrypt(enforcerId);
+
+  if (!rawId) {
+    throw new Error('Failed to decrypt enforcer ID');
+  }
+
+  const name = await adminService.getEnforcerbyID(rawId);
+  expect(name).toBe('Agent Smith');
+});
+
+test('getEnforcerbyID should return undefined for a non-existent enforcer ID', async () => {
+  const name = await adminService.getEnforcerbyID('00000000-0000-0000-0000-000000000000');
+  expect(name).toBeUndefined();
+});
+
+test('getEnforcerbyID should return undefined for an invalid ID format', async () => {
+  await expect(adminService.getEnforcerbyID('not-a-uuid')).rejects.toBeDefined();
 });

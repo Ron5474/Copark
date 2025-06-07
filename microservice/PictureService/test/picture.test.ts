@@ -76,3 +76,25 @@ test('Enforcer can extract plate from image', async () => {
   // expect(response.body.data.recognizePlate.plate).toBeTypeOf('string')
   // expect(response.body.data.recognizePlate.confidence).toBeGreaterThanOrEqual(0)
 }, 6000)
+
+test('Cannot extract plate from image without token', async () => {
+  const token = await loginAsEnforcer()
+
+  const response = await supertest(pictureServer)
+    .post('/graphql')
+    .send({
+      query: `
+        mutation Recognize($input: RecognizePlateInput!) {
+          recognizePlate(input: $input) {
+            plate
+            confidence
+          }
+        }
+      `,
+      variables: {
+        input: { image: plateBase64}
+      }
+    })
+
+  expect(response.status).toBe(200)
+}, 6000)

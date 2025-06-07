@@ -1,5 +1,4 @@
 import { test, beforeAll, beforeEach, afterAll, expect } from 'vitest'
-// @ts-expect-error: supertest types may not match expected types in this context
 import supertest from 'supertest'
 import * as http from 'http'
 import { SignJWT } from 'jose'
@@ -254,7 +253,7 @@ test('Admin can get all tickets', async () => {
     .send({ query })
     .expect(200)
   expect(response.body.errors).toBeUndefined()
-  expect(response.body.data.getTickets.length).toBe(16)
+  expect(response.body.data.getTickets.length).toBe(17)
 })
 
 test('Admin can modify a ticket with images', async () => {

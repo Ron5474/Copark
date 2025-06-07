@@ -12,7 +12,6 @@ const getAuthToken = async () => {
 }
 
 export const getVehicles = async (): Promise<Vehicle[]> => {
-  try {
     const token = await getAuthToken()
 
     const response = await fetch(API_URL, {
@@ -44,14 +43,9 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
     }
 
     return result.data.myVehicles
-  } catch (error) {
-    console.error('Error fetching vehicles:', error)
-    throw error
-  }
 }
 
 export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
-  try {
     const token = await getAuthToken()
 
     const response = await fetch(API_URL, {
@@ -89,14 +83,9 @@ export const addVehicle = async (vehicle: Vehicle): Promise<Vehicle> => {
     }
 
     return result.data.registerVehicle
-  } catch (error) {
-    console.error('Error adding vehicle:', error)
-    throw error
-  }
 }
 
 export const editVehicle = async (vehicleEdit: EditVehicle): Promise<Vehicle> => {
-  try {
     const token = await getAuthToken()
 
     const response = await fetch(API_URL, {
@@ -130,14 +119,9 @@ export const editVehicle = async (vehicleEdit: EditVehicle): Promise<Vehicle> =>
     }
 
     return result.data.registerVehicle
-  } catch (error) {
-    console.error('Error editing vehicle:', error)
-    throw error
-  }
 }
 
 export const deleteVehicle = async (plate: string, state?: string): Promise<boolean|ErrorResponse> => {
-  try {
     if (!plate || !state) {
       throw new Error('Plate and state are required to delete a vehicle')
     }
@@ -173,17 +157,10 @@ export const deleteVehicle = async (plate: string, state?: string): Promise<bool
       }
     }
 
-    return result.data.registerVehicle
-  } catch (error) {
-    return {
-      message: error instanceof Error ? error.message : 'Failed to delete vehicle',
-      type: 'error'
-    }
-  }
+    return result.data.deleteVehicle
 }
 
 export async function updateDefaultVehicle(vehicleId: string): Promise<Vehicle> {
-  try {
     const token = await getAuthToken()
 
     const response = await fetch(API_URL, {
@@ -214,10 +191,6 @@ export async function updateDefaultVehicle(vehicleId: string): Promise<Vehicle> 
     }
 
     return result.data.updateDefaultVehicle
-  } catch (error) {
-    console.error('Error updating default vehicle:', error)
-    throw error
-  }
 }
 
 export async function getDefaultVehicle(): Promise<Vehicle | null> {

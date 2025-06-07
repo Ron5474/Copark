@@ -357,6 +357,7 @@ build:pictureService:
       - .gitlab-ci.yml
 
 setup-db:
+  stage: setup-db
   script:
     - apt-get update && apt-get install -y postgresql-client
     - until pg_isready -h postgres -p 5432; do sleep 1; done
@@ -370,7 +371,7 @@ setup-db:
     - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/VehicleService/sql/schema.sql"
     - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/VehicleService/sql/data.sql"
     - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/TicketService/sql/databases.sql"
-    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "../microservice/TicketService/sql/schema.sql"
+    - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/TicketService/sql/schema.sql"
     - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/TicketService/sql/data.sql"
     - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/PermitService/sql/databases.sql"
     - PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U "$POSTGRES_USER" -d postgres -f "./microservice/PermitService/sql/schema.sql"

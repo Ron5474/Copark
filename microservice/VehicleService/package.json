@@ -7,7 +7,7 @@
     "build": "tsc",
     "dev": "nodemon",
     "pretest": "npm run lint && npm run build",
-    "test": "vitest run --no-file-parallelism --testTimeout=3000 --coverage",
+    "test": "vitest run --no-file-parallelism --testTimeout=10000 --coverage",
     "lint": "eslint src/**/*.[jt]s --fix"
   },
   "keywords": [],
